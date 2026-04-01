@@ -1,8 +1,10 @@
 name: Sync release/10.0 → bazel
 
 on:
+  push:
+    branches: [ bazel ]
   schedule:
-    - cron: '0 6 * * *'  # Daily at 6:00 UTC
+    - cron: '0 * * * *'  # Hourly
   workflow_dispatch:
     inputs:
       skip_copilot_fix:
