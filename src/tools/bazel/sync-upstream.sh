@@ -347,8 +347,10 @@ else
     full_body=$(printf '%s' "$header" && cat "$report_file")
     echo "$full_body" > "$report_file"
 
+    # Use GH_PR_TOKEN if available so the PR triggers pull_request workflows.
+    # PRs created with GITHUB_TOKEN don't fire events (GitHub security feature).
     # shellcheck disable=SC2086
-    pr_url=$(gh pr create \
+    pr_url=$(GH_TOKEN="${GH_PR_TOKEN:-$GH_TOKEN}" gh pr create \
         --repo "$REPO" \
         --base "$BASE_BRANCH" \
         --head "$branch" \

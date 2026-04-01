@@ -56,10 +56,18 @@ jobs:
       - name: Install Paket
         run: dotnet tool install -g paket --add-source https://api.nuget.org/v3/index.json
 
+      - name: Generate App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.SYNC_APP_ID }}
+          private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+
       - name: Run sync
         id: run-sync
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PR_TOKEN: ${{ steps.app-token.outputs.token }}
         run: >-
           chmod +x src/tools/bazel/sync-upstream.sh src/tools/bazel/detect-upstream-changes.sh &&
           src/tools/bazel/sync-upstream.sh
