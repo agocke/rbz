@@ -47,7 +47,7 @@ jobs:
           sudo apt-get install -qq -y clang-18 lld libkrb5-dev liblttng-ust-dev
 
       - name: Restore Bazel cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.cache/bazel-disk
           key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
@@ -63,7 +63,7 @@ jobs:
 
       - name: Save Bazel cache
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ~/.cache/bazel-disk
           key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
