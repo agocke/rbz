@@ -6,10 +6,10 @@ import_library(
     name = "GenResxSourceNuGetFiles",
     library_name = "GenResxSourceDlls",
     refs = [
-        "@nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26161.102//:tools/net/Microsoft.DotNet.Arcade.Sdk.dll",
+        "@nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26165.109//:tools/net/Microsoft.DotNet.Arcade.Sdk.dll",
     ],
     libs = [
-        "@nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26161.102//:tools/net/Microsoft.DotNet.Arcade.Sdk.dll",
+        "@nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26165.109//:tools/net/Microsoft.DotNet.Arcade.Sdk.dll",
     ],
 )
 
