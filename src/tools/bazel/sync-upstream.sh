@@ -256,7 +256,9 @@ if [[ "$classification" == "build-changes" || "$classification" == "conflict" ]]
     # to reference new repo names (e.g., v26161.102) but paket.main.bzl
     # still has old names (e.g., v26125.123), the bazel command will fail
     # with "module extension does not generate repository".
-    cp "$REPO_ROOT/MODULE.bazel" /tmp/module-bazel-pre-fixup
+    module_bazel_pre=$(mktemp)
+    module_bazel_post=$(mktemp)
+    cp "$REPO_ROOT/MODULE.bazel" "$module_bazel_pre"
 
     cd "$SCRIPT_DIR"
     if dotnet run FixVersionBumps.cs -- "origin/$BASE_BRANCH" "$next_commit" --repo-root "$REPO_ROOT"; then
@@ -266,8 +268,8 @@ if [[ "$classification" == "build-changes" || "$classification" == "conflict" ]]
 
             # Save the updated MODULE.bazel, then restore the original so
             # bazel can run against the still-consistent old paket.main.bzl.
-            cp "$REPO_ROOT/MODULE.bazel" /tmp/module-bazel-post-fixup
-            cp /tmp/module-bazel-pre-fixup "$REPO_ROOT/MODULE.bazel"
+            cp "$REPO_ROOT/MODULE.bazel" "$module_bazel_post"
+            cp "$module_bazel_pre" "$REPO_ROOT/MODULE.bazel"
 
             paket_ok=false
             bazel_ok=false
@@ -310,12 +312,13 @@ if [[ "$classification" == "build-changes" || "$classification" == "conflict" ]]
 
             # Now restore the updated MODULE.bazel with new repo names.
             # paket.main.bzl has been regenerated and defines the new repos.
-            cp /tmp/module-bazel-post-fixup "$REPO_ROOT/MODULE.bazel"
+            cp "$module_bazel_post" "$REPO_ROOT/MODULE.bazel"
 
             if [[ "$paket_ok" == false || "$bazel_ok" == false ]]; then
                 err "Paket regeneration incomplete (paket=$paket_ok, bazel=$bazel_ok)."
                 err "Reverting version bump changes to avoid committing inconsistent state."
-                git checkout -- .
+                git checkout -- paket.dependencies defs.bzl MODULE.bazel paket.lock paket/
+                git checkout -- src/tools/bazel/
             else
                 git add -A
                 git diff --cached --stat
@@ -335,6 +338,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
         err "FixVersionBumps.cs failed."
     fi
     cd "$REPO_ROOT"
+    rm -f "$module_bazel_pre" "$module_bazel_post"
 fi
 
 # ─── Step 6: Push branch ─────────────────────────────────────────────────────
