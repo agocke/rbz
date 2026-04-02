@@ -38,7 +38,7 @@ csharp_library(
         "//src/libraries/Common:src/Interop/Android/Interop.Libraries.cs",
         "//src/libraries/Common:src/Interop/Android/System.Security.Cryptography.Native.Android/Interop.Ssl.ProtocolSupport.cs",
     ],
-    nullable = "enable",
+    nullable = "annotations",
     langversion = "preview",
     compiler_options = [
         "/features:strict",
