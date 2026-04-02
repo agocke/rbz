@@ -301,10 +301,20 @@ release/10.0 commits and bazel merge commits.
      `ARCADE_SDK_REPO`, `OPEN_SNK`, `MSFT_SNK`)
    - `MODULE.bazel` — `use_repo()` entries for versioned repos
 
+   **Ordering constraint:** `MODULE.bazel` must be temporarily reverted to its
+   pre-update state while running `sync-paket.sh`, because `bazel run
+   paket2bazel` validates `use_repo` entries against repos in the current
+   `paket/paket.main.bzl`. The sync script saves the updated `MODULE.bazel`,
+   restores the original for paket regeneration, then applies the update
+   after `paket/paket.main.bzl` has been regenerated with the new repos.
+
    After updating these files, the script runs `sync-paket.sh` to regenerate
    `paket/paket.main.bzl` via `paket2bazel`, ensuring sha512 hashes and
    dependency graphs are correct. All other BUILD files reference the
    centralized constants in `defs.bzl`, so they don't need updating.
+
+   If either `paket install` or `sync-paket.sh` fails, all version bump
+   changes are reverted to avoid committing an inconsistent state.
 6. **Copilot auto-fix** (build-changes/conflict only): A C# script using the
    GitHub Copilot SDK (`src/tools/bazel/CopilotFixSync.cs`) attempts to
    automatically handle remaining non-version changes (new/removed files,

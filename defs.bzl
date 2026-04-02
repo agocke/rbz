@@ -14,9 +14,9 @@ NETCOREAPP_TOOL_CURRENT = "net10.0"
 #
 # The repo names follow the pattern: nuget.<lowercased-package-name>.v<version>
 
-ARCADE_SDK_REPO = "nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26125.123"
-GENFACADES_REPO = "nuget.microsoft.dotnet.genfacades.v10.0.0-beta.26125.123"
-XUNIT_CONSOLE_RUNNER_REPO = "nuget.microsoft.dotnet.xunitconsolerunner.v2.9.3-beta.26125.123"
+ARCADE_SDK_REPO = "nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26161.102"
+GENFACADES_REPO = "nuget.microsoft.dotnet.genfacades.v10.0.0-beta.26161.102"
+XUNIT_CONSOLE_RUNNER_REPO = "nuget.microsoft.dotnet.xunitconsolerunner.v2.9.3-beta.26161.102"
 UNICODE_DATA_REPO = "nuget.system.private.runtime.unicodedata.v10.0.0-beta.25418.1"
 ILLINK_TASKS_NET8_REPO = "nuget.microsoft.net.illink.tasks.v8.0.22"
 ILLINK_TASKS_NET9_REPO = "nuget.microsoft.net.illink.tasks.v9.0.11"
