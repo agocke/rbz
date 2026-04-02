@@ -248,17 +248,36 @@ echo ""
 if [[ "$classification" == "build-changes" || "$classification" == "conflict" ]]; then
     info "Fixing NuGet version bumps..."
 
+    # Save MODULE.bazel before FixVersionBumps.cs modifies it.
+    # We need the original version during paket regeneration because
+    # sync-paket.sh calls `bazel run @rules_dotnet//tools/paket2bazel`,
+    # and Bazel validates MODULE.bazel use_repo entries against repos
+    # registered in paket/paket.main.bzl. If MODULE.bazel has been updated
+    # to reference new repo names (e.g., v26161.102) but paket.main.bzl
+    # still has old names (e.g., v26125.123), the bazel command will fail
+    # with "module extension does not generate repository".
+    cp "$REPO_ROOT/MODULE.bazel" /tmp/module-bazel-pre-fixup
+
     cd "$SCRIPT_DIR"
     if dotnet run FixVersionBumps.cs -- "origin/$BASE_BRANCH" "$next_commit" --repo-root "$REPO_ROOT"; then
         cd "$REPO_ROOT"
         if ! git diff --quiet; then
             detail "Version bump changes detected — regenerating paket files..."
 
+            # Save the updated MODULE.bazel, then restore the original so
+            # bazel can run against the still-consistent old paket.main.bzl.
+            cp "$REPO_ROOT/MODULE.bazel" /tmp/module-bazel-post-fixup
+            cp /tmp/module-bazel-pre-fixup "$REPO_ROOT/MODULE.bazel"
+
+            paket_ok=false
+            bazel_ok=false
+
             # Regenerate paket.lock from updated paket.dependencies
             if command -v paket &>/dev/null; then
                 info "Running paket install to regenerate paket.lock..."
                 if paket install; then
                     detail "paket.lock regenerated successfully."
+                    paket_ok=true
                 else
                     err "paket install failed — paket.lock may be stale."
                 fi
@@ -266,6 +285,7 @@ if [[ "$classification" == "build-changes" || "$classification" == "conflict" ]]
                 info "Running dotnet paket install to regenerate paket.lock..."
                 if dotnet paket install; then
                     detail "paket.lock regenerated successfully."
+                    paket_ok=true
                 else
                     err "dotnet paket install failed — paket.lock may be stale."
                 fi
@@ -279,6 +299,7 @@ if [[ "$classification" == "build-changes" || "$classification" == "conflict" ]]
                 info "Running sync-paket.sh to regenerate paket/paket.main.bzl..."
                 if "$REPO_ROOT/sync-paket.sh"; then
                     detail "paket/paket.main.bzl regenerated successfully."
+                    bazel_ok=true
                 else
                     err "sync-paket.sh failed — paket/paket.main.bzl may be stale."
                 fi
@@ -287,16 +308,26 @@ if [[ "$classification" == "build-changes" || "$classification" == "conflict" ]]
                 err "paket/paket.main.bzl must be regenerated manually via sync-paket.sh."
             fi
 
-            git add -A
-            git diff --cached --stat
-            git commit -m "Update Bazel NuGet versions and regenerate paket
+            # Now restore the updated MODULE.bazel with new repo names.
+            # paket.main.bzl has been regenerated and defines the new repos.
+            cp /tmp/module-bazel-post-fixup "$REPO_ROOT/MODULE.bazel"
+
+            if [[ "$paket_ok" == false || "$bazel_ok" == false ]]; then
+                err "Paket regeneration incomplete (paket=$paket_ok, bazel=$bazel_ok)."
+                err "Reverting version bump changes to avoid committing inconsistent state."
+                git checkout -- .
+            else
+                git add -A
+                git diff --cached --stat
+                git commit -m "Update Bazel NuGet versions and regenerate paket
 
 Deterministic update of paket.dependencies, defs.bzl constants, and
 MODULE.bazel use_repo entries. Regenerated paket/paket.main.bzl via
 paket2bazel.
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
-            detail "Committed version bump fixes."
+                detail "Committed version bump fixes."
+            fi
         else
             detail "No version bump changes needed."
         fi
