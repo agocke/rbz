@@ -243,7 +243,6 @@ public static class BazelAqueryParser
         var sourceFileOriginalPaths = new Dictionary<string, string>(StringComparer.Ordinal);
         var defines = new SortedSet<string>(StringComparer.Ordinal);
         var references = new SortedSet<string>(StringComparer.Ordinal);
-        var noWarn = new SortedSet<string>(StringComparer.Ordinal);
         var analyzers = new SortedSet<string>(StringComparer.Ordinal);
         var cscFlags = new SortedSet<string>(StringComparer.Ordinal);
         string targetType = "library";
@@ -264,8 +263,9 @@ public static class BazelAqueryParser
             }
             else if (arg.StartsWith("/nowarn:"))
             {
+                // Expand comma-separated codes into individual /nowarn: flags.
                 foreach (var w in arg[8..].Split(',', StringSplitOptions.RemoveEmptyEntries))
-                    noWarn.Add(w);
+                    cscFlags.Add("/nowarn:" + w);
             }
             else if (arg.StartsWith("-r:") || arg.StartsWith("/r:") || arg.StartsWith("/reference:") || arg.StartsWith("-reference:"))
             {
@@ -312,7 +312,7 @@ public static class BazelAqueryParser
             SourceFileOriginalPaths = sourceFileOriginalPaths,
             Defines = defines,
             References = references,
-            NoWarn = noWarn,
+            NoWarn = new SortedSet<string>(StringComparer.Ordinal),
             Analyzers = analyzers,
             Flags = cscFlags,
             TargetType = targetType,

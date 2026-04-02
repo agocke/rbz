@@ -86,6 +86,7 @@ public static class BinlogParser
                     case "HighEntropyVA":
                     case "Optimize":
                     case "AllowUnsafeBlocks":
+                    case "TreatWarningsAsErrors":
                         flags.Add($"/{prop.Name.ToLowerInvariant()}:{prop.Value}");
                         break;
                 }
