@@ -71,11 +71,12 @@ public static class BinlogParser
         for (int i = 0; i < args.Count && i < 3; i++)
         {
             var a = args[i];
-            if (a.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
-                || a.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
-                || a.EndsWith("/dotnet", StringComparison.Ordinal)
-                || a.EndsWith("\\dotnet.exe", StringComparison.OrdinalIgnoreCase)
-                || a == "dotnet")
+            if (!IsCscFlag(a)
+                && (a.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
+                    || a.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+                    || a.EndsWith("/dotnet", StringComparison.Ordinal)
+                    || a.EndsWith("\\dotnet.exe", StringComparison.OrdinalIgnoreCase)
+                    || a == "dotnet"))
             {
                 startIndex = i + 1;
             }
@@ -91,10 +92,10 @@ public static class BinlogParser
 
             // Source files: check .cs extension BEFORE flag prefix detection,
             // because absolute paths on Linux start with '/' which would
-            // otherwise be mistaken for a csc flag.
+            // otherwise be mistaken for a csc flag. Use IsCscFlag to
+            // distinguish /home/user/File.cs from /additionalfile:Foo.cs.
             if (arg.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)
-                && !arg.StartsWith("/define:", StringComparison.Ordinal)
-                && !arg.StartsWith("-define:", StringComparison.Ordinal))
+                && !IsCscFlag(arg))
             {
                 var normalized = NormalizePath(arg, repoRoot, projectDirectory);
                 sourceFiles.Add(normalized);
@@ -235,11 +236,37 @@ public static class BinlogParser
         // binlog relative to the .csproj become fully repo-relative.
         var basePath = Path.IsPathRooted(path) ? path : Path.Combine(projectDirectory, path);
         var normalized = Path.GetFullPath(basePath);
-        var root = Path.GetFullPath(repoRoot).TrimEnd('/') + "/";
+        var root = Path.GetFullPath(repoRoot).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
         if (normalized.StartsWith(root, StringComparison.Ordinal))
             return normalized[root.Length..];
 
         return normalized;
+    }
+
+    /// <summary>
+    /// Determine whether an argument is a csc flag (e.g. /out:Foo.dll, /unsafe+)
+    /// versus a file path (e.g. /home/user/csc.dll, src/File.cs).
+    /// Csc flags start with / or - followed by alphabetic characters, then : or +/-.
+    /// File paths on Linux start with / but have a path separator within the name.
+    /// </summary>
+    private static bool IsCscFlag(string arg)
+    {
+        if (arg.Length < 2 || (arg[0] != '/' && arg[0] != '-'))
+            return false;
+
+        for (int i = 1; i < arg.Length; i++)
+        {
+            char c = arg[i];
+            if (c is ':' or '+' or '-')
+                return true;
+            if (c is '/' or '\\')
+                return false;
+            if (!char.IsLetter(c))
+                return false;
+        }
+
+        // Bare flag like /noconfig (all letters after the prefix)
+        return true;
     }
 
     /// <summary>

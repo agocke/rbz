@@ -172,8 +172,12 @@ enabled and PDB paths are normalized. The default configuration is **release**.
 ```
 
 The tool lives in `src/tools/bazel/BuildEquivalenceCheck/`. It parses MSBuild `.binlog`
-files, CMake `compile_commands.json`, and Bazel `aquery` output to extract and
-normalize compilation records, then compares them field-by-field.
+files (reading the full `csc` command line from each Csc task), CMake
+`compile_commands.json`, and Bazel `aquery` output to extract and normalize
+compilation records, then compares them field-by-field: source files, defines,
+references, flags (including `/nowarn`, `/warn`, `/features`, `/warnaserror`,
+`/unsafe`, `/checked`, `/nullable`, etc.), analyzers, language version, and
+target type.
 
 Managed assemblies are tracked via a **manifest file**
 (`managed-assembly-manifest.txt`) that lists every expected assembly as either
@@ -191,8 +195,10 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 391 of 404 tracked assemblies fully match MSBuild's CSC
-  invocations (defines, nowarn, source files, generated content, references).
+- **Managed assemblies**: 391 of 404 tracked assemblies are expected to match
+  MSBuild's full CSC command line (source files, defines, references, flags,
+  analyzers, language version, target type). Path-bearing flags are normalized
+  to filename-only for cross-build-system comparison.
   The remaining 13 differ due to:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
