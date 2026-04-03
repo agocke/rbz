@@ -643,8 +643,8 @@ public static class ComparisonEngine
             StringComparer.Ordinal);
         AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
 
-        // Analyzers are intentionally not compared — Bazel does not wire Roslyn
-        // analyzers yet, so the diff would always be MSBuild-only noise.
+        // Analyzers
+        AddSetDifference(result, "analyzers", msbuild.Analyzers, bazel.Analyzers);
 
         var msbuildLang = NormalizeLangVersion(msbuild.LangVersion);
         var bazelLang = NormalizeLangVersion(bazel.LangVersion);
