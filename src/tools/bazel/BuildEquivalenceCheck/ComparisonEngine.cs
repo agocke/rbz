@@ -403,10 +403,10 @@ public static class ComparisonEngine
         return result;
     }
 
-    // Analyzer-only nowarns that MSBuild suppresses but Bazel doesn't need
+    // Analyzer-only nowarn codes that MSBuild suppresses but Bazel doesn't need
     // (Bazel doesn't run these analyzers). Entries with compound format like
-    // "CA1845 (+3 more)" are also filtered.
-    private static readonly HashSet<string> AnalyzerNoWarns = new(StringComparer.Ordinal)
+    // "CA1845 (+3 more)" are also filtered via the Contains("(+") check.
+    private static readonly HashSet<string> AnalyzerNoWarnCodes = new(StringComparer.Ordinal)
     {
         // Use throw helper (CA1510–CA1513)
         "CA1510", "CA1511", "CA1512", "CA1513",
@@ -456,29 +456,57 @@ public static class ComparisonEngine
         "SR.cs",
     };
 
-    // Nowarns that are systemic differences between MSBuild and Bazel builds,
+    // Nowarn codes that are systemic differences between MSBuild and Bazel builds,
     // filtered during comparison since they don't affect compiled output.
-    private static readonly HashSet<string> IgnoredNoWarns = new(StringComparer.Ordinal)
+    private static readonly HashSet<string> IgnoredNoWarnCodes = new(StringComparer.Ordinal)
     {
         // XML doc comment warnings — handled via EditorConfig in MSBuild, nowarn in Bazel
-        "1591", "1572", "1574", "1710", "1734",
+        "CS1591", "CS1572", "CS1574", "CS1710", "CS1734",
         // Nullable context handling — globalconfig in MSBuild, nowarn in Bazel
-        "8632", "nullable",
+        "CS8632", "nullable",
         // Type forwarding / nullable analysis — suppressed inconsistently
-        "1701", "1702", "1705", "8500", "8604", "8969",
+        "CS1701", "CS1702", "CS1705", "CS8500", "CS8604", "CS8969",
         // Referenced assembly without strong name — MSBuild toolchain difference
-        "8002",
+        "CS8002",
         // CLS compliance — Bazel source generators suppress this; MSBuild doesn't
-        "3003",
+        "CS3003",
+    };
+
+    // MSBuild csc flags that are toolchain noise and should be ignored in comparisons.
+    // These are boilerplate flags that MSBuild always passes but don't affect
+    // semantic equivalence. Bazel typically doesn't emit these.
+    private static readonly HashSet<string> IgnoredMSBuildCscFlags = new(StringComparer.Ordinal)
+    {
+        "/noconfig",
+        "/nostdlib+",
+        "/fullpaths",
+        "/utf8output",
     };
 
     /// <summary>
-    /// Check if a nowarn code should be ignored in comparisons.
-    /// Covers analyzer-only warnings, systemic build infrastructure differences,
-    /// and compound entries like "CA1845 (+3 more)".
+    /// Check if a managed flag should be ignored in comparisons.
+    /// Covers /nowarn flags for analyzer-only and systemic build differences,
+    /// MSBuild toolchain boilerplate flags, and error report flags.
     /// </summary>
-    private static bool IsIgnoredNoWarn(string code) =>
-        AnalyzerNoWarns.Contains(code) || IgnoredNoWarns.Contains(code) || code.Contains("(+");
+    private static bool IsIgnoredManagedFlag(string flag)
+    {
+        if (IgnoredMSBuildCscFlags.Contains(flag))
+            return true;
+
+        // /errorreport: and /filealign: are MSBuild toolchain defaults
+        if (flag.StartsWith("/errorreport:", StringComparison.Ordinal)
+            || flag.StartsWith("/filealign:", StringComparison.Ordinal))
+            return true;
+
+        // /nowarn:CODE — check if the code is an ignored nowarn
+        if (flag.StartsWith("/nowarn:", StringComparison.Ordinal))
+        {
+            var code = flag[8..];
+            return AnalyzerNoWarnCodes.Contains(code) || IgnoredNoWarnCodes.Contains(code) || code.Contains("(+");
+        }
+
+        return false;
+    }
 
     private static ComparisonResult CompareManagedRecords(string name, ManagedCompilationRecord msbuild, ManagedCompilationRecord bazel)
     {
@@ -521,19 +549,16 @@ public static class ComparisonEngine
             });
         }
 
-        // NoWarn: compare all warning suppressions. Normalize CS prefix for consistency.
-        // Filter CS8632 and "nullable" — rules_dotnet explicitly passes /nullable:disable
-        // for assemblies where nullable is disabled, but MSBuild omits it (disable is the
-        // default). This triggers CS8632 on nullable annotations in shared source files.
-        // MSBuild also passes "nullable" as a nowarn for PNSE assemblies that set
-        // <Nullable>disable</Nullable>. Both are nullable context infrastructure noise.
-        var msbuildNoWarn = new SortedSet<string>(
-            msbuild.NoWarn.Select(NormalizeNoWarn).Where(w => w is not "8632" and not "nullable"),
+        // Flags: compare all csc flags (including /nowarn:CODE entries).
+        // Filter ignored flags from both sides before comparing.
+        var msbuildFlags = new SortedSet<string>(
+            msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)),
             StringComparer.Ordinal);
-        var bazelNoWarn = new SortedSet<string>(
-            bazel.NoWarn.Select(NormalizeNoWarn).Where(w => w is not "8632" and not "nullable"),
+        var bazelFlags = new SortedSet<string>(
+            bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)),
             StringComparer.Ordinal);
-        AddSetDifference(result, "nowarn", msbuildNoWarn, bazelNoWarn);
+        AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
+
         // Analyzers are intentionally not compared — Bazel does not wire Roslyn
         // analyzers yet, so the diff would always be MSBuild-only noise.
 
@@ -738,19 +763,6 @@ public static class ComparisonEngine
                 OnlyInBazel = onlyInRight,
             });
         }
-    }
-
-    /// <summary>
-    /// Normalize a nowarn code so that "CS0168" and "0168" compare as equal.
-    /// MSBuild typically emits the CS-prefixed form, while Bazel BUILD files
-    /// sometimes use just the numeric code.
-    /// </summary>
-    private static string NormalizeNoWarn(string code)
-    {
-        if (code.StartsWith("CS", StringComparison.Ordinal) && code.Length > 2 && char.IsDigit(code[2]))
-            return code[2..];
-
-        return code;
     }
 
     /// <summary>

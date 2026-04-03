@@ -265,7 +265,7 @@ public static class BazelAqueryParser
             {
                 // Expand comma-separated codes into individual /nowarn: flags.
                 foreach (var w in arg[8..].Split(',', StringSplitOptions.RemoveEmptyEntries))
-                    cscFlags.Add("/nowarn:" + w);
+                    cscFlags.Add("/nowarn:" + BinlogParser.NormalizeWarningCode(w.Trim()));
             }
             else if (arg.StartsWith("-r:") || arg.StartsWith("/r:") || arg.StartsWith("/reference:") || arg.StartsWith("-reference:"))
             {
@@ -312,7 +312,6 @@ public static class BazelAqueryParser
             SourceFileOriginalPaths = sourceFileOriginalPaths,
             Defines = defines,
             References = references,
-            NoWarn = new SortedSet<string>(StringComparer.Ordinal),
             Analyzers = analyzers,
             Flags = cscFlags,
             TargetType = targetType,

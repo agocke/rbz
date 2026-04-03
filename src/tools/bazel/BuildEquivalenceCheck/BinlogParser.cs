@@ -1,13 +1,15 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Text;
 using Microsoft.Build.Logging.StructuredLogger;
 using MSBuildTask = Microsoft.Build.Logging.StructuredLogger.Task;
 
 namespace BuildEquivalenceCheck;
 
 /// <summary>
-/// Parses MSBuild binary log (.binlog) files to extract Csc task invocations.
+/// Parses MSBuild binary log (.binlog) files to extract Csc task invocations
+/// by reading the full compiler command line from each Csc task.
 /// </summary>
 public static class BinlogParser
 {
@@ -31,125 +33,112 @@ public static class BinlogParser
 
     private static ManagedCompilationRecord? ExtractFromCscTask(MSBuildTask task, string repoRoot)
     {
+        var commandLine = task.CommandLineArguments;
+        if (string.IsNullOrWhiteSpace(commandLine))
+            return null;
+
         // Resolve relative source paths against the project directory, not CWD.
         var projectDirectory = task.GetNearestParent<Project>()?.ProjectDirectory ?? repoRoot;
 
+        var args = SplitCommandLine(commandLine);
+        return ParseCscArguments(args, projectDirectory, repoRoot);
+    }
+
+    /// <summary>
+    /// Parse a list of csc command-line arguments into a <see cref="ManagedCompilationRecord"/>.
+    /// The argument list should already have the tool path stripped or it will be
+    /// skipped automatically (first token ending in .dll or .exe).
+    /// </summary>
+    private static ManagedCompilationRecord? ParseCscArguments(
+        List<string> args, string projectDirectory, string repoRoot)
+    {
         var sourceFiles = new SortedSet<string>(StringComparer.Ordinal);
         var sourceFileOriginalPaths = new Dictionary<string, string>(StringComparer.Ordinal);
         var defines = new SortedSet<string>(StringComparer.Ordinal);
         var references = new SortedSet<string>(StringComparer.Ordinal);
         var referencePaths = new Dictionary<string, string>(StringComparer.Ordinal);
-        var noWarn = new SortedSet<string>(StringComparer.Ordinal);
         var analyzers = new SortedSet<string>(StringComparer.Ordinal);
         var flags = new SortedSet<string>(StringComparer.Ordinal);
         string targetType = "library";
         string langVersion = "";
         string? assemblyName = null;
         string? outputPath = null;
+        bool firstArg = true;
 
-        // Extract parameters from task children
-        var folder = task.FindChild<Folder>("Parameters");
-        if (folder is null)
-            return null;
-
-        foreach (var child in folder.Children)
+        foreach (var arg in args)
         {
-            if (child is Property prop)
+            // Skip the tool path (first argument, e.g. /path/to/csc.dll)
+            if (firstArg)
             {
-                switch (prop.Name)
-                {
-                    case "OutputAssembly":
-                        assemblyName = Path.GetFileNameWithoutExtension(prop.Value);
-                        outputPath = prop.Value;
-                        break;
-                    case "DefineConstants":
-                        foreach (var d in prop.Value.Split(';', StringSplitOptions.RemoveEmptyEntries))
-                            defines.Add(d.Trim());
-                        break;
-                    case "NoWarn":
-                        foreach (var w in prop.Value.Split([',', ';'], StringSplitOptions.RemoveEmptyEntries))
-                            noWarn.Add(NormalizeWarningCode(w.Trim()));
-                        break;
-                    case "TargetType":
-                        targetType = prop.Value;
-                        break;
-                    case "LangVersion":
-                        langVersion = prop.Value;
-                        break;
-                    case "CommandLineArguments":
-                        ParseCommandLineArguments(prop.Value, noWarn);
-                        break;
-                    case "Nullable":
-                    case "Unsafe":
-                    case "CheckForOverflowUnderflow":
-                    case "Deterministic":
-                    case "HighEntropyVA":
-                    case "Optimize":
-                    case "AllowUnsafeBlocks":
-                    case "TreatWarningsAsErrors":
-                        flags.Add($"/{prop.Name.ToLowerInvariant()}:{prop.Value}");
-                        break;
-                }
+                firstArg = false;
+                if (arg.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
+                    || arg.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    continue;
             }
-            else if (child is Parameter param)
+
+            if (arg.StartsWith("/define:") || arg.StartsWith("/d:") || arg.StartsWith("-define:") || arg.StartsWith("-d:"))
             {
-                switch (param.Name)
-                {
-                    case "Sources":
-                        foreach (var item in param.Children.OfType<Item>())
-                        {
-                            var normalized = NormalizePath(item.Text, repoRoot, projectDirectory);
-                            sourceFiles.Add(normalized);
-                            var diskPath = Path.IsPathRooted(item.Text)
-                                ? item.Text
-                                : Path.GetFullPath(Path.Combine(projectDirectory, item.Text));
-                            sourceFileOriginalPaths.TryAdd(normalized, diskPath);
-                        }
-                        break;
-                    case "References" or "ReferencePath":
-                        foreach (var item in param.Children.OfType<Item>())
-                        {
-                            var name = Path.GetFileNameWithoutExtension(item.Text);
-                            references.Add(name);
-                            // Resolve relative paths against the project directory
-                            var fullPath = Path.IsPathRooted(item.Text)
-                                ? Path.GetFullPath(item.Text)
-                                : Path.GetFullPath(Path.Combine(projectDirectory, item.Text));
-                            referencePaths.TryAdd(name, fullPath);
-                        }
-                        break;
-                    case "Analyzers":
-                        foreach (var item in param.Children.OfType<Item>())
-                            analyzers.Add(Path.GetFileNameWithoutExtension(item.Text));
-                        break;
-                }
+                var value = arg[(arg.IndexOf(':') + 1)..];
+                foreach (var d in value.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                    defines.Add(d.Trim());
+            }
+            else if (arg.StartsWith("/nowarn:") || arg.StartsWith("-nowarn:"))
+            {
+                // Expand comma-separated codes into individual /nowarn: flags.
+                foreach (var w in arg[(arg.IndexOf(':') + 1)..].Split(',', StringSplitOptions.RemoveEmptyEntries))
+                    flags.Add("/nowarn:" + NormalizeWarningCode(w.Trim()));
+            }
+            else if (arg.StartsWith("/r:") || arg.StartsWith("-r:")
+                || arg.StartsWith("/reference:") || arg.StartsWith("-reference:"))
+            {
+                var refPath = arg[(arg.IndexOf(':') + 1)..];
+                var name = Path.GetFileNameWithoutExtension(refPath);
+                references.Add(name);
+                var fullPath = Path.IsPathRooted(refPath)
+                    ? Path.GetFullPath(refPath)
+                    : Path.GetFullPath(Path.Combine(projectDirectory, refPath));
+                referencePaths.TryAdd(name, fullPath);
+            }
+            else if (arg.StartsWith("/analyzer:") || arg.StartsWith("-analyzer:"))
+            {
+                analyzers.Add(Path.GetFileNameWithoutExtension(arg[(arg.IndexOf(':') + 1)..]));
+            }
+            else if (arg.StartsWith("/target:") || arg.StartsWith("-target:"))
+            {
+                targetType = arg[(arg.IndexOf(':') + 1)..];
+            }
+            else if (arg.StartsWith("/langversion:") || arg.StartsWith("-langversion:"))
+            {
+                langVersion = arg[(arg.IndexOf(':') + 1)..];
+            }
+            else if (arg.StartsWith("/out:") || arg.StartsWith("-out:"))
+            {
+                var outPath = arg[(arg.IndexOf(':') + 1)..];
+                assemblyName = Path.GetFileNameWithoutExtension(outPath);
+                outputPath = outPath;
+            }
+            else if (arg.StartsWith('/') || arg.StartsWith('-'))
+            {
+                // Other csc flags — skip the response file marker (@file)
+                flags.Add(arg);
+            }
+            else if (arg.StartsWith('@'))
+            {
+                // Response file reference — skip
+            }
+            else if (arg.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
+            {
+                var normalized = NormalizePath(arg, repoRoot, projectDirectory);
+                sourceFiles.Add(normalized);
+                var diskPath = Path.IsPathRooted(arg)
+                    ? arg
+                    : Path.GetFullPath(Path.Combine(projectDirectory, arg));
+                sourceFileOriginalPaths.TryAdd(normalized, diskPath);
             }
         }
 
         if (assemblyName is null)
             return null;
-
-        // The modern Csc task puts /nowarn flags in CommandLineArguments
-        // which appears as a Message in the task, not a Property in Parameters.
-        // Fall back to parsing messages if we didn't find NoWarn as a property.
-        if (noWarn.Count == 0)
-        {
-            task.VisitAllChildren<Property>(p =>
-            {
-                if (p.Name == "CommandLineArguments")
-                    ParseCommandLineArguments(p.Value, noWarn);
-            });
-        }
-
-        // Also check task messages for the response file content
-        if (noWarn.Count == 0)
-        {
-            task.VisitAllChildren<Message>(msg =>
-            {
-                if (msg.Text?.Contains("/nowarn:", StringComparison.Ordinal) == true)
-                    ParseCommandLineArguments(msg.Text, noWarn);
-            });
-        }
 
         // Determine if this is a reference assembly by checking the project
         // directory or output path for a "/ref/" segment.
@@ -164,7 +153,6 @@ public static class BinlogParser
             Defines = defines,
             References = references,
             ReferencePaths = referencePaths,
-            NoWarn = noWarn,
             Analyzers = analyzers,
             Flags = flags,
             TargetType = targetType,
@@ -173,6 +161,44 @@ public static class BinlogParser
             OutputPath = outputPath ?? "",
             IsReferenceAssembly = isRef,
         };
+    }
+
+    /// <summary>
+    /// Split a command-line string into individual arguments, respecting
+    /// double-quoted segments (quotes are stripped from the result).
+    /// </summary>
+    internal static List<string> SplitCommandLine(string commandLine)
+    {
+        var args = new List<string>();
+        var sb = new StringBuilder();
+        bool inQuote = false;
+
+        for (int i = 0; i < commandLine.Length; i++)
+        {
+            char c = commandLine[i];
+
+            if (c == '"')
+            {
+                inQuote = !inQuote;
+            }
+            else if (!inQuote && char.IsWhiteSpace(c))
+            {
+                if (sb.Length > 0)
+                {
+                    args.Add(sb.ToString());
+                    sb.Clear();
+                }
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        if (sb.Length > 0)
+            args.Add(sb.ToString());
+
+        return args;
     }
 
     private static string NormalizePath(string path, string repoRoot, string projectDirectory)
@@ -193,38 +219,13 @@ public static class BinlogParser
     }
 
     /// <summary>
-    /// Parse /nowarn: flags from the Csc CommandLineArguments or response file text.
-    /// Modern MSBuild puts NoWarn values here rather than as a separate property.
-    /// </summary>
-    private static void ParseCommandLineArguments(string commandLine, SortedSet<string> noWarn)
-    {
-        var span = commandLine.AsSpan();
-        int idx;
-        while ((idx = span.IndexOf("/nowarn:", StringComparison.Ordinal)) >= 0)
-        {
-            span = span[(idx + 8)..];
-            // Read until whitespace or end of string
-            var end = span.IndexOfAny([' ', '\t', '\r', '\n']);
-            var value = end >= 0 ? span[..end] : span;
-            foreach (var range in value.Split(','))
-            {
-                var code = value[range].Trim();
-                if (!code.IsEmpty)
-                    noWarn.Add(NormalizeWarningCode(code.ToString()));
-            }
-            if (end >= 0) span = span[end..];
-            else break;
-        }
-    }
-
-    /// <summary>
     /// Normalize warning codes to a consistent format.
     /// MSBuild sometimes emits bare numbers (e.g. "1701") and sometimes
     /// prefixed codes (e.g. "CS1701"). Normalize to always use "CS" prefix
     /// for numeric codes and pad CS codes to at least 4 digits so that
     /// CS649 and CS0649 compare as equal.
     /// </summary>
-    private static string NormalizeWarningCode(string code)
+    internal static string NormalizeWarningCode(string code)
     {
         if (code.Length > 0 && char.IsDigit(code[0]))
             return "CS" + code.PadLeft(4, '0');
