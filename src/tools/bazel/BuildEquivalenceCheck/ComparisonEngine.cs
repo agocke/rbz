@@ -472,30 +472,79 @@ public static class ComparisonEngine
         "CS3003",
     };
 
-    // MSBuild csc flags that are toolchain noise and should be ignored in comparisons.
-    // These are boilerplate flags that MSBuild always passes but don't affect
-    // semantic equivalence. Bazel typically doesn't emit these.
-    private static readonly HashSet<string> IgnoredMSBuildCscFlags = new(StringComparer.Ordinal)
+    // Csc flags that are pure toolchain boilerplate — always emitted by one build
+    // system but not the other, with no semantic impact on compilation.
+    private static readonly HashSet<string> IgnoredCscFlags = new(StringComparer.Ordinal)
     {
+        // MSBuild toolchain defaults not emitted by Bazel
         "/noconfig",
         "/nostdlib+",
         "/fullpaths",
         "/utf8output",
+        // Bazel toolchain default not emitted by MSBuild
+        "/nologo",
     };
 
     /// <summary>
-    /// Check if a managed flag should be ignored in comparisons.
-    /// Covers /nowarn flags for analyzer-only and systemic build differences,
-    /// MSBuild toolchain boilerplate flags, and error report flags.
+    /// Csc flag prefixes whose values are absolute or repo-relative paths.
+    /// These are normalized to filename-only before comparison so that the
+    /// same logical file compares equal regardless of build-system layout.
+    /// </summary>
+    private static readonly string[] PathBearingFlagPrefixes =
+    [
+        "/analyzerconfig:",
+        "/additionalfile:",
+        "/doc:",
+        "/keyfile:",
+        "/resource:",
+    ];
+
+    /// <summary>
+    /// Check if a managed flag should be ignored entirely in comparisons.
+    /// Only filters pure toolchain boilerplate, build infrastructure that has
+    /// no Bazel equivalent, and /nowarn codes for analyzers or systemic
+    /// build differences.
     /// </summary>
     private static bool IsIgnoredManagedFlag(string flag)
     {
-        if (IgnoredMSBuildCscFlags.Contains(flag))
+        if (IgnoredCscFlags.Contains(flag))
             return true;
 
-        // /errorreport: and /filealign: are MSBuild toolchain defaults
+        // MSBuild toolchain defaults with values
         if (flag.StartsWith("/errorreport:", StringComparison.Ordinal)
             || flag.StartsWith("/filealign:", StringComparison.Ordinal))
+            return true;
+
+        // Debug symbol format — both build systems produce debug info, but the
+        // specific flags (/debug-, /debug:portable, /debug:pdbonly) are configuration
+        // choices that don't affect source equivalence.
+        if (flag.StartsWith("/debug", StringComparison.Ordinal))
+            return true;
+
+        // Strong naming signing mechanism — /publicsign, /delaysign are
+        // toolchain config differences
+        if (flag.StartsWith("/publicsign", StringComparison.Ordinal)
+            || flag.StartsWith("/delaysign", StringComparison.Ordinal))
+            return true;
+
+        // Build infrastructure flags that have no Bazel equivalent and don't
+        // affect the compiled assembly semantics:
+        // /pathmap — deterministic build path remapping
+        // /sourcelink — PDB source link JSON
+        // /skipanalyzers — build-time optimization (don't run analyzers)
+        // /pdb — PDB output path
+        // /refout — ref assembly output path
+        // /embed — embed source file in PDB
+        // /generatedfilesout — generated files output directory
+        // /ruleset — code analysis ruleset path
+        if (flag.StartsWith("/pathmap:", StringComparison.Ordinal)
+            || flag.StartsWith("/sourcelink:", StringComparison.Ordinal)
+            || flag.StartsWith("/skipanalyzers", StringComparison.Ordinal)
+            || flag.StartsWith("/pdb:", StringComparison.Ordinal)
+            || flag.StartsWith("/refout:", StringComparison.Ordinal)
+            || flag.StartsWith("/embed:", StringComparison.Ordinal)
+            || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal)
+            || flag.StartsWith("/ruleset:", StringComparison.Ordinal))
             return true;
 
         // /nowarn:CODE — check if the code is an ignored nowarn
@@ -506,6 +555,41 @@ public static class ComparisonEngine
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Normalize a managed csc flag for comparison. Path-bearing flags (e.g.
+    /// /keyfile:some/long/path/Open.snk) are reduced to filename-only
+    /// (/keyfile:Open.snk) so that the same logical file compares equal
+    /// regardless of build-system output layout.
+    /// For /resource: flags, only the first segment (the file path) is
+    /// normalized; the optional logical name and accessibility are preserved.
+    /// </summary>
+    private static string NormalizeManagedFlag(string flag)
+    {
+        foreach (var prefix in PathBearingFlagPrefixes)
+        {
+            if (!flag.StartsWith(prefix, StringComparison.Ordinal))
+                continue;
+
+            var value = flag[prefix.Length..];
+
+            if (prefix == "/resource:")
+            {
+                // /resource:file[,logicalName[,accessibility]]
+                var commaIdx = value.IndexOf(',');
+                if (commaIdx >= 0)
+                {
+                    var filePart = value[..commaIdx];
+                    var rest = value[commaIdx..];
+                    return prefix + Path.GetFileName(filePart) + rest;
+                }
+            }
+
+            return prefix + Path.GetFileName(value);
+        }
+
+        return flag;
     }
 
     private static ComparisonResult CompareManagedRecords(string name, ManagedCompilationRecord msbuild, ManagedCompilationRecord bazel)
@@ -550,12 +634,12 @@ public static class ComparisonEngine
         }
 
         // Flags: compare all csc flags (including /nowarn:CODE entries).
-        // Filter ignored flags from both sides before comparing.
+        // Filter ignored flags, then normalize path-bearing flags to filename-only.
         var msbuildFlags = new SortedSet<string>(
-            msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)),
+            msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag),
             StringComparer.Ordinal);
         var bazelFlags = new SortedSet<string>(
-            bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)),
+            bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag),
             StringComparer.Ordinal);
         AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
 

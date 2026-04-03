@@ -46,8 +46,7 @@ public static class BinlogParser
 
     /// <summary>
     /// Parse a list of csc command-line arguments into a <see cref="ManagedCompilationRecord"/>.
-    /// The argument list should already have the tool path stripped or it will be
-    /// skipped automatically (first token ending in .dll or .exe).
+    /// Leading tool path arguments (dotnet host and/or csc.dll) are automatically skipped.
     /// </summary>
     private static ManagedCompilationRecord? ParseCscArguments(
         List<string> args, string projectDirectory, string repoRoot)
@@ -63,20 +62,48 @@ public static class BinlogParser
         string langVersion = "";
         string? assemblyName = null;
         string? outputPath = null;
-        bool firstArg = true;
 
-        foreach (var arg in args)
+        // Skip leading tool path arguments. MSBuild CommandLineArguments may start
+        // with the dotnet host and/or the csc.dll path, e.g.:
+        //   /path/to/dotnet /path/to/csc.dll /out:...
+        //   /path/to/csc.dll /out:...
+        int startIndex = 0;
+        for (int i = 0; i < args.Count && i < 3; i++)
         {
-            // Skip the tool path (first argument, e.g. /path/to/csc.dll)
-            if (firstArg)
+            var a = args[i];
+            if (a.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
+                || a.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+                || a.EndsWith("/dotnet", StringComparison.Ordinal)
+                || a.EndsWith("\\dotnet.exe", StringComparison.OrdinalIgnoreCase)
+                || a == "dotnet")
             {
-                firstArg = false;
-                if (arg.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
-                    || arg.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-                    continue;
+                startIndex = i + 1;
             }
+            else
+            {
+                break;
+            }
+        }
 
-            if (arg.StartsWith("/define:") || arg.StartsWith("/d:") || arg.StartsWith("-define:") || arg.StartsWith("-d:"))
+        for (int i = startIndex; i < args.Count; i++)
+        {
+            var arg = args[i];
+
+            // Source files: check .cs extension BEFORE flag prefix detection,
+            // because absolute paths on Linux start with '/' which would
+            // otherwise be mistaken for a csc flag.
+            if (arg.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)
+                && !arg.StartsWith("/define:", StringComparison.Ordinal)
+                && !arg.StartsWith("-define:", StringComparison.Ordinal))
+            {
+                var normalized = NormalizePath(arg, repoRoot, projectDirectory);
+                sourceFiles.Add(normalized);
+                var diskPath = Path.IsPathRooted(arg)
+                    ? arg
+                    : Path.GetFullPath(Path.Combine(projectDirectory, arg));
+                sourceFileOriginalPaths.TryAdd(normalized, diskPath);
+            }
+            else if (arg.StartsWith("/define:") || arg.StartsWith("/d:") || arg.StartsWith("-define:") || arg.StartsWith("-d:"))
             {
                 var value = arg[(arg.IndexOf(':') + 1)..];
                 foreach (var d in value.Split(';', StringSplitOptions.RemoveEmptyEntries))
@@ -119,21 +146,18 @@ public static class BinlogParser
             }
             else if (arg.StartsWith('/') || arg.StartsWith('-'))
             {
-                // Other csc flags — skip the response file marker (@file)
+                // Skip tool paths that leaked through (e.g. /path/to/csc.dll
+                // when preceded by "dotnet exec"). Genuine csc flags are short
+                // prefixes like /out:, /unsafe+, etc.—not multi-segment paths.
+                if (arg.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
+                    || arg.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 flags.Add(arg);
             }
             else if (arg.StartsWith('@'))
             {
                 // Response file reference — skip
-            }
-            else if (arg.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
-            {
-                var normalized = NormalizePath(arg, repoRoot, projectDirectory);
-                sourceFiles.Add(normalized);
-                var diskPath = Path.IsPathRooted(arg)
-                    ? arg
-                    : Path.GetFullPath(Path.Combine(projectDirectory, arg));
-                sourceFileOriginalPaths.TryAdd(normalized, diskPath);
             }
         }
 

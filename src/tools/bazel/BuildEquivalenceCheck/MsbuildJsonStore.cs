@@ -61,7 +61,9 @@ public static class MsbuildJsonStore
         {
             // Merge legacy NoWarn entries into Flags for backward compatibility
             // with JSON files that still have the separate noWarn field.
-            var flags = new SortedSet<string>(d.Flags ?? [], StringComparer.Ordinal);
+            var flags = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var f in d.Flags ?? [])
+                flags.Add(NormalizeLegacyFlag(f));
             if (d.NoWarn is not null)
             {
                 foreach (var code in d.NoWarn)
@@ -101,6 +103,30 @@ public static class MsbuildJsonStore
         public string? LangVersion { get; set; }
         public string? OutputPath { get; set; }
         public bool? IsReferenceAssembly { get; set; }
+    }
+
+    /// <summary>
+    /// Normalize legacy MSBuild property-format flags to csc command-line format.
+    /// The old BinlogParser emitted flags as property names (e.g. /allowunsafeblocks:True)
+    /// instead of csc switches (e.g. /unsafe+). This converts them so legacy JSON files
+    /// compare correctly against csc command-line flags from Bazel or the new BinlogParser.
+    /// </summary>
+    private static string NormalizeLegacyFlag(string flag)
+    {
+        return flag switch
+        {
+            "/allowunsafeblocks:True" => "/unsafe+",
+            "/allowunsafeblocks:False" => "/unsafe-",
+            "/checkforoverflowunderflow:True" => "/checked+",
+            "/checkforoverflowunderflow:False" => "/checked-",
+            "/deterministic:True" => "/deterministic+",
+            "/deterministic:False" => "/deterministic-",
+            "/highentropyva:True" => "/highentropyva+",
+            "/highentropyva:False" => "/highentropyva-",
+            "/optimize:True" => "/optimize+",
+            "/optimize:False" => "/optimize-",
+            _ => flag,
+        };
     }
 
     /// <summary>
