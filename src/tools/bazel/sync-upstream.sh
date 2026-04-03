@@ -28,14 +28,12 @@
 #   2. Fetch upstream, find next commit
 #   3. Create sync branch, merge
 #   4. Run change detection
-#   5. Fix version bumps (deterministic — no Copilot needed)
+#   5. Fix version bumps (deterministic)
 #      - Updates paket.dependencies, defs.bzl, MODULE.bazel, BUILD.bazel files
 #      - Runs paket install to regenerate paket.lock
 #      - Runs sync-paket.sh to regenerate paket/paket.main.bzl
 #   6. Push branch
 #   7. Create PR (last step — everything is ready)
-#
-# Copilot auto-fix runs as a separate CI job after this script completes.
 #
 # Prerequisites:
 #   - git with fetch access to upstream
@@ -326,9 +324,7 @@ if [[ "$classification" == "build-changes" || "$classification" == "conflict" ]]
 
 Deterministic update of paket.dependencies, defs.bzl constants, and
 MODULE.bazel use_repo entries. Regenerated paket/paket.main.bzl via
-paket2bazel.
-
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+paket2bazel."
                 detail "Committed version bump fixes."
             fi
         else

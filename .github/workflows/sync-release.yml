@@ -7,10 +7,6 @@ on:
     - cron: '0 * * * *'  # Hourly
   workflow_dispatch:
     inputs:
-      skip_copilot_fix:
-        description: 'Skip Copilot SDK auto-fix job'
-        type: boolean
-        default: false
       skip_equivalence:
         description: 'Skip equivalence check'
         type: boolean
@@ -76,74 +72,13 @@ jobs:
           --repo "${{ github.repository }}"
           --output-file "$GITHUB_OUTPUT"
 
-  copilot-fix:
-    name: Copilot Auto-Fix
+  equivalence-check:
+    name: Equivalence Check
     needs: sync
     if: >-
       needs.sync.result == 'success' &&
       needs.sync.outputs.has_new_commits == 'true' &&
-      (needs.sync.outputs.classification == 'build-changes' || needs.sync.outputs.classification == 'conflict') &&
-      github.event.inputs.skip_copilot_fix != 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Checkout sync branch
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ needs.sync.outputs.sync_branch }}
-          fetch-depth: 0
-
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Install Copilot CLI
-        run: npm install -g @github/copilot
-
-      - name: Run change detection
-        run: >-
-          chmod +x src/tools/bazel/detect-upstream-changes.sh &&
-          src/tools/bazel/detect-upstream-changes.sh origin/bazel HEAD
-          --report-file /tmp/sync-report.md || true
-
-      - name: Run Copilot auto-fix
-        env:
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-        run: |
-          if [[ ! -f /tmp/sync-report.md ]]; then
-            echo "No report file — skipping auto-fix."
-            exit 0
-          fi
-          cd src/tools/bazel
-          if dotnet run CopilotFixSync.cs -- /tmp/sync-report.md; then
-            cd "$GITHUB_WORKSPACE"
-            if ! git diff --quiet; then
-              echo "Copilot produced changes:"
-              git diff --stat
-              git add -A
-              git commit -m "Auto-fix BUILD.bazel files for upstream sync
-
-          Applied by Copilot SDK based on detection report.
-
-          Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
-              git push
-            else
-              echo "Copilot produced no changes."
-            fi
-          else
-            echo "::warning::CopilotFixSync.cs failed."
-          fi
-
-  equivalence-check:
-    name: Equivalence Check
-    needs: sync
-    if: needs.sync.result == 'success' && github.event.inputs.skip_equivalence != 'true'
+      github.event.inputs.skip_equivalence != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
