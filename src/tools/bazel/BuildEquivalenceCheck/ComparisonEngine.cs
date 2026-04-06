@@ -521,6 +521,14 @@ public static class ComparisonEngine
         if (flag.StartsWith("/debug", StringComparison.Ordinal))
             return true;
 
+        // Warning policy flags — /warnaserror controls whether warnings are
+        // errors and /warn: sets the warning level. MSBuild passes these on
+        // nearly every assembly; Bazel doesn't. They don't change what code
+        // is compiled, only whether warnings cause the build to fail.
+        if (flag.StartsWith("/warnaserror", StringComparison.Ordinal)
+            || flag.StartsWith("/warn:", StringComparison.Ordinal))
+            return true;
+
         // Strong naming signing mechanism — /publicsign, /delaysign are
         // toolchain config differences
         if (flag.StartsWith("/publicsign", StringComparison.Ordinal)

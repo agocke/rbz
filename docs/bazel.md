@@ -196,9 +196,12 @@ areas:
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
 - **Managed assemblies**: 391 of 404 tracked assemblies are expected to match
-  MSBuild's full CSC command line (source files, defines, references, flags,
-  analyzers, language version, target type). Path-bearing flags are normalized
-  to filename-only for cross-build-system comparison.
+  MSBuild's CSC command line on source files, defines, references, analyzers,
+  language version, and target type. Build-policy flags (`/warnaserror`,
+  `/warn:`, `/nowarn:` for analyzers) and toolchain boilerplate (`/noconfig`,
+  `/debug`, `/pathmap:`, etc.) are filtered before comparison since they don't
+  affect source equivalence. Path-bearing flags are normalized to filename-only
+  for cross-build-system comparison.
   The remaining 13 differ due to:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
