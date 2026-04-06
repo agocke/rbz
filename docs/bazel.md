@@ -195,14 +195,14 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 391 of 404 tracked assemblies are expected to match
+- **Managed assemblies**: 0 of 404 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
-  language version, and target type. Output-formatting flags (`/fullpaths`,
-  `/utf8output`, `/nologo`), debug symbol format, and build infrastructure
-  (`/pathmap:`, `/sourcelink:`, etc.) are filtered before comparison.
-  Path-bearing flags are normalized to filename-only for cross-build-system
-  comparison.
-  The remaining 13 differ due to:
+  language version, target type, and flags (including `/nowarn:`, `/noconfig`,
+  `/nostdlib+`). Output-formatting flags (`/fullpaths`, `/utf8output`,
+  `/nologo`), debug symbol format, and build infrastructure (`/pathmap:`,
+  `/sourcelink:`, etc.) are filtered before comparison. Path-bearing flags are
+  normalized to filename-only for cross-build-system comparison.
+  Of the 404 tracked assemblies, 13 are expected to differ due to:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
