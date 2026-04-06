@@ -403,41 +403,6 @@ public static class ComparisonEngine
         return result;
     }
 
-    // Analyzer-only nowarn codes that MSBuild suppresses but Bazel doesn't need
-    // (Bazel doesn't run these analyzers). Entries with compound format like
-    // "CA1845 (+3 more)" are also filtered via the Contains("(+") check.
-    private static readonly HashSet<string> AnalyzerNoWarnCodes = new(StringComparer.Ordinal)
-    {
-        // Use throw helper (CA1510–CA1513)
-        "CA1510", "CA1511", "CA1512", "CA1513",
-        // String comparison / optimization analyzers
-        "CA1845", "CA1846", "CA1847", "CA1850", "CA1852", "CA1859",
-        "CA1865", "CA1866", "CA1867",
-        // Other code quality analyzers
-        "CA1052", "CA1821", "CA1822", "CA1823", "CA1838", "CA2249",
-        // NuGet warnings
-        "NU1511", "NU1701", "NU5105", "NU5128", "NU5129", "NU5131",
-        // IDE suggestions
-        "IDE0059", "IDE0060", "IDE0100",
-        // API compat
-        "CP0001", "CP0003",
-        // Source generator warnings
-        "RS1038", "RS2008",
-        // Serialization compat
-        "SYSLIB0003", "SYSLIB0004", "SYSLIB0011", "SYSLIB0015", "SYSLIB0017",
-        "SYSLIB0050", "SYSLIB0051", "SYSLIB1100", "SYSLIB1101",
-        // Package validation
-        "PKG0001",
-        // StyleCop
-        "SA1121", "SA1129",
-        // ILLinker warnings
-        "IL2121",
-        // CS1702 — assembly reference identity warnings (MSBuild toolchain)
-        "CS1702",
-        // CS8002 — referenced assembly without strong name (MSBuild toolchain)
-        "CS8002",
-    };
-
     // Source files that are test-SDK or polyfill artifacts — present in MSBuild but
     // not in Bazel because Bazel doesn't use the test SDK or need netstandard polyfills.
     private static readonly HashSet<string> IgnoredSourceFileNames = new(StringComparer.Ordinal)
@@ -456,32 +421,14 @@ public static class ComparisonEngine
         "SR.cs",
     };
 
-    // Nowarn codes that are systemic differences between MSBuild and Bazel builds,
-    // filtered during comparison since they don't affect compiled output.
-    private static readonly HashSet<string> IgnoredNoWarnCodes = new(StringComparer.Ordinal)
-    {
-        // XML doc comment warnings — handled via EditorConfig in MSBuild, nowarn in Bazel
-        "CS1591", "CS1572", "CS1574", "CS1710", "CS1734",
-        // Nullable context handling — globalconfig in MSBuild, nowarn in Bazel
-        "CS8632", "nullable",
-        // Type forwarding / nullable analysis — suppressed inconsistently
-        "CS1701", "CS1702", "CS1705", "CS8500", "CS8604", "CS8969",
-        // Referenced assembly without strong name — MSBuild toolchain difference
-        "CS8002",
-        // CLS compliance — Bazel source generators suppress this; MSBuild doesn't
-        "CS3003",
-    };
-
-    // Csc flags that are pure toolchain boilerplate — always emitted by one build
+    // Csc flags that are pure output-formatting boilerplate — always emitted by one
     // system but not the other, with no semantic impact on compilation.
     private static readonly HashSet<string> IgnoredCscFlags = new(StringComparer.Ordinal)
     {
-        // MSBuild toolchain defaults not emitted by Bazel
-        "/noconfig",
-        "/nostdlib+",
+        // MSBuild output formatting defaults not emitted by Bazel
         "/fullpaths",
         "/utf8output",
-        // Bazel toolchain default not emitted by MSBuild
+        // Bazel output formatting default not emitted by MSBuild
         "/nologo",
     };
 
@@ -501,9 +448,8 @@ public static class ComparisonEngine
 
     /// <summary>
     /// Check if a managed flag should be ignored entirely in comparisons.
-    /// Only filters pure toolchain boilerplate, build infrastructure that has
-    /// no Bazel equivalent, and /nowarn codes for analyzers or systemic
-    /// build differences.
+    /// Only filters pure output-formatting boilerplate and build infrastructure
+    /// flags that don't affect compiled assembly semantics.
     /// </summary>
     private static bool IsIgnoredManagedFlag(string flag)
     {
@@ -554,13 +500,6 @@ public static class ComparisonEngine
             || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal)
             || flag.StartsWith("/ruleset:", StringComparison.Ordinal))
             return true;
-
-        // /nowarn:CODE — check if the code is an ignored nowarn
-        if (flag.StartsWith("/nowarn:", StringComparison.Ordinal))
-        {
-            var code = flag[8..];
-            return AnalyzerNoWarnCodes.Contains(code) || IgnoredNoWarnCodes.Contains(code) || code.Contains("(+");
-        }
 
         return false;
     }
