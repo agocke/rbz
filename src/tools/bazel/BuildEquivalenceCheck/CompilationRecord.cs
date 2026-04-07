@@ -38,7 +38,6 @@ public sealed class ManagedCompilationRecord
     /// Used to distinguish ref vs impl assemblies in MSBuild records.
     /// </summary>
     public Dictionary<string, string> ReferencePaths { get; init; } = [];
-    public required SortedSet<string> NoWarn { get; init; }
     public required SortedSet<string> Analyzers { get; init; }
     public required SortedSet<string> Flags { get; init; }
     public string TargetType { get; init; } = "library";

@@ -39,7 +39,6 @@ public static class MsbuildJsonStore
             ReferencePaths = r.ReferencePaths.Count > 0
                 ? NormalizeRefPaths(r.ReferencePaths, r.IsReferenceAssembly, root)
                 : null,
-            NoWarn = [.. r.NoWarn],
             Analyzers = r.Analyzers.Count > 0 ? [.. r.Analyzers] : null,
             Flags = r.Flags.Count > 0 ? [.. r.Flags] : null,
             TargetType = r.TargetType != "library" ? r.TargetType : null,
@@ -58,22 +57,35 @@ public static class MsbuildJsonStore
         var dtos = JsonSerializer.Deserialize<List<RecordDto>>(json, s_readOptions)
             ?? throw new InvalidOperationException($"Failed to deserialize MSBuild JSON from {path}");
 
-        return dtos.Select(d => new ManagedCompilationRecord
+        return dtos.Select(d =>
         {
-            AssemblyName = d.AssemblyName,
-            SourceFiles = new SortedSet<string>(d.SourceFiles ?? [], StringComparer.Ordinal),
-            SourceFileOriginalPaths = [],
-            Defines = new SortedSet<string>(d.Defines ?? [], StringComparer.Ordinal),
-            References = new SortedSet<string>(d.References ?? [], StringComparer.Ordinal),
-            ReferencePaths = d.ReferencePaths ?? [],
-            NoWarn = new SortedSet<string>(d.NoWarn ?? [], StringComparer.Ordinal),
-            Analyzers = new SortedSet<string>(d.Analyzers ?? [], StringComparer.Ordinal),
-            Flags = new SortedSet<string>(d.Flags ?? [], StringComparer.Ordinal),
-            TargetType = d.TargetType ?? "library",
-            LangVersion = d.LangVersion ?? "",
-            BuildSystem = "msbuild",
-            OutputPath = d.OutputPath ?? "",
-            IsReferenceAssembly = d.IsReferenceAssembly ?? false,
+            // Merge legacy NoWarn entries into Flags for backward compatibility
+            // with JSON files that still have the separate noWarn field.
+            var flags = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var f in d.Flags ?? [])
+                flags.Add(NormalizeLegacyFlag(f));
+            if (d.NoWarn is not null)
+            {
+                foreach (var code in d.NoWarn)
+                    flags.Add("/nowarn:" + BinlogParser.NormalizeWarningCode(code));
+            }
+
+            return new ManagedCompilationRecord
+            {
+                AssemblyName = d.AssemblyName,
+                SourceFiles = new SortedSet<string>(d.SourceFiles ?? [], StringComparer.Ordinal),
+                SourceFileOriginalPaths = [],
+                Defines = new SortedSet<string>(d.Defines ?? [], StringComparer.Ordinal),
+                References = new SortedSet<string>(d.References ?? [], StringComparer.Ordinal),
+                ReferencePaths = d.ReferencePaths ?? [],
+                Analyzers = new SortedSet<string>(d.Analyzers ?? [], StringComparer.Ordinal),
+                Flags = flags,
+                TargetType = d.TargetType ?? "library",
+                LangVersion = d.LangVersion ?? "",
+                BuildSystem = "msbuild",
+                OutputPath = d.OutputPath ?? "",
+                IsReferenceAssembly = d.IsReferenceAssembly ?? false,
+            };
         }).ToList();
     }
 
@@ -91,6 +103,30 @@ public static class MsbuildJsonStore
         public string? LangVersion { get; set; }
         public string? OutputPath { get; set; }
         public bool? IsReferenceAssembly { get; set; }
+    }
+
+    /// <summary>
+    /// Normalize legacy MSBuild property-format flags to csc command-line format.
+    /// The old BinlogParser emitted flags as property names (e.g. /allowunsafeblocks:True)
+    /// instead of csc switches (e.g. /unsafe+). This converts them so legacy JSON files
+    /// compare correctly against csc command-line flags from Bazel or the new BinlogParser.
+    /// </summary>
+    private static string NormalizeLegacyFlag(string flag)
+    {
+        return flag switch
+        {
+            "/allowunsafeblocks:True" => "/unsafe+",
+            "/allowunsafeblocks:False" => "/unsafe-",
+            "/checkforoverflowunderflow:True" => "/checked+",
+            "/checkforoverflowunderflow:False" => "/checked-",
+            "/deterministic:True" => "/deterministic+",
+            "/deterministic:False" => "/deterministic-",
+            "/highentropyva:True" => "/highentropyva+",
+            "/highentropyva:False" => "/highentropyva-",
+            "/optimize:True" => "/optimize+",
+            "/optimize:False" => "/optimize-",
+            _ => flag,
+        };
     }
 
     /// <summary>

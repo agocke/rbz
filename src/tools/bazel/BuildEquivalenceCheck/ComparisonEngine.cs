@@ -403,41 +403,6 @@ public static class ComparisonEngine
         return result;
     }
 
-    // Analyzer-only nowarns that MSBuild suppresses but Bazel doesn't need
-    // (Bazel doesn't run these analyzers). Entries with compound format like
-    // "CA1845 (+3 more)" are also filtered.
-    private static readonly HashSet<string> AnalyzerNoWarns = new(StringComparer.Ordinal)
-    {
-        // Use throw helper (CA1510–CA1513)
-        "CA1510", "CA1511", "CA1512", "CA1513",
-        // String comparison / optimization analyzers
-        "CA1845", "CA1846", "CA1847", "CA1850", "CA1852", "CA1859",
-        "CA1865", "CA1866", "CA1867",
-        // Other code quality analyzers
-        "CA1052", "CA1821", "CA1822", "CA1823", "CA1838", "CA2249",
-        // NuGet warnings
-        "NU1511", "NU1701", "NU5105", "NU5128", "NU5129", "NU5131",
-        // IDE suggestions
-        "IDE0059", "IDE0060", "IDE0100",
-        // API compat
-        "CP0001", "CP0003",
-        // Source generator warnings
-        "RS1038", "RS2008",
-        // Serialization compat
-        "SYSLIB0003", "SYSLIB0004", "SYSLIB0011", "SYSLIB0015", "SYSLIB0017",
-        "SYSLIB0050", "SYSLIB0051", "SYSLIB1100", "SYSLIB1101",
-        // Package validation
-        "PKG0001",
-        // StyleCop
-        "SA1121", "SA1129",
-        // ILLinker warnings
-        "IL2121",
-        // CS1702 — assembly reference identity warnings (MSBuild toolchain)
-        "CS1702",
-        // CS8002 — referenced assembly without strong name (MSBuild toolchain)
-        "CS8002",
-    };
-
     // Source files that are test-SDK or polyfill artifacts — present in MSBuild but
     // not in Bazel because Bazel doesn't use the test SDK or need netstandard polyfills.
     private static readonly HashSet<string> IgnoredSourceFileNames = new(StringComparer.Ordinal)
@@ -456,29 +421,123 @@ public static class ComparisonEngine
         "SR.cs",
     };
 
-    // Nowarns that are systemic differences between MSBuild and Bazel builds,
-    // filtered during comparison since they don't affect compiled output.
-    private static readonly HashSet<string> IgnoredNoWarns = new(StringComparer.Ordinal)
+    // Csc flags that are pure output-formatting boilerplate — always emitted by one
+    // system but not the other, with no semantic impact on compilation.
+    private static readonly HashSet<string> IgnoredCscFlags = new(StringComparer.Ordinal)
     {
-        // XML doc comment warnings — handled via EditorConfig in MSBuild, nowarn in Bazel
-        "1591", "1572", "1574", "1710", "1734",
-        // Nullable context handling — globalconfig in MSBuild, nowarn in Bazel
-        "8632", "nullable",
-        // Type forwarding / nullable analysis — suppressed inconsistently
-        "1701", "1702", "1705", "8500", "8604", "8969",
-        // Referenced assembly without strong name — MSBuild toolchain difference
-        "8002",
-        // CLS compliance — Bazel source generators suppress this; MSBuild doesn't
-        "3003",
+        // MSBuild output formatting defaults not emitted by Bazel
+        "/fullpaths",
+        "/utf8output",
+        // Bazel output formatting default not emitted by MSBuild
+        "/nologo",
     };
 
     /// <summary>
-    /// Check if a nowarn code should be ignored in comparisons.
-    /// Covers analyzer-only warnings, systemic build infrastructure differences,
-    /// and compound entries like "CA1845 (+3 more)".
+    /// Csc flag prefixes whose values are absolute or repo-relative paths.
+    /// These are normalized to filename-only before comparison so that the
+    /// same logical file compares equal regardless of build-system layout.
     /// </summary>
-    private static bool IsIgnoredNoWarn(string code) =>
-        AnalyzerNoWarns.Contains(code) || IgnoredNoWarns.Contains(code) || code.Contains("(+");
+    private static readonly string[] PathBearingFlagPrefixes =
+    [
+        "/analyzerconfig:",
+        "/additionalfile:",
+        "/doc:",
+        "/keyfile:",
+        "/resource:",
+    ];
+
+    /// <summary>
+    /// Check if a managed flag should be ignored entirely in comparisons.
+    /// Only filters pure output-formatting boilerplate and build infrastructure
+    /// flags that don't affect compiled assembly semantics.
+    /// </summary>
+    private static bool IsIgnoredManagedFlag(string flag)
+    {
+        if (IgnoredCscFlags.Contains(flag))
+            return true;
+
+        // MSBuild toolchain defaults with values
+        if (flag.StartsWith("/errorreport:", StringComparison.Ordinal)
+            || flag.StartsWith("/filealign:", StringComparison.Ordinal))
+            return true;
+
+        // Debug symbol format — both build systems produce debug info, but the
+        // specific flags (/debug-, /debug:portable, /debug:pdbonly) are configuration
+        // choices that don't affect source equivalence.
+        if (flag.StartsWith("/debug", StringComparison.Ordinal))
+            return true;
+
+        // Warning policy flags — /warnaserror controls whether warnings are
+        // errors and /warn: sets the warning level. MSBuild passes these on
+        // nearly every assembly; Bazel doesn't. They don't change what code
+        // is compiled, only whether warnings cause the build to fail.
+        if (flag.StartsWith("/warnaserror", StringComparison.Ordinal)
+            || flag.StartsWith("/warn:", StringComparison.Ordinal))
+            return true;
+
+        // Strong naming signing mechanism — /publicsign, /delaysign are
+        // toolchain config differences
+        if (flag.StartsWith("/publicsign", StringComparison.Ordinal)
+            || flag.StartsWith("/delaysign", StringComparison.Ordinal))
+            return true;
+
+        // Build infrastructure flags that have no Bazel equivalent and don't
+        // affect the compiled assembly semantics:
+        // /pathmap — deterministic build path remapping
+        // /sourcelink — PDB source link JSON
+        // /skipanalyzers — build-time optimization (don't run analyzers)
+        // /pdb — PDB output path
+        // /refout — ref assembly output path
+        // /embed — embed source file in PDB
+        // /generatedfilesout — generated files output directory
+        // /ruleset — code analysis ruleset path
+        if (flag.StartsWith("/pathmap:", StringComparison.Ordinal)
+            || flag.StartsWith("/sourcelink:", StringComparison.Ordinal)
+            || flag.StartsWith("/skipanalyzers", StringComparison.Ordinal)
+            || flag.StartsWith("/pdb:", StringComparison.Ordinal)
+            || flag.StartsWith("/refout:", StringComparison.Ordinal)
+            || flag.StartsWith("/embed:", StringComparison.Ordinal)
+            || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal)
+            || flag.StartsWith("/ruleset:", StringComparison.Ordinal))
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
+    /// Normalize a managed csc flag for comparison. Path-bearing flags (e.g.
+    /// /keyfile:some/long/path/Open.snk) are reduced to filename-only
+    /// (/keyfile:Open.snk) so that the same logical file compares equal
+    /// regardless of build-system output layout.
+    /// For /resource: flags, only the first segment (the file path) is
+    /// normalized; the optional logical name and accessibility are preserved.
+    /// </summary>
+    private static string NormalizeManagedFlag(string flag)
+    {
+        foreach (var prefix in PathBearingFlagPrefixes)
+        {
+            if (!flag.StartsWith(prefix, StringComparison.Ordinal))
+                continue;
+
+            var value = flag[prefix.Length..];
+
+            if (prefix == "/resource:")
+            {
+                // /resource:file[,logicalName[,accessibility]]
+                var commaIdx = value.IndexOf(',');
+                if (commaIdx >= 0)
+                {
+                    var filePart = value[..commaIdx];
+                    var rest = value[commaIdx..];
+                    return prefix + Path.GetFileName(filePart) + rest;
+                }
+            }
+
+            return prefix + Path.GetFileName(value);
+        }
+
+        return flag;
+    }
 
     private static ComparisonResult CompareManagedRecords(string name, ManagedCompilationRecord msbuild, ManagedCompilationRecord bazel)
     {
@@ -521,21 +580,18 @@ public static class ComparisonEngine
             });
         }
 
-        // NoWarn: compare all warning suppressions. Normalize CS prefix for consistency.
-        // Filter CS8632 and "nullable" — rules_dotnet explicitly passes /nullable:disable
-        // for assemblies where nullable is disabled, but MSBuild omits it (disable is the
-        // default). This triggers CS8632 on nullable annotations in shared source files.
-        // MSBuild also passes "nullable" as a nowarn for PNSE assemblies that set
-        // <Nullable>disable</Nullable>. Both are nullable context infrastructure noise.
-        var msbuildNoWarn = new SortedSet<string>(
-            msbuild.NoWarn.Select(NormalizeNoWarn).Where(w => w is not "8632" and not "nullable"),
+        // Flags: compare all csc flags (including /nowarn:CODE entries).
+        // Filter ignored flags, then normalize path-bearing flags to filename-only.
+        var msbuildFlags = new SortedSet<string>(
+            msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag),
             StringComparer.Ordinal);
-        var bazelNoWarn = new SortedSet<string>(
-            bazel.NoWarn.Select(NormalizeNoWarn).Where(w => w is not "8632" and not "nullable"),
+        var bazelFlags = new SortedSet<string>(
+            bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag),
             StringComparer.Ordinal);
-        AddSetDifference(result, "nowarn", msbuildNoWarn, bazelNoWarn);
-        // Analyzers are intentionally not compared — Bazel does not wire Roslyn
-        // analyzers yet, so the diff would always be MSBuild-only noise.
+        AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
+
+        // Analyzers
+        AddSetDifference(result, "analyzers", msbuild.Analyzers, bazel.Analyzers);
 
         var msbuildLang = NormalizeLangVersion(msbuild.LangVersion);
         var bazelLang = NormalizeLangVersion(bazel.LangVersion);
@@ -738,19 +794,6 @@ public static class ComparisonEngine
                 OnlyInBazel = onlyInRight,
             });
         }
-    }
-
-    /// <summary>
-    /// Normalize a nowarn code so that "CS0168" and "0168" compare as equal.
-    /// MSBuild typically emits the CS-prefixed form, while Bazel BUILD files
-    /// sometimes use just the numeric code.
-    /// </summary>
-    private static string NormalizeNoWarn(string code)
-    {
-        if (code.StartsWith("CS", StringComparison.Ordinal) && code.Length > 2 && char.IsDigit(code[2]))
-            return code[2..];
-
-        return code;
     }
 
     /// <summary>
