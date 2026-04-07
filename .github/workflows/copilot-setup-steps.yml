@@ -25,8 +25,10 @@ jobs:
           # which installs the SDK version from global.json into .dotnet/.
           ./dotnet.sh --info
 
+      - name: Verify Bazel (pre-installed via Bazelisk)
+        run: bazel version
+
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -qq -y bazel clang-18 lld libkrb5-dev liblttng-ust-dev
-          bazel version
+          sudo apt-get install -qq -y clang-18 lld libkrb5-dev liblttng-ust-dev
