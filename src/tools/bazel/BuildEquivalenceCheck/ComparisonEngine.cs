@@ -528,8 +528,19 @@ public static class ComparisonEngine
                 if (commaIdx >= 0)
                 {
                     var filePart = value[..commaIdx];
-                    var rest = value[commaIdx..];
-                    return prefix + Path.GetFileName(filePart) + rest;
+                    var rest = value[(commaIdx + 1)..];
+                    var fileName = Path.GetFileName(filePart);
+
+                    // csc treats /resource:file,SameName as equivalent to
+                    // /resource:file when the logical name is just the file
+                    // name. MSBuild often omits the redundant logical name
+                    // while Bazel emits it explicitly via resource_logical_names.
+                    if (string.Equals(fileName, rest, StringComparison.Ordinal))
+                    {
+                        return prefix + rest;
+                    }
+
+                    return prefix + fileName + "," + rest;
                 }
             }
 

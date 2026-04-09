@@ -4,6 +4,8 @@ load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("//:defs.bzl", "ARCADE_SDK_REPO", "XUNIT_CONSOLE_RUNNER_REPO")
 
 exports_files([
+    "CodeAnalysis.src.globalconfig",
+    "CodeAnalysis.test.globalconfig",
     "run_binary.sh.tpl",
     "run_test.sh.tpl",
     "run_library_test.sh.tpl",

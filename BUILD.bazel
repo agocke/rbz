@@ -17,11 +17,46 @@ load(
 )
 
 exports_files([
+    ".editorconfig",
     "artifacts/obj/coreclr/System.Private.CoreLib/linux.x64.Debug/System.Private.CoreLib.Strings.resources",
     "artifacts/obj/coreclr/System.Private.CoreLib/osx.arm64.Debug/System.Private.CoreLib.Strings.resources",
     "LICENSE.TXT",
     "THIRD-PARTY-NOTICES.TXT",
 ])
+
+source_analyzer_config_files = [
+    ".editorconfig",
+    "//eng:CodeAnalysis.src.globalconfig",
+] + sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_11_default.globalconfig"]))[-1:] + sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/build/config/analysislevelstyle_default.globalconfig"]))[-1:]
+
+filegroup(
+    name = "source_analyzer_configs",
+    srcs = source_analyzer_config_files,
+    visibility = ["//visibility:public"],
+)
+
+source_build_analyzer_files = (
+    sorted(glob([".packages/microsoft.net.illink.tasks/*/analyzers/dotnet/cs/ILLink.RoslynAnalyzer.dll"]))[-1:] +
+    sorted(glob([".packages/microsoft.codeanalysis.analyzers/*/analyzers/dotnet/cs/Microsoft.CodeAnalysis.Analyzers.dll"]))[-1:] +
+    sorted(glob([".packages/microsoft.codeanalysis.analyzers/*/analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.Analyzers.dll"]))[-1:] +
+    sorted(glob([".packages/microsoft.codeanalysis.netanalyzers/*/analyzers/dotnet/Microsoft.CodeAnalysis.NetAnalyzers.dll"]))[-1:] +
+    sorted(glob([".packages/microsoft.codeanalysis.netanalyzers/*/analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll"]))[-1:] +
+    sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/Microsoft.CodeAnalysis.CSharp.CodeStyle.dll"]))[-1:] +
+    sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/Microsoft.CodeAnalysis.CSharp.CodeStyle.Fixes.dll"]))[-1:] +
+    sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/Microsoft.CodeAnalysis.CodeStyle.dll"]))[-1:] +
+    sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/Microsoft.CodeAnalysis.CodeStyle.Fixes.dll"]))[-1:] +
+    sorted(glob([".packages/microsoft.dotnet.codeanalysis/*/analyzers/Microsoft.DotNet.CodeAnalysis.dll"]))[-1:] +
+    sorted(glob([".packages/stylecop.analyzers.unstable/*/analyzers/dotnet/cs/StyleCop.Analyzers.dll"]))[-1:] +
+    sorted(glob([".packages/stylecop.analyzers.unstable/*/analyzers/dotnet/cs/StyleCop.Analyzers.CodeFixes.dll"]))[-1:]
+)
+
+import_library(
+    name = "source_build_analyzers",
+    library_name = "SourceBuildAnalyzers",
+    refs = source_build_analyzer_files,
+    libs = source_build_analyzer_files,
+    visibility = ["//visibility:public"],
+)
 
 # ── Per-component build configuration flags ──────────────────────────
 # These replace the legacy --define runtime_debug=1 mechanism with modern

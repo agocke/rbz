@@ -288,6 +288,21 @@ public static class BazelAqueryParser
             {
                 assemblyName = ExtractAssemblyName(arg[5..]);
             }
+            else if (arg is "/unsafe+" or "/unsafe-")
+            {
+                // rules_dotnet emits a default /unsafe- and then appends /unsafe+
+                // when allow_unsafe_blocks is enabled. Model csc's last-wins
+                // behavior so we compare the effective flag, not both entries.
+                cscFlags.Remove("/unsafe+");
+                cscFlags.Remove("/unsafe-");
+                cscFlags.Add(arg);
+            }
+            else if (arg is "/checked+" or "/checked-")
+            {
+                cscFlags.Remove("/checked+");
+                cscFlags.Remove("/checked-");
+                cscFlags.Add(arg);
+            }
             else if (arg.StartsWith('/'))
             {
                 // Other csc flags

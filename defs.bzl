@@ -491,11 +491,16 @@ def csharp_library(
         # (GenerateDocumentationFile=true in src/libraries/Directory.Build.props
         # when IsSourceProject=true).  Default to False to match MSBuild.
         generate_documentation_file = generate_documentation_file,
-        # rules_dotnet restricts warning_level to [0..5] so we use
-        # compiler_options to emit /warn:9999, matching MSBuild's
-        # WarningLevel=9999.  Placed after rules_dotnet's own /warn:3 so
-        # the last-wins semantics of csc give us the correct level.
-        compiler_options = compiler_options + ["/warn:9999"],
+        # Match MSBuild's csc defaults. rules_dotnet emits its own baseline
+        # flags, so keep these late in the command line for last-wins behavior.
+        compiler_options = compiler_options + [
+            "/noconfig",
+            "/platform:AnyCPU",
+            # rules_dotnet restricts warning_level to [0..5] so we use
+            # compiler_options to emit /warn:9999, matching MSBuild's
+            # WarningLevel=9999.
+            "/warn:9999",
+        ],
         # In CI mode, normalize PDB paths to match MSBuild's CI layout
         # (ContinuousIntegrationBuild=true → DeterministicSourcePaths → PathMap).
         pathmap = select({
