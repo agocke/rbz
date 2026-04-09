@@ -18,7 +18,6 @@ NUGET
       Microsoft.VisualStudio.Setup.Configuration.Interop (>= 3.2.2146)
       System.Collections.Immutable (>= 7.0)
       System.Configuration.ConfigurationManager (>= 7.0)
-    Microsoft.CodeAnalysis.Analyzers (3.11.0)
     Microsoft.CodeAnalysis.Common (4.11.0)
       Microsoft.CodeAnalysis.Analyzers (>= 3.3.4)
       System.Collections.Immutable (>= 8.0)
@@ -28,6 +27,7 @@ NUGET
       Microsoft.CodeAnalysis.Common (4.11)
       System.Collections.Immutable (>= 8.0)
       System.Reflection.Metadata (>= 8.0)
+    Microsoft.CodeAnalysis.CSharp.CodeStyle (4.14.0)
     Microsoft.CodeAnalysis.CSharp.Workspaces (4.11.0)
       Humanizer.Core (>= 2.14.1)
       Microsoft.CodeAnalysis.Analyzers (>= 3.3.4)
@@ -68,6 +68,9 @@ NUGET
     runtime.win-arm64.runtime.native.System.Data.SqlClient.sni (4.4.0)
     runtime.win-x64.runtime.native.System.Data.SqlClient.sni (4.4.0)
     runtime.win-x86.runtime.native.System.Data.SqlClient.sni (4.4.0)
+    StyleCop.Analyzers (1.2.0-beta.556)
+      StyleCop.Analyzers.Unstable (>= 1.2.0.556)
+    StyleCop.Analyzers.Unstable (1.2.0.556)
     System.Buffers (4.5.1)
     System.Collections.Immutable (9.0.0)
     System.Composition (8.0.0)
@@ -106,8 +109,15 @@ NUGET
       xunit.abstractions (>= 2.0.3)
     xunit.extensibility.execution (2.9.3)
       xunit.extensibility.core (2.9.3)
+  remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+    Microsoft.CodeAnalysis.Analyzers (5.0.0-2.26170.102)
+  remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/darc-pub-dotnet-dotnet-b32125d4/nuget/v3/index.json
+    Microsoft.CodeAnalysis.NetAnalyzers (10.0.106)
+    System.CommandLine (2.0.6)
+    System.Formats.Asn1 (10.0.6)
   remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json
     Microsoft.DotNet.Arcade.Sdk (10.0.0-beta.26170.102)
+    Microsoft.DotNet.CodeAnalysis (10.0.0-beta.26170.102)
     microsoft.dotnet.genfacades (10.0.0-beta.26170.102)
     Microsoft.DotNet.RemoteExecutor (10.0.0-beta.26170.102)
       Microsoft.Diagnostics.Runtime (>= 1.0.5)
@@ -130,6 +140,3 @@ NUGET
     System.Private.Runtime.UnicodeData (10.0.0-beta.25418.1)
     System.Security.Cryptography.X509Certificates.TestData (10.0.0-beta.25418.1)
     System.Text.RegularExpressions.TestData (10.0.0-beta.25418.1)
-  remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/darc-pub-dotnet-dotnet-b32125d4/nuget/v3/index.json
-    System.CommandLine (2.0.6)
-    System.Formats.Asn1 (10.0.6)
