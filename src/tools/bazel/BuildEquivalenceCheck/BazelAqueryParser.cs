@@ -244,6 +244,7 @@ public static class BazelAqueryParser
         var defines = new SortedSet<string>(StringComparer.Ordinal);
         var references = new SortedSet<string>(StringComparer.Ordinal);
         var analyzers = new SortedSet<string>(StringComparer.Ordinal);
+        var analyzerPaths = new Dictionary<string, string>(StringComparer.Ordinal);
         var cscFlags = new SortedSet<string>(StringComparer.Ordinal);
         string targetType = "library";
         string langVersion = "";
@@ -274,7 +275,10 @@ public static class BazelAqueryParser
             }
             else if (arg.StartsWith("/analyzer:"))
             {
-                analyzers.Add(ExtractAssemblyName(arg[10..]));
+                var analyzerPath = arg[10..];
+                var name = ExtractAssemblyName(analyzerPath);
+                analyzers.Add(name);
+                analyzerPaths.TryAdd(name, analyzerPath);
             }
             else if (arg.StartsWith("/target:"))
             {
@@ -328,6 +332,7 @@ public static class BazelAqueryParser
             Defines = defines,
             References = references,
             Analyzers = analyzers,
+            AnalyzerPaths = analyzerPaths,
             Flags = cscFlags,
             TargetType = targetType,
             LangVersion = langVersion,

@@ -57,6 +57,7 @@ public static class BinlogParser
         var references = new SortedSet<string>(StringComparer.Ordinal);
         var referencePaths = new Dictionary<string, string>(StringComparer.Ordinal);
         var analyzers = new SortedSet<string>(StringComparer.Ordinal);
+        var analyzerPaths = new Dictionary<string, string>(StringComparer.Ordinal);
         var flags = new SortedSet<string>(StringComparer.Ordinal);
         string targetType = "library";
         string langVersion = "";
@@ -129,7 +130,13 @@ public static class BinlogParser
             }
             else if (arg.StartsWith("/analyzer:") || arg.StartsWith("-analyzer:"))
             {
-                analyzers.Add(Path.GetFileNameWithoutExtension(arg[(arg.IndexOf(':') + 1)..]));
+                var analyzerPath = arg[(arg.IndexOf(':') + 1)..];
+                var name = Path.GetFileNameWithoutExtension(analyzerPath);
+                analyzers.Add(name);
+                var fullPath = Path.IsPathRooted(analyzerPath)
+                    ? Path.GetFullPath(analyzerPath)
+                    : Path.GetFullPath(Path.Combine(projectDirectory, analyzerPath));
+                analyzerPaths.TryAdd(name, fullPath);
             }
             else if (arg.StartsWith("/target:") || arg.StartsWith("-target:"))
             {
@@ -179,6 +186,7 @@ public static class BinlogParser
             References = references,
             ReferencePaths = referencePaths,
             Analyzers = analyzers,
+            AnalyzerPaths = analyzerPaths,
             Flags = flags,
             TargetType = targetType,
             LangVersion = langVersion,
