@@ -46,14 +46,6 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq -y clang-18 lld libkrb5-dev liblttng-ust-dev
 
-      - name: Restore Bazel cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.cache/bazel-disk
-          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
-          restore-keys: |
-            bazel-${{ runner.os }}-${{ matrix.config }}-
-
       - name: Build
         run: bazel build ${{ matrix.targets || '//...' }} --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk
 
