@@ -272,6 +272,7 @@ csharp_library(
         "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
         "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
         "//src/libraries/System.Private.CoreLib:System.Private.CoreLib.Generators",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
     ],
     srcs = [
         ":corelib_assembly_info",
