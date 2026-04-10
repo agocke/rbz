@@ -244,6 +244,7 @@ public static class BazelAqueryParser
         var defines = new SortedSet<string>(StringComparer.Ordinal);
         var references = new SortedSet<string>(StringComparer.Ordinal);
         var analyzers = new SortedSet<string>(StringComparer.Ordinal);
+        var analyzerPaths = new Dictionary<string, string>(StringComparer.Ordinal);
         var cscFlags = new SortedSet<string>(StringComparer.Ordinal);
         string targetType = "library";
         string langVersion = "";
@@ -274,7 +275,10 @@ public static class BazelAqueryParser
             }
             else if (arg.StartsWith("/analyzer:"))
             {
-                analyzers.Add(ExtractAssemblyName(arg[10..]));
+                var analyzerPath = arg[10..];
+                var name = ExtractAssemblyName(analyzerPath);
+                analyzers.Add(name);
+                analyzerPaths.TryAdd(name, analyzerPath);
             }
             else if (arg.StartsWith("/target:"))
             {
@@ -287,6 +291,21 @@ public static class BazelAqueryParser
             else if (arg.StartsWith("/out:"))
             {
                 assemblyName = ExtractAssemblyName(arg[5..]);
+            }
+            else if (arg is "/unsafe+" or "/unsafe-")
+            {
+                // rules_dotnet emits a default /unsafe- and then appends /unsafe+
+                // when allow_unsafe_blocks is enabled. Model csc's last-wins
+                // behavior so we compare the effective flag, not both entries.
+                cscFlags.Remove("/unsafe+");
+                cscFlags.Remove("/unsafe-");
+                cscFlags.Add(arg);
+            }
+            else if (arg is "/checked+" or "/checked-")
+            {
+                cscFlags.Remove("/checked+");
+                cscFlags.Remove("/checked-");
+                cscFlags.Add(arg);
             }
             else if (arg.StartsWith('/'))
             {
@@ -313,6 +332,7 @@ public static class BazelAqueryParser
             Defines = defines,
             References = references,
             Analyzers = analyzers,
+            AnalyzerPaths = analyzerPaths,
             Flags = cscFlags,
             TargetType = targetType,
             LangVersion = langVersion,

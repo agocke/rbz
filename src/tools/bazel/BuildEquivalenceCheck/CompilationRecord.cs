@@ -39,6 +39,11 @@ public sealed class ManagedCompilationRecord
     /// </summary>
     public Dictionary<string, string> ReferencePaths { get; init; } = [];
     public required SortedSet<string> Analyzers { get; init; }
+    /// <summary>
+    /// Maps analyzer assembly name → resolved full path on disk.
+    /// Preserved for diagnostic purposes; comparison uses name-only.
+    /// </summary>
+    public Dictionary<string, string> AnalyzerPaths { get; init; } = [];
     public required SortedSet<string> Flags { get; init; }
     public string TargetType { get; init; } = "library";
     public string LangVersion { get; init; } = "";
