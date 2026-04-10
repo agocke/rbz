@@ -6,7 +6,12 @@ load("//eng/bazel:runtime_layout.bzl", "runtime_layout")
 load("//eng/bazel:version.bzl", "PRODUCT_VERSION", "PRODUCT_VERSION_FULL")
 load(
     "//:defs.bzl",
+    "CODEANALYSIS_ANALYZERS_REPO",
+    "CODEANALYSIS_CSHARP_CODESTYLE_REPO",
+    "CODEANALYSIS_NETANALYZERS_REPO",
+    "DOTNET_CODEANALYSIS_REPO",
     "MIBC_FILES",
+    "STYLECOP_ANALYZERS_UNSTABLE_REPO",
 )
 load(
     "//:framework_r2r.bzl",
@@ -35,20 +40,19 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-source_build_analyzer_files = (
-    sorted(glob([".packages/microsoft.net.illink.tasks/*/analyzers/dotnet/cs/ILLink.RoslynAnalyzer.dll"]))[-1:] +
-    sorted(glob([".packages/microsoft.codeanalysis.analyzers/*/analyzers/dotnet/cs/Microsoft.CodeAnalysis.Analyzers.dll"]))[-1:] +
-    sorted(glob([".packages/microsoft.codeanalysis.analyzers/*/analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.Analyzers.dll"]))[-1:] +
-    sorted(glob([".packages/microsoft.codeanalysis.netanalyzers/*/analyzers/dotnet/Microsoft.CodeAnalysis.NetAnalyzers.dll"]))[-1:] +
-    sorted(glob([".packages/microsoft.codeanalysis.netanalyzers/*/analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll"]))[-1:] +
-    sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/Microsoft.CodeAnalysis.CSharp.CodeStyle.dll"]))[-1:] +
-    sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/Microsoft.CodeAnalysis.CSharp.CodeStyle.Fixes.dll"]))[-1:] +
-    sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/Microsoft.CodeAnalysis.CodeStyle.dll"]))[-1:] +
-    sorted(glob([".dotnet/sdk/*/Sdks/Microsoft.NET.Sdk/codestyle/cs/Microsoft.CodeAnalysis.CodeStyle.Fixes.dll"]))[-1:] +
-    sorted(glob([".packages/microsoft.dotnet.codeanalysis/*/analyzers/Microsoft.DotNet.CodeAnalysis.dll"]))[-1:] +
-    sorted(glob([".packages/stylecop.analyzers.unstable/*/analyzers/dotnet/cs/StyleCop.Analyzers.dll"]))[-1:] +
-    sorted(glob([".packages/stylecop.analyzers.unstable/*/analyzers/dotnet/cs/StyleCop.Analyzers.CodeFixes.dll"]))[-1:]
-)
+source_build_analyzer_files = [
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.Analyzers.dll".format(CODEANALYSIS_ANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.Analyzers.dll".format(CODEANALYSIS_ANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/Microsoft.CodeAnalysis.NetAnalyzers.dll".format(CODEANALYSIS_NETANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll".format(CODEANALYSIS_NETANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.CodeStyle.dll".format(CODEANALYSIS_CSHARP_CODESTYLE_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.CodeStyle.Fixes.dll".format(CODEANALYSIS_CSHARP_CODESTYLE_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CodeStyle.dll".format(CODEANALYSIS_CSHARP_CODESTYLE_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CodeStyle.Fixes.dll".format(CODEANALYSIS_CSHARP_CODESTYLE_REPO),
+    "@{}//:analyzers/Microsoft.DotNet.CodeAnalysis.dll".format(DOTNET_CODEANALYSIS_REPO),
+    "@{}//:analyzers/dotnet/cs/StyleCop.Analyzers.dll".format(STYLECOP_ANALYZERS_UNSTABLE_REPO),
+    "@{}//:analyzers/dotnet/cs/StyleCop.Analyzers.CodeFixes.dll".format(STYLECOP_ANALYZERS_UNSTABLE_REPO),
+]
 
 import_library(
     name = "source_build_analyzers",

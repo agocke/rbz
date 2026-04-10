@@ -24,6 +24,13 @@ ILLINK_TASKS_NET10_REPO = "nuget.microsoft.net.illink.tasks.v10.0.0"
 MIBC_LINUX_X64_REPO = "nuget.optimization.linux-x64.mibc.runtime.v1.0.0-prerelease.26080.1"
 MIBC_LINUX_ARM64_REPO = "nuget.optimization.linux-arm64.mibc.runtime.v1.0.0-prerelease.26080.1"
 
+# Analyzer NuGet packages (from eng/Analyzers.targets)
+CODEANALYSIS_ANALYZERS_REPO = "nuget.microsoft.codeanalysis.analyzers.v5.0.0-2.26170.102"
+CODEANALYSIS_NETANALYZERS_REPO = "nuget.microsoft.codeanalysis.netanalyzers.v10.0.106"
+CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codestyle.v4.14.0"
+DOTNET_CODEANALYSIS_REPO = "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26170.102"
+STYLECOP_ANALYZERS_UNSTABLE_REPO = "nuget.stylecop.analyzers.unstable.v1.2.0.556"
+
 # ─── Pre-built labels for commonly used assets ───────────────────────────────
 # SNK signing keys are copied to a stable path in //eng:snk/ (via copy_file)
 # so that Arcade SDK version bumps don't invalidate the cache for every
