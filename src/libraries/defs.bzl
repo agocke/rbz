@@ -12,6 +12,11 @@ load(
 )
 
 load(
+    "//eng/bazel:version.bzl",
+    "PRODUCT_VERSION",
+)
+
+load(
     "@rules_dotnet//dotnet/private:providers.bzl",
     "DotnetAssemblyCompileInfo",
     "DotnetAssemblyRuntimeInfo",
@@ -293,6 +298,12 @@ def impl_assembly(
     unsupported_os_platforms = [],
     generate_documentation_file = True,
     skip_locals_init = False,
+    additionalfiles = [],
+    analyzer_configs = [],
+    analyzers = [],
+    library_import_generator = True,
+    com_interface_generator = False,
+    include_editorconfig = True,
     **kwargs
 ):
     base_name = name[len("impl_"):]
@@ -445,7 +456,68 @@ def impl_assembly(
         # Match MSBuild's /features flags
         "/features:strict",
         "/features:nullablePublicOnly",
+        # .NET SDK adds this for TFM >= 10.0 via FrameworkReferenceResolution.targets
+        "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
     ]
+
+    # ── Analyzer infrastructure (matching MSBuild's Analyzers.targets) ──────
+    # Generate an empty disabledAnalyzers.config (MSBuild always passes this as
+    # /additionalfile even though it's empty).
+    _disabled_analyzers_target = "disabled_analyzers_" + base_name
+    native.genrule(
+        name = _disabled_analyzers_target,
+        outs = [name + "/disabledAnalyzers.config"],
+        cmd = ": > \"$@\"",
+    )
+
+    # Generate per-assembly GeneratedMSBuildEditorConfig.editorconfig matching
+    # MSBuild's GenerateMSBuildEditorConfigFile task output.
+    _editorconfig_target = "editorconfig_" + base_name
+    native.genrule(
+        name = _editorconfig_target,
+        outs = [name + "/" + base_name + ".GeneratedMSBuildEditorConfig.editorconfig"],
+        cmd = """cat >"$@" <<'EOF'
+is_global = true
+build_property.InformationalVersion = {version}
+build_property._SupportedPlatformList = Linux,macOS,Windows,Android,iOS,tvOS,macCatalyst,browser,wasi,illumos,Solaris,Haiku,Unix,FreeBSD
+EOF""".format(version = PRODUCT_VERSION),
+    )
+
+    # Merge caller-provided additionalfiles with the generated disabledAnalyzers.config.
+    # MSBuild also passes resx files as /additionalfile for analyzer consumption.
+    _additionalfiles = additionalfiles + [":" + _disabled_analyzers_target]
+    if resx_file != None:
+        _additionalfiles = _additionalfiles + [resx_file]
+
+    # Merge caller-provided analyzer_configs with the standard source configs
+    # and the per-assembly generated editorconfig.
+    # include_editorconfig=False for facade/shim assemblies whose MSBuild
+    # project doesn't emit a local .editorconfig analyzerconfig entry.
+    _analyzer_configs = analyzer_configs + [
+        "//:source_analyzer_configs",
+        ":" + _editorconfig_target,
+    ] if include_editorconfig else analyzer_configs + [
+        "//:source_analyzer_configs_no_editorconfig",
+        ":" + _editorconfig_target,
+    ]
+
+    # Merge caller-provided analyzers with the standard source build analyzers
+    # and ILLink Roslyn analyzer.  Interop source generators are conditional on
+    # the assembly's dependency on System.Runtime.InteropServices / CoreLib
+    # (matching eng/generators.targets).
+    _analyzers = analyzers + [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+    ]
+    if library_import_generator:
+        _analyzers = _analyzers + [
+            "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
+            "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+        ]
+    if com_interface_generator:
+        _analyzers = _analyzers + [
+            "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+        ]
 
     # Build suffix_srcs in MSBuild order: AssemblyInfo → Forwards
     # These go AFTER the resx-generated System.SR.cs (which is inserted by csharp_library)
@@ -490,6 +562,9 @@ def impl_assembly(
         nowarn = nowarn,
         # MSBuild sets GenerateDocumentationFile=true for IsSourceProject
         generate_documentation_file = generate_documentation_file,
+        additionalfiles = _additionalfiles,
+        analyzer_configs = _analyzer_configs,
+        analyzers = _analyzers,
         **kwargs
     )
 

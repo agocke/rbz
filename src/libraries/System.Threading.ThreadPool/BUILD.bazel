@@ -18,6 +18,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Threading.ThreadPool",
+    include_editorconfig = False,
     nowarn = ["CS1591"],
     srcs = [],
     deps = [

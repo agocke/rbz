@@ -34,10 +34,6 @@ impl_assembly(
         "//src/libraries/Common:src/System/Console/ConsoleUtils.cs",
     ],
     allow_unsafe_blocks = True,
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     defines = ["NO_SUPPRESS_GC_TRANSITION"],
     deps = [
         "//src/libraries:ref_System.Runtime",

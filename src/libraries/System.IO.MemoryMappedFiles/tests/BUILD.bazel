@@ -20,10 +20,6 @@ library_test(
         "//src/libraries/Common:src/Interop/Windows/Kernel32/Interop.MemOptions.cs",
         "//src/libraries/Common:src/Interop/Windows/Kernel32/Interop.SECURITY_ATTRIBUTES.cs",
     ],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     deps = [
         "//src/libraries/System.IO.MemoryMappedFiles:ref_System.IO.MemoryMappedFiles",
         "//src/libraries/System.IO.Pipes:ref_System.IO.Pipes",

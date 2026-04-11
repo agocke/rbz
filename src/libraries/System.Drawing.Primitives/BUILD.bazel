@@ -15,6 +15,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Drawing.Primitives",
+    com_interface_generator = True,
     nowarn = ["CS1591"],
     srcs = [
         "src/System/Drawing/Color.cs",

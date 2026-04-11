@@ -19,6 +19,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.IO.IsolatedStorage",
+    library_import_generator = False,
     nowarn = ["CS1591"],
     os_targeted = "unix",
     srcs = [

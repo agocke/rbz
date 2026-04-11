@@ -44,9 +44,6 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    analyzers = [
-        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
-    ],
     keyfile = OPEN_SNK,
     data = ["@paket.main//system.text.regularexpressions.testdata:content_files"],
     nowarn = MULTITARGET_NOWARN + ["xUnit2008", "SYSLIB0036", "SYSLIB1045", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],

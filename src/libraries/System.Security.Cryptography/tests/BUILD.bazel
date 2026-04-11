@@ -274,10 +274,6 @@ library_test(
     data = ["@paket.main//system.security.cryptography.x509certificates.testdata:content_files"],
     nowarn = ["SYSLIB0021", "SYSLIB0026", "SYSLIB0027", "SYSLIB0028", "SYSLIB0057", "SYSLIB5006"],
     defines = ["UNIX", "UNIX1_0", "Unix"],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     size = "large",
     keyfile = OPEN_SNK,
     target_compatible_with = ["@platforms//os:linux"],

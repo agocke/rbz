@@ -32,10 +32,6 @@ impl_assembly(
         "//src/libraries/Common:src/Interop/Windows/Kernel32/Interop.CreateToolhelp32Snapshot.cs",
         "//src/libraries/Common:src/Interop/Windows/Kernel32/Interop.MAX_PATH.cs",
     ],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     allow_unsafe_blocks = True,
     deps = [
         "//src/libraries:ref_System.Runtime",

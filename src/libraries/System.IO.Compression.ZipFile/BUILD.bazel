@@ -14,10 +14,6 @@ netcoreapp_ref_assembly(
 netcoreapp_impl_assembly(
     name = "impl_System.IO.Compression.ZipFile",
     nowarn = ["CS1591"],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     srcs = [
         # Common files (all platforms)
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",

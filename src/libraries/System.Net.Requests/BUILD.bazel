@@ -26,6 +26,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Net.Requests",
+    com_interface_generator = True,
     os_targeted = "unix",
     srcs = glob(
         ["src/System/**/*.cs"],
