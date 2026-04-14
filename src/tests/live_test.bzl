@@ -598,6 +598,7 @@ def library_test(
     additionalfiles = [],
     analyzer_configs = [],
     compiler_options = [],
+    features_strict = True,
     **kwargs
 ):
     """Test macro for library tests that compiles as library and runs via xunit.console.dll."""
@@ -658,13 +659,12 @@ EOF""".format(version = PRODUCT_VERSION),
     # Match MSBuild test compiler options
     compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
-        "/features:strict",
         "/features:nullablePublicOnly",
         "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
         "/noconfig",
         "/warn:9999",
         "/ruleset:eng/Default.ruleset",
-    ]
+    ] + (["/features:strict"] if features_strict else [])
 
     _xunit_library_test(
         name = name,
@@ -678,6 +678,8 @@ EOF""".format(version = PRODUCT_VERSION),
         nowarn = all_nowarn,
         size = size,
         nullable = nullable,
+        # Match MSBuild's LangVersion=preview from Directory.Build.props.
+        langversion = "preview",
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = True,
         # Match MSBuild's WarningsNotAsErrors from Directory.Build.props
