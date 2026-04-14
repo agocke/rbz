@@ -1,5 +1,5 @@
 load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
-load("//:defs.bzl", "csharp_library")
+load("//:defs.bzl", "OPEN_SNK", "csharp_library")
 
 exports_files([
     "ref/System.Text.RegularExpressions.cs",
@@ -7,6 +7,7 @@ exports_files([
 
 csharp_library(
     name = "RegexGenerator",
+    keyfile = OPEN_SNK,
     out = "System.Text.RegularExpressions.Generator",
     srcs = [
         "gen/RegexGenerator.cs",

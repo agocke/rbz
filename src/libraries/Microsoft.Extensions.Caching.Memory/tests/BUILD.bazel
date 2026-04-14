@@ -5,7 +5,9 @@ load("//:defs.bzl", "ASPNETCORE_SNK")
 library_test(
     name = "Microsoft.Extensions.Caching.Memory.Tests",
     nowarn = MULTITARGET_NOWARN,
-    srcs = glob(["**/*.cs"]),
+    srcs = glob(["**/*.cs"]) + [
+        "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
+    ],
     deps = [
         "//src/libraries/Microsoft.Extensions.Caching.Abstractions:ref_Microsoft.Extensions.Caching.Abstractions",
         "//src/libraries/Microsoft.Extensions.Caching.Memory:impl_Microsoft.Extensions.Caching.Memory",

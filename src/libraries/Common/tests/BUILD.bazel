@@ -10,7 +10,9 @@ csharp_library(
         ["TestUtilities/**/*.cs"],
         exclude = [
             "TestUtilities/System/WindowsTestFileShare.cs",
-            # Not compiled by MSBuild TestUtilities project
+            # Not compiled by MSBuild TestUtilities project; individual tests
+            # include these directly as source files instead.
+            "TestUtilities/System/DisableParallelization.cs",
             "TestUtilities/System/DisableParallelizationPerAssembly.cs",
         ],
     ) + [
