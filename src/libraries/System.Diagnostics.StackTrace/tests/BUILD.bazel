@@ -7,6 +7,7 @@ load("//:defs.bzl", "OPEN_SNK")
 # MSBuild's <DebugType>None</DebugType>.
 live_csharp_library(
     name = "ExceptionTestAssembly",
+    keyfile = OPEN_SNK,
     srcs = ["ExceptionTestAssembly/ExceptionTestAssembly.cs"],
     # MSBuild uses DebugType=None but rules_dotnet always declares a .pdb
     # output.  Omit /debug- and let the default PDB be generated; the test

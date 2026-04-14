@@ -41,6 +41,7 @@ OPEN_SNK = "//eng:snk/Open.snk"
 ASPNETCORE_SNK = "//eng:snk/AspNetCore.snk"
 ECMA_SNK = "//eng:snk/ECMA.snk"
 SILVERLIGHT_SNK = "//eng:snk/SilverlightPlatformPublicKey.snk"
+DEFAULT_RULESET = "//eng:Default.ruleset"
 
 # MIBC PGO optimization data files from NuGet (matched to target architecture).
 # MSBuild equivalent: eng/restore/optimizationData.targets selects the right
@@ -404,6 +405,7 @@ def csharp_library(
     suffix_srcs = [],
     use_shared_compilation = True,
     compiler_options = [],
+    compile_data = [],
     treat_warnings_as_errors = True,
     warnings_not_as_errors = [],
     generate_documentation_file = False,
@@ -493,7 +495,16 @@ def csharp_library(
         ],
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,
-        warnings_not_as_errors = warnings_not_as_errors,
+        # Match MSBuild's WarningsNotAsErrors from Directory.Build.props
+        # (NuGet audit warnings demoted from errors for non-official builds).
+        # rules_dotnet forbids warnings_not_as_errors when treat_warnings_as_errors
+        # is false, so only add them when warnaserror is enabled.
+        warnings_not_as_errors = (warnings_not_as_errors + [
+            "NU1901",
+            "NU1902",
+            "NU1903",
+            "NU1904",
+        ]) if treat_warnings_as_errors else warnings_not_as_errors,
         # MSBuild only generates XML doc files for library source assemblies
         # (GenerateDocumentationFile=true in src/libraries/Directory.Build.props
         # when IsSourceProject=true).  Default to False to match MSBuild.
@@ -502,12 +513,20 @@ def csharp_library(
         # flags, so keep these late in the command line for last-wins behavior.
         compiler_options = compiler_options + [
             "/noconfig",
-            "/platform:AnyCPU",
             # rules_dotnet restricts warning_level to [0..5] so we use
             # compiler_options to emit /warn:9999, matching MSBuild's
             # WarningLevel=9999.
             "/warn:9999",
+            # SDK WarningsAsErrors: BinaryFormatter obsolete (SYSLIB0011)
+            # set by Microsoft.NET.Sdk.CSharp.targets when net10.0+.
+            "/warnaserror+:SYSLIB0011",
+            # Microsoft.DotNet.CodeAnalysis package supplies this ruleset to
+            # all projects.  It suppresses several CA rules globally (e.g.
+            # CA1018, CA1001, CA2213).  compile_data makes the file available
+            # in the sandbox so csc can read it.
+            "/ruleset:eng/Default.ruleset",
         ],
+        compile_data = compile_data + [DEFAULT_RULESET],
         # In CI mode, normalize PDB paths to match MSBuild's CI layout
         # (ContinuousIntegrationBuild=true → DeterministicSourcePaths → PathMap).
         pathmap = select({

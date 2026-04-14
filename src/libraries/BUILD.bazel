@@ -326,6 +326,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_Microsoft.Win32.Primitives",
+    include_editorconfig = False,
     nowarn = ["CS1591"],
     deps = [
         "//src/coreclr/System.Private.CoreLib:impl_System.Private.CoreLib",
@@ -433,13 +434,10 @@ netcoreapp_impl_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Diagnostics.Process",
+    com_interface_generator = True,
     nowarn = ["CS1591"],
     os_targeted = True,
     defines = ["FEATURE_REGISTRY"],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     srcs = [
         "System.Diagnostics.Process/src/Microsoft/Win32/SafeHandles/SafeProcessHandle.cs",
         "System.Diagnostics.Process/src/System/Collections/Specialized/DictionaryWrapper.cs",
@@ -571,6 +569,7 @@ netcoreapp_impl_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.ComponentModel.Primitives",
+    library_import_generator = False,
     nowarn = ["CS1591"],
     srcs = [
         "System.ComponentModel.Primitives/src/System/ComponentModel/ISynchronizeInvoke.cs",

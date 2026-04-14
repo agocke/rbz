@@ -473,10 +473,13 @@ csharp_library(
         "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
         "/features:nullablePublicOnly",
         "/features:strict",
-        "/skipanalyzers+",
+        "/platform:AnyCPU",
         "/runtimemetadataversion:v4.0.30319",
         "/checksumalgorithm:SHA256",
         "/publicsign+",
+        # SDK WarningsAsErrors: NU1605 added by Microsoft.NET.Sdk.CSharp.props.
+        # SYSLIB0011 is added by the csharp_library wrapper.
+        "/warnaserror+:NU1605",
     ] + select({
         # override_debug skips /debug and /optimize; set them per CLR config.
         # MSBuild: Debug → /optimize-, Checked → /optimize+, Release → /optimize+

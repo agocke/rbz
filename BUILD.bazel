@@ -36,9 +36,36 @@ source_analyzer_config_files = [
     "//src/tools/bazel:analysislevelstyle_default.globalconfig",
 ]
 
+# Variant without .editorconfig for facade/shim assemblies whose MSBuild
+# project doesn't emit a root .editorconfig analyzerconfig entry.
+source_analyzer_config_files_no_editorconfig = [
+    "//eng:CodeAnalysis.src.globalconfig",
+    "//src/tools/bazel:analysislevel_11_default.globalconfig",
+    "//src/tools/bazel:analysislevelstyle_default.globalconfig",
+]
+
 filegroup(
     name = "source_analyzer_configs",
     srcs = source_analyzer_config_files,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "source_analyzer_configs_no_editorconfig",
+    srcs = source_analyzer_config_files_no_editorconfig,
+    visibility = ["//visibility:public"],
+)
+
+test_analyzer_config_files = [
+    ".editorconfig",
+    "//eng:CodeAnalysis.test.globalconfig",
+    "//src/tools/bazel:analysislevel_11_default.globalconfig",
+    "//src/tools/bazel:analysislevelstyle_default.globalconfig",
+]
+
+filegroup(
+    name = "test_analyzer_configs",
+    srcs = test_analyzer_config_files,
     visibility = ["//visibility:public"],
 )
 

@@ -14,7 +14,9 @@ library_test(
         exclude = [
             "TrimmingTests/**",
         ],
-    ),
+    ) + [
+        "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
+    ],
     deps = [
         "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",

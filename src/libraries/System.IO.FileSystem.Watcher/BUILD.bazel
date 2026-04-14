@@ -15,11 +15,8 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.IO.FileSystem.Watcher",
+    com_interface_generator = True,
     nowarn = ["CS1591"],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     srcs = [
         "src/System/HResults.cs",
         "src/System/IO/ErrorEventArgs.cs",

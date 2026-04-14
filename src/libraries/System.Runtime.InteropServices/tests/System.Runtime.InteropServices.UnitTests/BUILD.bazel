@@ -54,10 +54,6 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     allow_unsafe_blocks = True,
     size = "large",
     keyfile = OPEN_SNK,

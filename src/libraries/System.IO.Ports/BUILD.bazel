@@ -18,10 +18,6 @@ impl_assembly(
     nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],
     defines = ["SERIAL_PORTS"],
     include_dll_safe_search_path = True,
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     srcs = glob(
         ["src/**/*.cs"],
         exclude = [

@@ -16,6 +16,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Diagnostics.Contracts",
+    include_editorconfig = False,
     nowarn = ["CS1591"],
     srcs = [],
     deps = [

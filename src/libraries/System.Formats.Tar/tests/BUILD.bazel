@@ -64,10 +64,6 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     allow_unsafe_blocks = True,
     data = ["@paket.main//system.formats.tar.testdata:content_files"],
     size = "large",

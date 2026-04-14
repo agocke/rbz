@@ -6,9 +6,6 @@ library_test(
     name = "System.Memory.Data.Tests",
     nowarn = MULTITARGET_NOWARN,
     srcs = glob(["**/*.cs"]),
-    analyzers = [
-        "//src/libraries/System.Text.Json:JsonSourceGenerator",
-    ],
     deps = [
         "//src/libraries/System.Memory.Data:impl_System.Memory.Data",
         "//src/libraries/System.Text.Json:ref_System.Text.Json",

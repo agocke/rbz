@@ -27,6 +27,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Security.Cryptography",
+    com_interface_generator = True,
     os_targeted = "unix",
     srcs = [
         "//src/libraries/Common:src/System/Security/Cryptography/Asn1Reader/AsnValueReader.cs",
@@ -750,10 +751,6 @@ netcoreapp_impl_assembly(
             "//src/libraries/System.Console:ref_System.Console",
         ],
     }),
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     allow_unsafe_blocks = True,
     nowarn = [
         "CA5350",

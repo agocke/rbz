@@ -8,6 +8,9 @@ library_test(
     srcs = glob(["*.cs"]) + [
         "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/IsExternalInit.cs",
     ],
+    # Match MSBuild csproj: <Features>$(Features.Replace('strict', '')</Features>
+    # Tests intentionally use underlying-enum arithmetic that strict mode rejects.
+    features_strict = False,
     deps = [
         "//src/libraries:ref_Microsoft.CSharp",
         "//src/libraries:ref_System.Linq.Expressions",

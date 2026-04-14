@@ -18,6 +18,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Text.Encoding.CodePages",
+    com_interface_generator = True,
     srcs = [
         "src/Microsoft/Win32/SafeHandles/SafeAllocHHandle.cs",
         "src/System/Text/BaseCodePageEncoding.cs",
