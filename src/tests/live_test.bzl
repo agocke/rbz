@@ -1,4 +1,4 @@
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_library")
+load("//:defs.bzl", "DEFAULT_RULESET", "NETCOREAPP_CURRENT", "csharp_library")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@rules_dotnet//dotnet/private:providers.bzl",
@@ -19,6 +19,7 @@ load("@rules_dotnet//dotnet/private:common.bzl",
 load("@rules_dotnet//dotnet/private/macros:register_tfms.bzl", "get_tfm_value")
 load("//src/libraries:defs.bzl", "LIVE_REFPACK_DEPS", "CORE_ROOT_REFPACK_DEPS")
 load("//src/tests:defs.bzl", "COMMON_ATTRS", "build_binary", "create_launcher")
+load("//eng/bazel:version.bzl", "PRODUCT_VERSION")
 
 # Match src/tests/Directory.Build.props NoWarn (for JIT/coreclr tests under src/tests/)
 _TEST_NOWARN = [
@@ -594,6 +595,10 @@ def library_test(
     size = "medium",
     use_shared_compilation = True,
     replace_library_nowarns = None,
+    additionalfiles = [],
+    analyzer_configs = [],
+    compiler_options = [],
+    features_strict = True,
     **kwargs
 ):
     """Test macro for library tests that compiles as library and runs via xunit.console.dll."""
@@ -607,14 +612,79 @@ def library_test(
         all_nowarn = nowarn + replace_library_nowarns
     else:
         all_nowarn = nowarn + _LIBRARY_TEST_NOWARN
+
+    # ── Analyzer infrastructure (matching MSBuild's Analyzers.targets for tests) ──
+    # Generate an empty disabledAnalyzers.config
+    _disabled_analyzers_target = "disabled_analyzers_" + name
+    native.genrule(
+        name = _disabled_analyzers_target,
+        outs = [name + "/disabledAnalyzers.config"],
+        cmd = ": > \"$@\"",
+    )
+
+    # Generate per-test GeneratedMSBuildEditorConfig.editorconfig
+    _editorconfig_target = "editorconfig_" + name
+    native.genrule(
+        name = _editorconfig_target,
+        outs = [name + "/" + name + ".GeneratedMSBuildEditorConfig.editorconfig"],
+        cmd = """cat >"$@" <<'EOF'
+is_global = true
+build_property.InformationalVersion = {version}
+build_property._SupportedPlatformList = Linux,macOS,Windows,Android,iOS,tvOS,macCatalyst,browser,wasi,illumos,Solaris,Haiku,Unix,FreeBSD
+EOF""".format(version = PRODUCT_VERSION),
+    )
+
+    # Merge additionalfiles with generated disabledAnalyzers.config
+    _additionalfiles = additionalfiles + [":" + _disabled_analyzers_target]
+
+    # Test analyzer configs: .editorconfig + test globalconfig + analysis levels + per-test editorconfig
+    _analyzer_configs = analyzer_configs + [
+        "//:test_analyzer_configs",
+        ":" + _editorconfig_target,
+    ]
+
+    # Test analyzers: source build analyzers + interop generators.
+    # MSBuild adds these via eng/Analyzers.targets, eng/generators.targets,
+    # and eng/testing/xunit/xunit.props.
+    # Note: xunit.analyzers and JSImportGenerator are not yet available in Bazel.
+    _analyzers = analyzers + [
+        "//:source_build_analyzers",
+        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ]
+
+    # Match MSBuild test compiler options
+    compiler_options = compiler_options + [
+        "/checksumalgorithm:SHA256",
+        "/features:nullablePublicOnly",
+        "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
+        "/noconfig",
+        "/warn:9999",
+        "/ruleset:eng/Default.ruleset",
+    ] + (["/features:strict"] if features_strict else [])
+
     _xunit_library_test(
         name = name,
         deps = deps,
-        analyzers = analyzers,
+        analyzers = _analyzers,
+        additionalfiles = _additionalfiles,
+        analyzer_configs = _analyzer_configs,
+        compiler_options = compiler_options,
+        compile_data = [DEFAULT_RULESET],
         target_frameworks = [NETCOREAPP_CURRENT],
         nowarn = all_nowarn,
         size = size,
         nullable = nullable,
+        # Match MSBuild's LangVersion=preview from Directory.Build.props.
+        langversion = "preview",
+        # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
+        treat_warnings_as_errors = True,
+        # Match MSBuild's WarningsNotAsErrors from Directory.Build.props
+        # (NuGet audit warnings demoted from errors for non-official builds).
+        warnings_not_as_errors = ["NU1901", "NU1902", "NU1903", "NU1904"],
         use_shared_compilation = use_shared_compilation,
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
         # Match MSBuild: GenerateAssemblyInfo=false (no CLSCompliant attribute),
@@ -686,7 +756,8 @@ def coreclr_test(
         size = size,
         tags = tags + ["pri%d" % pri],
         flaky = flaky,
-        compiler_options = compiler_options,
+        compiler_options = compiler_options + ["/ruleset:eng/Default.ruleset"],
+        compile_data = [DEFAULT_RULESET],
         target_frameworks = [NETCOREAPP_CURRENT],
         nowarn = ["CS1701"] + _TEST_NOWARN,
         use_shared_compilation = use_shared_compilation,

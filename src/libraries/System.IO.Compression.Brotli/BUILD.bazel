@@ -15,10 +15,6 @@ netcoreapp_impl_assembly(
     name = "impl_System.IO.Compression.Brotli",
     nowarn = ["CS1591"],
     os_targeted = "unix",
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     srcs = [
         # Common interop (all platforms)
         "//src/libraries/Common:src/Interop/Interop.Brotli.cs",

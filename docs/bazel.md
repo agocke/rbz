@@ -195,14 +195,28 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 0 of 404 tracked assemblies currently match
+- **Managed assemblies**: 69 of 404 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
-  `/nostdlib+`). Output-formatting flags (`/fullpaths`, `/utf8output`,
-  `/nologo`), debug symbol format, and build infrastructure (`/pathmap:`,
-  `/sourcelink:`, etc.) are filtered before comparison. Path-bearing flags are
-  normalized to filename-only for cross-build-system comparison.
-  Of the 404 tracked assemblies, 13 are expected to differ due to:
+  `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
+  flags (`/fullpaths`, `/utf8output`, `/nologo`), debug symbol format, and
+  build infrastructure (`/pathmap:`, `/sourcelink:`, etc.) are filtered
+  before comparison. Path-bearing flags are normalized to filename-only for
+  cross-build-system comparison. Warning flags are normalized: duplicate
+  `/warn:` entries keep the highest value (matching csc last-wins behavior),
+  and comma-separated `/warnaserror+:X,Y` entries are expanded into
+  individual entries for consistent comparison.
+  The matching assemblies include `System.Private.CoreLib` (full analyzer
+  and flag parity including the ILLink.RoslynAnalyzer built from source) and
+  68 library assemblies matched via infrastructure in `impl_assembly`
+  (`src/libraries/defs.bzl`), which automatically generates per-assembly
+  `disabledAnalyzers.config`, `GeneratedMSBuildEditorConfig.editorconfig`,
+  passes the standard Roslyn analyzers, ILLink analyzer, the
+  `Microsoft.DotNet.CodeAnalysis` `Default.ruleset` (via `compile_data`),
+  and conditionally the interop source generators (LibraryImportGenerator,
+  SourceGeneration, ComInterfaceGenerator) matching `eng/generators.targets`
+  logic.
+  Of the 335 remaining diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
@@ -724,6 +738,7 @@ and System.Net.Quic (msquic native library + full Linux implementation).
 - [x] `src/tools/GenFacades` — type-forward facade generator
 - [x] `src/tools/GenerateDepsFile` — generates `Microsoft.NETCore.App.deps.json` from assembled DLLs
 - [x] ILLink / IL trimmer (`src/tools/illink/`) — IL linker builds from source; `illink.bzl` rule trims framework assemblies
+- [x] ILLink.RoslynAnalyzer — Roslyn analyzer built from source (uses `paket.illink` group with Roslyn 4.14.0, separate from the main group's 4.11.0)
 - [ ] StressLogAnalyzer (`src/tools/StressLogAnalyzer/`)
 
 ### 5.4 Tests — 🔨 Partial

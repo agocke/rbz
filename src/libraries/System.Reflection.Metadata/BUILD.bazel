@@ -25,6 +25,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Reflection.Metadata",
+    com_interface_generator = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
     srcs = glob(
         ["src/System/**/*.cs"],

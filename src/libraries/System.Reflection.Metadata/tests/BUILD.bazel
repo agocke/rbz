@@ -27,10 +27,6 @@ library_test(
         "//src/libraries/Common:src/Interop/Windows/Kernel32/Interop.LoadLibraryEx.cs",
         "//src/libraries/Common:src/Microsoft/Win32/SafeHandles/SafeLibraryHandle.cs",
     ],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     deps = [
         "//src/libraries/System.Reflection.Metadata:impl_System.Reflection.Metadata",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",

@@ -11,6 +11,7 @@ library_test(
         "ComplexTests.GenericMath.cs",
         "//src/libraries/Common/tests:System/GenericMathHelpers.cs",
         "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
+        "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
     ],
     deps = [
         "//src/libraries/System.Net.Mail:ref_System.Net.Mail",

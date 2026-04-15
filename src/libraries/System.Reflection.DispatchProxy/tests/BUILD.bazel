@@ -4,6 +4,7 @@ load("//:defs.bzl", "OPEN_SNK")
 
 live_csharp_library(
     name = "System.Reflection.DispatchProxy.TestDependency",
+    keyfile = OPEN_SNK,
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     srcs = [
         "TestDependency/InternalsVisibleTo.cs",

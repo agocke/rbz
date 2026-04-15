@@ -24,6 +24,13 @@ ILLINK_TASKS_NET10_REPO = "nuget.microsoft.net.illink.tasks.v10.0.0"
 MIBC_LINUX_X64_REPO = "nuget.optimization.linux-x64.mibc.runtime.v1.0.0-prerelease.26080.1"
 MIBC_LINUX_ARM64_REPO = "nuget.optimization.linux-arm64.mibc.runtime.v1.0.0-prerelease.26080.1"
 
+# Analyzer NuGet packages (from eng/Analyzers.targets)
+CODEANALYSIS_ANALYZERS_REPO = "nuget.microsoft.codeanalysis.analyzers.v5.0.0-2.26170.102"
+CODEANALYSIS_NETANALYZERS_REPO = "nuget.microsoft.codeanalysis.netanalyzers.v10.0.106"
+CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codestyle.v4.14.0"
+DOTNET_CODEANALYSIS_REPO = "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26170.102"
+STYLECOP_ANALYZERS_UNSTABLE_REPO = "nuget.stylecop.analyzers.unstable.v1.2.0.556"
+
 # ─── Pre-built labels for commonly used assets ───────────────────────────────
 # SNK signing keys are copied to a stable path in //eng:snk/ (via copy_file)
 # so that Arcade SDK version bumps don't invalidate the cache for every
@@ -34,6 +41,7 @@ OPEN_SNK = "//eng:snk/Open.snk"
 ASPNETCORE_SNK = "//eng:snk/AspNetCore.snk"
 ECMA_SNK = "//eng:snk/ECMA.snk"
 SILVERLIGHT_SNK = "//eng:snk/SilverlightPlatformPublicKey.snk"
+DEFAULT_RULESET = "//eng:Default.ruleset"
 
 # MIBC PGO optimization data files from NuGet (matched to target architecture).
 # MSBuild equivalent: eng/restore/optimizationData.targets selects the right
@@ -397,6 +405,7 @@ def csharp_library(
     suffix_srcs = [],
     use_shared_compilation = True,
     compiler_options = [],
+    compile_data = [],
     treat_warnings_as_errors = True,
     warnings_not_as_errors = [],
     generate_documentation_file = False,
@@ -486,16 +495,38 @@ def csharp_library(
         ],
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,
-        warnings_not_as_errors = warnings_not_as_errors,
+        # Match MSBuild's WarningsNotAsErrors from Directory.Build.props
+        # (NuGet audit warnings demoted from errors for non-official builds).
+        # rules_dotnet forbids warnings_not_as_errors when treat_warnings_as_errors
+        # is false, so only add them when warnaserror is enabled.
+        warnings_not_as_errors = (warnings_not_as_errors + [
+            "NU1901",
+            "NU1902",
+            "NU1903",
+            "NU1904",
+        ]) if treat_warnings_as_errors else warnings_not_as_errors,
         # MSBuild only generates XML doc files for library source assemblies
         # (GenerateDocumentationFile=true in src/libraries/Directory.Build.props
         # when IsSourceProject=true).  Default to False to match MSBuild.
         generate_documentation_file = generate_documentation_file,
-        # rules_dotnet restricts warning_level to [0..5] so we use
-        # compiler_options to emit /warn:9999, matching MSBuild's
-        # WarningLevel=9999.  Placed after rules_dotnet's own /warn:3 so
-        # the last-wins semantics of csc give us the correct level.
-        compiler_options = compiler_options + ["/warn:9999"],
+        # Match MSBuild's csc defaults. rules_dotnet emits its own baseline
+        # flags, so keep these late in the command line for last-wins behavior.
+        compiler_options = compiler_options + [
+            "/noconfig",
+            # rules_dotnet restricts warning_level to [0..5] so we use
+            # compiler_options to emit /warn:9999, matching MSBuild's
+            # WarningLevel=9999.
+            "/warn:9999",
+            # SDK WarningsAsErrors: BinaryFormatter obsolete (SYSLIB0011)
+            # set by Microsoft.NET.Sdk.CSharp.targets when net10.0+.
+            "/warnaserror+:SYSLIB0011",
+            # Microsoft.DotNet.CodeAnalysis package supplies this ruleset to
+            # all projects.  It suppresses several CA rules globally (e.g.
+            # CA1018, CA1001, CA2213).  compile_data makes the file available
+            # in the sandbox so csc can read it.
+            "/ruleset:eng/Default.ruleset",
+        ],
+        compile_data = compile_data + [DEFAULT_RULESET],
         # In CI mode, normalize PDB paths to match MSBuild's CI layout
         # (ContinuousIntegrationBuild=true → DeterministicSourcePaths → PathMap).
         pathmap = select({

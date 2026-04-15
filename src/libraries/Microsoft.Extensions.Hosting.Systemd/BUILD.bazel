@@ -32,10 +32,6 @@ impl_assembly(
         "//src/libraries/Common:src/Interop/Unix/libc/Interop.GetParentPid.cs",
         "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
     ],
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-    ],
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",

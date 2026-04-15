@@ -1,4 +1,5 @@
 load("//src/libraries:defs.bzl", "live_csharp_library", "netcoreapp_ref_assembly")
+load("//:defs.bzl", "OPEN_SNK")
 
 netcoreapp_ref_assembly(
     name = "ref_System.IO.Hashing",
@@ -14,6 +15,7 @@ netcoreapp_ref_assembly(
 
 live_csharp_library(
     name = "live_System.IO.Hashing",
+    keyfile = OPEN_SNK,
     srcs = glob(
         ["src/**/*.cs"],
         exclude = [

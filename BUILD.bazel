@@ -6,7 +6,12 @@ load("//eng/bazel:runtime_layout.bzl", "runtime_layout")
 load("//eng/bazel:version.bzl", "PRODUCT_VERSION", "PRODUCT_VERSION_FULL")
 load(
     "//:defs.bzl",
+    "CODEANALYSIS_ANALYZERS_REPO",
+    "CODEANALYSIS_CSHARP_CODESTYLE_REPO",
+    "CODEANALYSIS_NETANALYZERS_REPO",
+    "DOTNET_CODEANALYSIS_REPO",
     "MIBC_FILES",
+    "STYLECOP_ANALYZERS_UNSTABLE_REPO",
 )
 load(
     "//:framework_r2r.bzl",
@@ -17,11 +22,74 @@ load(
 )
 
 exports_files([
+    ".editorconfig",
     "artifacts/obj/coreclr/System.Private.CoreLib/linux.x64.Debug/System.Private.CoreLib.Strings.resources",
     "artifacts/obj/coreclr/System.Private.CoreLib/osx.arm64.Debug/System.Private.CoreLib.Strings.resources",
     "LICENSE.TXT",
     "THIRD-PARTY-NOTICES.TXT",
 ])
+
+source_analyzer_config_files = [
+    ".editorconfig",
+    "//eng:CodeAnalysis.src.globalconfig",
+    "//src/tools/bazel:analysislevel_11_default.globalconfig",
+    "//src/tools/bazel:analysislevelstyle_default.globalconfig",
+]
+
+# Variant without .editorconfig for facade/shim assemblies whose MSBuild
+# project doesn't emit a root .editorconfig analyzerconfig entry.
+source_analyzer_config_files_no_editorconfig = [
+    "//eng:CodeAnalysis.src.globalconfig",
+    "//src/tools/bazel:analysislevel_11_default.globalconfig",
+    "//src/tools/bazel:analysislevelstyle_default.globalconfig",
+]
+
+filegroup(
+    name = "source_analyzer_configs",
+    srcs = source_analyzer_config_files,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "source_analyzer_configs_no_editorconfig",
+    srcs = source_analyzer_config_files_no_editorconfig,
+    visibility = ["//visibility:public"],
+)
+
+test_analyzer_config_files = [
+    ".editorconfig",
+    "//eng:CodeAnalysis.test.globalconfig",
+    "//src/tools/bazel:analysislevel_11_default.globalconfig",
+    "//src/tools/bazel:analysislevelstyle_default.globalconfig",
+]
+
+filegroup(
+    name = "test_analyzer_configs",
+    srcs = test_analyzer_config_files,
+    visibility = ["//visibility:public"],
+)
+
+source_build_analyzer_files = [
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.Analyzers.dll".format(CODEANALYSIS_ANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.Analyzers.dll".format(CODEANALYSIS_ANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/Microsoft.CodeAnalysis.NetAnalyzers.dll".format(CODEANALYSIS_NETANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll".format(CODEANALYSIS_NETANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.CodeStyle.dll".format(CODEANALYSIS_CSHARP_CODESTYLE_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.CodeStyle.Fixes.dll".format(CODEANALYSIS_CSHARP_CODESTYLE_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CodeStyle.dll".format(CODEANALYSIS_CSHARP_CODESTYLE_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CodeStyle.Fixes.dll".format(CODEANALYSIS_CSHARP_CODESTYLE_REPO),
+    "@{}//:analyzers/Microsoft.DotNet.CodeAnalysis.dll".format(DOTNET_CODEANALYSIS_REPO),
+    "@{}//:analyzers/dotnet/cs/StyleCop.Analyzers.dll".format(STYLECOP_ANALYZERS_UNSTABLE_REPO),
+    "@{}//:analyzers/dotnet/cs/StyleCop.Analyzers.CodeFixes.dll".format(STYLECOP_ANALYZERS_UNSTABLE_REPO),
+]
+
+import_library(
+    name = "source_build_analyzers",
+    library_name = "SourceBuildAnalyzers",
+    refs = source_build_analyzer_files,
+    libs = source_build_analyzer_files,
+    visibility = ["//visibility:public"],
+)
 
 # ── Per-component build configuration flags ──────────────────────────
 # These replace the legacy --define runtime_debug=1 mechanism with modern

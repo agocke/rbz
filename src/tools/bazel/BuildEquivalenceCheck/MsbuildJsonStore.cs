@@ -40,6 +40,9 @@ public static class MsbuildJsonStore
                 ? NormalizeRefPaths(r.ReferencePaths, r.IsReferenceAssembly, root)
                 : null,
             Analyzers = r.Analyzers.Count > 0 ? [.. r.Analyzers] : null,
+            AnalyzerPaths = r.AnalyzerPaths.Count > 0
+                ? NormalizeAnalyzerPaths(r.AnalyzerPaths, root)
+                : null,
             Flags = r.Flags.Count > 0 ? [.. r.Flags] : null,
             TargetType = r.TargetType != "library" ? r.TargetType : null,
             LangVersion = !string.IsNullOrEmpty(r.LangVersion) ? r.LangVersion : null,
@@ -79,6 +82,7 @@ public static class MsbuildJsonStore
                 References = new SortedSet<string>(d.References ?? [], StringComparer.Ordinal),
                 ReferencePaths = d.ReferencePaths ?? [],
                 Analyzers = new SortedSet<string>(d.Analyzers ?? [], StringComparer.Ordinal),
+                AnalyzerPaths = d.AnalyzerPaths ?? [],
                 Flags = flags,
                 TargetType = d.TargetType ?? "library",
                 LangVersion = d.LangVersion ?? "",
@@ -98,6 +102,7 @@ public static class MsbuildJsonStore
         public Dictionary<string, string>? ReferencePaths { get; set; }
         public List<string>? NoWarn { get; set; }
         public List<string>? Analyzers { get; set; }
+        public Dictionary<string, string>? AnalyzerPaths { get; set; }
         public List<string>? Flags { get; set; }
         public string? TargetType { get; set; }
         public string? LangVersion { get; set; }
@@ -140,6 +145,23 @@ public static class MsbuildJsonStore
         if (isRefAssembly || paths.Count > 50)
             return null;
 
+        var result = new Dictionary<string, string>(paths.Count);
+        foreach (var (name, fullPath) in paths)
+        {
+            if (repoRoot is not null && fullPath.StartsWith(repoRoot, StringComparison.Ordinal))
+                result[name] = fullPath[repoRoot.Length..];
+            else
+                result[name] = fullPath;
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Normalize analyzer paths to repo-relative for compact, portable JSON.
+    /// </summary>
+    private static Dictionary<string, string> NormalizeAnalyzerPaths(
+        Dictionary<string, string> paths, string? repoRoot)
+    {
         var result = new Dictionary<string, string>(paths.Count);
         foreach (var (name, fullPath) in paths)
         {

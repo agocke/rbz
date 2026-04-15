@@ -13,8 +13,12 @@ framework: net10.0
 nuget Microsoft.CodeAnalysis.Common 4.11.0
 nuget Microsoft.CodeAnalysis.CSharp 4.11.0
 nuget Microsoft.CodeAnalysis.CSharp.Workspaces 4.11.0
-nuget Microsoft.CodeAnalysis.Analyzers 3.11.0
+nuget Microsoft.CodeAnalysis.Analyzers 5.0.0-2.26170.102
+nuget Microsoft.CodeAnalysis.CSharp.CodeStyle 4.14.0
+nuget Microsoft.CodeAnalysis.NetAnalyzers 10.0.106
 nuget Microsoft.CodeAnalysis.Workspaces.Common 4.11.0
+nuget Microsoft.DotNet.CodeAnalysis 10.0.0-beta.26170.102
+nuget StyleCop.Analyzers 1.2.0-beta.556
 nuget System.Memory 4.5.5
 nuget microsoft.dotnet.arcade.sdk 10.0.0-beta.26170.102
 nuget System.Buffers 4.5.1
@@ -68,3 +72,14 @@ nuget Newtonsoft.Json 13.0.3
 nuget FsCheck 2.14.3
 nuget FsCheck.Xunit 2.14.3
 nuget System.Data.SqlClient 4.9.0
+
+group illink
+source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json
+
+storage: none
+framework: netstandard2.0
+
+nuget Microsoft.CodeAnalysis.Common 4.14.0
+nuget Microsoft.CodeAnalysis.CSharp 4.14.0
+nuget System.Collections.Immutable 9.0.0
+nuget System.Memory 4.5.5

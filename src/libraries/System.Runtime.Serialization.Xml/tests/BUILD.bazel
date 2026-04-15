@@ -6,6 +6,7 @@ load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK")
 
 csharp_library(
     name = "SerializableAssembly",
+    keyfile = OPEN_SNK,
     nowarn = ["1701", "1702", "1705", "8500", "8969", "IDE0060", "IDE0100", "IL2121", "NU5105", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     srcs = ["SerializationTypes.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
@@ -25,6 +26,7 @@ csharp_library(
 
 csharp_library(
     name = "XsdExporterSerializationTypes",
+    keyfile = OPEN_SNK,
     srcs = glob(["XsdDataContractExporterTests/SerializationTypes/*.cs"]),
     defines = ["UseSeparateAssemblyNamespace", "HideTypesWithoutSerializableAttribute"],
     nowarn = ["169", "414", "1701", "1702", "1705", "8500", "8969", "IDE0060", "IDE0100", "NU5105"],

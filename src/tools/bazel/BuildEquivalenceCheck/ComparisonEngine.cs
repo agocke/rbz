@@ -444,6 +444,7 @@ public static class ComparisonEngine
         "/doc:",
         "/keyfile:",
         "/resource:",
+        "/ruleset:",
     ];
 
     /// <summary>
@@ -467,14 +468,6 @@ public static class ComparisonEngine
         if (flag.StartsWith("/debug", StringComparison.Ordinal))
             return true;
 
-        // Warning policy flags — /warnaserror controls whether warnings are
-        // errors and /warn: sets the warning level. MSBuild passes these on
-        // nearly every assembly; Bazel doesn't. They don't change what code
-        // is compiled, only whether warnings cause the build to fail.
-        if (flag.StartsWith("/warnaserror", StringComparison.Ordinal)
-            || flag.StartsWith("/warn:", StringComparison.Ordinal))
-            return true;
-
         // Strong naming signing mechanism — /publicsign, /delaysign are
         // toolchain config differences
         if (flag.StartsWith("/publicsign", StringComparison.Ordinal)
@@ -490,15 +483,13 @@ public static class ComparisonEngine
         // /refout — ref assembly output path
         // /embed — embed source file in PDB
         // /generatedfilesout — generated files output directory
-        // /ruleset — code analysis ruleset path
         if (flag.StartsWith("/pathmap:", StringComparison.Ordinal)
             || flag.StartsWith("/sourcelink:", StringComparison.Ordinal)
             || flag.StartsWith("/skipanalyzers", StringComparison.Ordinal)
             || flag.StartsWith("/pdb:", StringComparison.Ordinal)
             || flag.StartsWith("/refout:", StringComparison.Ordinal)
             || flag.StartsWith("/embed:", StringComparison.Ordinal)
-            || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal)
-            || flag.StartsWith("/ruleset:", StringComparison.Ordinal))
+            || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal))
             return true;
 
         return false;
@@ -528,8 +519,19 @@ public static class ComparisonEngine
                 if (commaIdx >= 0)
                 {
                     var filePart = value[..commaIdx];
-                    var rest = value[commaIdx..];
-                    return prefix + Path.GetFileName(filePart) + rest;
+                    var rest = value[(commaIdx + 1)..];
+                    var fileName = Path.GetFileName(filePart);
+
+                    // csc treats /resource:file,SameName as equivalent to
+                    // /resource:file when the logical name is just the file
+                    // name. MSBuild often omits the redundant logical name
+                    // while Bazel emits it explicitly via resource_logical_names.
+                    if (string.Equals(fileName, rest, StringComparison.Ordinal))
+                    {
+                        return prefix + rest;
+                    }
+
+                    return prefix + fileName + "," + rest;
                 }
             }
 
@@ -537,6 +539,49 @@ public static class ComparisonEngine
         }
 
         return flag;
+    }
+
+    /// <summary>
+    /// Normalize warning-related flags for consistent comparison:
+    /// - /warn:N — keep only the highest value (csc uses last-wins semantics)
+    /// - /warnaserror+:X,Y — expand comma-separated codes into individual entries
+    /// - /warnaserror-:X,Y — same expansion
+    /// </summary>
+    private static IEnumerable<string> NormalizeWarningFlags(IEnumerable<string> flags)
+    {
+        var result = new List<string>();
+        int maxWarnLevel = -1;
+
+        foreach (var flag in flags)
+        {
+            if (flag.StartsWith("/warn:", StringComparison.Ordinal))
+            {
+                if (int.TryParse(flag["/warn:".Length..], out var level) && level > maxWarnLevel)
+                    maxWarnLevel = level;
+                continue;
+            }
+
+            if (flag.StartsWith("/warnaserror+:", StringComparison.Ordinal))
+            {
+                foreach (var code in flag["/warnaserror+:".Length..].Split(','))
+                    result.Add("/warnaserror+:" + code);
+                continue;
+            }
+
+            if (flag.StartsWith("/warnaserror-:", StringComparison.Ordinal))
+            {
+                foreach (var code in flag["/warnaserror-:".Length..].Split(','))
+                    result.Add("/warnaserror-:" + code);
+                continue;
+            }
+
+            result.Add(flag);
+        }
+
+        if (maxWarnLevel >= 0)
+            result.Add($"/warn:{maxWarnLevel}");
+
+        return result;
     }
 
     private static ComparisonResult CompareManagedRecords(string name, ManagedCompilationRecord msbuild, ManagedCompilationRecord bazel)
@@ -583,10 +628,10 @@ public static class ComparisonEngine
         // Flags: compare all csc flags (including /nowarn:CODE entries).
         // Filter ignored flags, then normalize path-bearing flags to filename-only.
         var msbuildFlags = new SortedSet<string>(
-            msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag),
+            NormalizeWarningFlags(msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag)),
             StringComparer.Ordinal);
         var bazelFlags = new SortedSet<string>(
-            bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag),
+            NormalizeWarningFlags(bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag)),
             StringComparer.Ordinal);
         AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
 
