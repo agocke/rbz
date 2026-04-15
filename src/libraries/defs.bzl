@@ -303,6 +303,7 @@ def impl_assembly(
     analyzers = [],
     library_import_generator = True,
     com_interface_generator = False,
+    jsimport_generator = True,
     include_editorconfig = True,
     **kwargs
 ):
@@ -502,9 +503,10 @@ EOF""".format(version = PRODUCT_VERSION),
     ]
 
     # Merge caller-provided analyzers with the standard source build analyzers
-    # and ILLink Roslyn analyzer.  Interop source generators are conditional on
+    # and ILLink Roslyn analyzer. Interop source generators are conditional on
     # the assembly's dependency on System.Runtime.InteropServices / CoreLib
-    # (matching eng/generators.targets).
+    # (matching eng/generators.targets). JSImportGenerator is separate because
+    # MSBuild flows it through the targeting-pack analyzer set for OOB builds.
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
@@ -517,6 +519,10 @@ EOF""".format(version = PRODUCT_VERSION),
     if com_interface_generator:
         _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+        ]
+    if jsimport_generator:
+        _analyzers = _analyzers + [
+            "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
         ]
 
     # Build suffix_srcs in MSBuild order: AssemblyInfo → Forwards
@@ -588,14 +594,20 @@ ref_impl_pair = rule(
     }
 )
 
-def netcoreapp_impl_assembly(skip_locals_init = True, **kwargs):
+def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False, **kwargs):
     """Wrapper for impl_assembly for assemblies in the shared framework (IsNETCoreAppSrc).
 
     Defaults skip_locals_init to True (includes SkipLocalsInit.cs), matching
     MSBuild's Directory.Build.targets condition for IsNETCoreAppSrc assemblies.
-    OOB assemblies should use impl_assembly() directly instead.
+    Defaults jsimport_generator to False because shared-framework builds use the
+    live generator outputs instead of the targeting-pack analyzer bundle that
+    carries JSImportGenerator for OOB/test builds.
     """
-    impl_assembly(skip_locals_init = skip_locals_init, **kwargs)
+    impl_assembly(
+        skip_locals_init = skip_locals_init,
+        jsimport_generator = jsimport_generator,
+        **kwargs
+    )
 
 def live_csharp_library(
     name,
