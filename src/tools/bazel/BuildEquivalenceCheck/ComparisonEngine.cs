@@ -635,7 +635,6 @@ public static class ComparisonEngine
             StringComparer.Ordinal);
         AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
 
-        // Analyzers
         AddSetDifference(result, "analyzers", msbuild.Analyzers, bazel.Analyzers);
 
         var msbuildLang = NormalizeLangVersion(msbuild.LangVersion);

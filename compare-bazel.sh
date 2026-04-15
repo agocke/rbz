@@ -155,7 +155,7 @@ for cfg in "${configs[@]}"; do
 
     # ----- Step 4: Build the analysis tool -----
     log "Building analysis tool..."
-    dotnet build "$scriptroot/src/tools/bazel/BuildEquivalenceCheck/BuildEquivalenceCheck.csproj" \
+    "$scriptroot/dotnet.sh" build "$scriptroot/src/tools/bazel/BuildEquivalenceCheck/BuildEquivalenceCheck.csproj" \
         --nologo -v quiet 2>&1
 
     # ----- Step 5: Run comparison -----
@@ -192,7 +192,7 @@ for cfg in "${configs[@]}"; do
         tool_args+=(--json-output "$local_json")
     fi
 
-    dotnet run --project "$scriptroot/src/tools/bazel/BuildEquivalenceCheck/BuildEquivalenceCheck.csproj" \
+    "$scriptroot/dotnet.sh" run --project "$scriptroot/src/tools/bazel/BuildEquivalenceCheck/BuildEquivalenceCheck.csproj" \
         --no-build -- "${tool_args[@]}" || overall_exit=1
 
     echo ""

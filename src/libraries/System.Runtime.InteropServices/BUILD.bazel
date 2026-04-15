@@ -4,6 +4,7 @@ load("//:defs.bzl", "csharp_library")
 load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
 
 exports_files([
+    "gen/Common/UnreachableException.cs",
     "ref/System.Runtime.InteropServices.cs",
     "ref/System.Runtime.InteropServices.Forwards.cs",
 ])

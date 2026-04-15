@@ -16,15 +16,29 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Security.Cryptography.ProtectedData",
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
-    pnse = True,
-    pnse_message = "SR.PlatformNotSupported_CryptographyProtectedData",
-    pnse_ref_srcs = [
-        "ref/System.Security.Cryptography.ProtectedData.cs",
+    analyzers = [
+        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
     ],
-    srcs = [],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591", "NU5128"],
+    srcs = [
+        "src/System/Security/Cryptography/DataProtectionScope.cs",
+        "src/System/Security/Cryptography/ProtectedData.cs",
+        "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
+        "//src/libraries/Common:src/Interop/Windows/Crypt32/Interop.CryptProtectData.cs",
+        "//src/libraries/Common:src/Interop/Windows/Crypt32/Interop.CryptProtectDataFlags.cs",
+        "//src/libraries/Common:src/Interop/Windows/Crypt32/Interop.CryptUnprotectData.cs",
+        "//src/libraries/Common:src/Interop/Windows/Crypt32/Interop.DATA_BLOB.cs",
+        "//src/libraries/Common:src/Interop/Windows/Interop.Errors.cs",
+        "//src/libraries/Common:src/Interop/Windows/Interop.Libraries.cs",
+        "//src/libraries/Common:src/Interop/Windows/Kernel32/Interop.FormatMessage.cs",
+        "//src/libraries/Common:src/System/HResults.cs",
+        "//src/libraries/Common:src/System/Security/Cryptography/CryptoThrowHelper.Windows.cs",
+    ],
     deps = [
         "//src/libraries:ref_System.Runtime",
+        "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
     ],
     resx_file = "src/Resources/Strings.resx",
     supported_os_platforms_short = ["windows"],

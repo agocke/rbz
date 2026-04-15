@@ -171,7 +171,9 @@ enabled and PDB paths are normalized. The default configuration is **release**.
 ./compare-bazel.sh --json-output results.json           # machine-readable output
 ```
 
-The tool lives in `src/tools/bazel/BuildEquivalenceCheck/`. It parses MSBuild `.binlog`
+The tool lives in `src/tools/bazel/BuildEquivalenceCheck/`. The script builds
+and runs it via the repo's `dotnet.sh` wrapper so the SDK pinned in
+`global.json` is used even if `.dotnet/` is stale. It parses MSBuild `.binlog`
 files (reading the full `csc` command line from each Csc task), CMake
 `compile_commands.json`, and Bazel `aquery` output to extract and normalize
 compilation records, then compares them field-by-field: source files, defines,
@@ -195,7 +197,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 69 of 404 tracked assemblies currently match
+- **Managed assemblies**: 70 of 404 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -208,15 +210,19 @@ areas:
   individual entries for consistent comparison.
   The matching assemblies include `System.Private.CoreLib` (full analyzer
   and flag parity including the ILLink.RoslynAnalyzer built from source) and
-  68 library assemblies matched via infrastructure in `impl_assembly`
+  69 library assemblies matched via infrastructure in `impl_assembly`
   (`src/libraries/defs.bzl`), which automatically generates per-assembly
   `disabledAnalyzers.config`, `GeneratedMSBuildEditorConfig.editorconfig`,
   passes the standard Roslyn analyzers, ILLink analyzer, the
   `Microsoft.DotNet.CodeAnalysis` `Default.ruleset` (via `compile_data`),
-  and conditionally the interop source generators (LibraryImportGenerator,
-  SourceGeneration, ComInterfaceGenerator) matching `eng/generators.targets`
-  logic.
-  Of the 335 remaining diffs:
+  and conditionally the interop source generators. Bazel now also builds
+  `Microsoft.Interop.JavaScript.JSImportGenerator` from
+  `System.Runtime.InteropServices.JavaScript/gen/JSImportGenerator` and wires
+  it into OOB `impl_assembly` targets plus `library_test`, matching the
+  targeting-pack analyzer input that MSBuild uses for those builds. Six known
+  diffs still mention `Microsoft.Interop.JavaScript.JSImportGenerator` on
+  helper/test-support assemblies outside that library infrastructure.
+  Of the 334 remaining diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
