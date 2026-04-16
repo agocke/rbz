@@ -1,5 +1,15 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
 
+exports_files([
+    "src/Resources/Strings.resx",
+    "src/System/Configuration/ConfigPathUtility.cs",
+    "src/System/Configuration/ExceptionUtil.cs",
+    "src/System/Configuration/StringUtil.cs",
+    "src/System/Configuration/TypeUtil.cs",
+    "src/System/Configuration/UrlPath.cs",
+    "src/System/Configuration/ValidatorUtils.cs",
+])
+
 netcoreapp_ref_assembly(
     name = "ref_System.Configuration.ConfigurationManager",
     srcs = [

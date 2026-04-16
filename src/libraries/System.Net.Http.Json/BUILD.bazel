@@ -1,5 +1,11 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly")
 
+exports_files([
+    "src/Resources/Strings.resx",
+    "src/System/Net/Http/Json/TranscodingReadStream.cs",
+    "src/System/Net/Http/Json/TranscodingWriteStream.cs",
+])
+
 netcoreapp_ref_assembly(
     name = "ref_System.Net.Http.Json",
     srcs = [

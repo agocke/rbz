@@ -192,7 +192,14 @@ diff   netstandard
 # uses precise deps, or because of stub vs full impl differences,
 # generated content differences, or source generator targeting variations.
 
+diff   ApplicationNameSetFromArgument
+diff   BuildWebHostInvalidSignature
+diff   BuildWebHostPatternTestSite
 diff   CollectibleAssembly
+diff   CreateHostBuilderInvalidSignature
+diff   CreateHostBuilderPatternTestSite
+diff   CreateWebHostBuilderInvalidSignature
+diff   CreateWebHostBuilderPatternTestSite
 diff   DefaultApartmentStateMain
 diff   ILCompiler.Compiler
 diff   ILCompiler.DependencyAnalysisFramework
@@ -203,8 +210,16 @@ diff   ILCompiler.RyuJit
 diff   ILCompiler.TypeSystem
 diff   ILLink.Tasks
 diff   MTAMain
+diff   Microsoft.Bcl.AsyncInterfaces
+diff   Microsoft.Bcl.AsyncInterfaces.Tests
 diff   Microsoft.Bcl.Cryptography
+diff   Microsoft.Bcl.Cryptography.Tests
 diff   Microsoft.Bcl.Memory
+diff   Microsoft.Bcl.Memory.Tests
+diff   Microsoft.Bcl.Numerics
+diff   Microsoft.Bcl.Numerics.Tests
+diff   Microsoft.Bcl.TimeProvider
+diff   Microsoft.Bcl.TimeProvider.Tests
 diff   Microsoft.CSharp.Tests
 diff   Microsoft.Extensions.Caching.Abstractions
 diff   Microsoft.Extensions.Caching.Memory
@@ -239,12 +254,16 @@ diff   Microsoft.Extensions.Diagnostics.Abstractions.Tests
 diff   Microsoft.Extensions.Diagnostics.Tests
 diff   Microsoft.Extensions.FileProviders.Abstractions
 diff   Microsoft.Extensions.FileProviders.Composite
+diff   Microsoft.Extensions.FileProviders.Composite.Tests
 diff   Microsoft.Extensions.FileProviders.Physical
+diff   Microsoft.Extensions.FileProviders.Physical.Tests
 diff   Microsoft.Extensions.FileSystemGlobbing
 diff   Microsoft.Extensions.FileSystemGlobbing.Tests
+diff   Microsoft.Extensions.HostFactoryResolver.Tests
 diff   Microsoft.Extensions.Hosting
 diff   Microsoft.Extensions.Hosting.Abstractions
 diff   Microsoft.Extensions.Hosting.Systemd
+diff   Microsoft.Extensions.Hosting.Systemd.Tests
 diff   Microsoft.Extensions.Hosting.Unit.Tests
 diff   Microsoft.Extensions.Hosting.WindowsServices
 diff   Microsoft.Extensions.Http
@@ -257,6 +276,7 @@ diff   Microsoft.Extensions.Logging.Console.Tests
 diff   Microsoft.Extensions.Logging.Debug
 diff   Microsoft.Extensions.Logging.EventLog
 diff   Microsoft.Extensions.Logging.EventSource
+diff   Microsoft.Extensions.Logging.EventSource.Tests
 diff   Microsoft.Extensions.Logging.Tests
 diff   Microsoft.Extensions.Logging.TraceSource
 diff   Microsoft.Extensions.Options
@@ -273,9 +293,18 @@ diff   Microsoft.Extensions.Primitives.Tests
 diff   Microsoft.Win32.Primitives.Tests
 diff   Microsoft.Win32.Registry.AccessControl
 diff   Microsoft.Win32.SystemEvents
+diff   MockHostTypes
+diff   NoSpecialEntryPointPattern
+diff   NoSpecialEntryPointPatternBuildsThenThrows
+diff   NoSpecialEntryPointPatternExits
+diff   NoSpecialEntryPointPatternHangs
+diff   NoSpecialEntryPointPatternMainNoArgs
+diff   NoSpecialEntryPointPatternThrows
 diff   STAMain
 diff   SerializableAssembly
 diff   StreamConformanceTests
+diff   TopLevelStatements
+diff   TopLevelStatementsTestsTimeout
 diff   System.CodeDom
 diff   System.CodeDom.Tests
 diff   System.Collections.Concurrent.Tests
@@ -287,6 +316,7 @@ diff   System.ComponentModel.Annotations.Tests
 diff   System.ComponentModel.Composition
 # System.ComponentModel.Composition.Noop.Assembly  # netstandard2.0, filtered
 diff   System.ComponentModel.Composition.Registration
+diff   System.ComponentModel.Composition.Registration.Tests
 diff   System.ComponentModel.Composition.Tests
 diff   System.ComponentModel.EventBasedAsync.Tests
 diff   System.ComponentModel.Primitives.Tests
@@ -295,12 +325,16 @@ diff   System.ComponentModel.TypeConverter.Tests
 diff   System.Composition.AttributeModel.Tests
 diff   System.Composition.AttributedModel
 diff   System.Composition.Convention
+diff   System.Composition.Convention.Tests
 diff   System.Composition.Hosting
 diff   System.Composition.Hosting.Tests
 diff   System.Composition.Runtime
+diff   System.Composition.Runtime.Tests
+diff   System.Composition.Tests
 diff   System.Composition.TypedParts
 diff   System.Composition.TypedParts.Tests
 diff   System.Configuration.ConfigurationManager
+diff   System.Configuration.ConfigurationManager.Tests
 diff   System.Console.Tests
 diff   System.Data.Common.Tests
 diff   System.Data.Odbc
@@ -311,6 +345,7 @@ diff   System.Diagnostics.EventLog
 diff   System.Diagnostics.FileVersionInfo.TestAssembly
 diff   System.Diagnostics.FileVersionInfo.Tests
 diff   System.Diagnostics.PerformanceCounter
+diff   System.Diagnostics.Process.Tests
 diff   System.Diagnostics.StackTrace.Tests
 diff   System.Diagnostics.TextWriterTraceListener.Tests
 diff   System.Diagnostics.TraceSource.Tests
@@ -349,6 +384,7 @@ diff   System.Memory.Data
 diff   System.Memory.Data.Tests
 diff   System.Memory.Tests
 diff   System.Net.Http.WinHttpHandler
+diff   System.Net.Http.Json.Unit.Tests
 diff   System.Net.HttpListener.Tests
 diff   System.Net.Mail.Functional.Tests
 diff   System.Net.NameResolution.Functional.Tests
@@ -356,6 +392,7 @@ diff   System.Net.NetworkInformation.Functional.Tests
 diff   System.Net.Ping.Functional.Tests
 diff   System.Net.Primitives.Functional.Tests
 diff   System.Net.Requests.Tests
+diff   System.Net.ServerSentEvents.Tests
 diff   System.Net.Sockets.Tests
 diff   System.Net.WebClient.Tests
 diff   System.Net.WebHeaderCollection.Tests
@@ -363,6 +400,7 @@ diff   System.Net.WebProxy.Tests
 diff   System.Net.WebSockets.Client.Tests
 diff   System.Net.WebSockets.Tests
 diff   System.Numerics.Tensors
+diff   System.Numerics.Tensors.Tests
 diff   System.Numerics.Vectors.Tests
 diff   System.ObjectModel.Tests
 # System.Private.CoreLib.Generators  # netstandard2.0, filtered
@@ -382,6 +420,7 @@ diff   System.Reflection.TypeExtensions.Tests
 diff   System.Resources.Extensions
 diff   System.Resources.Writer.Tests
 diff   System.Runtime.Caching
+diff   System.Runtime.Caching.Tests
 diff   System.Runtime.CompilerServices.VisualC.Tests
 diff   System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
@@ -390,6 +429,7 @@ diff   System.Runtime.Numerics.Tests
 diff   System.Runtime.Serialization.Json.Tests
 diff   System.Runtime.Serialization.Primitives.Tests
 diff   System.Runtime.Serialization.Schema
+diff   System.Runtime.Serialization.Schema.Tests
 diff   System.Runtime.Serialization.Xml.Tests
 diff   System.Security.Claims.Tests
 diff   System.Security.Cryptography.Cose
