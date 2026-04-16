@@ -26,5 +26,5 @@ netcoreapp_impl_assembly(
     resx_file = "Resources/Strings.resx",
     include_dll_safe_search_path = True,
     jsimport_generator = True,
-    nullable = "annotations",
+    nullable = "enable",
 )

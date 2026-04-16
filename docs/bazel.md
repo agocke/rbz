@@ -197,7 +197,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 70 of 404 tracked assemblies currently match
+- **Managed assemblies**: 76 of 404 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -222,7 +222,7 @@ areas:
   targeting-pack analyzer input that MSBuild uses for those builds. Six known
   diffs still mention `Microsoft.Interop.JavaScript.JSImportGenerator` on
   helper/test-support assemblies outside that library infrastructure.
-  Of the 334 remaining diffs:
+  Of the 328 remaining diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
