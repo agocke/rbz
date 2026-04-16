@@ -1,0 +1,13 @@
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly")
+
+impl_assembly(
+    name = "impl_Microsoft.Bcl.AsyncInterfaces",
+    srcs = [
+        "src/Microsoft.Bcl.AsyncInterfaces.Forwards.cs",
+    ],
+    deps = [
+        "//src/libraries:ref_System.Runtime",
+    ],
+    nowarn = MULTITARGET_NOWARN + ["CP0003"],
+    exclude_sr = True,
+)

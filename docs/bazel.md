@@ -33,7 +33,9 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  136 library test suites (Microsoft.CSharp,
+  150 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
+  Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
   Microsoft.Extensions.Configuration,
   Microsoft.Extensions.Configuration.Binder,
@@ -45,15 +47,17 @@ layout.
   Microsoft.Extensions.Configuration.UserSecrets,
   Microsoft.Extensions.Configuration.Xml,
   Microsoft.Extensions.DependencyInjection,
-  Microsoft.Extensions.DependencyModel,
   Microsoft.Extensions.Diagnostics,
   Microsoft.Extensions.Diagnostics.Abstractions,
+  Microsoft.Extensions.FileProviders.Composite,
+  Microsoft.Extensions.FileProviders.Physical,
   Microsoft.Extensions.FileSystemGlobbing,
-  Microsoft.Extensions.Hosting,
+  Microsoft.Extensions.HostFactoryResolver,
+  Microsoft.Extensions.Hosting, Microsoft.Extensions.Hosting.Systemd,
   Microsoft.Extensions.Http,
   Microsoft.Extensions.Logging,
-  Microsoft.Extensions.Logging.Abstractions,
   Microsoft.Extensions.Logging.Console,
+  Microsoft.Extensions.Logging.EventSource,
   Microsoft.Extensions.Options,
   Microsoft.Extensions.Options.ConfigurationExtensions,
   Microsoft.Extensions.Primitives,
@@ -61,10 +65,15 @@ layout.
   System.CodeDom, System.Collections, System.Collections.Concurrent,
   System.Collections.Immutable, System.Collections.NonGeneric,
   System.Collections.Specialized, System.ComponentModel,
-  System.ComponentModel.Annotations, System.ComponentModel.EventBasedAsync,
-  System.ComponentModel.Primitives, System.ComponentModel.TypeConverter,
+  System.ComponentModel.Annotations, System.ComponentModel.Composition,
+  System.ComponentModel.Composition.Registration,
+  System.ComponentModel.EventBasedAsync, System.ComponentModel.Primitives,
+  System.ComponentModel.TypeConverter, System.Composition,
+  System.Composition.Convention, System.Composition.Runtime,
+  System.Configuration.ConfigurationManager,
   System.Console, System.Data.Common, System.Diagnostics.Contracts,
   System.Diagnostics.DiagnosticSource, System.Diagnostics.FileVersionInfo,
+  System.Diagnostics.Process,
   System.Diagnostics.StackTrace, System.Diagnostics.TextWriterTraceListener,
   System.Diagnostics.TraceSource, System.Diagnostics.Tracing,
   System.Drawing.Primitives, System.Formats.Asn1, System.Formats.Cbor,
@@ -75,9 +84,10 @@ layout.
   System.IO.Packaging, System.IO.Pipelines, System.IO.Pipes, System.Linq,
   System.Linq.AsyncEnumerable, System.Linq.Expressions,
   System.Linq.Parallel, System.Linq.Queryable, System.Memory,
-  System.Memory.Data, System.Net.HttpListener, System.Net.Mail, System.Net.NameResolution,
+  System.Memory.Data, System.Net.Http.Json, System.Net.HttpListener,
+  System.Net.Mail, System.Net.NameResolution,
   System.Net.NetworkInformation, System.Net.Ping, System.Net.Primitives,
-  System.Net.Requests, System.Net.Sockets, System.Net.WebClient,
+  System.Net.Requests, System.Net.ServerSentEvents, System.Net.Sockets, System.Net.WebClient,
   System.Net.WebHeaderCollection, System.Net.WebProxy,
   System.Net.WebSockets, System.Net.WebSockets.Client,
   System.Numerics.Tensors, System.Numerics.Vectors, System.ObjectModel,
@@ -86,12 +96,13 @@ layout.
   System.Reflection.Emit.ILGeneration, System.Reflection.Emit.Lightweight,
   System.Reflection.Extensions, System.Reflection.Metadata,
   System.Reflection.MetadataLoadContext, System.Reflection.TypeExtensions,
-  System.Resources.Writer,
+  System.Resources.Writer, System.Runtime.Caching,
   System.Runtime.CompilerServices.VisualC,
   System.Runtime.InteropServices (UnitTests), System.Runtime.Intrinsics,
   System.Runtime.Loader, System.Runtime.Numerics,
   System.Runtime.Serialization.Json,
-  System.Runtime.Serialization.Primitives, System.Runtime.Serialization.Xml,
+  System.Runtime.Serialization.Primitives, System.Runtime.Serialization.Schema,
+  System.Runtime.Serialization.Xml,
   System.Security.Claims, System.Security.Cryptography,
   System.Security.Cryptography.Cose,
   System.Security.Cryptography.Pkcs,
@@ -119,7 +130,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (134 of ~187 libraries have Bazel test BUILD files)
+- Library unit tests (155 Bazel targets total; 150 currently pass on Linux and 5 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -771,7 +782,7 @@ and System.Net.Quic (msquic native library + full Linux implementation).
   or runtime-async support not yet available); all 31 async tests are `manual` because the
   `runtime-async=on` compiler feature they require is not yet supported by the Bazel-built runtime
 - [x] ~23 tests with `target_compatible_with = ["@platforms//os:windows"]` for Windows-only tests
-- [x] 117 library test suites (see §1 "What Works" for full list;
+- [x] 155 library test targets (150 currently passing on Linux; see §1 "What Works" for the full list;
   includes 5 platform-constrained suites: Microsoft.Win32.Registry (Windows),
   System.Resources.Extensions (needs System.Drawing.Common),
   System.Runtime.Serialization.Formatters (needs System.Drawing.Common),
@@ -779,7 +790,7 @@ and System.Net.Quic (msquic native library + full Linux implementation).
   System.Security.Principal.Windows (Windows))
 - [ ] Tests with CMakeProjectReference (~273 tests need native code built first)
 - [ ] Tests with ReferenceXUnitWrapperGenerator=false (~554 exe-style tests)
-- [ ] Remaining library unit tests (~78 libraries)
+- [ ] Remaining library unit tests (33 libraries still lack a Bazel test BUILD file)
 
 ### 5.5 Installer / Packaging
 - [ ] `src/installer/` — runtime packs, NuGet packaging, SDK integration
