@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  150 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  156 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -79,8 +79,9 @@ layout.
   System.Drawing.Primitives, System.Formats.Asn1, System.Formats.Cbor,
   System.Formats.Nrbf, System.Formats.Tar, System.IO.Compression,
   System.IO.Compression.Brotli, System.IO.Compression.ZipFile,
-  System.IO.FileSystem.DriveInfo, System.IO.FileSystem.Watcher,
-  System.IO.Hashing, System.IO.IsolatedStorage, System.IO.MemoryMappedFiles,
+  System.IO.FileSystem.DriveInfo, System.IO.FileSystem.Primitives,
+  System.IO.FileSystem.Watcher, System.IO.Hashing, System.IO.IsolatedStorage,
+  System.IO.MemoryMappedFiles, System.IO.UnmanagedMemoryStream,
   System.IO.Packaging, System.IO.Pipelines, System.IO.Pipes, System.Linq,
   System.Linq.AsyncEnumerable, System.Linq.Expressions,
   System.Linq.Parallel, System.Linq.Queryable, System.Memory,
@@ -97,7 +98,8 @@ layout.
   System.Reflection.Extensions, System.Reflection.Metadata,
   System.Reflection.MetadataLoadContext, System.Reflection.TypeExtensions,
   System.Resources.Writer, System.Runtime.Caching,
-  System.Runtime.CompilerServices.VisualC,
+  System.Runtime.CompilerServices.Unsafe,
+  System.Runtime.CompilerServices.VisualC, System.Runtime.Handles,
   System.Runtime.InteropServices (UnitTests), System.Runtime.Intrinsics,
   System.Runtime.Loader, System.Runtime.Numerics,
   System.Runtime.Serialization.Json,
@@ -115,7 +117,7 @@ layout.
   System.Threading, System.Threading.Channels, System.Threading.Overlapped,
   System.Threading.RateLimiting, System.Threading.Tasks.Dataflow,
   System.Threading.Tasks.Parallel, System.Threading.Thread,
-  System.Threading.ThreadPool, System.Transactions.Local,
+  System.Threading.ThreadPool, System.Transactions.Local, System.ValueTuple,
   System.Web.HttpUtility;
   plus 5 platform-constrained test suites with BUILD files:
   Microsoft.Win32.Registry (Windows), System.Resources.Extensions
@@ -130,7 +132,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (155 Bazel targets total; 150 currently pass on Linux and 5 are platform-constrained/skipped)
+- Library unit tests (161 Bazel targets total; 156 currently pass on Linux and 5 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))

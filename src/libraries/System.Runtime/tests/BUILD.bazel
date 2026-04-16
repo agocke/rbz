@@ -1,0 +1,89 @@
+load("//src/tests:live_test.bzl", "library_test")
+load("//:defs.bzl", "OPEN_SNK")
+
+exports_files([
+    "System.Runtime.Tests/System/IndexTests.cs",
+    "System.Runtime.Tests/System/RangeTests.cs",
+    "System.Runtime.Tests/System/Text/Unicode/Utf8Tests.cs",
+    "System.Threading.Tasks.Extensions.Tests/ManualResetValueTaskSourceTests.cs",
+    "System.Threading.Tasks.Tests/System.Runtime.CompilerServices/ConfiguredAsyncDisposable.cs",
+    "System.Threading.Tasks.Tests/System.Runtime.CompilerServices/ConfiguredCancelableAsyncEnumerableTests.cs",
+])
+
+XUNIT_DEPS = [
+    "@paket.main//microsoft.dotnet.xunitassert",
+    "@paket.main//microsoft.dotnet.xunitextensions",
+    "@paket.main//xunit.abstractions",
+    "@paket.main//xunit.extensibility.core",
+]
+
+library_test(
+    name = "System.IO.FileSystem.Primitives.Tests",
+    srcs = glob(["System.IO.FileSystem.Primitives.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.IO.FileSystem.Primitives:impl_System.IO.FileSystem.Primitives",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.IO.UnmanagedMemoryStream.Tests",
+    srcs = glob(["System.IO.UnmanagedMemoryStream.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.IO.UnmanagedMemoryStream:impl_System.IO.UnmanagedMemoryStream",
+        "//src/libraries/Common/tests:StreamConformanceTests",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+library_test(
+    name = "System.Runtime.CompilerServices.Unsafe.Tests",
+    srcs = glob(["System.Runtime.CompilerServices.Unsafe.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.Runtime.CompilerServices.Unsafe:impl_System.Runtime.CompilerServices.Unsafe",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.Runtime.Handles.Tests",
+    srcs = glob(["System.Runtime.Handles.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.Runtime.Handles:impl_System.Runtime.Handles",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.Security.SecureString.Tests",
+    srcs = glob(["System.Security.SecureString.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.Security.SecureString:impl_System.Security.SecureString",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.ValueTuple.Tests",
+    srcs = glob(["System.ValueTuple.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.ValueTuple:impl_System.ValueTuple",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
