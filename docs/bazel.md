@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  170 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  175 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -86,13 +86,16 @@ layout.
   System.IO.Packaging, System.IO.Pipelines, System.IO.Pipes, System.Linq,
   System.Linq.AsyncEnumerable, System.Linq.Expressions,
   System.Linq.Parallel, System.Linq.Queryable, System.Memory,
-  System.Memory.Data, System.Net.Http.Json, System.Net.Http.Json (FunctionalTests),
-  System.Net.HttpListener, System.Net.Mail, System.Net.Mail (UnitTests),
+  System.Memory.Data, System.Net.Http (EnterpriseTests),
+  System.Net.Http (FunctionalTests), System.Net.Http.Json,
+  System.Net.Http.Json (FunctionalTests), System.Net.HttpListener,
+  System.Net.Mail, System.Net.Mail (UnitTests),
   System.Net.NameResolution, System.Net.NameResolution (PalTests),
   System.Net.NetworkInformation, System.Net.Ping, System.Net.Primitives,
-  System.Net.Requests, System.Net.ServerSentEvents, System.Net.Sockets, System.Net.WebClient,
-  System.Net.WebHeaderCollection, System.Net.WebProxy,
-  System.Net.WebSockets, System.Net.WebSockets.Client,
+  System.Net.Primitives (PalTests), System.Net.Requests,
+  System.Net.Security (EnterpriseTests), System.Net.ServerSentEvents,
+  System.Net.Sockets, System.Net.WebClient, System.Net.WebHeaderCollection,
+  System.Net.WebProxy, System.Net.WebSockets, System.Net.WebSockets.Client,
   System.Numerics.Tensors, System.Numerics.Vectors, System.ObjectModel,
   System.Private.Uri, System.Private.Uri (ExtendedFunctionalTests),
   System.Private.Uri (UnitTests), System.Private.Xml.Linq,
@@ -110,7 +113,7 @@ layout.
   System.Runtime.Serialization.Xml,
   System.Security.Claims, System.Security.Cryptography,
   System.Security.Cryptography.Cose,
-  System.Security.Cryptography.Pkcs,
+  System.Security.Cryptography.OpenSsl, System.Security.Cryptography.Pkcs,
   System.Security.Cryptography.ProtectedData,
   System.Security.Cryptography.Xml,
   System.ServiceModel.Syndication,
@@ -135,7 +138,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (175 Bazel targets total; 170 currently pass on Linux and 5 are platform-constrained/skipped)
+- Library unit tests (180 Bazel targets total; 175 currently pass on Linux and 5 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))

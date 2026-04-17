@@ -1,7 +1,9 @@
 load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library")
 load("//src/libraries:defs.bzl", "live_csharp_library")
 
-exports_files(glob(["**/*.cs"]) + glob(["Data/**"]))
+exports_files(glob(["**/*.cs"]) + glob(["Data/**"]) + [
+    "System/DirectoryServices/LDAP.Configuration.xml",
+])
 
 csharp_library(
     name = "TestUtilities",
