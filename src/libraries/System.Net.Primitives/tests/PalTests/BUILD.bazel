@@ -1,10 +1,16 @@
-load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source", "resgen")
 load("//src/tests:live_test.bzl", "library_test")
 
 gen_resx_source(
     name = "gen_resx",
     out = "SR.g.cs",
     assembly_name = "System.Net.Primitives.Pal.Tests",
+    resx_file = "//src/libraries/System.Net.Primitives:src/Resources/Strings.resx",
+)
+
+resgen(
+    name = "strings_resx",
+    out = "FxResources.System.Net.Primitives.Pal.Tests.SR.resources",
     resx_file = "//src/libraries/System.Net.Primitives:src/Resources/Strings.resx",
 )
 
@@ -67,6 +73,11 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
+    additionalfiles = ["//src/libraries/System.Net.Primitives:src/Resources/Strings.resx"],
+    resources = [":strings_resx"],
+    resource_logical_names = {
+        "FxResources.System.Net.Primitives.Pal.Tests.SR.resources": "FxResources.System.Net.Primitives.Pal.Tests.SR.resources",
+    },
     allow_unsafe_blocks = True,
     size = "large",
     keyfile = OPEN_SNK,

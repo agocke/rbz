@@ -105,6 +105,7 @@ NUGET
     System.Security.Cryptography.ProtectedData (8.0.0)
     System.Threading.Channels (8.0.0)
     xunit.abstractions (2.0.3)
+    xunit.analyzers (1.22.0)
     xunit.extensibility.core (2.9.3)
       xunit.abstractions (>= 2.0.3)
     xunit.extensibility.execution (2.9.3)

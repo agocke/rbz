@@ -12,6 +12,7 @@ load(
     "DOTNET_CODEANALYSIS_REPO",
     "MIBC_FILES",
     "STYLECOP_ANALYZERS_UNSTABLE_REPO",
+    "XUNIT_ANALYZERS_REPO",
 )
 load(
     "//:framework_r2r.bzl",
@@ -88,6 +89,19 @@ import_library(
     library_name = "SourceBuildAnalyzers",
     refs = source_build_analyzer_files,
     libs = source_build_analyzer_files,
+    visibility = ["//visibility:public"],
+)
+
+xunit_test_analyzer_files = [
+    "@{}//:analyzers/dotnet/cs/xunit.analyzers.dll".format(XUNIT_ANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/cs/xunit.analyzers.fixes.dll".format(XUNIT_ANALYZERS_REPO),
+]
+
+import_library(
+    name = "xunit_test_analyzers",
+    library_name = "XunitTestAnalyzers",
+    refs = xunit_test_analyzer_files,
+    libs = xunit_test_analyzer_files,
     visibility = ["//visibility:public"],
 )
 

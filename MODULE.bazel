@@ -30,6 +30,7 @@ use_repo(
     "nuget.optimization.linux-x64.mibc.runtime.v1.0.0-prerelease.26080.1",
     "nuget.stylecop.analyzers.unstable.v1.2.0.556",
     "nuget.system.private.runtime.unicodedata.v10.0.0-beta.25418.1",
+    "nuget.xunit.analyzers.v1.22.0",
 )
 
 illink_extension = use_extension("//paket:paket.illink_extension.bzl", "illink_extension")

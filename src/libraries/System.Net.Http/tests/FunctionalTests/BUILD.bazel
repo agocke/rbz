@@ -1,5 +1,5 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source", "resgen")
 
 gen_resx_source(
     name = "gen_resx",
@@ -8,10 +8,16 @@ gen_resx_source(
     resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
 )
 
+resgen(
+    name = "strings_resx",
+    out = "FxResources.System.Net.Http.Functional.Tests.SR.resources",
+    resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
+)
+
 library_test(
     name = "System.Net.Http.Functional.Tests",
     defines = ["HTTP3", "LINUX", "LINUX1_0", "SYSNETHTTP_NO_OPENSSL"],
-    nowarn = ["SYSLIB0011", "SYSLIB0014"],
+    nowarn = ["SYSLIB0011"],
     srcs = glob(
         ["*.cs"],
         exclude = [
@@ -164,7 +170,14 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    resources = ["SelectedSitesTest.txt"],
+    additionalfiles = ["//src/libraries/System.Net.Http:src/Resources/Strings.resx"],
+    resources = [
+        ":strings_resx",
+        "SelectedSitesTest.txt",
+    ],
+    resource_logical_names = {
+        "FxResources.System.Net.Http.Functional.Tests.SR.resources": "FxResources.System.Net.Http.Functional.Tests.SR.resources",
+    },
     data = ["@paket.main//system.net.testdata:content_files"],
     allow_unsafe_blocks = True,
     size = "large",

@@ -646,7 +646,6 @@ EOF""".format(version = PRODUCT_VERSION),
     # Test analyzers: source build analyzers + interop generators.
     # MSBuild adds these via eng/Analyzers.targets, eng/generators.targets,
     # and eng/testing/xunit/xunit.props.
-    # Note: xunit.analyzers is not yet available in Bazel.
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
@@ -655,6 +654,7 @@ EOF""".format(version = PRODUCT_VERSION),
         "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
         "//src/libraries/System.Text.Json:JsonSourceGenerator",
         "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+        "//:xunit_test_analyzers",
     ]
 
     # Match MSBuild test compiler options
