@@ -1,41 +1,32 @@
-load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly")
+load("//src/tests:live_test.bzl", "library_test")
+load("//:defs.bzl", "OPEN_SNK")
 
-exports_files([
-    "src/System/Net/IPHostEntry.cs",
-    "src/System/Net/NameResolutionPal.Unix.cs",
-])
-
-netcoreapp_ref_assembly(
-    name = "ref_System.Net.NameResolution",
+library_test(
+    name = "System.Net.NameResolution.Pal.Tests",
+    defines = select({
+        "@platforms//os:linux": ["UNIX", "UNIX1_0"],
+        "@platforms//os:macos": ["UNIX", "UNIX1_0"],
+        "//conditions:default": [],
+    }),
     srcs = [
-        "ref/System.Net.NameResolution.cs",
-    ],
-    deps = [
-        "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",
-        "//src/libraries:ref_System.Runtime",
-    ],
-)
-
-netcoreapp_impl_assembly(
-    name = "impl_System.Net.NameResolution",
-    com_interface_generator = True,
-    nowarn = ["CS1591"],
-    os_targeted = "unix",
-    srcs = glob(
-        ["src/System/**/*.cs"],
-        exclude = [
-            "src/System/Net/Dns.Browser.cs",
-            "src/System/Net/NameResolutionPal.Windows.cs",
-        ],
-    ) + [
+        "AssemblyInfo.cs",
+        "NameResolutionPalTests.cs",
+        "Fakes/DnsFake.cs",
+        "//src/libraries/System.Net.NameResolution:src/System/Net/IPHostEntry.cs",
         "//src/libraries/Common:src/System/Net/Logging/NetEventSource.Common.cs",
-        "//src/libraries/Common:src/System/Net/InternalException.cs",
+        "//src/libraries/Common:src/System/Net/Sockets/ProtocolType.cs",
+        "//src/libraries/Common:src/System/Net/Sockets/SocketType.cs",
+        "//src/libraries/Common:src/System/Net/Sockets/ProtocolFamily.cs",
+        "//src/libraries/Common:src/System/Net/IPEndPointStatics.cs",
         "//src/libraries/Common:src/System/Net/IPAddressParserStatics.cs",
         "//src/libraries/Common:src/System/Net/SocketProtocolSupportPal.cs",
+        "//src/libraries/Common/tests:System/Net/Configuration.cs",
+        "//src/libraries/Common/tests:System/Net/Configuration.Http.cs",
     ] + select({
         "@platforms//os:linux": [
-            "//src/libraries/Common:src/System/Net/InteropIPAddressExtensions.Unix.cs",
+            "//src/libraries/System.Net.NameResolution:src/System/Net/NameResolutionPal.Unix.cs",
             "//src/libraries/Common:src/System/Net/SocketAddressPal.Unix.cs",
+            "//src/libraries/Common:src/System/Net/InteropIPAddressExtensions.Unix.cs",
             "//src/libraries/Common:src/System/Net/SocketProtocolSupportPal.Unix.cs",
             "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",
             "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
@@ -49,8 +40,9 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.SocketAddress.cs",
         ],
         "@platforms//os:macos": [
-            "//src/libraries/Common:src/System/Net/InteropIPAddressExtensions.Unix.cs",
+            "//src/libraries/System.Net.NameResolution:src/System/Net/NameResolutionPal.Unix.cs",
             "//src/libraries/Common:src/System/Net/SocketAddressPal.Unix.cs",
+            "//src/libraries/Common:src/System/Net/InteropIPAddressExtensions.Unix.cs",
             "//src/libraries/Common:src/System/Net/SocketProtocolSupportPal.Unix.cs",
             "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",
             "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
@@ -63,23 +55,29 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Socket.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.SocketAddress.cs",
         ],
+        "//conditions:default": [],
     }),
-    resx_file = "src/Resources/Strings.resx",
-    allow_unsafe_blocks = True,
     deps = [
         "//src/libraries:ref_Microsoft.Win32.Primitives",
-        "//src/libraries/System.Collections:ref_System.Collections",
+        "//src/libraries/Microsoft.Win32.Registry:ref_Microsoft.Win32.Registry",
         "//src/libraries/System.Diagnostics.DiagnosticSource:ref_System.Diagnostics.DiagnosticSource",
         "//src/libraries/System.Diagnostics.Tracing:ref_System.Diagnostics.Tracing",
-        "//src/libraries/System.Memory:ref_System.Memory",
+        "//src/libraries/System.Net.NetworkInformation:ref_System.Net.NetworkInformation",
         "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",
-        "//src/libraries:ref_System.Runtime",
-        "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
+        "//src/libraries/System.Net.Sockets:ref_System.Net.Sockets",
         "//src/libraries/System.Security.Claims:ref_System.Security.Claims",
         "//src/libraries/System.Security.Principal.Windows:ref_System.Security.Principal.Windows",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/System.Threading.Overlapped:ref_System.Threading.Overlapped",
         "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.xunitassert",
+        "@paket.main//microsoft.dotnet.xunitextensions",
+        "@paket.main//xunit.abstractions",
+        "@paket.main//xunit.extensibility.core",
     ],
-    supported_os_platforms = ["unix"],
+    nowarn = ["SYSLIB1051"],
+    allow_unsafe_blocks = True,
+    size = "large",
+    keyfile = OPEN_SNK,
 )

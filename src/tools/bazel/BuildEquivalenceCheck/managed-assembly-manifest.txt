@@ -387,10 +387,13 @@ diff   System.Memory.Data
 diff   System.Memory.Data.Tests
 diff   System.Memory.Tests
 diff   System.Net.Http.WinHttpHandler
+diff   System.Net.Http.Json.Functional.Tests
 diff   System.Net.Http.Json.Unit.Tests
 diff   System.Net.HttpListener.Tests
 diff   System.Net.Mail.Functional.Tests
+diff   System.Net.Mail.Unit.Tests
 diff   System.Net.NameResolution.Functional.Tests
+diff   System.Net.NameResolution.Pal.Tests
 diff   System.Net.NetworkInformation.Functional.Tests
 diff   System.Net.Ping.Functional.Tests
 diff   System.Net.Primitives.Functional.Tests
@@ -407,7 +410,9 @@ diff   System.Numerics.Tensors.Tests
 diff   System.Numerics.Vectors.Tests
 diff   System.ObjectModel.Tests
 # System.Private.CoreLib.Generators  # netstandard2.0, filtered
+diff   System.Private.Uri.ExtendedFunctional.Tests
 diff   System.Private.Uri.Functional.Tests
+diff   System.Private.Uri.Unit.Tests
 diff   System.Reflection.Context
 diff   System.Reflection.Context.Tests
 diff   System.Reflection.DispatchProxy.TestDependency
