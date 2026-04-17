@@ -386,6 +386,8 @@ diff   System.Management
 diff   System.Memory.Data
 diff   System.Memory.Data.Tests
 diff   System.Memory.Tests
+match  System.Net.Http.Enterprise.Tests
+match  System.Net.Http.Functional.Tests
 diff   System.Net.Http.WinHttpHandler
 diff   System.Net.Http.Json.Functional.Tests
 diff   System.Net.Http.Json.Unit.Tests
@@ -397,7 +399,9 @@ diff   System.Net.NameResolution.Pal.Tests
 diff   System.Net.NetworkInformation.Functional.Tests
 diff   System.Net.Ping.Functional.Tests
 diff   System.Net.Primitives.Functional.Tests
+match  System.Net.Primitives.Pal.Tests
 diff   System.Net.Requests.Tests
+match  System.Net.Security.Enterprise.Tests
 diff   System.Net.ServerSentEvents.Tests
 diff   System.Net.Sockets.Tests
 diff   System.Net.WebClient.Tests
@@ -445,6 +449,7 @@ diff   System.Runtime.Serialization.Xml.Tests
 diff   System.Security.Claims.Tests
 diff   System.Security.Cryptography.Cose
 diff   System.Security.Cryptography.Cose.Tests
+match  System.Security.Cryptography.OpenSsl.Tests
 diff   System.Security.Cryptography.Pkcs
 diff   System.Security.Cryptography.Pkcs.Tests
 match  System.Security.Cryptography.ProtectedData

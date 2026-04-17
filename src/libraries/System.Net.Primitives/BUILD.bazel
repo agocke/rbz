@@ -12,6 +12,8 @@ netcoreapp_ref_assembly(
     ],
 )
 
+exports_files(glob(["src/**/*.cs"]) + ["src/Resources/Strings.resx"])
+
 netcoreapp_impl_assembly(
     name = "impl_System.Net.Primitives",
     com_interface_generator = True,
