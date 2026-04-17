@@ -364,6 +364,7 @@ diff   System.IO.Compression.Brotli.Tests
 diff   System.IO.Compression.Tests
 diff   System.IO.Compression.ZipFile.Tests
 diff   System.IO.FileSystem.DriveInfo.Tests
+diff   System.IO.FileSystem.Primitives.Tests
 diff   System.IO.FileSystem.Watcher.Tests
 diff   System.IO.Hashing.Tests
 diff   System.IO.Hashing
@@ -373,6 +374,7 @@ diff   System.IO.Packaging
 diff   System.IO.Packaging.Tests
 diff   System.IO.Pipelines.Tests
 diff   System.IO.Pipes.Tests
+diff   System.IO.UnmanagedMemoryStream.Tests
 diff   System.IO.Ports
 diff   System.Linq.AsyncEnumerable.Tests
 diff   System.Linq.Expressions.Tests
@@ -421,6 +423,8 @@ diff   System.Resources.Extensions
 diff   System.Resources.Writer.Tests
 diff   System.Runtime.Caching
 diff   System.Runtime.Caching.Tests
+diff   System.Runtime.CompilerServices.Unsafe.Tests
+diff   System.Runtime.Handles.Tests
 diff   System.Runtime.CompilerServices.VisualC.Tests
 diff   System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
@@ -441,6 +445,7 @@ diff   System.Security.Cryptography.ProtectedData.Tests
 diff   System.Security.Cryptography.Tests
 diff   System.Security.Cryptography.Xml
 diff   System.Security.Cryptography.Xml.Tests
+diff   System.Security.SecureString.Tests
 diff   System.Security.Permissions
 diff   System.ServiceModel.Syndication
 diff   System.ServiceModel.Syndication.Tests
@@ -462,6 +467,7 @@ diff   System.Threading.Tests
 diff   System.Threading.Thread.Tests
 diff   System.Threading.ThreadPool.Tests
 diff   System.Transactions.Local.Tests
+diff   System.ValueTuple.Tests
 diff   System.Web.HttpUtility.Tests
 diff   System.Windows.Extensions
 diff   System.Xml.Linq.Axes.Tests
