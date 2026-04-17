@@ -17,6 +17,11 @@ nowarn = [ "CS8500", "CS8969" ]
 
 exports_files([
     "System.Diagnostics.Process/src/Resources/Strings.resx",
+    "System.Private.Uri/src/System/IriHelper.cs",
+    "System.Private.Uri/src/System/PercentEncodingHelper.cs",
+    "System.Private.Uri/src/System/UriEnumTypes.cs",
+    "System.Private.Uri/src/System/UriHelper.cs",
+    "System.Private.Uri/src/System/ValueStringBuilderExtensions.cs",
 ])
 
 # ── Minimal impl assemblies for JIT tests ─────────────────────────────

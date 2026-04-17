@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  165 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  170 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -86,14 +86,16 @@ layout.
   System.IO.Packaging, System.IO.Pipelines, System.IO.Pipes, System.Linq,
   System.Linq.AsyncEnumerable, System.Linq.Expressions,
   System.Linq.Parallel, System.Linq.Queryable, System.Memory,
-  System.Memory.Data, System.Net.Http.Json, System.Net.HttpListener,
-  System.Net.Mail, System.Net.NameResolution,
+  System.Memory.Data, System.Net.Http.Json, System.Net.Http.Json (FunctionalTests),
+  System.Net.HttpListener, System.Net.Mail, System.Net.Mail (UnitTests),
+  System.Net.NameResolution, System.Net.NameResolution (PalTests),
   System.Net.NetworkInformation, System.Net.Ping, System.Net.Primitives,
   System.Net.Requests, System.Net.ServerSentEvents, System.Net.Sockets, System.Net.WebClient,
   System.Net.WebHeaderCollection, System.Net.WebProxy,
   System.Net.WebSockets, System.Net.WebSockets.Client,
   System.Numerics.Tensors, System.Numerics.Vectors, System.ObjectModel,
-  System.Private.Uri, System.Private.Xml.Linq,
+  System.Private.Uri, System.Private.Uri (ExtendedFunctionalTests),
+  System.Private.Uri (UnitTests), System.Private.Xml.Linq,
   System.Reflection.Context, System.Reflection.DispatchProxy, System.Reflection.Emit,
   System.Reflection.Emit.ILGeneration, System.Reflection.Emit.Lightweight,
   System.Reflection.Extensions, System.Reflection.Metadata,
@@ -133,7 +135,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (170 Bazel targets total; 165 currently pass on Linux and 5 are platform-constrained/skipped)
+- Library unit tests (175 Bazel targets total; 170 currently pass on Linux and 5 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -211,7 +213,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 76 of 404 tracked assemblies currently match
+- **Managed assemblies**: 76 of 466 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -236,7 +238,7 @@ areas:
   targeting-pack analyzer input that MSBuild uses for those builds. Six known
   diffs still mention `Microsoft.Interop.JavaScript.JSImportGenerator` on
   helper/test-support assemblies outside that library infrastructure.
-  Of the 328 remaining diffs:
+  Of the 390 remaining diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
