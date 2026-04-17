@@ -3,7 +3,7 @@ load("//:defs.bzl", "OPEN_SNK")
 
 genrule(
     name = "mono_testdata",
-    srcs = ["System.Data.DataSetExtensions.Tests/Mono/testdataset1.xml"],
+    srcs = ["//src/libraries/System.Data.Common/tests/System.Data.DataSetExtensions.Tests:Mono/testdataset1.xml"],
     outs = ["Mono/testdataset1.xml"],
     cmd = "cp $< $@",
 )
