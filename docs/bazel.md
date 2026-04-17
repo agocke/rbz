@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  156 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  165 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -71,7 +71,8 @@ layout.
   System.ComponentModel.TypeConverter, System.Composition,
   System.Composition.Convention, System.Composition.Runtime,
   System.Configuration.ConfigurationManager,
-  System.Console, System.Data.Common, System.Diagnostics.Contracts,
+  System.Console, System.Data.Common, System.Data.DataSetExtensions,
+  System.Diagnostics.Contracts,
   System.Diagnostics.DiagnosticSource, System.Diagnostics.FileVersionInfo,
   System.Diagnostics.Process,
   System.Diagnostics.StackTrace, System.Diagnostics.TextWriterTraceListener,
@@ -132,7 +133,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (161 Bazel targets total; 156 currently pass on Linux and 5 are platform-constrained/skipped)
+- Library unit tests (170 Bazel targets total; 165 currently pass on Linux and 5 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))

@@ -1,0 +1,26 @@
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library")
+
+exports_files(glob(["**/*.cs"]))
+
+csharp_library(
+    name = "XDocument.Test.ModuleCore",
+    srcs = glob(["XDocument.Test.ModuleCore/*.cs"]),
+    target_frameworks = [NETCOREAPP_CURRENT],
+    visibility = ["//visibility:public"],
+    keyfile = OPEN_SNK,
+)
+
+csharp_library(
+    name = "XDocument.Common",
+    srcs = glob(["XDocument.Common/*.cs"]),
+    target_frameworks = [NETCOREAPP_CURRENT],
+    deps = [
+        ":XDocument.Test.ModuleCore",
+        "//src/libraries/Common/tests:XmlCoreTest",
+        "//src/libraries/Common/tests:XmlDiff",
+        "//src/libraries/System.Xml.ReaderWriter:ref_System.Xml.ReaderWriter",
+        "//src/libraries/System.Xml.XDocument:ref_System.Xml.XDocument",
+    ],
+    visibility = ["//visibility:public"],
+    keyfile = OPEN_SNK,
+)

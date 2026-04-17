@@ -337,6 +337,7 @@ diff   System.Configuration.ConfigurationManager
 diff   System.Configuration.ConfigurationManager.Tests
 diff   System.Console.Tests
 diff   System.Data.Common.Tests
+diff   System.Data.DataSetExtensions.Tests
 diff   System.Data.Odbc
 diff   System.Data.OleDb
 diff   System.Diagnostics.Contracts.Tests
@@ -430,6 +431,7 @@ diff   System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
 diff   System.Runtime.Loader.Tests
 diff   System.Runtime.Numerics.Tests
+diff   System.Runtime.Serialization.Json.ReflectionOnly.Tests
 diff   System.Runtime.Serialization.Json.Tests
 diff   System.Runtime.Serialization.Primitives.Tests
 diff   System.Runtime.Serialization.Schema
@@ -471,10 +473,19 @@ diff   System.ValueTuple.Tests
 diff   System.Web.HttpUtility.Tests
 diff   System.Windows.Extensions
 diff   System.Xml.Linq.Axes.Tests
+diff   System.Xml.Linq.Events.Tests
+diff   System.Xml.Linq.Misc.Tests
+diff   System.Xml.Linq.Properties.Tests
 diff   System.Xml.Linq.SDMSample.Tests
+diff   System.Xml.Linq.Streaming.Tests
+diff   System.Xml.Linq.TreeManipulation.Tests
 diff   System.Xml.Schema.Extensions.Tests
+diff   System.Xml.Linq.xNodeBuilder.Tests
+diff   System.Xml.Linq.xNodeReader.Tests
 # TestLibrary  # netstandard2.0, filtered
 # ExceptionTestAssembly  # netstandard2.0, filtered
+diff   XDocument.Common
+diff   XmlCoreTest
 diff   crossgen2
 diff   ilc
 diff   illink
