@@ -21,6 +21,7 @@ diff   Microsoft.Win32.Registry
 diff   System
 diff   System.AppContext
 diff   System.Buffers
+match  System.Buffers.Tests
 match  System.Collections
 match  System.Collections.Concurrent
 match  System.Collections.Immutable
@@ -291,7 +292,6 @@ diff   Microsoft.Extensions.Primitives.Tests
 # Microsoft.Interop.LibraryImportGenerator
 # Microsoft.Interop.SourceGeneration
 diff   Microsoft.Win32.Primitives.Tests
-match  System.Buffers.Tests
 diff   Microsoft.Win32.Registry.AccessControl
 diff   Microsoft.Win32.SystemEvents
 diff   MockHostTypes
@@ -379,9 +379,9 @@ diff   System.IO.Packaging
 diff   System.IO.Packaging.Tests
 diff   System.IO.Pipelines.Tests
 diff   System.IO.Pipes.Tests
-match  System.IO.Tests
 diff   System.IO.UnmanagedMemoryStream.Tests
 diff   System.IO.Ports
+match  System.IO.Tests
 diff   System.Linq.AsyncEnumerable.Tests
 diff   System.Linq.Expressions.Tests
 diff   System.Linq.Parallel.Tests

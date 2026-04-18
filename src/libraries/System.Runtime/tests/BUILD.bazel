@@ -89,11 +89,34 @@ library_test(
 )
 
 library_test(
+    name = "System.Diagnostics.Tools.Tests",
+    srcs = glob(["System.Diagnostics.Tools.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.Diagnostics.Tools:impl_System.Diagnostics.Tools",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.Resources.Reader.Tests",
+    srcs = glob(["System.Resources.Reader.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.Resources.Reader:impl_System.Resources.Reader",
+        "//src/libraries/System.Resources.Writer:ref_System.Resources.Writer",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
     name = "System.Buffers.Tests",
     srcs = glob(["System.Buffers.Tests/**/*.cs"]) + [
         "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
     ],
     deps = [
+        "//src/libraries/shims/System.Buffers:impl_System.Buffers",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/System.Diagnostics.Tracing:ref_System.Diagnostics.Tracing",
@@ -105,40 +128,7 @@ library_test(
     ] + XUNIT_DEPS,
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
-    size = "small",
-)
-
-library_test(
-    name = "System.Diagnostics.Tools.Tests",
-    srcs = glob(["System.Diagnostics.Tools.Tests/**/*.cs"]),
-    deps = XUNIT_DEPS,
-    keyfile = OPEN_SNK,
-    size = "small",
-)
-
-library_test(
-    name = "System.Threading.Tasks.Tests",
-    srcs = glob(["System.Threading.Tasks.Tests/**/*.cs"]) + [
-        "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
-        "//src/libraries/Common/tests:System/Threading/ThreadPoolHelpers.cs",
-        "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
-    ],
-    deps = [
-        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
-        "//src/libraries/System.Linq.AsyncEnumerable:ref_System.Linq.AsyncEnumerable",
-        "//src/libraries/System.Linq.Expressions:ref_System.Linq.Expressions",
-        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
-        "//src/libraries/System.Diagnostics.Tracing:ref_System.Diagnostics.Tracing",
-        "//src/libraries:ref_Microsoft.CSharp",
-        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
-        "//src/libraries/System.Threading:ref_System.Threading",
-        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
-        "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
-        "//src/libraries/Common/tests:TestUtilities",
-        "@paket.main//microsoft.dotnet.remoteexecutor",
-    ] + XUNIT_DEPS,
-    keyfile = OPEN_SNK,
-    size = "large",
+    size = "medium",
 )
 
 library_test(
@@ -147,6 +137,7 @@ library_test(
         "//src/libraries/Common/tests:System/Threading/ThreadTestHelpers.cs",
     ],
     deps = [
+        "//src/libraries/shims/System.Threading.Timer:impl_System.Threading.Timer",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
@@ -155,17 +146,6 @@ library_test(
     ] + XUNIT_DEPS,
     keyfile = OPEN_SNK,
     size = "medium",
-)
-
-library_test(
-    name = "System.Resources.Reader.Tests",
-    srcs = glob(["System.Resources.Reader.Tests/**/*.cs"]),
-    deps = [
-        "//src/libraries/System.Resources.Writer:impl_System.Resources.Writer",
-        "//src/libraries/Common/tests:TestUtilities",
-    ] + XUNIT_DEPS,
-    keyfile = OPEN_SNK,
-    size = "small",
 )
 
 library_test(
@@ -176,17 +156,44 @@ library_test(
         "//src/libraries/Common/tests:System/Threading/Tasks/GetStateMachineData.cs",
     ],
     deps = [
+        "//src/libraries/shims/System.Threading.Tasks.Extensions:impl_System.Threading.Tasks.Extensions",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
-        "//src/libraries/System.Security.AccessControl:ref_System.Security.AccessControl",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
         "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
+        "//src/libraries/shims/System.Security:impl_System.Security",
         "//src/libraries:ref_System.Threading.Tasks",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
     keyfile = OPEN_SNK,
     size = "medium",
+)
+
+library_test(
+    name = "System.Threading.Tasks.Tests",
+    srcs = glob(["System.Threading.Tasks.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
+        "//src/libraries/Common/tests:System/Threading/ThreadPoolHelpers.cs",
+        "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
+    ],
+    deps = [
+        "//src/libraries/shims/System.Threading.Tasks:impl_System.Threading.Tasks",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Diagnostics.Tracing:ref_System.Diagnostics.Tracing",
+        "//src/libraries/System.Linq.AsyncEnumerable:ref_System.Linq.AsyncEnumerable",
+        "//src/libraries/System.Linq.Expressions:ref_System.Linq.Expressions",
+        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
+        "//src/libraries:ref_Microsoft.CSharp",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "large",
 )
 
 library_test(
@@ -240,11 +247,14 @@ library_test(
         "//src/libraries/Common:src/System/Net/StreamBuffer.cs",
     ],
     deps = [
+        "//src/libraries/shims/System.IO:impl_System.IO",
         "//src/libraries/System.IO.Pipes:ref_System.IO.Pipes",
         "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
         "//src/libraries/System.Text.Encoding.CodePages:ref_System.Text.Encoding.CodePages",
         "//src/libraries/System.Text.Encoding.Extensions:ref_System.Text.Encoding.Extensions",
         "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
         "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
         "//src/libraries/Common/tests:StreamConformanceTests",
         "//src/libraries/Common/tests:TestUtilities",

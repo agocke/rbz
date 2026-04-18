@@ -34,6 +34,7 @@ layout.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
   184 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  184 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -74,15 +75,14 @@ layout.
   System.Console, System.Data.Common, System.Data.DataSetExtensions,
   System.Diagnostics.Contracts,
   System.Diagnostics.DiagnosticSource, System.Diagnostics.FileVersionInfo,
-  System.Diagnostics.Process,
+  System.Diagnostics.Process, System.Diagnostics.Tools,
   System.Diagnostics.StackTrace, System.Diagnostics.TextWriterTraceListener,
-  System.Diagnostics.Tools, System.Diagnostics.TraceSource, System.Diagnostics.Tracing,
+  System.Diagnostics.TraceSource, System.Diagnostics.Tracing,
   System.Drawing.Primitives, System.Dynamic.Runtime,
   System.Formats.Asn1, System.Formats.Cbor,
-  System.Formats.Nrbf, System.Formats.Tar,
-  System.Globalization.Calendars,
-  System.IO, System.IO.Compression,
-  System.IO.Compression.Brotli, System.IO.Compression.ZipFile,
+  System.Formats.Nrbf, System.Formats.Tar, System.Globalization.Calendars,
+  System.IO, System.IO.Compression, System.IO.Compression.Brotli,
+  System.IO.Compression.ZipFile,
   System.IO.FileSystem.DriveInfo, System.IO.FileSystem.Primitives,
   System.IO.FileSystem.Watcher, System.IO.Hashing, System.IO.IsolatedStorage,
   System.IO.MemoryMappedFiles, System.IO.UnmanagedMemoryStream,
@@ -124,11 +124,10 @@ layout.
   System.Text.Encodings.Web, System.Text.RegularExpressions,
   System.Text.RegularExpressions (UnitTests),
   System.Threading, System.Threading.Channels, System.Threading.Overlapped,
-  System.Threading.RateLimiting, System.Threading.Tasks,
-  System.Threading.Tasks.Dataflow, System.Threading.Tasks.Extensions,
-  System.Threading.Tasks.Parallel, System.Threading.Thread,
-  System.Threading.ThreadPool, System.Threading.Timer,
-  System.Transactions.Local, System.ValueTuple,
+  System.Threading.RateLimiting, System.Threading.Tasks.Dataflow,
+  System.Threading.Tasks.Extensions, System.Threading.Tasks.Parallel,
+  System.Threading.Tasks, System.Threading.Thread, System.Threading.ThreadPool,
+  System.Threading.Timer, System.Transactions.Local, System.ValueTuple,
   System.Web.HttpUtility;
   plus 5 platform-constrained test suites with BUILD files:
   Microsoft.Win32.Registry (Windows), System.Resources.Extensions
@@ -221,7 +220,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 76 of 466 tracked assemblies currently match
+- **Managed assemblies**: 216 of 478 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
