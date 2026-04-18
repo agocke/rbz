@@ -349,13 +349,14 @@ diff   System.Diagnostics.FileVersionInfo.Tests
 diff   System.Diagnostics.PerformanceCounter
 diff   System.Diagnostics.Process.Tests
 diff   System.Diagnostics.StackTrace.Tests
+match  System.Diagnostics.Tools.Tests
 diff   System.Diagnostics.TextWriterTraceListener.Tests
 diff   System.Diagnostics.TraceSource.Tests
 diff   System.Diagnostics.Tracing.Tests
-match  System.Diagnostics.Tools.Tests
 diff   System.DirectoryServices
 diff   System.DirectoryServices.AccountManagement
 diff   System.DirectoryServices.Protocols
+match  System.Dynamic.Runtime.Tests
 diff   System.Drawing.Primitives.Tests
 diff   System.Formats.Asn1.Tests
 diff   System.Formats.Cbor
@@ -363,6 +364,7 @@ diff   System.Formats.Cbor.Tests
 diff   System.Formats.Nrbf
 diff   System.Formats.Nrbf.Tests
 diff   System.Formats.Tar.Tests
+match  System.Globalization.Calendars.Tests
 diff   System.IO.Compression.Brotli.Tests
 diff   System.IO.Compression.Tests
 diff   System.IO.Compression.ZipFile.Tests

@@ -33,7 +33,8 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  182 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  184 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  184 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -77,9 +78,11 @@ layout.
   System.Diagnostics.Process, System.Diagnostics.Tools,
   System.Diagnostics.StackTrace, System.Diagnostics.TextWriterTraceListener,
   System.Diagnostics.TraceSource, System.Diagnostics.Tracing,
-  System.Drawing.Primitives, System.Formats.Asn1, System.Formats.Cbor,
-  System.Formats.Nrbf, System.Formats.Tar, System.IO.Compression,
-  System.IO, System.IO.Compression.Brotli, System.IO.Compression.ZipFile,
+  System.Drawing.Primitives, System.Dynamic.Runtime,
+  System.Formats.Asn1, System.Formats.Cbor,
+  System.Formats.Nrbf, System.Formats.Tar, System.Globalization.Calendars,
+  System.IO, System.IO.Compression, System.IO.Compression.Brotli,
+  System.IO.Compression.ZipFile,
   System.IO.FileSystem.DriveInfo, System.IO.FileSystem.Primitives,
   System.IO.FileSystem.Watcher, System.IO.Hashing, System.IO.IsolatedStorage,
   System.IO.MemoryMappedFiles, System.IO.UnmanagedMemoryStream,
@@ -139,7 +142,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (187 Bazel targets total; 182 currently pass on Linux and 5 are platform-constrained/skipped)
+- Library unit tests (189 Bazel targets total; 184 currently pass on Linux and 5 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
