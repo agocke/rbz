@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  175 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  182 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -62,7 +62,7 @@ layout.
   Microsoft.Extensions.Options.ConfigurationExtensions,
   Microsoft.Extensions.Primitives,
   Microsoft.Win32.Primitives,
-  System.CodeDom, System.Collections, System.Collections.Concurrent,
+  System.Buffers, System.CodeDom, System.Collections, System.Collections.Concurrent,
   System.Collections.Immutable, System.Collections.NonGeneric,
   System.Collections.Specialized, System.ComponentModel,
   System.ComponentModel.Annotations, System.ComponentModel.Composition,
@@ -74,12 +74,12 @@ layout.
   System.Console, System.Data.Common, System.Data.DataSetExtensions,
   System.Diagnostics.Contracts,
   System.Diagnostics.DiagnosticSource, System.Diagnostics.FileVersionInfo,
-  System.Diagnostics.Process,
+  System.Diagnostics.Process, System.Diagnostics.Tools,
   System.Diagnostics.StackTrace, System.Diagnostics.TextWriterTraceListener,
   System.Diagnostics.TraceSource, System.Diagnostics.Tracing,
   System.Drawing.Primitives, System.Formats.Asn1, System.Formats.Cbor,
   System.Formats.Nrbf, System.Formats.Tar, System.IO.Compression,
-  System.IO.Compression.Brotli, System.IO.Compression.ZipFile,
+  System.IO, System.IO.Compression.Brotli, System.IO.Compression.ZipFile,
   System.IO.FileSystem.DriveInfo, System.IO.FileSystem.Primitives,
   System.IO.FileSystem.Watcher, System.IO.Hashing, System.IO.IsolatedStorage,
   System.IO.MemoryMappedFiles, System.IO.UnmanagedMemoryStream,
@@ -103,7 +103,7 @@ layout.
   System.Reflection.Emit.ILGeneration, System.Reflection.Emit.Lightweight,
   System.Reflection.Extensions, System.Reflection.Metadata,
   System.Reflection.MetadataLoadContext, System.Reflection.TypeExtensions,
-  System.Resources.Writer, System.Runtime.Caching,
+  System.Resources.Reader, System.Resources.Writer, System.Runtime.Caching,
   System.Runtime.CompilerServices.Unsafe,
   System.Runtime.CompilerServices.VisualC, System.Runtime.Handles,
   System.Runtime.InteropServices (UnitTests), System.Runtime.Intrinsics,
@@ -122,8 +122,9 @@ layout.
   System.Text.RegularExpressions (UnitTests),
   System.Threading, System.Threading.Channels, System.Threading.Overlapped,
   System.Threading.RateLimiting, System.Threading.Tasks.Dataflow,
-  System.Threading.Tasks.Parallel, System.Threading.Thread,
-  System.Threading.ThreadPool, System.Transactions.Local, System.ValueTuple,
+  System.Threading.Tasks.Extensions, System.Threading.Tasks.Parallel,
+  System.Threading.Tasks, System.Threading.Thread, System.Threading.ThreadPool,
+  System.Threading.Timer, System.Transactions.Local, System.ValueTuple,
   System.Web.HttpUtility;
   plus 5 platform-constrained test suites with BUILD files:
   Microsoft.Win32.Registry (Windows), System.Resources.Extensions
@@ -138,7 +139,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (180 Bazel targets total; 175 currently pass on Linux and 5 are platform-constrained/skipped)
+- Library unit tests (187 Bazel targets total; 182 currently pass on Linux and 5 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -216,7 +217,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 76 of 466 tracked assemblies currently match
+- **Managed assemblies**: 216 of 478 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
