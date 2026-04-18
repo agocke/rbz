@@ -291,6 +291,7 @@ diff   Microsoft.Extensions.Primitives.Tests
 # Microsoft.Interop.LibraryImportGenerator
 # Microsoft.Interop.SourceGeneration
 diff   Microsoft.Win32.Primitives.Tests
+match  System.Buffers.Tests
 diff   Microsoft.Win32.Registry.AccessControl
 diff   Microsoft.Win32.SystemEvents
 diff   MockHostTypes
@@ -348,12 +349,14 @@ diff   System.Diagnostics.FileVersionInfo.Tests
 diff   System.Diagnostics.PerformanceCounter
 diff   System.Diagnostics.Process.Tests
 diff   System.Diagnostics.StackTrace.Tests
+match  System.Diagnostics.Tools.Tests
 diff   System.Diagnostics.TextWriterTraceListener.Tests
 diff   System.Diagnostics.TraceSource.Tests
 diff   System.Diagnostics.Tracing.Tests
 diff   System.DirectoryServices
 diff   System.DirectoryServices.AccountManagement
 diff   System.DirectoryServices.Protocols
+match  System.Dynamic.Runtime.Tests
 diff   System.Drawing.Primitives.Tests
 diff   System.Formats.Asn1.Tests
 diff   System.Formats.Cbor
@@ -361,6 +364,7 @@ diff   System.Formats.Cbor.Tests
 diff   System.Formats.Nrbf
 diff   System.Formats.Nrbf.Tests
 diff   System.Formats.Tar.Tests
+match  System.Globalization.Calendars.Tests
 diff   System.IO.Compression.Brotli.Tests
 diff   System.IO.Compression.Tests
 diff   System.IO.Compression.ZipFile.Tests
@@ -375,6 +379,7 @@ diff   System.IO.Packaging
 diff   System.IO.Packaging.Tests
 diff   System.IO.Pipelines.Tests
 diff   System.IO.Pipes.Tests
+match  System.IO.Tests
 diff   System.IO.UnmanagedMemoryStream.Tests
 diff   System.IO.Ports
 diff   System.Linq.AsyncEnumerable.Tests
@@ -430,6 +435,7 @@ diff   System.Reflection.MetadataLoadContext
 diff   System.Reflection.MetadataLoadContext.Tests
 diff   System.Reflection.TypeExtensions.Tests
 diff   System.Resources.Extensions
+match  System.Resources.Reader.Tests
 diff   System.Resources.Writer.Tests
 diff   System.Runtime.Caching
 diff   System.Runtime.Caching.Tests
@@ -474,10 +480,13 @@ diff   System.Threading.Overlapped.Tests
 diff   System.Threading.RateLimiting
 diff   System.Threading.RateLimiting.Tests
 diff   System.Threading.Tasks.Dataflow.Tests
+match  System.Threading.Tasks.Extensions.Tests
 diff   System.Threading.Tasks.Parallel.Tests
+match  System.Threading.Tasks.Tests
 diff   System.Threading.Tests
 diff   System.Threading.Thread.Tests
 diff   System.Threading.ThreadPool.Tests
+match  System.Threading.Timer.Tests
 diff   System.Transactions.Local.Tests
 diff   System.ValueTuple.Tests
 diff   System.Web.HttpUtility.Tests
