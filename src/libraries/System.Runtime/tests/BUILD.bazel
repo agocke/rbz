@@ -87,3 +87,134 @@ library_test(
     keyfile = OPEN_SNK,
     size = "small",
 )
+
+library_test(
+    name = "System.Buffers.Tests",
+    srcs = glob(["System.Buffers.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
+    ],
+    deps = [
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.Diagnostics.Tools.Tests",
+    srcs = glob(["System.Diagnostics.Tools.Tests/**/*.cs"]),
+    deps = XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.Threading.Tasks.Tests",
+    srcs = glob(["System.Threading.Tasks.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
+        "//src/libraries/Common/tests:System/Threading/ThreadPoolHelpers.cs",
+        "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
+    ],
+    deps = [
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
+library_test(
+    name = "System.Threading.Timer.Tests",
+    srcs = glob(["System.Threading.Timer.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Threading/ThreadTestHelpers.cs",
+    ],
+    deps = [
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+library_test(
+    name = "System.Resources.Reader.Tests",
+    srcs = glob(["System.Resources.Reader.Tests/**/*.cs"]),
+    deps = XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.Threading.Tasks.Extensions.Tests",
+    srcs = glob(["System.Threading.Tasks.Extensions.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Threading/Tasks/Sources/ManualResetValueTaskSource.cs",
+        "//src/libraries/Common/tests:System/Threading/Tasks/Sources/ManualResetValueTaskSourceFactory.cs",
+        "//src/libraries/Common/tests:System/Threading/Tasks/GetStateMachineData.cs",
+    ],
+    deps = [
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+library_test(
+    name = "System.Dynamic.Runtime.Tests",
+    srcs = glob(["System.Dynamic.Runtime.Tests/**/*.cs"]),
+    nowarn = [
+        "67", "168", "219", "414", "162", "184", "458", "464",
+        "78", "169", "114", "693", "108", "1981", "649", "109",
+        "1066", "3021", "3026", "3002", "3014", "3022", "660",
+        "661", "429", "xUnit1013",
+    ],
+    deps = [
+        "//src/libraries:ref_Microsoft.CSharp",
+        "//src/libraries/System.Linq.Expressions:ref_System.Linq.Expressions",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
+library_test(
+    name = "System.Globalization.Calendars.Tests",
+    srcs = glob(
+        ["System.Globalization.Calendars.Tests/**/*.cs"],
+        exclude = [
+            "System.Globalization.Calendars.Tests/CalendarTestWithConfigSwitch/**",
+            "System.Globalization.Calendars.Tests/Hybrid/**",
+        ],
+    ) + [
+        "//src/libraries/Common/tests:System/RandomDataGenerator.cs",
+    ],
+    deps = [
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+library_test(
+    name = "System.IO.Tests",
+    srcs = glob(["System.IO.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
+        "//src/libraries/Common/tests:System/Buffers/NativeMemoryManager.cs",
+        "//src/libraries/Common/tests:System/IO/CallTrackingStream.cs",
+        "//src/libraries/Common/tests:System/IO/DelegateStream.cs",
+        "//src/libraries/Common/tests:System/IO/WrappedMemoryStream.cs",
+        "//src/libraries/Common/tests:System/IO/ConnectedStreams.cs",
+        "//src/libraries/Common:src/System/Net/MultiArrayBuffer.cs",
+        "//src/libraries/Common:src/System/Net/StreamBuffer.cs",
+    ],
+    deps = [
+        "//src/libraries/Common/tests:StreamConformanceTests",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
