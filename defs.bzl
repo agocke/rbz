@@ -407,9 +407,15 @@ def csharp_library(
     use_shared_compilation = True,
     compiler_options = [],
     compile_data = [],
+    additionalfiles = [],
+    analyzer_configs = [],
+    analyzers = [],
     treat_warnings_as_errors = True,
     warnings_not_as_errors = [],
     generate_documentation_file = False,
+    msbuild_analyzer_config = "none",
+    include_default_ruleset = True,
+    interceptors_namespaces = None,
     **kwargs
 ):
     if out == None:
@@ -456,6 +462,43 @@ def csharp_library(
     # where AssemblyInfo.cs and Forwards.cs come after generated SR sources.
     srcs = srcs + suffix_srcs
 
+    if msbuild_analyzer_config not in ["none", "style", "source"]:
+        fail("msbuild_analyzer_config must be one of: none, style, source")
+
+    if msbuild_analyzer_config != "none":
+        if msbuild_analyzer_config == "source":
+            disabled_analyzers_target = "disabled_analyzers_" + name
+            native.genrule(
+                name = disabled_analyzers_target,
+                outs = [name + "/disabledAnalyzers.config"],
+                cmd = ": > \"$@\"",
+            )
+            additionalfiles = additionalfiles + [":" + disabled_analyzers_target]
+
+        editorconfig_target = "editorconfig_" + name
+        native.genrule(
+            name = editorconfig_target,
+            outs = [name + "/" + out + ".GeneratedMSBuildEditorConfig.editorconfig"],
+            cmd = """cat >"$@" <<'EOF'
+is_global = true
+build_property.InformationalVersion = {version}
+build_property._SupportedPlatformList = Linux,macOS,Windows,Android,iOS,tvOS,macCatalyst,browser,wasi,illumos,Solaris,Haiku,Unix,FreeBSD
+EOF""".format(version = PRODUCT_VERSION),
+        )
+
+        _msbuild_analyzer_configs = [
+            ":" + editorconfig_target,
+            "//src/tools/bazel:analysislevelstyle_default.globalconfig",
+            "//:.editorconfig",
+        ]
+        if msbuild_analyzer_config == "source":
+            _msbuild_analyzer_configs = _msbuild_analyzer_configs + [
+                "//eng:CodeAnalysis.src.globalconfig",
+                "//src/tools/bazel:analysislevel_11_default.globalconfig",
+            ]
+
+        analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
+
     # rules_dotnet explicitly passes /nullable:disable for assemblies with
     # nullable="disable", but MSBuild omits /nullable entirely (disable is
     # the default).  The explicit flag triggers CS8632 on nullable
@@ -472,6 +515,29 @@ def csharp_library(
     _pkg = native.package_name()
     _pathmap_key = "%s/%s/%s" % (_pkg, name, NETCOREAPP_CURRENT)
     _pathmap_value = "/_/artifacts/obj/%s/Release/%s" % (out, NETCOREAPP_CURRENT)
+
+    _compiler_options = compiler_options + [
+        "/checksumalgorithm:SHA256",
+        "/platform:AnyCPU",
+        "/features:strict",
+        "/features:nullablePublicOnly",
+        "/noconfig",
+        # rules_dotnet restricts warning_level to [0..5] so we use
+        # compiler_options to emit /warn:9999, matching MSBuild's
+        # WarningLevel=9999.
+        "/warn:9999",
+        "/warnaserror+:SYSLIB0011",
+    ]
+    if interceptors_namespaces != None:
+        _compiler_options = _compiler_options + [
+            "/features:InterceptorsNamespaces=" + interceptors_namespaces,
+        ]
+    if include_default_ruleset:
+        _compiler_options = _compiler_options + [
+            # Microsoft.DotNet.CodeAnalysis package supplies this ruleset to
+            # source-build projects. compile_data makes it available in the sandbox.
+            "/ruleset:eng/Default.ruleset",
+        ]
 
     _base_csharp_library(
         name = name,
@@ -512,22 +578,11 @@ def csharp_library(
         generate_documentation_file = generate_documentation_file,
         # Match MSBuild's csc defaults. rules_dotnet emits its own baseline
         # flags, so keep these late in the command line for last-wins behavior.
-        compiler_options = compiler_options + [
-            "/noconfig",
-            # rules_dotnet restricts warning_level to [0..5] so we use
-            # compiler_options to emit /warn:9999, matching MSBuild's
-            # WarningLevel=9999.
-            "/warn:9999",
-            # SDK WarningsAsErrors: BinaryFormatter obsolete (SYSLIB0011)
-            # set by Microsoft.NET.Sdk.CSharp.targets when net10.0+.
-            "/warnaserror+:SYSLIB0011",
-            # Microsoft.DotNet.CodeAnalysis package supplies this ruleset to
-            # all projects.  It suppresses several CA rules globally (e.g.
-            # CA1018, CA1001, CA2213).  compile_data makes the file available
-            # in the sandbox so csc can read it.
-            "/ruleset:eng/Default.ruleset",
-        ],
-        compile_data = compile_data + [DEFAULT_RULESET],
+        compiler_options = _compiler_options,
+        compile_data = compile_data + ([DEFAULT_RULESET] if include_default_ruleset else []),
+        additionalfiles = additionalfiles,
+        analyzer_configs = analyzer_configs,
+        analyzers = analyzers,
         # In CI mode, normalize PDB paths to match MSBuild's CI layout
         # (ContinuousIntegrationBuild=true → DeterministicSourcePaths → PathMap).
         pathmap = select({

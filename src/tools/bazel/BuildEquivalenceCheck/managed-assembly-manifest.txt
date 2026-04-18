@@ -203,11 +203,11 @@ diff   CreateWebHostBuilderInvalidSignature
 diff   CreateWebHostBuilderPatternTestSite
 diff   DefaultApartmentStateMain
 diff   ILCompiler.Compiler
-diff   ILCompiler.DependencyAnalysisFramework
-diff   ILCompiler.Diagnostics
-diff   ILCompiler.MetadataTransform
+match  ILCompiler.DependencyAnalysisFramework
+match  ILCompiler.Diagnostics
+match  ILCompiler.MetadataTransform
 diff   ILCompiler.ReadyToRun
-diff   ILCompiler.RyuJit
+match  ILCompiler.RyuJit
 diff   ILCompiler.TypeSystem
 diff   ILLink.Tasks
 diff   MTAMain
@@ -510,6 +510,6 @@ diff   ilc
 diff   illink
 
 # ── Unlisted assemblies added during equivalence improvement ──
-diff   ILCompiler.Reflection.ReadyToRun
+match  ILCompiler.Reflection.ReadyToRun
 diff   System.Text.Json.SourceGeneration
 diff   TestUtilities
