@@ -5,6 +5,10 @@ gen_resx_source(
     name = "gen_resx",
     out = "SR.g.cs",
     assembly_name = "System.Net.Http.Functional.Tests",
+    include_default_values = select({
+        "//:libs_debug": True,
+        "//conditions:default": False,
+    }),
     resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
 )
 
