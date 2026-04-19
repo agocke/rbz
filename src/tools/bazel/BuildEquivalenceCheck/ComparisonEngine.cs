@@ -432,6 +432,14 @@ public static class ComparisonEngine
         "/nologo",
     };
 
+    private static bool IsIgnoredManagedAnalyzer(string analyzer)
+    {
+        // Code-fix assemblies affect IDE suggestions but do not participate in
+        // the compilation pipeline that compare-bazel is validating.
+        return analyzer.EndsWith(".CodeFixes", StringComparison.Ordinal)
+            || analyzer.EndsWith("CodeFixProvider", StringComparison.Ordinal);
+    }
+
     /// <summary>
     /// Csc flag prefixes whose values are absolute or repo-relative paths.
     /// These are normalized to filename-only before comparison so that the
@@ -542,18 +550,51 @@ public static class ComparisonEngine
     }
 
     /// <summary>
-    /// Normalize warning-related flags for consistent comparison:
+    /// Normalize managed flags for consistent comparison:
     /// - /warn:N — keep only the highest value (csc uses last-wins semantics)
     /// - /warnaserror+:X,Y — expand comma-separated codes into individual entries
     /// - /warnaserror-:X,Y — same expansion
+    /// - /unsafe and /unsafe+ are treated equivalently
+    /// - default-off toggles (/unsafe-, /checked-, /nullable:disable,
+    ///   /platform:AnyCPU) are treated as equivalent to omission
     /// </summary>
-    private static IEnumerable<string> NormalizeWarningFlags(IEnumerable<string> flags)
+    private static IEnumerable<string> NormalizeManagedFlags(IEnumerable<string> flags)
     {
         var result = new List<string>();
         int maxWarnLevel = -1;
+        bool unsafeEnabled = false;
+        bool checkedEnabled = false;
+        string? nullableMode = null;
 
         foreach (var flag in flags)
         {
+            if (flag is "/unsafe" or "/unsafe+")
+            {
+                unsafeEnabled = true;
+                continue;
+            }
+
+            if (flag == "/unsafe-")
+                continue;
+
+            if (flag is "/checked" or "/checked+")
+            {
+                checkedEnabled = true;
+                continue;
+            }
+
+            if (flag == "/checked-")
+                continue;
+
+            if (flag.StartsWith("/nullable:", StringComparison.Ordinal))
+            {
+                nullableMode = flag["/nullable:".Length..];
+                continue;
+            }
+
+            if (string.Equals(flag, "/platform:AnyCPU", StringComparison.OrdinalIgnoreCase))
+                continue;
+
             if (flag.StartsWith("/warn:", StringComparison.Ordinal))
             {
                 if (int.TryParse(flag["/warn:".Length..], out var level) && level > maxWarnLevel)
@@ -576,6 +617,18 @@ public static class ComparisonEngine
             }
 
             result.Add(flag);
+        }
+
+        if (unsafeEnabled)
+            result.Add("/unsafe+");
+
+        if (checkedEnabled)
+            result.Add("/checked+");
+
+        if (!string.IsNullOrEmpty(nullableMode)
+            && !string.Equals(nullableMode, "disable", StringComparison.OrdinalIgnoreCase))
+        {
+            result.Add("/nullable:" + nullableMode);
         }
 
         if (maxWarnLevel >= 0)
@@ -628,14 +681,16 @@ public static class ComparisonEngine
         // Flags: compare all csc flags (including /nowarn:CODE entries).
         // Filter ignored flags, then normalize path-bearing flags to filename-only.
         var msbuildFlags = new SortedSet<string>(
-            NormalizeWarningFlags(msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag)),
+            NormalizeManagedFlags(msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag)),
             StringComparer.Ordinal);
         var bazelFlags = new SortedSet<string>(
-            NormalizeWarningFlags(bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag)),
+            NormalizeManagedFlags(bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag)),
             StringComparer.Ordinal);
         AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
 
-        AddSetDifference(result, "analyzers", msbuild.Analyzers, bazel.Analyzers);
+        var msbuildAnalyzers = new SortedSet<string>(msbuild.Analyzers.Where(a => !IsIgnoredManagedAnalyzer(a)), StringComparer.Ordinal);
+        var bazelAnalyzers = new SortedSet<string>(bazel.Analyzers.Where(a => !IsIgnoredManagedAnalyzer(a)), StringComparer.Ordinal);
+        AddSetDifference(result, "analyzers", msbuildAnalyzers, bazelAnalyzers);
 
         var msbuildLang = NormalizeLangVersion(msbuild.LangVersion);
         var bazelLang = NormalizeLangVersion(bazel.LangVersion);

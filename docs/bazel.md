@@ -220,7 +220,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 216 of 478 tracked assemblies currently match
+- **Managed assemblies**: 223 of 480 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -238,14 +238,20 @@ areas:
   `disabledAnalyzers.config`, `GeneratedMSBuildEditorConfig.editorconfig`,
   passes the standard Roslyn analyzers, ILLink analyzer, the
   `Microsoft.DotNet.CodeAnalysis` `Default.ruleset` (via `compile_data`),
-  and conditionally the interop source generators. Bazel now also builds
+  and conditionally the interop source generators. The shared
+  `csharp_library` wrapper in `defs.bzl` now also carries the same
+  MSBuild-style analyzerconfig and warning-flag parity needed for AOT tool
+  assemblies, moving `ILCompiler.DependencyAnalysisFramework`,
+  `ILCompiler.Diagnostics`, `ILCompiler.MetadataTransform`,
+  `ILCompiler.Reflection.ReadyToRun`, and `ILCompiler.RyuJit` to `match`.
+  Bazel now also builds
   `Microsoft.Interop.JavaScript.JSImportGenerator` from
   `System.Runtime.InteropServices.JavaScript/gen/JSImportGenerator` and wires
   it into OOB `impl_assembly` targets plus `library_test`, matching the
   targeting-pack analyzer input that MSBuild uses for those builds. Six known
   diffs still mention `Microsoft.Interop.JavaScript.JSImportGenerator` on
   helper/test-support assemblies outside that library infrastructure.
-  Of the 390 remaining diffs:
+  Of the 257 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps

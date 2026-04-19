@@ -9,6 +9,9 @@ genrule(
 csharp_library(
     name = "ILCompiler.MetadataTransform",
     nowarn = ["1591"],
+    msbuild_analyzer_config = "source",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    compiler_options = ["/warnaserror+:NU1605"],
     srcs = [
         ":AssemblyInfo",
         "ILCompiler/Metadata/EntityMap.cs",
@@ -49,7 +52,11 @@ csharp_library(
         "//src/coreclr/tools/Common:Internal/NativeFormat/NativeFormatWriterExtensions.cs",
     ],
     defines = ["NATIVEFORMAT_PUBLICWRITER"],
-    compiler_options = ["/unsafe"],
+    allow_unsafe_blocks = True,
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+    ],
     deps = [
         "//src/coreclr/tools/aot/ILCompiler.TypeSystem",
         "@paket.main//microsoft.diasymreader",
