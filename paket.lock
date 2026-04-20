@@ -39,6 +39,7 @@ NUGET
       System.IO.Pipelines (>= 8.0)
       System.Reflection.Metadata (>= 8.0)
       System.Threading.Channels (>= 7.0)
+    Microsoft.CodeAnalysis.NetAnalyzers (10.0.106)
     Microsoft.CodeAnalysis.Workspaces.Common (4.11.0)
       Humanizer.Core (>= 2.14.1)
       Microsoft.CodeAnalysis.Analyzers (>= 3.3.4)
@@ -73,6 +74,7 @@ NUGET
     StyleCop.Analyzers.Unstable (1.2.0.556)
     System.Buffers (4.5.1)
     System.Collections.Immutable (9.0.0)
+    System.CommandLine (2.0.6)
     System.Composition (8.0.0)
       System.Composition.AttributedModel (>= 8.0)
       System.Composition.Convention (>= 8.0)
@@ -95,6 +97,7 @@ NUGET
     System.Data.SqlClient (4.9.0)
       runtime.native.System.Data.SqlClient.sni (>= 4.4)
     System.Diagnostics.EventLog (8.0.1)
+    System.Formats.Asn1 (10.0.6)
     System.IO.Pipelines (8.0.0)
     System.Memory (4.5.5)
     System.Reflection.Metadata (9.0.0)
@@ -112,10 +115,6 @@ NUGET
       xunit.extensibility.core (2.9.3)
   remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
     Microsoft.CodeAnalysis.Analyzers (5.0.0-2.26170.102)
-  remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/darc-pub-dotnet-dotnet-b32125d4/nuget/v3/index.json
-    Microsoft.CodeAnalysis.NetAnalyzers (10.0.106)
-    System.CommandLine (2.0.6)
-    System.Formats.Asn1 (10.0.6)
   remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json
     Microsoft.DotNet.Arcade.Sdk (10.0.0-beta.26170.102)
     Microsoft.DotNet.CodeAnalysis (10.0.0-beta.26170.102)
