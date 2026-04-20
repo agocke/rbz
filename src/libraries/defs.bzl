@@ -1,9 +1,11 @@
 
 load(
     "//:defs.bzl",
+    "ASPNETCORE_SNK",
     "CI_INFORMATIONAL_VERSION",
     "MSFT_SNK",
     "NETCOREAPP_CURRENT",
+    "OPEN_SNK",
     "csharp_library",
     "gen_assembly_info",
     "gen_illink_substitutions",
@@ -137,6 +139,27 @@ LIVE_REFPACK_DEPS = [
     "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
 ]
 
+def _default_strong_name_keyfile(base_name, keyfile):
+    if keyfile != None:
+        return keyfile
+
+    # Match src/libraries/Directory.Build.props defaults for source projects.
+    # Many inbox assemblies still override this explicitly in their local
+    # Directory.Build.props, so MSFT_SNK remains the general fallback.
+    if base_name.startswith("Microsoft.Extensions."):
+        return ASPNETCORE_SNK
+    if base_name.startswith("Microsoft.Bcl."):
+        return OPEN_SNK
+
+    return MSFT_SNK
+
+def _dedupe(items):
+    result = []
+    for item in items:
+        if item not in result:
+            result.append(item)
+    return result
+
 # Convenience macro for defining a ref assembly for the NetCoreApp framework.
 def netcoreapp_ref_assembly(
     name,
@@ -172,7 +195,7 @@ def netcoreapp_ref_assembly(
         assembly_version = assembly_version,
         visibility = [ "//visibility:public" ],
         nullable = "annotations",
-        keyfile = keyfile if keyfile else MSFT_SNK,
+        keyfile = _default_strong_name_keyfile(base_name, keyfile),
         target_frameworks = [ NETCOREAPP_CURRENT ],
         disable_implicit_framework_refs = True,
         nowarn = nowarn,
@@ -524,6 +547,7 @@ EOF""".format(version = PRODUCT_VERSION),
         _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
         ]
+    _analyzers = _dedupe(_analyzers)
 
     # Build suffix_srcs in MSBuild order: AssemblyInfo → Forwards
     # These go AFTER the resx-generated System.SR.cs (which is inserted by csharp_library)
@@ -554,7 +578,7 @@ EOF""".format(version = PRODUCT_VERSION),
         visibility = [ "//visibility:public" ],
         nullable = nullable,
         allow_unsafe_blocks = allow_unsafe_blocks,
-        keyfile = keyfile if keyfile else MSFT_SNK,
+        keyfile = _default_strong_name_keyfile(base_name, keyfile),
         target_frameworks = [ NETCOREAPP_CURRENT ],
         disable_implicit_framework_refs = True,
         compiler_options = compiler_options,

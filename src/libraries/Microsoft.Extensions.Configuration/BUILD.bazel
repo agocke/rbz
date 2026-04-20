@@ -23,6 +23,12 @@ impl_assembly(
         "//src/libraries/Common:src/Extensions/ChangeCallbackRegistrar.cs",
         "//src/libraries/Common:src/Extensions/EmptyDisposable.cs",
     ],
+    allow_unsafe_blocks = False,
+    analyzers = [
+        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/Microsoft.Extensions.Configuration.Abstractions:ref_Microsoft.Extensions.Configuration.Abstractions",

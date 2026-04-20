@@ -60,7 +60,6 @@ library_test(
         "//src/libraries/shims/System.Runtime.Handles:impl_System.Runtime.Handles",
         "//src/libraries/Common/tests:TestUtilities",
     ] + XUNIT_DEPS,
-    allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
     size = "small",
 )

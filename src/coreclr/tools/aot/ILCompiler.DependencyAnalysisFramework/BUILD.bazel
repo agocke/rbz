@@ -3,6 +3,9 @@ load("//:defs.bzl", "csharp_library")
 csharp_library(
     name = "ILCompiler.DependencyAnalysisFramework",
     nowarn = ["1591"],
+    msbuild_analyzer_config = "source",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    compiler_options = ["/warnaserror+:NU1605"],
     srcs = glob(["*.cs"]) + [
         "//src/coreclr/tools/Common:Sorting/ArrayAccessor.cs",
         "//src/coreclr/tools/Common:Sorting/ICompareAsEqualAction.cs",
@@ -10,6 +13,10 @@ csharp_library(
         "//src/coreclr/tools/Common:Sorting/ListAccessor.cs",
         "//src/coreclr/tools/Common:Sorting/MergeSort.cs",
         "//src/coreclr/tools/Common:Sorting/MergeSortCore.cs",
+    ],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
     ],
     target_frameworks = ["net10.0"],
     visibility = ["//visibility:public"],

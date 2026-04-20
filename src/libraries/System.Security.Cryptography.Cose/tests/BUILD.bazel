@@ -28,6 +28,7 @@ library_test(
     ],
     nowarn = MULTITARGET_NOWARN + ["SYSLIB5006"],
     defines = ["EXCLUDE_PEM_ENCODING_FROM_TEST_DATA"],
+    nullable = "enable",
     size = "large",
     keyfile = OPEN_SNK,
 )

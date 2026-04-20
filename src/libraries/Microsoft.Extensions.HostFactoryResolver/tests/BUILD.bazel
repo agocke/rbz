@@ -1,6 +1,6 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "live_csharp_library")
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "ASPNETCORE_SNK", "csharp_binary")
+load("//:defs.bzl", "ASPNETCORE_SNK", "OPEN_SNK", "csharp_binary")
 
 _hosting_deps = [
     "//src/libraries/Microsoft.Extensions.Configuration:impl_Microsoft.Extensions.Configuration",
@@ -34,7 +34,7 @@ _mock_host_type_deps = _hosting_deps + [":MockHostTypes"]
 live_csharp_library(
     name = "MockHostTypes",
     srcs = glob(["MockHostTypes/*.cs"]),
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nullable = "enable",
 )
 
@@ -42,7 +42,7 @@ csharp_binary(
     name = "ApplicationNameSetFromArgument",
     srcs = ["ApplicationNameSetFromArgument/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -51,7 +51,7 @@ csharp_binary(
     name = "BuildWebHostInvalidSignature",
     srcs = ["BuildWebHostInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -60,7 +60,7 @@ csharp_binary(
     name = "BuildWebHostPatternTestSite",
     srcs = ["BuildWebHostPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -69,7 +69,7 @@ csharp_binary(
     name = "CreateHostBuilderInvalidSignature",
     srcs = ["CreateHostBuilderInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -78,7 +78,7 @@ csharp_binary(
     name = "CreateHostBuilderPatternTestSite",
     srcs = ["CreateHostBuilderPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -87,7 +87,7 @@ csharp_binary(
     name = "CreateWebHostBuilderInvalidSignature",
     srcs = ["CreateWebHostBuilderInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -96,7 +96,7 @@ csharp_binary(
     name = "CreateWebHostBuilderPatternTestSite",
     srcs = ["CreateWebHostBuilderPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -105,7 +105,7 @@ csharp_binary(
     name = "NoSpecialEntryPointPattern",
     srcs = ["NoSpecialEntryPointPattern/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -114,7 +114,7 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternBuildsThenThrows",
     srcs = ["NoSpecialEntryPointPatternBuildsThenThrows/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -123,7 +123,7 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternExits",
     srcs = ["NoSpecialEntryPointPatternExits/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -132,7 +132,7 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternHangs",
     srcs = ["NoSpecialEntryPointPatternHangs/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -141,7 +141,7 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternMainNoArgs",
     srcs = ["NoSpecialEntryPointPatternMainNoArgs/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -150,7 +150,7 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternThrows",
     srcs = ["NoSpecialEntryPointPatternThrows/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -159,7 +159,7 @@ csharp_binary(
     name = "TopLevelStatements",
     srcs = ["TopLevelStatements/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -168,7 +168,7 @@ csharp_binary(
     name = "TopLevelStatementsTestsTimeout",
     srcs = ["TopLevelStatementsTestsTimeout/Program.cs"],
     deps = _hosting_deps,
-    keyfile = ASPNETCORE_SNK,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )

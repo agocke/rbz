@@ -78,7 +78,7 @@ match  System.Linq.AsyncEnumerable
 match  System.Linq.Expressions
 match  System.Linq.Parallel
 match  System.Linq.Queryable
-diff   System.Memory
+match  System.Memory
 diff   System.Net
 match  System.Net.Http
 diff   System.Net.Http.Json
@@ -127,7 +127,7 @@ match  System.Runtime.Handles
 match  System.Runtime.InteropServices
 match  System.Runtime.InteropServices.JavaScript
 match  System.Runtime.InteropServices.RuntimeInformation
-diff   System.Runtime.Intrinsics
+match  System.Runtime.Intrinsics
 match  System.Runtime.Loader
 match  System.Runtime.Numerics
 diff   System.Runtime.Serialization
@@ -203,11 +203,11 @@ diff   CreateWebHostBuilderInvalidSignature
 diff   CreateWebHostBuilderPatternTestSite
 diff   DefaultApartmentStateMain
 diff   ILCompiler.Compiler
-diff   ILCompiler.DependencyAnalysisFramework
-diff   ILCompiler.Diagnostics
-diff   ILCompiler.MetadataTransform
+match  ILCompiler.DependencyAnalysisFramework
+match  ILCompiler.Diagnostics
+match  ILCompiler.MetadataTransform
 diff   ILCompiler.ReadyToRun
-diff   ILCompiler.RyuJit
+match  ILCompiler.RyuJit
 diff   ILCompiler.TypeSystem
 diff   ILLink.Tasks
 diff   MTAMain
@@ -222,27 +222,27 @@ diff   Microsoft.Bcl.Numerics.Tests
 diff   Microsoft.Bcl.TimeProvider
 diff   Microsoft.Bcl.TimeProvider.Tests
 diff   Microsoft.CSharp.Tests
-diff   Microsoft.Extensions.Caching.Abstractions
-diff   Microsoft.Extensions.Caching.Memory
+match  Microsoft.Extensions.Caching.Abstractions
+match  Microsoft.Extensions.Caching.Memory
 diff   Microsoft.Extensions.Caching.Memory.Tests
-diff   Microsoft.Extensions.Configuration
-diff   Microsoft.Extensions.Configuration.Abstractions
-diff   Microsoft.Extensions.Configuration.Binder
+match  Microsoft.Extensions.Configuration
+match  Microsoft.Extensions.Configuration.Abstractions
+match  Microsoft.Extensions.Configuration.Binder
 diff   Microsoft.Extensions.Configuration.Binder.Tests
-diff   Microsoft.Extensions.Configuration.CommandLine
+match  Microsoft.Extensions.Configuration.CommandLine
 diff   Microsoft.Extensions.Configuration.CommandLine.Tests
-diff   Microsoft.Extensions.Configuration.EnvironmentVariables
+match  Microsoft.Extensions.Configuration.EnvironmentVariables
 diff   Microsoft.Extensions.Configuration.EnvironmentVariables.Tests
-diff   Microsoft.Extensions.Configuration.FileExtensions
+match  Microsoft.Extensions.Configuration.FileExtensions
 diff   Microsoft.Extensions.Configuration.FileExtensions.Tests
-diff   Microsoft.Extensions.Configuration.Ini
+match  Microsoft.Extensions.Configuration.Ini
 diff   Microsoft.Extensions.Configuration.Ini.Tests
-diff   Microsoft.Extensions.Configuration.Json
+match  Microsoft.Extensions.Configuration.Json
 diff   Microsoft.Extensions.Configuration.Json.Tests
 diff   Microsoft.Extensions.Configuration.Tests
-diff   Microsoft.Extensions.Configuration.UserSecrets
+match  Microsoft.Extensions.Configuration.UserSecrets
 diff   Microsoft.Extensions.Configuration.UserSecrets.Tests
-diff   Microsoft.Extensions.Configuration.Xml
+match  Microsoft.Extensions.Configuration.Xml
 diff   Microsoft.Extensions.Configuration.Xml.Tests
 diff   Microsoft.Extensions.DependencyInjection
 diff   Microsoft.Extensions.DependencyInjection.Abstractions
@@ -440,7 +440,7 @@ diff   System.Resources.Writer.Tests
 diff   System.Runtime.Caching
 diff   System.Runtime.Caching.Tests
 diff   System.Runtime.CompilerServices.Unsafe.Tests
-diff   System.Runtime.Handles.Tests
+match  System.Runtime.Handles.Tests
 diff   System.Runtime.CompilerServices.VisualC.Tests
 diff   System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
@@ -454,7 +454,7 @@ diff   System.Runtime.Serialization.Schema.Tests
 diff   System.Runtime.Serialization.Xml.Tests
 diff   System.Security.Claims.Tests
 diff   System.Security.Cryptography.Cose
-diff   System.Security.Cryptography.Cose.Tests
+match  System.Security.Cryptography.Cose.Tests
 match  System.Security.Cryptography.OpenSsl.Tests
 diff   System.Security.Cryptography.Pkcs
 diff   System.Security.Cryptography.Pkcs.Tests
@@ -471,7 +471,7 @@ diff   System.ServiceProcess.ServiceController
 diff   System.Speech
 diff   System.Text.Encoding.CodePages.Tests
 diff   System.Text.Encoding.Extensions.Tests
-diff   System.Text.Encodings.Web.Tests
+match  System.Text.Encodings.Web.Tests
 # System.Text.RegularExpressions.Generator  # netstandard2.0, filtered
 diff   System.Text.RegularExpressions.Tests
 diff   System.Text.RegularExpressions.Unit.Tests
@@ -510,6 +510,6 @@ diff   ilc
 diff   illink
 
 # ── Unlisted assemblies added during equivalence improvement ──
-diff   ILCompiler.Reflection.ReadyToRun
+match  ILCompiler.Reflection.ReadyToRun
 diff   System.Text.Json.SourceGeneration
 diff   TestUtilities
