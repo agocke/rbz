@@ -1,3 +1,4 @@
+load("//:defs.bzl", "OPEN_SNK")
 load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly")
 
 exports_files([
@@ -12,7 +13,8 @@ netcoreapp_ref_assembly(
     ],
     deps = [
         "//src/libraries:ref_System.Runtime",
-    ]
+    ],
+    keyfile = OPEN_SNK,
 )
 
 netcoreapp_impl_assembly(
@@ -48,4 +50,5 @@ netcoreapp_impl_assembly(
     generate_facades = True,
     facade_contract_assembly = ":ref_System.Memory",
     defines = [ "MAKE_ABW_PUBLIC" ],
+    keyfile = OPEN_SNK,
 )
