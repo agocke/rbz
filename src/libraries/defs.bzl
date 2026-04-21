@@ -42,6 +42,15 @@ MULTITARGET_NOWARN = [
     "CA1845", "CA1846", "CA1847",
 ]
 
+# MSBuild flows these SDK-shipped source generators into a broad set of source
+# library projects via the targeting pack. Reuse the shared list for assemblies
+# that need that analyzer parity in compare-bazel.
+COMMON_GENERATOR_ANALYZERS = [
+    "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+    "//src/libraries/System.Text.Json:JsonSourceGenerator",
+    "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+]
+
 # ── Core_Root library set ─────────────────────────────────────────────
 # This is the single source of truth for what libraries are available to
 # JIT/coreclr tests at both compile time (refs) and runtime (impls).

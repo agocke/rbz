@@ -45,7 +45,7 @@ diff   System.Diagnostics.DiagnosticSource
 match  System.Diagnostics.FileVersionInfo
 match  System.Diagnostics.Process
 match  System.Diagnostics.StackTrace
-diff   System.Diagnostics.TextWriterTraceListener
+match  System.Diagnostics.TextWriterTraceListener
 match  System.Diagnostics.Tools
 match  System.Diagnostics.TraceSource
 match  System.Diagnostics.Tracing
@@ -213,9 +213,9 @@ diff   ILLink.Tasks
 diff   MTAMain
 diff   Microsoft.Bcl.AsyncInterfaces
 diff   Microsoft.Bcl.AsyncInterfaces.Tests
-diff   Microsoft.Bcl.Cryptography
+match  Microsoft.Bcl.Cryptography
 diff   Microsoft.Bcl.Cryptography.Tests
-diff   Microsoft.Bcl.Memory
+match  Microsoft.Bcl.Memory
 diff   Microsoft.Bcl.Memory.Tests
 diff   Microsoft.Bcl.Numerics
 diff   Microsoft.Bcl.Numerics.Tests
@@ -256,27 +256,27 @@ diff   Microsoft.Extensions.Diagnostics.Tests
 diff   Microsoft.Extensions.FileProviders.Abstractions
 diff   Microsoft.Extensions.FileProviders.Composite
 diff   Microsoft.Extensions.FileProviders.Composite.Tests
-diff   Microsoft.Extensions.FileProviders.Physical
+match  Microsoft.Extensions.FileProviders.Physical
 diff   Microsoft.Extensions.FileProviders.Physical.Tests
 diff   Microsoft.Extensions.FileSystemGlobbing
 diff   Microsoft.Extensions.FileSystemGlobbing.Tests
 diff   Microsoft.Extensions.HostFactoryResolver.Tests
 diff   Microsoft.Extensions.Hosting
 diff   Microsoft.Extensions.Hosting.Abstractions
-diff   Microsoft.Extensions.Hosting.Systemd
+match  Microsoft.Extensions.Hosting.Systemd
 diff   Microsoft.Extensions.Hosting.Systemd.Tests
 diff   Microsoft.Extensions.Hosting.Unit.Tests
-diff   Microsoft.Extensions.Hosting.WindowsServices
+match  Microsoft.Extensions.Hosting.WindowsServices
 diff   Microsoft.Extensions.Http
 diff   Microsoft.Extensions.Http.Tests
 diff   Microsoft.Extensions.Logging
-diff   Microsoft.Extensions.Logging.Abstractions
+match  Microsoft.Extensions.Logging.Abstractions
 diff   Microsoft.Extensions.Logging.Configuration
 diff   Microsoft.Extensions.Logging.Console
 diff   Microsoft.Extensions.Logging.Console.Tests
 diff   Microsoft.Extensions.Logging.Debug
 diff   Microsoft.Extensions.Logging.EventLog
-diff   Microsoft.Extensions.Logging.EventSource
+match  Microsoft.Extensions.Logging.EventSource
 diff   Microsoft.Extensions.Logging.EventSource.Tests
 diff   Microsoft.Extensions.Logging.Tests
 diff   Microsoft.Extensions.Logging.TraceSource
@@ -284,7 +284,7 @@ diff   Microsoft.Extensions.Options
 diff   Microsoft.Extensions.Options.ConfigurationExtensions
 diff   Microsoft.Extensions.Options.DataAnnotations
 diff   Microsoft.Extensions.Options.Tests
-diff   Microsoft.Extensions.Primitives
+match  Microsoft.Extensions.Primitives
 diff   Microsoft.Extensions.Primitives.Tests
 # Assemblies below target netstandard2.0 in MSBuild and are filtered from
 # comparison (Bazel targets them differently). Removed from active manifest.
@@ -375,7 +375,7 @@ diff   System.IO.Hashing.Tests
 diff   System.IO.Hashing
 diff   System.IO.IsolatedStorage.Tests
 diff   System.IO.MemoryMappedFiles.Tests
-diff   System.IO.Packaging
+match  System.IO.Packaging
 diff   System.IO.Packaging.Tests
 diff   System.IO.Pipelines.Tests
 diff   System.IO.Pipes.Tests
