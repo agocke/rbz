@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Extensions.DependencyModel.cs",
@@ -27,6 +27,7 @@ impl_assembly(
     ) + [
         "//src/libraries/System.Private.CoreLib:src/System/Numerics/Hashing/HashHelpers.cs",
     ],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.Collections:ref_System.Collections",

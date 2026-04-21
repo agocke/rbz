@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Extensions.DependencyInjection.Abstractions.cs",
@@ -22,6 +22,7 @@ impl_assembly(
         "//src/libraries/Common:src/Extensions/ParameterDefaultValue/ParameterDefaultValue.cs",
         "//src/libraries/Common:src/Extensions/ParameterDefaultValue/ParameterDefaultValue.netcoreapp.cs",
     ],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.Collections:ref_System.Collections",

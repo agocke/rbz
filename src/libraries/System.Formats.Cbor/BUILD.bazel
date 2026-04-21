@@ -21,6 +21,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Formats.Cbor",
+    allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = [
         "//src/libraries/Common:src/System/Memory/PointerMemoryManager.cs",
