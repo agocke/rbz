@@ -31,7 +31,6 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_Microsoft.Extensions.Hosting",
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
-    allow_unsafe_blocks = False,
     srcs = glob(
         ["src/**/*.cs"],
         exclude = [

@@ -309,7 +309,7 @@ def impl_assembly(
     cls_compliant = True,
     is_trimmable = True,
     is_aot_compatible = True,
-    allow_unsafe_blocks = True,
+    allow_unsafe_blocks = False,
     nullable = "enable",
     internals_visible_to = [],
     resources = [],
@@ -627,7 +627,7 @@ ref_impl_pair = rule(
     }
 )
 
-def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False, **kwargs):
+def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False, allow_unsafe_blocks = None, **kwargs):
     """Wrapper for impl_assembly for assemblies in the shared framework (IsNETCoreAppSrc).
 
     Defaults skip_locals_init to True (includes SkipLocalsInit.cs), matching
@@ -635,10 +635,17 @@ def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False
     Defaults jsimport_generator to False because shared-framework builds use the
     live generator outputs instead of the targeting-pack analyzer bundle that
     carries JSImportGenerator for OOB/test builds.
+
+    When skip_locals_init is True (the default), allow_unsafe_blocks is also
+    defaulted to True because [module: SkipLocalsInit] requires /unsafe in C#,
+    matching MSBuild which always sets AllowUnsafeBlocks for such assemblies.
     """
+    if allow_unsafe_blocks == None:
+        allow_unsafe_blocks = skip_locals_init
     impl_assembly(
         skip_locals_init = skip_locals_init,
         jsimport_generator = jsimport_generator,
+        allow_unsafe_blocks = allow_unsafe_blocks,
         **kwargs
     )
 

@@ -17,6 +17,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Primitives",
+    allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = [
         "//src/libraries/System.Private.CoreLib:src/System/Numerics/Hashing/HashHelpers.cs",

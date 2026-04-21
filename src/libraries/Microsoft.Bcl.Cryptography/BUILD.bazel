@@ -9,6 +9,7 @@ exports_files([
 # PQC / X509Loader code is only compiled for older TFMs.
 impl_assembly(
     name = "impl_Microsoft.Bcl.Cryptography",
+    allow_unsafe_blocks = True,
     srcs = [
         "src/Microsoft.Bcl.Cryptography.Forwards.cs",
         "src/System/Security/Cryptography/X509Certificates/X509CertificateKeyAccessors.cs",

@@ -19,7 +19,6 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_Microsoft.Extensions.FileProviders.Composite",
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
-    allow_unsafe_blocks = False,
     exclude_sr = True,
     srcs = glob(["src/**/*.cs"]),
     analyzers = COMMON_GENERATOR_ANALYZERS,

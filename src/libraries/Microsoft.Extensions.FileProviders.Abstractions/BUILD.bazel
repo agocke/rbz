@@ -18,7 +18,6 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_Microsoft.Extensions.FileProviders.Abstractions",
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
-    allow_unsafe_blocks = False,
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/EmptyDisposable.cs",
     ],

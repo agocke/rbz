@@ -17,6 +17,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Memory.Data",
+    allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
     srcs = [
         "src/System/BinaryData.cs",

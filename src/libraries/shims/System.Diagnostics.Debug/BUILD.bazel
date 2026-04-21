@@ -9,7 +9,6 @@ netcoreapp_impl_assembly(
     ],
     os_targeted = True,
     exclude_sr = True,
-    allow_unsafe_blocks = False,
     generate_documentation_file = False,
     library_import_generator = False,
 )

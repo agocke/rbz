@@ -19,6 +19,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Logging.EventSource",
+    allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "PKG0001"],
     exclude_sr = True,
     srcs = glob(["src/**/*.cs"]) + [
