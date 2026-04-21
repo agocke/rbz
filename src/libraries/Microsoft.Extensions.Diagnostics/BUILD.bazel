@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Extensions.Diagnostics.cs",
@@ -24,9 +24,11 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_Microsoft.Extensions.Diagnostics",
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
+    allow_unsafe_blocks = False,
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/System/Diagnostics/DiagnosticsHelper.cs",
     ],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/Microsoft.Extensions.Configuration:ref_Microsoft.Extensions.Configuration",

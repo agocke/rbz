@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Extensions.FileProviders.Composite.cs",
@@ -19,8 +19,10 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_Microsoft.Extensions.FileProviders.Composite",
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
+    allow_unsafe_blocks = False,
     exclude_sr = True,
     srcs = glob(["src/**/*.cs"]),
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/Microsoft.Extensions.FileProviders.Abstractions:ref_Microsoft.Extensions.FileProviders.Abstractions",

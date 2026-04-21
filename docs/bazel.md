@@ -220,7 +220,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 250 of 480 tracked assemblies currently match
+- **Managed assemblies**: 260 of 480 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -233,7 +233,7 @@ areas:
   individual entries for consistent comparison.
   The matching assemblies include `System.Private.CoreLib` (full analyzer
   and flag parity including the ILLink.RoslynAnalyzer built from source) and
-  81 library assemblies matched via infrastructure in `impl_assembly`
+  91 library assemblies matched via infrastructure in `impl_assembly`
   (`src/libraries/defs.bzl`), which automatically generates per-assembly
   `disabledAnalyzers.config`, `GeneratedMSBuildEditorConfig.editorconfig`,
   passes the standard Roslyn analyzers, ILLink analyzer, the
@@ -263,8 +263,17 @@ areas:
   `Microsoft.Extensions.Logging.EventSource`,
   `Microsoft.Extensions.Primitives`,
   `System.Diagnostics.TextWriterTraceListener`, and
-  `System.IO.Packaging`.
-  Of the 230 remaining known diffs:
+  `System.IO.Packaging`. Explicit `/unsafe` parity plus the same shared
+  analyzer set now also moves 10 core `Microsoft.Extensions.*` libraries to
+  `match`: `Microsoft.Extensions.DependencyInjection`,
+  `Microsoft.Extensions.DependencyInjection.Abstractions`,
+  `Microsoft.Extensions.DependencyModel`, `Microsoft.Extensions.Diagnostics`,
+  `Microsoft.Extensions.Diagnostics.Abstractions`,
+  `Microsoft.Extensions.FileProviders.Abstractions`,
+  `Microsoft.Extensions.FileProviders.Composite`,
+  `Microsoft.Extensions.FileSystemGlobbing`, `Microsoft.Extensions.Hosting`,
+  and `Microsoft.Extensions.Hosting.Abstractions`.
+  Of the 220 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
