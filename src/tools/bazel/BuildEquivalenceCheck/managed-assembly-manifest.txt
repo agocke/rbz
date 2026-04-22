@@ -345,6 +345,7 @@ diff   System.Data.DataSetExtensions.Tests
 diff   System.Data.Odbc
 diff   System.Data.OleDb
 diff   System.Diagnostics.Contracts.Tests
+diff   System.Diagnostics.Debug.Tests
 diff   System.Diagnostics.DiagnosticSource.Tests
 diff   System.Diagnostics.EventLog
 diff   System.Diagnostics.FileVersionInfo.TestAssembly
@@ -368,11 +369,14 @@ diff   System.Formats.Nrbf
 diff   System.Formats.Nrbf.Tests
 diff   System.Formats.Tar.Tests
 match  System.Globalization.Calendars.Tests
+diff   System.Globalization.Extensions.Tests
+diff   System.Globalization.Tests
 diff   System.IO.Compression.Brotli.Tests
 diff   System.IO.Compression.Tests
 diff   System.IO.Compression.ZipFile.Tests
 diff   System.IO.FileSystem.DriveInfo.Tests
 diff   System.IO.FileSystem.Primitives.Tests
+diff   System.IO.FileSystem.Tests
 diff   System.IO.FileSystem.Watcher.Tests
 diff   System.IO.Hashing.Tests
 diff   System.IO.Hashing
@@ -441,15 +445,19 @@ diff   System.Reflection.Extensions.Tests
 diff   System.Reflection.Metadata.Tests
 diff   System.Reflection.MetadataLoadContext
 diff   System.Reflection.MetadataLoadContext.Tests
+diff   System.Reflection.Tests
 diff   System.Reflection.TypeExtensions.Tests
 diff   System.Resources.Extensions
 match  System.Resources.Reader.Tests
+diff   System.Resources.ResourceManager.Tests
 diff   System.Resources.Writer.Tests
 diff   System.Runtime.Caching
 diff   System.Runtime.Caching.Tests
 diff   System.Runtime.CompilerServices.Unsafe.Tests
 match  System.Runtime.Handles.Tests
 diff   System.Runtime.CompilerServices.VisualC.Tests
+diff   System.Runtime.Extensions.Tests
+diff   System.Runtime.InteropServices.RuntimeInformation.Tests
 diff   System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
 diff   System.Runtime.Loader.Tests
@@ -465,6 +473,7 @@ diff   System.Runtime.Serialization.Schema.Tests
 diff   System.Runtime.Serialization.Xml.Tests
 diff   System.Runtime.Serialization.Xml.Canonicalization.Tests
 diff   System.Runtime.Serialization.Xml.ReflectionOnly.Tests
+diff   System.Runtime.Tests
 diff   System.Security.Claims.Tests
 diff   System.Security.Cryptography.Cose
 match  System.Security.Cryptography.Cose.Tests
@@ -484,6 +493,7 @@ diff   System.ServiceProcess.ServiceController
 diff   System.Speech
 diff   System.Text.Encoding.CodePages.Tests
 diff   System.Text.Encoding.Extensions.Tests
+diff   System.Text.Encoding.Tests
 match  System.Text.Encodings.Web.Tests
 # System.Text.RegularExpressions.Generator  # netstandard2.0, filtered
 diff   System.Text.RegularExpressions.Tests
@@ -526,3 +536,4 @@ diff   illink
 match  ILCompiler.Reflection.ReadyToRun
 diff   System.Text.Json.SourceGeneration
 diff   TestUtilities
+diff Microsoft.Extensions.DependencyModel.Tests

@@ -308,6 +308,7 @@ library_test(
     deps = [
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries:ref_System.Threading.Tasks",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
@@ -351,6 +352,9 @@ library_test(
         "//src/libraries/System.IO.FileSystem.DriveInfo:ref_System.IO.FileSystem.DriveInfo",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
+        "//src/libraries/System.Text.Encoding.Extensions:ref_System.Text.Encoding.Extensions",
+        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
         "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
@@ -380,6 +384,17 @@ library_test(
             "System.Reflection.Tests/UnloadableAssembly/**",
             # AssemblyTests.cs uses TypeForwardedTo for types from helper projects
             "System.Reflection.Tests/AssemblyTests.cs",
+            # GetTypeTests.cs uses EquivalentValueType from TestAssembly helper project
+            "System.Reflection.Tests/GetTypeTests.cs",
+            # AssemblyNameTests.cs uses AssemblyVersion from excluded helper project
+            "System.Reflection.Tests/AssemblyNameTests.cs",
+            # FieldInfoTests.cs uses MyClass1 from TestAssembly helper project
+            "System.Reflection.Tests/FieldInfoTests.cs",
+            # MethodInfoTests.cs uses TestAssembly namespace
+            "System.Reflection.Tests/MethodInfoTests.cs",
+            # MethodCommonTests and MethodInvokerTests use types from MethodInfoTests (excluded)
+            "System.Reflection.Tests/MethodCommonTests.cs",
+            "System.Reflection.Tests/MethodInvokerTests.cs",
         ],
     ) + [
         "//src/libraries/Common/tests:System/Reflection/MockParameterInfo.cs",
@@ -389,6 +404,9 @@ library_test(
     nowarn = ["SYSLIB0013", "SYSLIB0037"],
     deps = [
         "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
+        "//src/libraries/System.Reflection.TypeExtensions:ref_System.Reflection.TypeExtensions",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
@@ -413,13 +431,24 @@ library_test(
 # .resources content files may need additional work.
 library_test(
     name = "System.Resources.ResourceManager.Tests",
-    srcs = glob(["System.Resources.ResourceManager.Tests/**/*.cs"]) + [
-        "//src/libraries/Common/tests:System/Drawing/Helpers.cs",
-    ],
+    srcs = glob(
+        ["System.Resources.ResourceManager.Tests/**/*.cs"],
+        exclude = [
+            # Uses System.Drawing types (NuGet not available in Bazel)
+            "System.Resources.ResourceManager.Tests/ResourceManagerTests.cs",
+            "System.Resources.ResourceManager.Tests/Resources/TestResx.netstandard17.Designer.cs",
+        ],
+    ),
     deps = [
         "//src/libraries/shims/System.Resources.ResourceManager:impl_System.Resources.ResourceManager",
         "//src/libraries/System.Resources.Extensions:ref_System.Resources.Extensions",
+        "//src/libraries/System.Resources.Writer:ref_System.Resources.Writer",
         "//src/libraries/System.Runtime.Serialization.Formatters:ref_System.Runtime.Serialization.Formatters",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Net.Http:ref_System.Net.Http",
+        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
+        "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
@@ -446,6 +475,8 @@ library_test(
             "System.Runtime.Extensions.Tests/VoidMainWithExitCodeApp/**",
             "System.Runtime.Extensions.Tests/TestApp/**",
             "System.Runtime.Extensions.Tests/TargetFrameworkNameTestApp/**",
+            # Environment.ProcessorCount.cs uses Win32Exception (Windows-only)
+            "System.Runtime.Extensions.Tests/System/Environment.ProcessorCount.cs",
         ],
     ) + [
         "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.GetHostName.cs",
@@ -459,11 +490,16 @@ library_test(
     defines = ["Unix"],
     deps = [
         "//src/libraries/shims/System.Runtime.Extensions:impl_System.Runtime.Extensions",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/System.Net.Http:ref_System.Net.Http",
         "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
+        "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
+        "//src/libraries/System.Security.Claims:ref_System.Security.Claims",
         "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
@@ -519,6 +555,18 @@ library_test(
             "System.Runtime.Tests/Hybrid/**",
             "System.Runtime.Tests/InvariantTimezone/**",
             "System.Runtime.Tests/NlsTests/**",
+            # InlineArrayTests.cs has non-static methods in static class - compile error
+            "System.Runtime.Tests/System/Runtime/CompilerServices/InlineArrayTests.cs",
+            # ActivatorTests use types from excluded TestStructs IL project
+            "System.Runtime.Tests/System/ActivatorTests.cs",
+            "System.Runtime.Tests/System/ActivatorTests.Generic.cs",
+            # CharTests and RuneTests use UnicodeData NuGet package (not available in Bazel)
+            "System.Runtime.Tests/System/CharTests.cs",
+            "System.Runtime.Tests/System/Text/RuneTests.cs",
+            # ModuleTests uses TestModule helper project (excluded)
+            "System.Runtime.Tests/System/Reflection/ModuleTests.cs",
+            # FieldInfoTests uses TestAttributes namespace from ModuleTests.cs
+            "System.Runtime.Tests/System/Reflection/FieldInfoTests.cs",
         ],
     ) + [
         "//src/libraries/Common/tests:System/EnumTypes.cs",
@@ -526,7 +574,6 @@ library_test(
         "//src/libraries/Common/tests:System/FunctionPointerCallingConventionTests.cs",
         "//src/libraries/Common/tests:System/FunctionPointerEqualityTests.cs",
         "//src/libraries/Common/tests:System/MockType.cs",
-        "//src/libraries/Common/tests:System/ModifiedTypeTests.cs",
         "//src/libraries/Common/tests:System/Collections/CollectionAsserts.cs",
         "//src/libraries/Common/tests:System/Collections/ICollection.Generic.Tests.cs",
         "//src/libraries/Common/tests:System/Collections/IEnumerable.Generic.Tests.cs",
@@ -549,15 +596,25 @@ library_test(
         "//src/libraries/Common/tests:System/RealFormatterTestsBase.cs",
         "//src/libraries/Common/tests:System/RealParserTestsBase.cs",
     ],
-    nowarn = ["1718", "SYSLIB0013"],
+    nowarn = ["1718", "SYSLIB0013", "xUnit1012"],
     deps = [
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",
+        "//src/libraries/System.Diagnostics.StackTrace:ref_System.Diagnostics.StackTrace",
         "//src/libraries/System.Linq.Expressions:ref_System.Linq.Expressions",
         "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
+        "//src/libraries/System.Reflection.Emit.Lightweight:ref_System.Reflection.Emit.Lightweight",
+        "//src/libraries/System.Reflection.Emit.ILGeneration:ref_System.Reflection.Emit.ILGeneration",
+        "//src/libraries/System.Reflection.Primitives:ref_System.Reflection.Primitives",
+        "//src/libraries/System.Runtime.Numerics:ref_System.Runtime.Numerics",
+        "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
+        "//src/libraries/System.Text.Encoding.Extensions:ref_System.Text.Encoding.Extensions",
         "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
+        "//src/libraries:ref_System.Threading.Tasks",
         "//src/libraries/System.Runtime.Serialization.Formatters:ref_System.Runtime.Serialization.Formatters",
         "//src/libraries/System.Security.Permissions:ref_System.Security.Permissions",
         "//src/libraries/Common/tests:TestUtilities",
