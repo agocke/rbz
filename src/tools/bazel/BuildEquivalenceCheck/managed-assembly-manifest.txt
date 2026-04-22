@@ -399,6 +399,7 @@ match  System.Net.Http.Functional.Tests
 diff   System.Net.Http.WinHttpHandler
 diff   System.Net.Http.Json.Functional.Tests
 diff   System.Net.Http.Json.Unit.Tests
+diff   System.Net.Http.Unit.Tests
 diff   System.Net.HttpListener.Tests
 diff   System.Net.Mail.Functional.Tests
 diff   System.Net.Mail.Unit.Tests
@@ -408,8 +409,12 @@ diff   System.Net.NetworkInformation.Functional.Tests
 diff   System.Net.Ping.Functional.Tests
 diff   System.Net.Primitives.Functional.Tests
 match  System.Net.Primitives.Pal.Tests
+diff   System.Net.Primitives.UnitTests.Tests
 diff   System.Net.Requests.Tests
 match  System.Net.Security.Enterprise.Tests
+diff   System.Net.Security.Tests
+diff   System.Net.Security.Unit.Tests
+diff   System.Net.ServicePoint.Tests
 diff   System.Net.ServerSentEvents.Tests
 diff   System.Net.Sockets.Tests
 diff   System.Net.WebClient.Tests
