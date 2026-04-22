@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  186 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  191 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -91,13 +91,15 @@ layout.
   System.Linq.AsyncEnumerable, System.Linq.Expressions,
   System.Linq.Parallel, System.Linq.Queryable, System.Memory,
   System.Memory.Data, System.Net.Http (EnterpriseTests),
-  System.Net.Http (FunctionalTests), System.Net.Http.Json,
+  System.Net.Http (FunctionalTests), System.Net.Http (UnitTests), System.Net.Http.Json,
   System.Net.Http.Json (FunctionalTests), System.Net.HttpListener,
   System.Net.Mail, System.Net.Mail (UnitTests),
   System.Net.NameResolution, System.Net.NameResolution (PalTests),
   System.Net.NetworkInformation, System.Net.Ping, System.Net.Primitives,
-  System.Net.Primitives (PalTests), System.Net.Requests,
-  System.Net.Security (EnterpriseTests), System.Net.ServerSentEvents,
+  System.Net.Primitives (PalTests), System.Net.Primitives (UnitTests),
+  System.Net.Requests, System.Net.Security (EnterpriseTests),
+  System.Net.Security (FunctionalTests), System.Net.Security (UnitTests),
+  System.Net.ServerSentEvents, System.Net.ServicePoint,
   System.Net.Sockets, System.Net.WebClient, System.Net.WebHeaderCollection,
   System.Net.WebProxy, System.Net.WebSockets, System.Net.WebSockets.Client,
   System.Numerics.Tensors, System.Numerics.Vectors, System.ObjectModel,
@@ -134,7 +136,8 @@ layout.
   System.Threading.Tasks.Extensions, System.Threading.Tasks.Parallel,
   System.Threading.Tasks, System.Threading.Thread, System.Threading.ThreadPool,
   System.Threading.Timer, System.Transactions.Local, System.ValueTuple,
-  System.Web.HttpUtility;
+  System.Web.HttpUtility,
+  System.Xml.XmlSerializer.ReflectionOnly;
   plus 5 platform-constrained test suites with BUILD files:
   Microsoft.Win32.Registry (Windows), System.Resources.Extensions
   (needs System.Drawing.Common), System.Runtime.Serialization.Formatters
@@ -148,7 +151,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (189 Bazel targets total; 184 currently pass on Linux and 5 are platform-constrained/skipped)
+- Library unit tests (194 Bazel targets total; 189 currently pass on Linux and 5 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))

@@ -10,6 +10,7 @@ csharp_library(
     nowarn = ["1701", "1702", "1705", "8500", "8969", "IDE0060", "IDE0100", "IL2121", "NU5105", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     srcs = ["SerializationTypes.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
+    visibility = ["//visibility:public"],
     deps = [
         "//src/libraries/System.Runtime.Serialization.Xml:ref_System.Runtime.Serialization.Xml",
         "//src/libraries/System.Runtime.Serialization.Json:ref_System.Runtime.Serialization.Json",

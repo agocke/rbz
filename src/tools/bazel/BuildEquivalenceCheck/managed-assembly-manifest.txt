@@ -183,6 +183,7 @@ diff   System.Xml.XPath
 match  System.Xml.XPath.XDocument
 diff   System.Xml.XmlDocument
 diff   System.Xml.XmlSerializer
+diff   System.Xml.XmlSerializer.ReflectionOnly.Tests
 diff   WindowsBase
 diff   mscorlib
 diff   netstandard
@@ -447,6 +448,9 @@ diff   System.Runtime.CompilerServices.VisualC.Tests
 diff   System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
 diff   System.Runtime.Loader.Tests
+diff   System.Runtime.Loader.DefaultContext.Tests
+diff   System.Runtime.Loader.Noop.Assembly
+diff   System.Runtime.Loader.RefEmitLoadContext.Tests
 diff   System.Runtime.Numerics.Tests
 diff   System.Runtime.Serialization.Json.ReflectionOnly.Tests
 diff   System.Runtime.Serialization.Json.Tests
@@ -454,6 +458,8 @@ diff   System.Runtime.Serialization.Primitives.Tests
 diff   System.Runtime.Serialization.Schema
 diff   System.Runtime.Serialization.Schema.Tests
 diff   System.Runtime.Serialization.Xml.Tests
+diff   System.Runtime.Serialization.Xml.Canonicalization.Tests
+diff   System.Runtime.Serialization.Xml.ReflectionOnly.Tests
 diff   System.Security.Claims.Tests
 diff   System.Security.Cryptography.Cose
 match  System.Security.Cryptography.Cose.Tests
