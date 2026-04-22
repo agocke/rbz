@@ -1,10 +1,9 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN")
 load("//:defs.bzl", "OPEN_SNK")
 
 library_test(
     name = "System.ComponentModel.Composition.Registration.Tests",
-    nowarn = MULTITARGET_NOWARN + ["nullable"],
+    nowarn = ["nullable"],
     srcs = glob(["**/*.cs"]),
     deps = [
         "//src/libraries/System.ComponentModel.Composition.Registration:impl_System.ComponentModel.Composition.Registration",

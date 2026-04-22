@@ -1,10 +1,9 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN")
 load("//:defs.bzl", "ASPNETCORE_SNK")
 
 library_test(
     name = "Microsoft.Extensions.Logging.EventSource.Tests",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = ["PKG0001"],
     srcs = glob(["*.cs"]),
     deps = [
         "//src/libraries/Microsoft.Extensions.DependencyInjection:impl_Microsoft.Extensions.DependencyInjection",
