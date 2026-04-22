@@ -233,6 +233,350 @@ library_test(
     size = "medium",
 )
 
+# NOTE: System.Diagnostics.Debug.Tests uses CompileUsingReferenceAssemblies=false
+# to access DebugProvider from System.Private.CoreLib internals.
+# Files DebugTests.cs and DebugTestsUsingListeners.cs reference CoreLib-internal
+# types and must be excluded until CoreLib impl assembly is available as a Bazel dep.
+library_test(
+    name = "System.Diagnostics.Debug.Tests",
+    srcs = glob(
+        ["System.Diagnostics.Debug.Tests/**/*.cs"],
+        exclude = [
+            "System.Diagnostics.Debug.Tests/DebugTests.cs",
+            "System.Diagnostics.Debug.Tests/DebugTestsNoListeners.cs",
+            "System.Diagnostics.Debug.Tests/DebugTestsNoListeners.Interpolation.cs",
+            "System.Diagnostics.Debug.Tests/DebugTestsUsingListeners.cs",
+        ],
+    ),
+    deps = [
+        "//src/libraries/shims/System.Diagnostics.Debug:impl_System.Diagnostics.Debug",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "small",
+)
+
+library_test(
+    name = "System.Globalization.Extensions.Tests",
+    srcs = glob(["System.Globalization.Extensions.Tests/**/*.cs"]),
+    deps = [
+        "//src/libraries/shims/System.Globalization.Extensions:impl_System.Globalization.Extensions",
+        "//src/libraries:ref_System.Threading.Tasks",
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    resources = glob([
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/**/*.txt",
+        "System.Globalization.Extensions.Tests/Normalization/Data/*.txt",
+    ]),
+    resource_logical_names = {
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_6_0/IdnaTest_6.txt": "IdnaTest_6.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_Win7/IdnaTest_Win7.txt": "IdnaTest_Win7.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_9_0/IdnaTest_9.txt": "IdnaTest_9.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_11_0/IdnaTest_11.txt": "IdnaTest_11.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_13_0/IdnaTest_13.txt": "IdnaTest_13.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_15_0/IdnaTest_15_0.txt": "IdnaTest_15_0.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_15_1/IdnaTest_15_1.txt": "IdnaTest_15_1.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_16_0/IdnaTest_16.txt": "IdnaTest_16.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_17_0/IdnaTest_17.txt": "IdnaTest_17.txt",
+        "System.Globalization.Extensions.Tests/Normalization/Data/win8.txt": "NormalizationDataWin8",
+        "System.Globalization.Extensions.Tests/Normalization/Data/win7.txt": "NormalizationDataWin7",
+    },
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+# NOTE: System.Globalization.Tests depends on TestUtilities.Unicode (not yet in Bazel),
+# so CharUnicodeInfoTests and GraphemeBreakTest that use CodePoint are excluded.
+library_test(
+    name = "System.Globalization.Tests",
+    srcs = glob(
+        ["System.Globalization.Tests/**/*.cs"],
+        exclude = [
+            "System.Globalization.Tests/Hybrid/**",
+            "System.Globalization.Tests/Invariant/**",
+            "System.Globalization.Tests/IcuAppLocal/**",
+            "System.Globalization.Tests/NlsTests/**",
+            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTests.cs",
+            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTests.Generated.cs",
+            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTestData.cs",
+            "System.Globalization.Tests/System/Globalization/GraphemeBreakTest.cs",
+        ],
+    ) + [
+        "//src/libraries/Common/tests:System/RandomDataGenerator.cs",
+    ],
+    deps = [
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
+library_test(
+    name = "System.IO.FileSystem.Tests",
+    srcs = glob(
+        ["System.IO.FileSystem.Tests/**/*.cs"],
+        exclude = [
+            "System.IO.FileSystem.Tests/FileSystemTest.Windows.cs",
+            "System.IO.FileSystem.Tests/FileSystemTest.Browser.cs",
+            "System.IO.FileSystem.Tests/Directory/Delete.Windows.cs",
+            "System.IO.FileSystem.Tests/Directory/CreateDirectory_UnixFileMode.Windows.cs",
+            "System.IO.FileSystem.Tests/File/EncryptDecrypt.Windows.cs",
+            "System.IO.FileSystem.Tests/FileStream/ctor_options.Windows.cs",
+            "System.IO.FileSystem.Tests/FileStream/ctor_options.Browser.cs",
+            "System.IO.FileSystem.Tests/FileStream/FileStreamConformanceTests.Windows.cs",
+            "System.IO.FileSystem.Tests/Junctions.Windows.cs",
+            "System.IO.FileSystem.Tests/RandomAccess/Mixed.Windows.cs",
+            "System.IO.FileSystem.Tests/RandomAccess/NoBuffering.Windows.cs",
+            "System.IO.FileSystem.Tests/RandomAccess/SectorAlignedMemory.Windows.cs",
+            "System.IO.FileSystem.Tests/VirtualDriveSymbolicLinks.Windows.cs",
+            "System.IO.FileSystem.Tests/ManualTests/**",
+        ],
+    ) + [
+        "//src/libraries/Common:src/System/IO/PathInternal.CaseSensitivity.cs",
+        "//src/libraries/Common/tests:System/Buffers/NativeMemoryManager.cs",
+        "//src/libraries/Common/tests:System/IO/TempFile.cs",
+        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
+        "//src/libraries/Common/tests:System/IO/ReparsePointUtilities.cs",
+        "//src/libraries/Common/tests:Tests/TheoryDataExtensions.cs",
+        "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
+        "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
+    ],
+    deps = [
+        "//src/libraries/System.IO.Pipes:ref_System.IO.Pipes",
+        "//src/libraries/System.IO.FileSystem.DriveInfo:ref_System.IO.FileSystem.DriveInfo",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
+        "//src/libraries/Common/tests:StreamConformanceTests",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    data = ["System.IO.FileSystem.Tests/DirectoryInfo/test-dir/dummy.txt"],
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
+library_test(
+    name = "System.Reflection.Tests",
+    srcs = glob(
+        ["System.Reflection.Tests/**/*.cs"],
+        exclude = [
+            "System.Reflection.Tests/AssemblyVersion/**",
+            "System.Reflection.Tests/CoreCLR/**",
+            "System.Reflection.Tests/ForwardedTypesAssembly/**",
+            "System.Reflection.Tests/Hello工程123/**",
+            "System.Reflection.Tests/InvokeEmit/**",
+            "System.Reflection.Tests/InvokeInterpreted/**",
+            "System.Reflection.Tests/TestAssembly/**",
+            "System.Reflection.Tests/TestExe/**",
+            "System.Reflection.Tests/UnloadableAssembly/**",
+            # AssemblyTests.cs uses TypeForwardedTo for types from helper projects
+            "System.Reflection.Tests/AssemblyTests.cs",
+        ],
+    ) + [
+        "//src/libraries/Common/tests:System/Reflection/MockParameterInfo.cs",
+        "//src/libraries/Common/tests:System/MockType.cs",
+        "//src/libraries/Common/tests:System/IO/TempFile.cs",
+    ],
+    nowarn = ["SYSLIB0013", "SYSLIB0037"],
+    deps = [
+        "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    resources = [
+        "System.Reflection.Tests/Resources/EmbeddedImage.png",
+        "System.Reflection.Tests/Resources/EmbeddedTextFile.txt",
+        "System.Reflection.Tests/Resources/ResourceTextFile.txt",
+    ],
+    resource_logical_names = {
+        "System.Reflection.Tests/Resources/EmbeddedImage.png": "EmbeddedImage.png",
+        "System.Reflection.Tests/Resources/EmbeddedTextFile.txt": "EmbeddedTextFile.txt",
+        "System.Reflection.Tests/Resources/ResourceTextFile.txt": "ResourceTextFile.txt",
+    },
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
+# NOTE: System.Resources.ResourceManager.Tests requires System.Drawing.Common (NuGet),
+# System.Resources.Extensions, System.Runtime.Serialization.Formatters, resx-generated
+# code, and satellite assemblies. Ported with available deps; satellite assemblies and
+# .resources content files may need additional work.
+library_test(
+    name = "System.Resources.ResourceManager.Tests",
+    srcs = glob(["System.Resources.ResourceManager.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Drawing/Helpers.cs",
+    ],
+    deps = [
+        "//src/libraries/shims/System.Resources.ResourceManager:impl_System.Resources.ResourceManager",
+        "//src/libraries/System.Resources.Extensions:ref_System.Resources.Extensions",
+        "//src/libraries/System.Runtime.Serialization.Formatters:ref_System.Runtime.Serialization.Formatters",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    resources = glob([
+        "System.Resources.ResourceManager.Tests/Resources/*.resx",
+        "System.Resources.ResourceManager.Tests/Resources/*.resources",
+    ]),
+    data = [
+        "System.Resources.ResourceManager.Tests/Resources/TestResx.netstandard17.resources",
+        "System.Resources.ResourceManager.Tests/Resources/bitmap.bmp",
+        "System.Resources.ResourceManager.Tests/Resources/icon.ico",
+    ],
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+library_test(
+    name = "System.Runtime.Extensions.Tests",
+    srcs = glob(
+        ["System.Runtime.Extensions.Tests/**/*.cs"],
+        exclude = [
+            "System.Runtime.Extensions.Tests/AssemblyResolveTestApp/**",
+            "System.Runtime.Extensions.Tests/TestAppOutsideOfTPA/**",
+            "System.Runtime.Extensions.Tests/VoidMainWithExitCodeApp/**",
+            "System.Runtime.Extensions.Tests/TestApp/**",
+            "System.Runtime.Extensions.Tests/TargetFrameworkNameTestApp/**",
+        ],
+    ) + [
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.GetHostName.cs",
+        "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
+        "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
+        "//src/libraries/Common/tests:System/GenericMathTestMemberData.cs",
+        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
+        "//src/libraries/Common/tests:System/ShouldNotBeInvokedException.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/ByteUtils.cs",
+    ],
+    defines = ["Unix"],
+    deps = [
+        "//src/libraries/shims/System.Runtime.Extensions:impl_System.Runtime.Extensions",
+        "//src/libraries/System.Net.Http:ref_System.Net.Http",
+        "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
+        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
+library_test(
+    name = "System.Text.Encoding.Tests",
+    srcs = glob(["System.Text.Encoding.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/RandomDataGenerator.cs",
+        "//src/libraries/Common/tests:System/IO/ConnectedStreams.cs",
+        "//src/libraries/Common:src/System/Net/ArrayBuffer.cs",
+        "//src/libraries/Common:src/System/Net/MultiArrayBuffer.cs",
+        "//src/libraries/Common:src/System/Net/StreamBuffer.cs",
+    ],
+    nowarn = ["SYSLIB0001"],
+    deps = [
+        "//src/libraries/shims/System.Text.Encoding:impl_System.Text.Encoding",
+        "//src/libraries/System.Text.Encoding.Extensions:ref_System.Text.Encoding.Extensions",
+        "//src/libraries/System.IO.Pipelines:ref_System.IO.Pipelines",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Linq.Expressions:ref_System.Linq.Expressions",
+        "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/Common/tests:StreamConformanceTests",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//moq",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
+# NOTE: System.Runtime.Tests is very large and has dependencies on helper IL projects
+# (TestILAssembly, TestLoadAssembly, TestCollectibleAssembly, TestModule, TestStructs)
+# and the UnicodeData NuGet package. These helper projects are not yet ported to Bazel.
+# The test is included with available sources; some tests depending on helper assemblies
+# may fail at runtime until those projects are ported.
+library_test(
+    name = "System.Runtime.Tests",
+    srcs = glob(
+        ["System.Runtime.Tests/**/*.cs"],
+        exclude = [
+            "System.Runtime.Tests/TestCollectibleAssembly/**",
+            "System.Runtime.Tests/TestLoadAssembly/**",
+            "System.Runtime.Tests/TestModule/**",
+            "System.Runtime.Tests/TestStructs/**",
+            "System.Runtime.Tests/TrimmingTests/**",
+            "System.Runtime.Tests/Hybrid/**",
+            "System.Runtime.Tests/InvariantTimezone/**",
+            "System.Runtime.Tests/NlsTests/**",
+        ],
+    ) + [
+        "//src/libraries/Common/tests:System/EnumTypes.cs",
+        "//src/libraries/Common/tests:System/FunctionPointerTests.cs",
+        "//src/libraries/Common/tests:System/FunctionPointerCallingConventionTests.cs",
+        "//src/libraries/Common/tests:System/FunctionPointerEqualityTests.cs",
+        "//src/libraries/Common/tests:System/MockType.cs",
+        "//src/libraries/Common/tests:System/ModifiedTypeTests.cs",
+        "//src/libraries/Common/tests:System/Collections/CollectionAsserts.cs",
+        "//src/libraries/Common/tests:System/Collections/ICollection.Generic.Tests.cs",
+        "//src/libraries/Common/tests:System/Collections/IEnumerable.Generic.Tests.cs",
+        "//src/libraries/Common/tests:System/Collections/IList.Generic.Tests.cs",
+        "//src/libraries/Common/tests:System/Collections/TestBase.Generic.cs",
+        "//src/libraries/Common/tests:System/Collections/TestBase.NonGeneric.cs",
+        "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
+        "//src/libraries/Common/tests:System/GenericMathTestMemberData.cs",
+        "//src/libraries/Common/tests:System/TimeProviderTests.cs",
+        "//src/libraries/Common/tests:Tests/System/StringTests.cs",
+        "//src/libraries/Common/tests:System/Collections/IDictionary.NonGeneric.Tests.cs",
+        "//src/libraries/Common/tests:System/Collections/IList.NonGeneric.Tests.cs",
+        "//src/libraries/Common/tests:System/Collections/ICollection.NonGeneric.Tests.cs",
+        "//src/libraries/Common/tests:System/Collections/IEnumerable.NonGeneric.Tests.cs",
+        "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
+        "//src/libraries/Common/tests:System/GenericMathHelpers.cs",
+        "//src/libraries/Common/tests:System/Collections/IEnumerable.Generic.Serialization.Tests.cs",
+        "//src/libraries/Common/tests:System/Runtime/Serialization/Formatters/BinaryFormatterHelpers.cs",
+        "//src/libraries/Common/tests:System/RandomDataGenerator.cs",
+        "//src/libraries/Common/tests:System/RealFormatterTestsBase.cs",
+        "//src/libraries/Common/tests:System/RealParserTestsBase.cs",
+    ],
+    nowarn = ["1718", "SYSLIB0013"],
+    deps = [
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Linq.Expressions:ref_System.Linq.Expressions",
+        "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
+        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/System.Runtime.Serialization.Formatters:ref_System.Runtime.Serialization.Formatters",
+        "//src/libraries/System.Security.Permissions:ref_System.Security.Permissions",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//moq",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    resources = [
+        "System.Runtime.Tests/System/Reflection/EmbeddedImage.png",
+        "System.Runtime.Tests/System/Reflection/EmbeddedTextFile.txt",
+    ],
+    resource_logical_names = {
+        "System.Runtime.Tests/System/Reflection/EmbeddedImage.png": "System.Reflection.Tests.EmbeddedImage.png",
+        "System.Runtime.Tests/System/Reflection/EmbeddedTextFile.txt": "System.Reflection.Tests.EmbeddedTextFile.txt",
+    },
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
 library_test(
     name = "System.IO.Tests",
     srcs = glob(["System.IO.Tests/**/*.cs"]) + [
@@ -262,4 +606,31 @@ library_test(
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
     size = "large",
+)
+
+library_test(
+    name = "System.Runtime.InteropServices.RuntimeInformation.Tests",
+    srcs = glob(["System.Runtime.InteropServices.RuntimeInformation.Tests/**/*.cs"]) + [
+        "//src/libraries/Common:src/Interop/Linux/os-release/Interop.OSReleaseFile.cs",
+        "//src/libraries/Common:src/Interop/Linux/cgroups/Interop.cgroups.cs",
+        "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcMountInfo.cs",
+        "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcMountInfo.TryParseMountInfoLine.cs",
+        "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",
+        "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MountPoints.FormatInfo.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.RealPath.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.UnixFileSystemTypes.cs",
+    ],
+    deps = [
+        "//src/libraries/shims/System.Runtime.InteropServices.RuntimeInformation:impl_System.Runtime.InteropServices.RuntimeInformation",
+        "//src/libraries/System.IO.FileSystem.DriveInfo:ref_System.IO.FileSystem.DriveInfo",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "medium",
 )

@@ -112,7 +112,9 @@ layout.
   System.Resources.Reader, System.Resources.Writer, System.Runtime.Caching,
   System.Runtime.CompilerServices.Unsafe,
   System.Runtime.CompilerServices.VisualC, System.Runtime.Handles,
-  System.Runtime.InteropServices (UnitTests), System.Runtime.Intrinsics,
+  System.Runtime.InteropServices (UnitTests),
+  System.Runtime.InteropServices.RuntimeInformation,
+  System.Runtime.Intrinsics,
   System.Runtime.Loader, System.Runtime.Loader.DefaultContext,
   System.Runtime.Loader.RefEmitLoadContext,
   System.Runtime.Numerics,
@@ -831,7 +833,7 @@ and System.Net.Quic (msquic native library + full Linux implementation).
   or runtime-async support not yet available); all 31 async tests are `manual` because the
   `runtime-async=on` compiler feature they require is not yet supported by the Bazel-built runtime
 - [x] ~23 tests with `target_compatible_with = ["@platforms//os:windows"]` for Windows-only tests
-- [x] 155 library test targets (150 currently passing on Linux; see §1 "What Works" for the full list;
+- [x] 160 library test targets (155 currently passing on Linux; see §1 "What Works" for the full list;
   includes 5 platform-constrained suites: Microsoft.Win32.Registry (Windows),
   System.Resources.Extensions (needs System.Drawing.Common),
   System.Runtime.Serialization.Formatters (needs System.Drawing.Common),
