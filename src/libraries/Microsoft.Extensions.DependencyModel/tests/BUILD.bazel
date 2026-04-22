@@ -1,5 +1,4 @@
-# NOTE: All test files in this library require AwesomeAssertions
-# (FluentAssertions) and/or Moq, which are not available in Bazel.
-# The remaining utility/mock files access internal types and have no
-# standalone test methods. This BUILD file is a placeholder for when
-# those packages become available.
+# NOTE: Tests require the AwesomeAssertions package which is not available
+# in the Bazel build. 11 of 13 source files use AwesomeAssertions (.Should()).
+# Moq is available (@paket.main//moq) but AwesomeAssertions is not in paket.
+# This BUILD file is a placeholder until AwesomeAssertions is added to paket.

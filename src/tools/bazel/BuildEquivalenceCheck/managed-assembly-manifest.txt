@@ -240,6 +240,7 @@ diff   Microsoft.Extensions.Configuration.Ini.Tests
 match  Microsoft.Extensions.Configuration.Json
 diff   Microsoft.Extensions.Configuration.Json.Tests
 diff   Microsoft.Extensions.Configuration.Tests
+diff   Microsoft.Extensions.Configuration.Functional.Tests
 match  Microsoft.Extensions.Configuration.UserSecrets
 diff   Microsoft.Extensions.Configuration.UserSecrets.Tests
 match  Microsoft.Extensions.Configuration.Xml
@@ -279,6 +280,7 @@ diff   Microsoft.Extensions.Logging.EventLog
 match  Microsoft.Extensions.Logging.EventSource
 diff   Microsoft.Extensions.Logging.EventSource.Tests
 diff   Microsoft.Extensions.Logging.Tests
+diff   Microsoft.Extensions.Logging.Testing.Tests
 diff   Microsoft.Extensions.Logging.TraceSource
 diff   Microsoft.Extensions.Options
 diff   Microsoft.Extensions.Options.ConfigurationExtensions
