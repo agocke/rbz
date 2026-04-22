@@ -25,6 +25,9 @@ jobs:
           # which installs the SDK version from global.json into .dotnet/.
           ./dotnet.sh --info
 
+      - name: Install paket
+        run: dotnet tool install -g paket
+
       - name: Verify Bazel (pre-installed via Bazelisk)
         run: bazel version
 
