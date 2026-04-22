@@ -766,9 +766,10 @@ public static class ComparisonEngine
         });
 
         // Filter out MSBuild-generated InternalsVisibleTo.cs files.
-        // In Bazel, IVT attributes are set via the internals_visible_to parameter.
-        onlyInMSBuild.RemoveWhere(f => Path.GetFileName(f).EndsWith("InternalsVisibleTo.cs", StringComparison.Ordinal));
-        onlyInBazel.RemoveWhere(f => Path.GetFileName(f).EndsWith("InternalsVisibleTo.cs", StringComparison.Ordinal));
+        // In Bazel, IVT attributes are set via the internals_visible_to parameter,
+        // which generates a file named internalsvisibleto.cs (lowercase).
+        onlyInMSBuild.RemoveWhere(f => Path.GetFileName(f).EndsWith("InternalsVisibleTo.cs", StringComparison.OrdinalIgnoreCase));
+        onlyInBazel.RemoveWhere(f => Path.GetFileName(f).EndsWith("internalsvisibleto.cs", StringComparison.OrdinalIgnoreCase));
 
         // Filter out test SDK and polyfill source files that MSBuild includes
         // but Bazel doesn't need (test SDK entry point, netstandard polyfills).
