@@ -10,4 +10,7 @@ netcoreapp_impl_assembly(
     ],
     os_targeted = True,
     exclude_sr = True,
+    generate_documentation_file = False,
+    library_import_generator = False,
+    com_interface_generator = True,
 )

@@ -10,9 +10,6 @@ library_test(
             # Windows-only files
             "IdentityValidator.Windows.cs",
             "Interop/SafeCertContextHandle.cs",
-            # Kerberos tests require Kerberos.NET package which is not available
-            "NegotiateAuthenticationKerberosTest.cs",
-            "NegotiateStreamKerberosTest.cs",
         ],
     ) + [
         # Common source files
@@ -55,6 +52,14 @@ library_test(
         "//src/libraries/Common/tests:System/Security/Cryptography/OpenSslNamedKeys.Helpers.cs",
         "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
         "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
+        "//src/libraries/Common/tests:System/Net/Security/Kerberos/FakeKdcServer.cs",
+        "//src/libraries/Common/tests:System/Net/Security/Kerberos/FakeKerberosPrincipal.cs",
+        "//src/libraries/Common/tests:System/Net/Security/Kerberos/FakePrincipalService.cs",
+        "//src/libraries/Common/tests:System/Net/Security/Kerberos/FakeRealmReferral.cs",
+        "//src/libraries/Common/tests:System/Net/Security/Kerberos/FakeRealmService.cs",
+        "//src/libraries/Common/tests:System/Net/Security/Kerberos/FakeRealmSettings.cs",
+        "//src/libraries/Common/tests:System/Net/Security/Kerberos/FakeTrustedRealms.cs",
+        "//src/libraries/Common/tests:System/Net/Security/Kerberos/KerberosExecutor.cs",
     ],
     deps = [
         "//src/libraries/System.Net.Security:ref_System.Net.Security",

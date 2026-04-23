@@ -49,7 +49,8 @@ _COMMON_TEST_FILES = [
     "//src/libraries/System.Text.Json/tests:Common/JsonCreationHandlingTests.Object.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonNumberTestData.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonSerializerWrapper.cs",
-    # JsonSchemaExporterTests excluded: requires JsonSchema.Net NuGet (not in paket.dependencies)
+    "//src/libraries/System.Text.Json/tests:Common/JsonSchemaExporterTests.TestTypes.cs",
+    "//src/libraries/System.Text.Json/tests:Common/JsonSchemaExporterTests.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonTestHelper.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonTestSerializerOptions.cs",
     "//src/libraries/System.Text.Json/tests:Common/MetadataTests.cs",
@@ -97,6 +98,13 @@ library_test(
     size = "large",
     allow_unsafe_blocks = True,
     nowarn = [
+        "CA1510",
+        "CA1511",
+        "CA1512",
+        "CA1513",
+        "CA1845",
+        "CA1846",
+        "CA1847",
         "SYSLIB0020",  # JsonSerializerOptions.IgnoreNullValues is obsolete
         "SYSLIB0049",  # JsonSerializerOptions.AddContext is obsolete
         "JSON001",     # JSON misformatted in string literals
@@ -106,8 +114,6 @@ library_test(
         exclude = [
             # TrimmingTests are not applicable under Bazel
             "TrimmingTests/**",
-            # JsonSchemaExporterTests require JsonSchema.Net NuGet (not in paket.dependencies)
-            "Serialization/JsonSchemaExporterTests.cs",
         ],
     ) + _COMMON_TEST_FILES + [
         ":gen_resx",
