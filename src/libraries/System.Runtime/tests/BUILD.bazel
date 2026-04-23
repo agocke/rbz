@@ -239,15 +239,7 @@ library_test(
 # types and must be excluded until CoreLib impl assembly is available as a Bazel dep.
 library_test(
     name = "System.Diagnostics.Debug.Tests",
-    srcs = glob(
-        ["System.Diagnostics.Debug.Tests/**/*.cs"],
-        exclude = [
-            "System.Diagnostics.Debug.Tests/DebugTests.cs",
-            "System.Diagnostics.Debug.Tests/DebugTestsNoListeners.cs",
-            "System.Diagnostics.Debug.Tests/DebugTestsNoListeners.Interpolation.cs",
-            "System.Diagnostics.Debug.Tests/DebugTestsUsingListeners.cs",
-        ],
-    ),
+    srcs = glob(["System.Diagnostics.Debug.Tests/**/*.cs"]),
     deps = [
         "//src/libraries/shims/System.Diagnostics.Debug:impl_System.Diagnostics.Debug",
         "//src/libraries/System.Threading:ref_System.Threading",
@@ -287,8 +279,6 @@ library_test(
     size = "medium",
 )
 
-# NOTE: System.Globalization.Tests depends on TestUtilities.Unicode (not yet in Bazel),
-# so CharUnicodeInfoTests and GraphemeBreakTest that use CodePoint are excluded.
 library_test(
     name = "System.Globalization.Tests",
     srcs = glob(
@@ -298,10 +288,8 @@ library_test(
             "System.Globalization.Tests/Invariant/**",
             "System.Globalization.Tests/IcuAppLocal/**",
             "System.Globalization.Tests/NlsTests/**",
-            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTests.cs",
-            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTests.Generated.cs",
-            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTestData.cs",
-            "System.Globalization.Tests/System/Globalization/GraphemeBreakTest.cs",
+            "System.Globalization.Tests/CultureInfo/CultureInfoGetCultures.cs",
+            "System.Globalization.Tests/CultureInfo/CultureInfoThreeLetterISOInfo.cs",
         ],
     ) + [
         "//src/libraries/Common/tests:System/RandomDataGenerator.cs",
@@ -400,21 +388,9 @@ library_test(
             "System.Reflection.Tests/TestAssembly/**",
             "System.Reflection.Tests/TestExe/**",
             "System.Reflection.Tests/UnloadableAssembly/**",
-            # AssemblyTests.cs uses TypeForwardedTo for types from helper projects
-            "System.Reflection.Tests/AssemblyTests.cs",
-            # GetTypeTests.cs uses EquivalentValueType from TestAssembly helper project
-            "System.Reflection.Tests/GetTypeTests.cs",
-            # AssemblyNameTests.cs uses AssemblyVersion from excluded helper project
-            "System.Reflection.Tests/AssemblyNameTests.cs",
-            # FieldInfoTests.cs uses MyClass1 from TestAssembly helper project
-            "System.Reflection.Tests/FieldInfoTests.cs",
-            # MethodInfoTests.cs uses TestAssembly namespace
-            "System.Reflection.Tests/MethodInfoTests.cs",
-            # MethodCommonTests and MethodInvokerTests use types from MethodInfoTests (excluded)
-            "System.Reflection.Tests/MethodCommonTests.cs",
-            "System.Reflection.Tests/MethodInvokerTests.cs",
         ],
     ) + [
+        "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly:EquivalentValueType.cs",
         "//src/libraries/Common/tests:System/Reflection/MockParameterInfo.cs",
         "//src/libraries/Common/tests:System/MockType.cs",
         "//src/libraries/Common/tests:System/IO/TempFile.cs",
@@ -449,17 +425,9 @@ library_test(
 # .resources content files may need additional work.
 library_test(
     name = "System.Resources.ResourceManager.Tests",
-    srcs = glob(
-        ["System.Resources.ResourceManager.Tests/**/*.cs"],
-        exclude = [
-            # Uses System.Drawing types (NuGet not available in Bazel)
-            "System.Resources.ResourceManager.Tests/ResourceManagerTests.cs",
-            "System.Resources.ResourceManager.Tests/Resources/TestResx.netstandard17.Designer.cs",
-            # TrimCompatibilityTests expects NotSupportedException but gets MissingManifestResourceException
-            # because the feature switch is not active without trimming
-            "System.Resources.ResourceManager.Tests/TrimCompatibilityTests.cs",
-        ],
-    ),
+    srcs = glob(["System.Resources.ResourceManager.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Drawing/Helpers.cs",
+    ],
     deps = [
         "//src/libraries/shims/System.Resources.ResourceManager:impl_System.Resources.ResourceManager",
         "//src/libraries/System.Resources.Extensions:ref_System.Resources.Extensions",
