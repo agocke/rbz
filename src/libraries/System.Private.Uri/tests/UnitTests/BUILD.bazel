@@ -1,5 +1,12 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "OPEN_SNK")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
+
+gen_resx_source(
+    name = "gen_resx",
+    out = "SR.g.cs",
+    assembly_name = "System.Private.Uri.Unit.Tests",
+    resx_file = "//src/libraries:System.Private.Uri/src/Resources/Strings.resx",
+)
 
 library_test(
     name = "System.Private.Uri.Unit.Tests",
@@ -12,6 +19,8 @@ library_test(
         "//src/libraries:System.Private.Uri/src/System/UriEnumTypes.cs",
         "//src/libraries:System.Private.Uri/src/System/UriHelper.cs",
         "//src/libraries:System.Private.Uri/src/System/ValueStringBuilderExtensions.cs",
+        "//src/libraries/Common:src/System/SR.cs",
+        ":gen_resx",
     ],
     deps = [
         "//src/libraries/Common/tests:TestUtilities",
@@ -20,7 +29,7 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    nowarn = ["436"],
+    nowarn = ["436", "CS1591"],
     nullable = "enable",
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
