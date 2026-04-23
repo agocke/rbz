@@ -1,7 +1,9 @@
+load("//:defs.bzl", "SHAREDLIB1024_SNK")
 load("//src/libraries:defs.bzl", "netcoreapp_impl_assembly")
 
 netcoreapp_impl_assembly(
     name = "impl_System.ComponentModel.DataAnnotations",
+    keyfile = SHAREDLIB1024_SNK,
     skip_locals_init = False,
     srcs = [
         "src/System.ComponentModel.DataAnnotations.cs",

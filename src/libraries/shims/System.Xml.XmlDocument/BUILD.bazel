@@ -2,6 +2,8 @@ load("//src/libraries:defs.bzl", "netcoreapp_impl_assembly")
 
 netcoreapp_impl_assembly(
     name = "impl_System.Xml.XmlDocument",
+    library_import_generator = False,
+    generate_documentation_file = False,
     skip_locals_init = False,
     srcs = ["src/System.Xml.XmlDocument.cs"],
     deps = [

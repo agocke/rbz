@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "SHAREDLIB1024_SNK", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "SHAREDLIB1024_SNK")
 
 exports_files(["ref/System.Speech.cs"])
 

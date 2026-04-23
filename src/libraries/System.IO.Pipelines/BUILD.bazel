@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "OPEN_SNK", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "ref/System.IO.Pipelines.cs",

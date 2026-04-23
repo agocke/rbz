@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "OPEN_SNK", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "src/Resources/Strings.resx",

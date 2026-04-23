@@ -35,7 +35,7 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Memory:ref_System.Memory",
     ],
     resx_file = "src/Resources/Strings.resx",
-    generate_documentation_file = False,
+
     library_import_generator = False,
 )
 

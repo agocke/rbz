@@ -1,7 +1,10 @@
+load("//:defs.bzl", "OPEN_SNK")
 load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly")
 
 netcoreapp_ref_assembly(
     name = "ref_System.Transactions.Local",
+    com_interface_generator = True,
+    keyfile = OPEN_SNK,
     srcs = [
         "ref/System.Transactions.Local.cs",
     ],

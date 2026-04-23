@@ -14,6 +14,7 @@ exports_files([
 
 netcoreapp_ref_assembly(
     name = "ref_System.Text.Encodings.Web",
+    library_import_generator = False,
     srcs = [
         "ref/System.Text.Encodings.Web.cs",
     ],

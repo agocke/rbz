@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "ECMA_SNK", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "ECMA_SNK")
 
 exports_files([
     "ref/System.Reflection.Context.cs",

@@ -1,7 +1,12 @@
+load("//:defs.bzl", "ECMA_SNK")
 load("//src/libraries:defs.bzl", "netcoreapp_impl_assembly")
 
 netcoreapp_impl_assembly(
     name = "impl_System",
+    com_interface_generator = True,
+    library_import_generator = False,
+    generate_documentation_file = False,
+    keyfile = ECMA_SNK,
     skip_locals_init = False,
     srcs = [
         "ref/System.cs",

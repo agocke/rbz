@@ -6,6 +6,7 @@ exports_files([
 
 netcoreapp_impl_assembly(
     name = "impl_Microsoft.CSharp",
+    com_interface_generator = True,
     srcs = [
         # Common files
         "//src/libraries/Common:src/System/Obsoletions.cs",

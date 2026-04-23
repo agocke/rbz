@@ -25,7 +25,6 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Security.Cryptography.Pkcs",
-    keyfile = OPEN_SNK,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     srcs = [
         # Asn1Reader shared projitems
