@@ -1,4 +1,5 @@
 load("//src/libraries:defs.bzl", "netcoreapp_impl_assembly", "netcoreapp_ref_assembly")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "src/System/Net/Quic/Internal/ResettableValueTaskSource.cs",
@@ -33,6 +34,8 @@ netcoreapp_ref_assembly(
 # On Linux, this library is either PlatformNotSupported or platform-specific.
 netcoreapp_impl_assembly(
     name = "impl_System.Net.Quic",
+    keyfile = OPEN_SNK,
+    com_interface_generator = True,
     os_targeted = True,
     srcs = ["//src/libraries/shims:System.Void.cs"],
     deps = [

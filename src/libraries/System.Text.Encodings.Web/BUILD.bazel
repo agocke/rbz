@@ -1,4 +1,5 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "ref/System.Text.Encodings.Web.cs",
@@ -25,6 +26,8 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Text.Encodings.Web",
+    keyfile = OPEN_SNK,
+    com_interface_generator = True,
     srcs = [
         "src/System/IO/TextWriterExtensions.cs",
         "src/System/Text/Encodings/Web/AllowedBmpCodePointsBitmap.cs",
