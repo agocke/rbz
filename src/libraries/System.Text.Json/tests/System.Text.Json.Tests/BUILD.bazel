@@ -161,4 +161,5 @@ library_test(
         # Newtonsoft.Json (used for comparison tests)
         "@paket.main//newtonsoft.json",
     ],
+    keyfile = OPEN_SNK,
 )

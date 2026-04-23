@@ -1,4 +1,4 @@
-load("//:defs.bzl", "gen_resx_source")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
 load("//src/tests:live_test.bzl", "library_test")
 
 gen_resx_source(
@@ -67,4 +67,5 @@ library_test(
     allow_unsafe_blocks = True,
     data = ["@paket.main//system.formats.tar.testdata:content_files"],
     size = "large",
+    keyfile = OPEN_SNK,
 )
