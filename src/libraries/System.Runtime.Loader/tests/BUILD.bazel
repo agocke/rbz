@@ -5,7 +5,7 @@ load("//:defs.bzl", "OPEN_SNK", "resgen")
 # Satellite .resx files (.en, .es-MX) are passed as additionalfiles only.
 resgen(
     name = "resgen_MainStrings",
-    out = "MainStrings.resources",
+    out = "System.Runtime.Loader.Tests.MainStrings.resources",
     resx_file = "MainStrings.resx",
 )
 
@@ -33,7 +33,7 @@ library_test(
     allow_unsafe_blocks = True,
     resources = [":resgen_MainStrings"],
     resource_logical_names = {
-        "MainStrings.resources": "System.Runtime.Loader.Tests.MainStrings.resources",
+        "System.Runtime.Loader.Tests.MainStrings.resources": "System.Runtime.Loader.Tests.MainStrings.resources",
     },
     additionalfiles = glob(["MainStrings*.resx"]),
     keyfile = OPEN_SNK,

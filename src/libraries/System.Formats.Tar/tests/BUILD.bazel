@@ -1,15 +1,23 @@
-load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source", "resgen")
 load("//src/tests:live_test.bzl", "library_test")
 
 gen_resx_source(
     name = "gen_resx",
     out = "SR.g.cs",
-    assembly_name = "System.Formats.Tar",
+    assembly_name = "System.Formats.Tar.Tests",
+    resx_file = "//src/libraries/System.Formats.Tar:src/Resources/Strings.resx",
+)
+
+resgen(
+    name = "strings_resx",
+    out = "FxResources.System.Formats.Tar.Tests.SR.resources",
     resx_file = "//src/libraries/System.Formats.Tar:src/Resources/Strings.resx",
 )
 
 library_test(
     name = "System.Formats.Tar.Tests",
+    resources = [":strings_resx"],
+    resource_logical_names = {"FxResources.System.Formats.Tar.Tests.SR.resources": "FxResources.System.Formats.Tar.Tests.SR.resources"},
     defines = select({"@platforms//os:linux": ["UNIX", "UNIX1_0"], "@platforms//os:macos": ["UNIX", "UNIX1_0"], "//conditions:default": []}),
     srcs = glob(
         ["**/*.cs"],

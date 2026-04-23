@@ -1,4 +1,4 @@
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library", "gen_resx_source")
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library", "gen_resx_source", "resgen")
 load("//src/libraries:defs.bzl", "live_csharp_library")
 load("//src/tests:live_test.bzl", "library_test")
 
@@ -155,8 +155,16 @@ gen_resx_source(
     resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
 )
 
+resgen(
+    name = "strings_resx",
+    out = "FxResources.Common.Tests.SR.resources",
+    resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
+)
+
 library_test(
     name = "Common.Tests",
+    resources = [":strings_resx"],
+    resource_logical_names = {"FxResources.Common.Tests.SR.resources": "FxResources.Common.Tests.SR.resources"},
     srcs = [
         # Test files (unconditional)
         "Tests/Interop/OSReleaseTests.cs",

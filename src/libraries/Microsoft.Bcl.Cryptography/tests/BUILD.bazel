@@ -1,6 +1,6 @@
 load("//src/tests:live_test.bzl", "library_test")
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN")
-load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source", "resgen")
 
 gen_resx_source(
     name = "gen_resx",
@@ -9,8 +9,16 @@ gen_resx_source(
     resx_file = "//src/libraries/Microsoft.Bcl.Cryptography:src/Resources/Strings.resx",
 )
 
+resgen(
+    name = "strings_resx",
+    out = "FxResources.Microsoft.Bcl.Cryptography.Tests.SR.resources",
+    resx_file = "//src/libraries/Microsoft.Bcl.Cryptography:src/Resources/Strings.resx",
+)
+
 library_test(
     name = "Microsoft.Bcl.Cryptography.Tests",
+    resources = [":strings_resx"],
+    resource_logical_names = {"FxResources.Microsoft.Bcl.Cryptography.Tests.SR.resources": "FxResources.Microsoft.Bcl.Cryptography.Tests.SR.resources"},
     additionalfiles = ["//src/libraries/Microsoft.Bcl.Cryptography:src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["SYSLIB5006"],
