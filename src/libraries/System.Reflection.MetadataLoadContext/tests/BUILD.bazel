@@ -10,7 +10,7 @@ library_test(
         "//src/libraries/Common/tests:System/FunctionPointerTests.cs",
         "//src/libraries/Common/tests:System/FunctionPointerCallingConventionTests.cs",
         "//src/libraries/Common/tests:System/FunctionPointerEqualityTests.cs",
-        "//src/libraries/Common/tests:System/ModifiedTypeTests.cs",
+        # ModifiedTypeTests.cs excluded: requires TestILAssembly.ilproj (IL assembler not available in Bazel)
     ],
     deps = [
         "//src/libraries/System.Reflection.MetadataLoadContext:impl_System.Reflection.MetadataLoadContext",

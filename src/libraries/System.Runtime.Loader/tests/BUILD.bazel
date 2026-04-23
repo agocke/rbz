@@ -13,7 +13,22 @@ library_test(
     name = "System.Runtime.Loader.Tests",
     srcs = glob(
         ["*.cs"],
-        exclude = [],
+        exclude = [
+            # ApplyUpdate tests require hot-reload infrastructure and many
+            # dependent assemblies that are not available in Bazel.
+            "ApplyUpdateTest.cs",
+            "ApplyUpdateUtil.cs",
+            "MetadataUpdateHandlerAttributeTest.cs",
+            # These tests depend on external test assemblies (LoaderLinkTest.Shared,
+            # ContextualReflectionDependency, ReferencedClassLib, etc.) not in Bazel.
+            "AssemblyLoadContextTest.cs",
+            "AssemblyResolutionDowngradeTest.cs",
+            "CollectibleAssemblyLoadContextTest.cs",
+            "ContextualReflection.cs",
+            "LoaderLinkTest.cs",
+            "ResourceAssemblyLoadContext.cs",
+            "SatelliteAssemblies.cs",
+        ],
     ) + [
         "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
     ],

@@ -239,13 +239,22 @@ library_test(
 # types and must be excluded until CoreLib impl assembly is available as a Bazel dep.
 library_test(
     name = "System.Diagnostics.Debug.Tests",
-    srcs = glob(["System.Diagnostics.Debug.Tests/**/*.cs"]),
+    srcs = glob(
+        ["System.Diagnostics.Debug.Tests/**/*.cs"],
+        exclude = [
+            # These files use internal types (DebugProvider, DefaultTraceListener)
+            # from CoreLib impl assembly which is not yet available as a Bazel dep.
+            "System.Diagnostics.Debug.Tests/DebugTests.cs",
+            "System.Diagnostics.Debug.Tests/DebugTestsNoListeners.cs",
+            "System.Diagnostics.Debug.Tests/DebugTestsNoListeners.Interpolation.cs",
+            "System.Diagnostics.Debug.Tests/DebugTestsUsingListeners.cs",
+        ],
+    ),
     deps = [
         "//src/libraries/shims/System.Diagnostics.Debug:impl_System.Diagnostics.Debug",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/Common/tests:TestUtilities",
     ] + XUNIT_DEPS,
-    os_targeted = "unix",
     keyfile = OPEN_SNK,
     size = "small",
 )
@@ -291,6 +300,12 @@ library_test(
             "System.Globalization.Tests/NlsTests/**",
             "System.Globalization.Tests/CultureInfo/CultureInfoGetCultures.cs",
             "System.Globalization.Tests/CultureInfo/CultureInfoThreeLetterISOInfo.cs",
+            # CharUnicodeInfoTests and GraphemeBreakTest depend on TestUtilities.Unicode
+            # (CodePoint type) and Microsoft.VisualBasic which are not yet available.
+            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTests.cs",
+            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTests.Generated.cs",
+            "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTestData.cs",
+            "System.Globalization.Tests/System/Globalization/GraphemeBreakTest.cs",
         ],
     ) + [
         "//src/libraries/Common/tests:System/RandomDataGenerator.cs",
@@ -414,6 +429,15 @@ library_test(
             "System.Reflection.Tests/TestAssembly/**",
             "System.Reflection.Tests/TestExe/**",
             "System.Reflection.Tests/UnloadableAssembly/**",
+            # These files depend on ForwardedTypesAssembly/TestAssembly helper projects
+            # that are not yet wired as Bazel deps.
+            "System.Reflection.Tests/AssemblyTests.cs",
+            "System.Reflection.Tests/GetTypeTests.cs",
+            "System.Reflection.Tests/AssemblyNameTests.cs",
+            "System.Reflection.Tests/FieldInfoTests.cs",
+            "System.Reflection.Tests/MethodInfoTests.cs",
+            "System.Reflection.Tests/MethodCommonTests.cs",
+            "System.Reflection.Tests/MethodInvokerTests.cs",
         ],
     ) + [
         "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly:EquivalentValueType.cs",
@@ -477,9 +501,17 @@ resgen(
 
 library_test(
     name = "System.Resources.ResourceManager.Tests",
-    srcs = glob(["System.Resources.ResourceManager.Tests/**/*.cs"]) + [
-        "//src/libraries/Common/tests:System/Drawing/Helpers.cs",
-    ],
+    srcs = glob(
+        ["System.Resources.ResourceManager.Tests/**/*.cs"],
+        exclude = [
+            # Uses System.Drawing types (NuGet not available in Bazel)
+            "System.Resources.ResourceManager.Tests/ResourceManagerTests.cs",
+            "System.Resources.ResourceManager.Tests/Resources/TestResx.netstandard17.Designer.cs",
+            # TrimCompatibilityTests expects NotSupportedException but gets MissingManifestResourceException
+            # because the feature switch is not active without trimming
+            "System.Resources.ResourceManager.Tests/TrimCompatibilityTests.cs",
+        ],
+    ),
     deps = [
         "//src/libraries/shims/System.Resources.ResourceManager:impl_System.Resources.ResourceManager",
         "//src/libraries/System.Resources.Extensions:ref_System.Resources.Extensions",

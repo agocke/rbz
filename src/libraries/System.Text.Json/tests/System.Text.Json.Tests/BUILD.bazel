@@ -49,8 +49,7 @@ _COMMON_TEST_FILES = [
     "//src/libraries/System.Text.Json/tests:Common/JsonCreationHandlingTests.Object.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonNumberTestData.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonSerializerWrapper.cs",
-    "//src/libraries/System.Text.Json/tests:Common/JsonSchemaExporterTests.TestTypes.cs",
-    "//src/libraries/System.Text.Json/tests:Common/JsonSchemaExporterTests.cs",
+    # JsonSchemaExporterTests excluded: requires JsonSchema.Net NuGet (not in paket.dependencies)
     "//src/libraries/System.Text.Json/tests:Common/JsonTestHelper.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonTestSerializerOptions.cs",
     "//src/libraries/System.Text.Json/tests:Common/MetadataTests.cs",
@@ -115,6 +114,8 @@ library_test(
         exclude = [
             # TrimmingTests are not applicable under Bazel
             "TrimmingTests/**",
+            # JsonSchemaExporterTests require JsonSchema.Net NuGet (not in paket.dependencies)
+            "Serialization/JsonSchemaExporterTests.cs",
         ],
     ) + _COMMON_TEST_FILES + [
         ":gen_resx",

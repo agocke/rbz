@@ -31,7 +31,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.Security.Permissions",
     keyfile = OPEN_SNK,
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "IDE0073", "nullable", "CS1591"],
     partial_facade = True,
     srcs = glob(["src/**/*.cs"]) + [
         "ref/System.Security.Permissions.Forwards.cs",

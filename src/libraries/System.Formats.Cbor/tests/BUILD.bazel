@@ -14,8 +14,6 @@ library_test(
         ],
     ) + [
         "//src/libraries/Common/tests:System/Security/Cryptography/ByteUtils.cs",
-        "PropertyTests/CborPropertyTests.cs",
-        "PropertyTests/CborRandomGenerators.cs",
     ],
     deps = [
         "//src/libraries/System.Formats.Cbor:ref_System.Formats.Cbor",

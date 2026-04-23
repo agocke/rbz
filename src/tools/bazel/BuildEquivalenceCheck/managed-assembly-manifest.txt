@@ -349,7 +349,7 @@ match  System.Data.Odbc.Tests
 diff   System.Data.Odbc
 match  System.Data.OleDb
 match  System.Diagnostics.Contracts.Tests
-match  System.Diagnostics.Debug.Tests
+diff   System.Diagnostics.Debug.Tests
 match  System.Diagnostics.DiagnosticSource.Tests
 match  MetricOuterLoop.Tests
 match  MetricOuterLoop1.Tests
@@ -371,13 +371,13 @@ match  System.Dynamic.Runtime.Tests
 match  System.Drawing.Primitives.Tests
 match  System.Formats.Asn1.Tests
 match  System.Formats.Cbor
-match  System.Formats.Cbor.Tests
+diff   System.Formats.Cbor.Tests
 match  System.Formats.Nrbf
 match  System.Formats.Nrbf.Tests
 match  System.Formats.Tar.Tests
 match  System.Globalization.Calendars.Tests
 match  System.Globalization.Extensions.Tests
-match  System.Globalization.Tests
+diff   System.Globalization.Tests
 match  System.IO.Compression.Brotli.Tests
 match  System.IO.Compression.Tests
 match  System.IO.Compression.ZipFile.Tests
@@ -425,7 +425,7 @@ match  System.Net.Primitives.UnitTests.Tests
 match  System.Net.Quic.Functional.Tests
 match  System.Net.Requests.Tests
 match  System.Net.Security.Enterprise.Tests
-match  System.Net.Security.Tests
+diff   System.Net.Security.Tests
 match  System.Net.Security.Unit.Tests
 match  System.Net.ServicePoint.Tests
 match  System.Net.ServerSentEvents.Tests
@@ -453,7 +453,7 @@ match  System.Reflection.Emit.Tests
 match  System.Reflection.Extensions.Tests
 diff   System.Reflection.Metadata.Tests
 match  System.Reflection.MetadataLoadContext
-match  System.Reflection.MetadataLoadContext.Tests
+diff   System.Reflection.MetadataLoadContext.Tests
 match  System.Reflection.CoreCLR.Tests
 match  System.Reflection.TestExe
 diff   System.Reflection.Tests
@@ -475,7 +475,7 @@ match  System.Runtime.Extensions.Tests
 match  System.Runtime.InteropServices.RuntimeInformation.Tests
 match  System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
-match  System.Runtime.Loader.Tests
+diff   System.Runtime.Loader.Tests
 match  System.Runtime.Loader.DefaultContext.Tests
 match  System.Runtime.Loader.Noop.Assembly
 match  System.Runtime.Loader.RefEmitLoadContext.Tests
@@ -485,7 +485,7 @@ match  System.Runtime.Serialization.Json.Tests
 match  System.Runtime.Serialization.Primitives.Tests
 match  System.Runtime.Serialization.Schema
 match  System.Runtime.Serialization.Schema.Tests
-match  System.Runtime.Serialization.Xml.Tests
+diff   System.Runtime.Serialization.Xml.Tests
 match  System.Runtime.Serialization.Xml.Canonicalization.Tests
 match  System.Runtime.Serialization.Xml.ReflectionOnly.Tests
 match  System.Runtime.ReflectionInvokeEmit.Tests
@@ -503,7 +503,7 @@ match  System.Security.Cryptography.Tests
 match  System.Security.Cryptography.Xml
 match  System.Security.Cryptography.Xml.Tests
 match  System.Security.SecureString.Tests
-match  System.Security.Permissions
+diff   System.Security.Permissions
 match  System.ServiceModel.Syndication
 match  System.ServiceModel.Syndication.Tests
 match    System.ServiceProcess.ServiceController
@@ -513,7 +513,7 @@ match  System.Text.Encoding.Extensions.Tests
 match  System.Text.Encoding.Tests
 match  System.Text.Encodings.Web.Tests
 # System.Text.RegularExpressions.Generator  # netstandard2.0, filtered
-match  System.Text.RegularExpressions.Tests
+diff   System.Text.RegularExpressions.Tests
 match  System.Text.RegularExpressions.Unit.Tests
 match  System.Threading.Channels.Tests
 match  System.Threading.Overlapped.Tests
@@ -554,7 +554,7 @@ match  ILCompiler.Reflection.ReadyToRun
 diff   System.Text.Json.SourceGeneration
 diff   TestUtilities
 match  Microsoft.Extensions.DependencyModel.Tests
-match  System.Private.Xml.Tests
+diff   System.Private.Xml.Tests
 diff   System.Text.Json.Tests
 
 # ── Loader test helper assemblies ──

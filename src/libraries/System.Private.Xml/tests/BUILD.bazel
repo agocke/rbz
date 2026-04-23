@@ -131,6 +131,41 @@ library_test(
         exclude = [
             "XmlReaderLib/**",
             "TrimmingTests/**",
+            # XmlPreloadedResolverGetEntity needs DTD files at Utils/DTDs/ that aren't in the repo
+            "XmlResolver/System.Xml.XmlResolver.Tests/XmlPreloadedResolverGetEntity.cs",
+            # XmlWriterApi/TestExtensions.cs overrides DataAttribute.GetData(MethodInfo)
+            # from xunit.extensibility.core (netstandard1.1). This requires the
+            # System.Reflection facade assembly for MethodInfo type unification, which
+            # is not available in LIVE_REFPACK_DEPS. Exclude TestExtensions.cs and the
+            # 27 test files that use its XmlWriterInlineDataAttribute.
+            "Writers/XmlWriterApi/TestExtensions.cs",
+            "Writers/XmlWriterApi/EndOfLineHandlingTests.cs",
+            "Writers/XmlWriterApi/ErrorCondition.cs",
+            "Writers/XmlWriterApi/NamespaceHandlingTests.cs",
+            "Writers/XmlWriterApi/TCAttribute.cs",
+            "Writers/XmlWriterApi/TCAutoCL.cs",
+            "Writers/XmlWriterApi/TCAutoComplete.cs",
+            "Writers/XmlWriterApi/TCCheckChars.cs",
+            "Writers/XmlWriterApi/TCCloseOutput.cs",
+            "Writers/XmlWriterApi/TCDefaultWriterSettingsTests.cs",
+            "Writers/XmlWriterApi/TCDocType.cs",
+            "Writers/XmlWriterApi/TCDocument.cs",
+            "Writers/XmlWriterApi/TCElement.cs",
+            "Writers/XmlWriterApi/TCErrorState.cs",
+            "Writers/XmlWriterApi/TCFlushClose.cs",
+            "Writers/XmlWriterApi/TCFragmentCL.cs",
+            "Writers/XmlWriterApi/TCFullEndElement.cs",
+            "Writers/XmlWriterApi/TCIndent.cs",
+            "Writers/XmlWriterApi/TCIndentChars.cs",
+            "Writers/XmlWriterApi/TCNewLineChars.cs",
+            "Writers/XmlWriterApi/TCNewLineHandling.cs",
+            "Writers/XmlWriterApi/TCNewLineOnAttributes.cs",
+            "Writers/XmlWriterApi/TCOmitXmlDecl.cs",
+            "Writers/XmlWriterApi/TCStandAlone.cs",
+            "Writers/XmlWriterApi/TCWriteAttributes.cs",
+            "Writers/XmlWriterApi/TCWriteNode_XPathNavigator.cs",
+            "Writers/XmlWriterApi/TCWriteNode_XmlReader.cs",
+            "Writers/XmlWriterApi/TCWriterWithMemoryStream.cs",
         ],
     ) + [
         # Common test utilities
@@ -193,10 +228,6 @@ library_test(
         "//src/libraries/Common/tests:System/Xml/XPath/XPathExpressionTests/EvaluateTests.cs",
         # SerializationTypes from System.Runtime.Serialization.Xml tests
         "//src/libraries/System.Runtime.Serialization.Xml/tests:SerializationTypes.RuntimeOnly.cs",
-        # XmlSerializer test files
-        "//src/libraries/System.Private.Xml/tests/XmlSerializer:XmlSerializerTests.Internal.cs",
-        "//src/libraries/System.Private.Xml/tests/XmlSerializer:XmlSerializerTests.RuntimeOnly.cs",
-        "//src/libraries/System.Private.Xml/tests/XmlSerializer:XmlSerializerTests.cs",
     ],
     data = glob([
         "XmlSchema/TestFiles/**",
@@ -210,9 +241,11 @@ library_test(
     resource_logical_names = _XPATH_RESOURCE_NAMES,
     deps = [
         ":BaseLibManaged",
+        ":XmlReaderLib",
         "//src/libraries/Common/tests:TestUtilities",
         "//src/libraries/Common/tests:XmlCoreTest",
         "//src/libraries/Common/tests:XmlDiff",
+        "//src/libraries/Common/tests:XmlModuleCore",
         "//src/libraries/System.Runtime.Serialization.Xml/tests:SerializableAssembly",
         "//src/libraries/System.Xml.ReaderWriter:ref_System.Xml.ReaderWriter",
         "//src/libraries/System.Xml.XDocument:ref_System.Xml.XDocument",

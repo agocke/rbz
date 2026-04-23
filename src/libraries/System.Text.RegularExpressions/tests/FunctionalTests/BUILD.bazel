@@ -11,6 +11,9 @@ library_test(
             "RegexAssert.netfx.cs",
             "RegexParserTests.netfx.cs",
             "RegexGeneratorHelper.netfx.cs",
+            # Requires Microsoft.CodeAnalysis.CSharp.CodeFix.Testing (not in paket)
+            "CSharpCodeFixVerifier*",
+            "UpgradeToGeneratedRegexAnalyzerTests.cs",
         ],
     ) + [
         "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
