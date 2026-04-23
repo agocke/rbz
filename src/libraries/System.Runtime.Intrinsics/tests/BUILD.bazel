@@ -4,6 +4,8 @@ load("//:defs.bzl", "OPEN_SNK")
 library_test(
     name = "System.Runtime.Intrinsics.Tests",
     defines = select({"@platforms//os:linux": ["UNIX", "UNIX1_0"], "@platforms//os:macos": ["UNIX", "UNIX1_0"], "//conditions:default": []}),
+    # Match MSBuild csproj: removes nullablePublicOnly and strict from Features.
+    features_strict = False,
     srcs = glob(["**/*.cs"]) + [
         "//src/libraries/Common/tests:System/GenericMathTestMemberData.cs",
     ],
