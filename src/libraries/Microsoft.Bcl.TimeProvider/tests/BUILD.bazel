@@ -10,7 +10,6 @@ library_test(
         "//src/libraries/Common/tests:System/TimeProviderTests.cs",
     ],
     deps = [
-        "//src/libraries/Microsoft.Bcl.AsyncInterfaces:impl_Microsoft.Bcl.AsyncInterfaces",
         "//src/libraries/Microsoft.Bcl.TimeProvider:impl_Microsoft.Bcl.TimeProvider",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
