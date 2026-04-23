@@ -610,10 +610,30 @@ def library_test(
     analyzer_configs = [],
     compiler_options = [],
     features_strict = True,
+    os_targeted = False,
     **kwargs
 ):
     """Test macro for library tests that compiles as library and runs via xunit.console.dll."""
     deps = deps + LIVE_REFPACK_DEPS
+
+    # Assemblies whose MSBuild TFM includes an OS suffix receive OS-specific
+    # implicit defines.  Match that in Bazel via select().
+    # os_targeted can be True/"linux" for net10.0-linux, or "unix" for net10.0-unix.
+    defines = kwargs.pop("defines", [])
+    if os_targeted == "unix" or os_targeted == "Unix":
+        defines = defines + select({
+            "@platforms//os:linux": ["UNIX", "UNIX1_0"],
+            "@platforms//os:macos": ["UNIX", "UNIX1_0"],
+            "//conditions:default": [],
+        })
+    elif os_targeted:
+        defines = defines + select({
+            "@platforms//os:linux": ["LINUX", "LINUX1_0"],
+            "@platforms//os:macos": ["OSX", "OSX1_0"],
+            "//conditions:default": [],
+        })
+    if defines:
+        kwargs["defines"] = defines
     # Match MSBuild default: src/libraries/Directory.Build.props sets
     # <Nullable>annotations</Nullable> for test projects.
     nullable = kwargs.pop("nullable", "annotations")

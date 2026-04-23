@@ -90,6 +90,7 @@ library_test(
         "FxResources.System.Net.Primitives.UnitTests.Tests.SR.resources": "FxResources.System.Net.Primitives.UnitTests.Tests.SR.resources",
     },
     nowarn = ["169", "649"],
+    os_targeted = "unix",
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
     size = "medium",

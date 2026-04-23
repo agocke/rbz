@@ -69,6 +69,7 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     nowarn = ["SYSLIB0021"],
+    os_targeted = "unix",
     keyfile = OPEN_SNK,
     size = "large",
 )

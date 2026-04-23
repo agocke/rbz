@@ -145,6 +145,7 @@ library_test(
         "FxResources.System.Net.Security.Unit.Tests.SR.resources": "FxResources.System.Net.Security.Unit.Tests.SR.resources",
     },
     nowarn = ["436", "3021"],
+    os_targeted = "unix",
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
     size = "large",

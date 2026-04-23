@@ -826,3 +826,123 @@ library_test(
     keyfile = OPEN_SNK,
     size = "medium",
 )
+
+# Invariant.Tests: globalization invariant mode with InvariantGlobalization=true.
+library_test(
+    name = "Invariant.Tests",
+    srcs = ["System.Globalization.Tests/Invariant/InvariantMode.cs"],
+    deps = [
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    runtimeconfig_properties = {
+        "System.Globalization.Invariant": "true",
+        "System.Globalization.PredefinedCulturesOnly": "false",
+    },
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+# CalendarsWithConfigSwitch.Tests: Japanese era year range enforcement switch.
+library_test(
+    name = "System.Globalization.CalendarsWithConfigSwitch.Tests",
+    srcs = ["System.Globalization.Calendars.Tests/CalendarTestWithConfigSwitch/CalendarTests.cs"],
+    deps = [
+        "//src/libraries/Common/tests:TestUtilities",
+    ] + XUNIT_DEPS,
+    runtimeconfig_properties = {
+        "Switch.System.Globalization.EnforceJapaneseEraYearRanges": "true",
+    },
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+# DisabledFileLocking.Tests: file locking disabled via config switch.
+# This test includes sources from the parent FileSystem.Tests with a different config.
+library_test(
+    name = "System.IO.FileSystem.DisabledFileLocking.Tests",
+    srcs = [
+        "System.IO.FileSystem.Tests/DisabledFileLockingTests/DisabledFileLockingSwitchTests.cs",
+        "System.IO.FileSystem.Tests/FSAssert.cs",
+        "System.IO.FileSystem.Tests/TestData.cs",
+        "System.IO.FileSystem.Tests/FileSystemTest.cs",
+        "System.IO.FileSystem.Tests/FileSystemTest.Unix.cs",
+        "System.IO.FileSystem.Tests/UnseekableFileStream.cs",
+        "System.IO.FileSystem.Tests/PortedCommon/DllImports.cs",
+        "System.IO.FileSystem.Tests/PortedCommon/IOInputs.cs",
+        "System.IO.FileSystem.Tests/PortedCommon/IOServices.cs",
+    ] + glob(
+        ["System.IO.FileSystem.Tests/FileStream/**/*.cs"],
+        exclude = [
+            "System.IO.FileSystem.Tests/FileStream/ctor_options.Windows.cs",
+            "System.IO.FileSystem.Tests/FileStream/ctor_options.Browser.cs",
+            "System.IO.FileSystem.Tests/FileStream/FileStreamConformanceTests.Windows.cs",
+        ],
+    ) + [
+        "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
+        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
+        "//src/libraries/Common/tests:Tests/TheoryDataExtensions.cs",
+        "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
+        "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Stat.cs",
+    ],
+    deps = [
+        "//src/libraries/System.IO.Pipes:ref_System.IO.Pipes",
+        "//src/libraries/System.IO.FileSystem.DriveInfo:ref_System.IO.FileSystem.DriveInfo",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
+        "//src/libraries/System.Text.Encoding.Extensions:ref_System.Text.Encoding.Extensions",
+        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
+        "//src/libraries/Common/tests:StreamConformanceTests",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    runtimeconfig_properties = {
+        "System.IO.DisableFileLocking": "true",
+    },
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
+)
+
+# InvariantTimezone.Tests: timezone invariant mode via config switch.
+library_test(
+    name = "System.Runtime.InvariantTimezone.Tests",
+    srcs = [
+        "System.Runtime.Tests/System/TimeZoneInfoTests.Common.cs",
+        "System.Runtime.Tests/System/TimeZoneInfoTests.Invariant.cs",
+        "System.Runtime.Tests/System/TimeZoneTests.cs",
+        "System.Runtime.Tests/System/TimeZoneNotFoundExceptionTests.cs",
+    ],
+    deps = [
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    runtimeconfig_properties = {
+        "System.TimeZoneInfo.Invariant": "true",
+    },
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "medium",
+)
+
+# IcuAppLocal.Tests: ICU app-local globalization test.
+# The ICU NuGet package (Microsoft.ICU.ICU4C.Runtime) is not available in Bazel,
+# so the test is marked incompatible.
+library_test(
+    name = "IcuAppLocal.Tests",
+    srcs = ["System.Globalization.Tests/IcuAppLocal/IcuAppLocal.cs"],
+    deps = [
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+    ] + XUNIT_DEPS,
+    keyfile = OPEN_SNK,
+    size = "medium",
+    target_compatible_with = ["@platforms//:incompatible"],
+)
