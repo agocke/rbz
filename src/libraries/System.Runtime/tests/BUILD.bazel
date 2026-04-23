@@ -665,32 +665,8 @@ library_test(
     size = "large",
 )
 
-library_test(
-    name = "System.Runtime.InteropServices.RuntimeInformation.Tests",
-    srcs = glob(["System.Runtime.InteropServices.RuntimeInformation.Tests/**/*.cs"]) + [
-        "//src/libraries/Common:src/Interop/Linux/os-release/Interop.OSReleaseFile.cs",
-        "//src/libraries/Common:src/Interop/Linux/cgroups/Interop.cgroups.cs",
-        "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcMountInfo.cs",
-        "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcMountInfo.TryParseMountInfoLine.cs",
-        "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",
-        "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
-        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MountPoints.FormatInfo.cs",
-        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.RealPath.cs",
-        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.UnixFileSystemTypes.cs",
-    ],
-    deps = [
-        "//src/libraries/shims/System.Runtime.InteropServices.RuntimeInformation:impl_System.Runtime.InteropServices.RuntimeInformation",
-        "//src/libraries/System.IO.FileSystem.DriveInfo:ref_System.IO.FileSystem.DriveInfo",
-        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
-        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
-        "//src/libraries/System.Threading:ref_System.Threading",
-        "//src/libraries/Common/tests:TestUtilities",
-        "@paket.main//microsoft.dotnet.remoteexecutor",
-    ] + XUNIT_DEPS,
-    allow_unsafe_blocks = True,
-    keyfile = OPEN_SNK,
-    size = "medium",
-)
+# NOTE: System.Runtime.InteropServices.RuntimeInformation.Tests is defined in its
+# own sub-package BUILD.bazel and should be built from there.
 
 # ── Helper library for System.Reflection.CoreCLR.Tests ──
 # TestExe is a trivial helper project used as a compile-time reference.
@@ -734,6 +710,9 @@ library_test(
         "System.Reflection.Tests/ConstructorCommonTests.cs",
         "System.Reflection.Tests/ConstructorInfoTests.cs",
         "System.Reflection.Tests/ConstructorInvokerTests.cs",
+        "System.Reflection.Tests/MethodCommonTests.cs",
+        "System.Reflection.Tests/MethodInfoTests.cs",
+        "System.Reflection.Tests/MethodInvokerTests.cs",
         "System.Reflection.Tests/PropertyInfoTests.cs",
     ],
     deps = [
@@ -742,6 +721,7 @@ library_test(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/Common/tests:TestUtilities",
+        "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
     runtimeconfig_properties = {
@@ -761,6 +741,9 @@ library_test(
         "System.Reflection.Tests/ConstructorCommonTests.cs",
         "System.Reflection.Tests/ConstructorInfoTests.cs",
         "System.Reflection.Tests/ConstructorInvokerTests.cs",
+        "System.Reflection.Tests/MethodCommonTests.cs",
+        "System.Reflection.Tests/MethodInfoTests.cs",
+        "System.Reflection.Tests/MethodInvokerTests.cs",
         "System.Reflection.Tests/PropertyInfoTests.cs",
     ],
     deps = [
@@ -769,6 +752,7 @@ library_test(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/Common/tests:TestUtilities",
+        "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
     runtimeconfig_properties = {
@@ -919,6 +903,8 @@ library_test(
         "System.Runtime.Tests/System/TimeZoneNotFoundExceptionTests.cs",
     ],
     deps = [
+        "//src/libraries/System.Runtime.Serialization.Formatters:ref_System.Runtime.Serialization.Formatters",
+        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/Common/tests:TestUtilities",

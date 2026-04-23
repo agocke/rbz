@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  221 library test suites on Linux (Common,
+  230 library test suites on Linux (Common,
   Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
@@ -80,6 +80,7 @@ layout.
   System.Diagnostics.DiagnosticSource,
   System.Diagnostics.DiagnosticSource (MetricOuterLoop),
   System.Diagnostics.DiagnosticSource (MetricOuterLoop1),
+  System.Diagnostics.DiagnosticSource.Switches,
   System.Diagnostics.FileVersionInfo,
   System.Diagnostics.Process, System.Diagnostics.Tools,
   System.Diagnostics.StackTrace, System.Diagnostics.TextWriterTraceListener,
