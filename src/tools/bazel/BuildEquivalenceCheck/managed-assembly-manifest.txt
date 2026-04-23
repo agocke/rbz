@@ -14,7 +14,7 @@
 # ── Archive assemblies ─────────────────────────────────────────────
 # These assemblies are shipped in the runtime archive tarball.
 
-diff   Microsoft.CSharp
+match  Microsoft.CSharp
 match  Microsoft.VisualBasic
 match  Microsoft.Win32.Primitives
 match  Microsoft.Win32.Registry
@@ -73,7 +73,7 @@ match  System.IO.Pipelines
 match  System.IO.Pipes
 match  System.IO.Pipes.AccessControl
 match    System.IO.UnmanagedMemoryStream
-diff   System.Linq
+match  System.Linq
 match  System.Linq.AsyncEnumerable
 match  System.Linq.Expressions
 match  System.Linq.Parallel
@@ -105,7 +105,7 @@ match  System.ObjectModel
 match  System.Private.CoreLib
 match  System.Private.DataContractSerialization
 match  System.Private.Uri
-diff   System.Private.Xml
+match  System.Private.Xml
 match  System.Private.Xml.Linq
 match  System.Reflection
 match  System.Reflection.DispatchProxy
@@ -164,7 +164,7 @@ match  System.Threading.AccessControl
 match  System.Threading.Channels
 match  System.Threading.Overlapped
 match  System.Threading.Tasks
-diff   System.Threading.Tasks.Dataflow
+match  System.Threading.Tasks.Dataflow
 match  System.Threading.Tasks.Extensions
 match  System.Threading.Tasks.Parallel
 match  System.Threading.Thread
@@ -200,12 +200,12 @@ diff   ApplicationNameSetFromArgument
 diff   BuildWebHostInvalidSignature
 diff   BuildWebHostPatternTestSite
 diff   CollectibleAssembly
-diff   Common.Tests
+match  Common.Tests
 diff   CreateHostBuilderInvalidSignature
 diff   CreateHostBuilderPatternTestSite
 diff   CreateWebHostBuilderInvalidSignature
 diff   CreateWebHostBuilderPatternTestSite
-diff   DefaultApartmentStateMain
+match  DefaultApartmentStateMain
 diff   ILCompiler.Compiler
 match  ILCompiler.DependencyAnalysisFramework
 match  ILCompiler.Diagnostics
@@ -214,11 +214,11 @@ diff   ILCompiler.ReadyToRun
 match  ILCompiler.RyuJit
 diff   ILCompiler.TypeSystem
 diff   ILLink.Tasks
-diff   MTAMain
+match  MTAMain
 diff   Microsoft.Bcl.AsyncInterfaces
 match  Microsoft.Bcl.AsyncInterfaces.Tests
 match  Microsoft.Bcl.Cryptography
-diff   Microsoft.Bcl.Cryptography.Tests
+match  Microsoft.Bcl.Cryptography.Tests
 match  Microsoft.Bcl.Memory
 match  Microsoft.Bcl.Memory.Tests
 diff   Microsoft.Bcl.Numerics
@@ -232,7 +232,7 @@ match  Microsoft.Extensions.Caching.Memory.Tests
 match  Microsoft.Extensions.Configuration
 match  Microsoft.Extensions.Configuration.Abstractions
 match  Microsoft.Extensions.Configuration.Binder
-diff   Microsoft.Extensions.Configuration.Binder.Tests
+match  Microsoft.Extensions.Configuration.Binder.Tests
 match  Microsoft.Extensions.Configuration.CommandLine
 match  Microsoft.Extensions.Configuration.CommandLine.Tests
 match  Microsoft.Extensions.Configuration.EnvironmentVariables
@@ -276,8 +276,8 @@ match  Microsoft.Extensions.Http
 match  Microsoft.Extensions.Http.Tests
 match  Microsoft.Extensions.Logging
 match  Microsoft.Extensions.Logging.Abstractions
-diff   Microsoft.Extensions.Logging.Configuration
-diff   Microsoft.Extensions.Logging.Console
+match  Microsoft.Extensions.Logging.Configuration
+match  Microsoft.Extensions.Logging.Console
 match  Microsoft.Extensions.Logging.Console.Tests
 match  Microsoft.Extensions.Logging.Debug
 match  Microsoft.Extensions.Logging.EventLog
@@ -307,7 +307,7 @@ diff   NoSpecialEntryPointPatternExits
 diff   NoSpecialEntryPointPatternHangs
 diff   NoSpecialEntryPointPatternMainNoArgs
 diff   NoSpecialEntryPointPatternThrows
-diff   STAMain
+match  STAMain
 diff   SerializableAssembly
 diff   StreamConformanceTests
 diff   TopLevelStatements
@@ -342,22 +342,22 @@ match  System.Composition.TypedParts
 match  System.Composition.TypedParts.Tests
 match  System.Configuration.ConfigurationManager
 match    System.Configuration.ConfigurationManager.Tests
-diff   System.Console.Tests
+match  System.Console.Tests
 match  System.Data.Common.Tests
 match  System.Data.DataSetExtensions.Tests
 match  System.Data.Odbc.Tests
 diff   System.Data.Odbc
-diff   System.Data.OleDb
+match  System.Data.OleDb
 match  System.Diagnostics.Contracts.Tests
 match  System.Diagnostics.Debug.Tests
-diff   System.Diagnostics.DiagnosticSource.Tests
+match  System.Diagnostics.DiagnosticSource.Tests
 match  MetricOuterLoop.Tests
 match  MetricOuterLoop1.Tests
 match  System.Diagnostics.EventLog
 match  System.Diagnostics.FileVersionInfo.TestAssembly
 match  System.Diagnostics.FileVersionInfo.Tests
 match  System.Diagnostics.PerformanceCounter
-diff   System.Diagnostics.Process.Tests
+match  System.Diagnostics.Process.Tests
 match  System.Diagnostics.StackTrace.Tests
 match  System.Diagnostics.Tools.Tests
 match  System.Diagnostics.TextWriterTraceListener.Tests
@@ -374,7 +374,7 @@ match  System.Formats.Cbor
 match  System.Formats.Cbor.Tests
 match  System.Formats.Nrbf
 match  System.Formats.Nrbf.Tests
-diff   System.Formats.Tar.Tests
+match  System.Formats.Tar.Tests
 match  System.Globalization.Calendars.Tests
 match  System.Globalization.Extensions.Tests
 match  System.Globalization.Tests
@@ -387,14 +387,14 @@ match  System.IO.FileSystem.Tests
 match  System.IO.FileSystem.Watcher.Tests
 match  System.IO.Hashing.Tests
 diff   System.IO.Hashing
-diff   System.IO.IsolatedStorage.Tests
+match  System.IO.IsolatedStorage.Tests
 match  System.IO.MemoryMappedFiles.Tests
 match  System.IO.Packaging
 match  System.IO.Packaging.Tests
 match  System.IO.Pipelines.Tests
 match  System.IO.Pipes.Tests
 match  System.IO.UnmanagedMemoryStream.Tests
-diff   System.IO.Ports
+match  System.IO.Ports
 match  System.IO.Ports.Tests
 match  System.IO.Tests
 match  System.Linq.AsyncEnumerable.Tests
@@ -412,20 +412,20 @@ match    System.Net.Http.WinHttpHandler
 match  System.Net.Http.Json.Functional.Tests
 match    System.Net.Http.Json.Unit.Tests
 match  System.Net.Http.Unit.Tests
-diff   System.Net.HttpListener.Tests
+match  System.Net.HttpListener.Tests
 match  System.Net.Mail.Functional.Tests
 match    System.Net.Mail.Unit.Tests
 match  System.Net.NameResolution.Functional.Tests
-diff   System.Net.NameResolution.Pal.Tests
-diff   System.Net.NetworkInformation.Functional.Tests
+match  System.Net.NameResolution.Pal.Tests
+match  System.Net.NetworkInformation.Functional.Tests
 match  System.Net.Ping.Functional.Tests
 match  System.Net.Primitives.Functional.Tests
 match  System.Net.Primitives.Pal.Tests
 match  System.Net.Primitives.UnitTests.Tests
 match  System.Net.Quic.Functional.Tests
-diff   System.Net.Requests.Tests
+match  System.Net.Requests.Tests
 match  System.Net.Security.Enterprise.Tests
-diff   System.Net.Security.Tests
+match  System.Net.Security.Tests
 match  System.Net.Security.Unit.Tests
 match  System.Net.ServicePoint.Tests
 match  System.Net.ServerSentEvents.Tests
@@ -433,8 +433,8 @@ match  System.Net.Sockets.Tests
 match  System.Net.WebClient.Tests
 match  System.Net.WebHeaderCollection.Tests
 match  System.Net.WebProxy.Tests
-diff   System.Net.WebSockets.Client.Tests
-diff   System.Net.WebSockets.Tests
+match  System.Net.WebSockets.Client.Tests
+match  System.Net.WebSockets.Tests
 match  System.Numerics.Tensors
 match  System.Numerics.Tensors.Tests
 match  System.Numerics.Vectors.Tests
@@ -442,7 +442,7 @@ match  System.ObjectModel.Tests
 # System.Private.CoreLib.Generators  # netstandard2.0, filtered
 match  System.Private.Uri.ExtendedFunctional.Tests
 match  System.Private.Uri.Functional.Tests
-diff   System.Private.Uri.Unit.Tests
+match  System.Private.Uri.Unit.Tests
 match  System.Reflection.Context
 match  System.Reflection.Context.Tests
 diff   System.Reflection.DispatchProxy.TestDependency
@@ -466,7 +466,7 @@ match  System.Resources.Extensions.Tests
 match  System.Resources.Reader.Tests
 diff   System.Resources.ResourceManager.Tests
 match  System.Resources.Writer.Tests
-diff   System.Runtime.Caching
+match  System.Runtime.Caching
 match  System.Runtime.Caching.Tests
 match  System.Runtime.CompilerServices.Unsafe.Tests
 match  System.Runtime.Handles.Tests
@@ -475,7 +475,7 @@ match  System.Runtime.Extensions.Tests
 match  System.Runtime.InteropServices.RuntimeInformation.Tests
 match  System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
-diff   System.Runtime.Loader.Tests
+match  System.Runtime.Loader.Tests
 match  System.Runtime.Loader.DefaultContext.Tests
 match  System.Runtime.Loader.Noop.Assembly
 match  System.Runtime.Loader.RefEmitLoadContext.Tests
@@ -499,22 +499,22 @@ match  System.Security.Cryptography.Pkcs
 match  System.Security.Cryptography.Pkcs.Tests
 match  System.Security.Cryptography.ProtectedData
 match  System.Security.Cryptography.ProtectedData.Tests
-diff   System.Security.Cryptography.Tests
+match  System.Security.Cryptography.Tests
 match  System.Security.Cryptography.Xml
 match  System.Security.Cryptography.Xml.Tests
 match  System.Security.SecureString.Tests
-diff   System.Security.Permissions
+match  System.Security.Permissions
 match  System.ServiceModel.Syndication
 match  System.ServiceModel.Syndication.Tests
 match    System.ServiceProcess.ServiceController
-diff   System.Speech
+match  System.Speech
 match  System.Text.Encoding.CodePages.Tests
 match  System.Text.Encoding.Extensions.Tests
 match  System.Text.Encoding.Tests
 match  System.Text.Encodings.Web.Tests
 # System.Text.RegularExpressions.Generator  # netstandard2.0, filtered
 match  System.Text.RegularExpressions.Tests
-diff   System.Text.RegularExpressions.Unit.Tests
+match  System.Text.RegularExpressions.Unit.Tests
 match  System.Threading.Channels.Tests
 match  System.Threading.Overlapped.Tests
 match  System.Threading.RateLimiting
@@ -555,7 +555,7 @@ diff   System.Text.Json.SourceGeneration
 diff   TestUtilities
 match  Microsoft.Extensions.DependencyModel.Tests
 match  System.Private.Xml.Tests
-diff System.Text.Json.Tests
+diff   System.Text.Json.Tests
 
 # ── Loader test helper assemblies ──
 match  System.Runtime.Loader.Test.Assembly
@@ -569,10 +569,10 @@ diff   ReferencedClassLibNeutralIsSatellite
 
 # ── Runtime test helper assemblies ──
 diff   TestUtilities.Unicode
-diff   TargetFrameworkNameTestApp
+match  TargetFrameworkNameTestApp
 diff   TestApp
 match  AssemblyResolveTestApp
-diff   TestAppOutsideOfTPA
+match  TestAppOutsideOfTPA
 
 # ── ApplyUpdate test helper assemblies ──
 match  System.Reflection.Metadata.ApplyUpdate.Test.AddFieldRVA

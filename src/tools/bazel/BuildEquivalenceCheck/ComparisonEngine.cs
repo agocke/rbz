@@ -508,6 +508,11 @@ public static class ComparisonEngine
             || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal))
             return true;
 
+        // Unevaluated MSBuild property expressions that leaked into msbuild-records
+        // (e.g. "/features:$(Features.Replace('nullablePublicOnly', ''))")
+        if (flag.Contains("$(", StringComparison.Ordinal))
+            return true;
+
         return false;
     }
 
@@ -573,9 +578,18 @@ public static class ComparisonEngine
         bool unsafeEnabled = false;
         bool checkedEnabled = false;
         string? nullableMode = null;
+        var interceptorNamespaces = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var flag in flags)
         {
+            // Merge all /features:InterceptorsNamespaces= entries into one canonical flag
+            if (flag.StartsWith("/features:InterceptorsNamespaces=", StringComparison.Ordinal))
+            {
+                var value = flag["/features:InterceptorsNamespaces=".Length..];
+                foreach (var ns in value.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                    interceptorNamespaces.Add(ns);
+                continue;
+            }
             if (flag is "/unsafe" or "/unsafe+")
             {
                 unsafeEnabled = true;
@@ -641,6 +655,9 @@ public static class ComparisonEngine
 
         if (maxWarnLevel >= 0)
             result.Add($"/warn:{maxWarnLevel}");
+
+        if (interceptorNamespaces.Count > 0)
+            result.Add("/features:InterceptorsNamespaces=;" + string.Join(";", interceptorNamespaces));
 
         return result;
     }

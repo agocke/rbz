@@ -97,6 +97,7 @@ library_test(
     name = "System.Text.Json.Tests",
     size = "large",
     allow_unsafe_blocks = True,
+    features_nullable_public_only = False,
     nowarn = [
         "CA1510",
         "CA1511",

@@ -19,8 +19,7 @@ netcoreapp_ref_assembly(
 netcoreapp_impl_assembly(
     name = "impl_System.Threading.Tasks.Dataflow",
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
-    # MSBuild sets UseCompilerGeneratedDocXmlFile=false; uses hand-written XML docs.
-    generate_documentation_file = False,
+    generate_documentation_file = True,
     srcs = [
         "src/Base/DataflowBlock.cs",
         "src/Base/DataflowBlock.netstandard21.cs",

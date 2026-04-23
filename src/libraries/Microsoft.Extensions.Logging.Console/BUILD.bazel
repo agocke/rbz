@@ -25,7 +25,7 @@ impl_assembly(
     analyzers = COMMON_GENERATOR_ANALYZERS + [
         "//src/libraries/Microsoft.Extensions.Configuration.Binder:ConfigurationBinderSourceGeneration",
     ],
-    interceptors_namespaces = ";Microsoft.Extensions.Configuration.Binder.SourceGeneration",
+    interceptors_namespaces = ";Microsoft.Extensions.Configuration.Binder.SourceGeneration;Microsoft.Extensions.Validation.Generated",
     nowarn = MULTITARGET_NOWARN + ["CP0003", "SYSLIB1100", "SYSLIB1101"],
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/Logging/NullExternalScopeProvider.cs",
