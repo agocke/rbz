@@ -1,5 +1,12 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "OPEN_SNK")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
+
+gen_resx_source(
+    name = "gen_resx",
+    out = "SR.g.cs",
+    assembly_name = "System.Net.NameResolution",
+    resx_file = "//src/libraries/System.Net.NameResolution:src/Resources/Strings.resx",
+)
 
 library_test(
     name = "System.Net.NameResolution.Pal.Tests",
@@ -23,6 +30,8 @@ library_test(
         "//src/libraries/Common:src/System/Net/SocketProtocolSupportPal.cs",
         "//src/libraries/Common/tests:System/Net/Configuration.cs",
         "//src/libraries/Common/tests:System/Net/Configuration.Http.cs",
+        "//src/libraries/Common:src/System/SR.cs",
+        ":gen_resx",
     ] + select({
         "@platforms//os:linux": [
             "//src/libraries/System.Net.NameResolution:src/System/Net/NameResolutionPal.Unix.cs",

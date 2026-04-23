@@ -1,4 +1,4 @@
-load("//:defs.bzl", "gen_resx_source")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
 load("//src/tests:live_test.bzl", "library_test")
 
 gen_resx_source(
@@ -42,6 +42,7 @@ library_test(
         "//src/libraries/Common:src/System/SR.cs",
         ":gen_resx",
     ],
+    keyfile = OPEN_SNK,
     deps = [
         "//src/libraries/System.IO.IsolatedStorage:ref_System.IO.IsolatedStorage",
         "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
