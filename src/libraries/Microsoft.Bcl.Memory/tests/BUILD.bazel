@@ -31,5 +31,6 @@ library_test(
     ],
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
+    nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847"],
     size = "large",
 )

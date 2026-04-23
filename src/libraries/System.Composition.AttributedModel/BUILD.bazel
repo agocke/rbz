@@ -22,6 +22,6 @@ impl_assembly(
     ],
     nullable = "disable",
     analyzers = COMMON_GENERATOR_ANALYZERS,
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],
     exclude_sr = True,
 )

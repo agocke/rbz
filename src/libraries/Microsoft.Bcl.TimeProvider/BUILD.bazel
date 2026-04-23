@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "impl_assembly")
 
 impl_assembly(
     name = "impl_Microsoft.Bcl.TimeProvider",
@@ -12,4 +12,5 @@ impl_assembly(
     ],
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     exclude_sr = True,
+    analyzers = COMMON_GENERATOR_ANALYZERS,
 )

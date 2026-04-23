@@ -107,6 +107,7 @@ library_test(
     data = ["@paket.main//system.net.testdata:content_files"],
     allow_unsafe_blocks = True,
     size = "large",
+    additionalfiles = ["//src/libraries/System.Net.Security:src/Resources/Strings.resx"],
     keyfile = OPEN_SNK,
     target_compatible_with = ["@platforms//os:linux"],
 )

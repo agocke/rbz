@@ -31,6 +31,7 @@ library_test(
     ],
     nowarn = ["436", "CS1591"],
     nullable = "enable",
+    additionalfiles = ["//src/libraries:System.Private.Uri/src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
 )

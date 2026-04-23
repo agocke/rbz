@@ -87,6 +87,7 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     allow_unsafe_blocks = True,
+    additionalfiles = ["//src/libraries/System.Net.NameResolution:src/Resources/Strings.resx"],
     size = "large",
     keyfile = OPEN_SNK,
 )

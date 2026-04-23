@@ -22,5 +22,7 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     resources = [":PropertiesResources"],
+    resource_logical_names = {"System.Reflection.Context.Tests.Properties.Resources.resources": "System.Reflection.Context.Tests.Properties.Resources.resources"},
+    additionalfiles = ["Properties/Resources.resx"],
     keyfile = OPEN_SNK,
 )

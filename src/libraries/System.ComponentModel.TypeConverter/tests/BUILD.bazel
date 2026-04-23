@@ -40,6 +40,8 @@ library_test(
     ],
     defines = ["FUNCTIONAL_TESTS"],
     resources = [":TestResx"],
+    resource_logical_names = {"Resources.TestResx.resources": "Resources.TestResx.resources"},
+    additionalfiles = ["Resources/TestResx.resx"],
     keyfile = OPEN_SNK,
     assembly_version = "9.9.9.9",
     nowarn = ["SYSLIB0011"],

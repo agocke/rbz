@@ -19,7 +19,7 @@ impl_assembly(
     resx_file = "src/Resources/Strings.resx",
     nullable = "disable",
     analyzers = COMMON_GENERATOR_ANALYZERS,
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],
     is_trimmable = False,
     is_aot_compatible = False,
 )

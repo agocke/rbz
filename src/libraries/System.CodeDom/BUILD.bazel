@@ -1,4 +1,5 @@
 load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "ref/System.CodeDom.cs",
@@ -158,7 +159,9 @@ impl_assembly(
     resx_file = "src/Resources/Strings.resx",
     nullable = "disable",
     analyzers = COMMON_GENERATOR_ANALYZERS,
-    nowarn = MULTITARGET_NOWARN + ["nullable", "CP0003"],
+    keyfile = OPEN_SNK,
+    allow_unsafe_blocks = True,
+    nowarn = MULTITARGET_NOWARN + ["nullable", "CP0003", "CS1591"],
 )
 
 ref_impl_pair(

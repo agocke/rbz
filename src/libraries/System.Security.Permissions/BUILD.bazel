@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
@@ -31,7 +31,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.Security.Permissions",
     keyfile = OPEN_SNK,
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591", "IDE0073"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],
     partial_facade = True,
     srcs = glob(["src/**/*.cs"]) + [
         "ref/System.Security.Permissions.Forwards.cs",
@@ -53,6 +53,7 @@ impl_assembly(
         "//src/libraries/System.Windows.Extensions:ref_System.Windows.Extensions",
     ],
     resx_file = "src/Resources/Strings.resx",
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     nullable = "disable",
 )
 

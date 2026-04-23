@@ -194,6 +194,8 @@ netcoreapp_impl_assembly(
         "LEGACY_GETRESOURCESTRING_USER",
     ],
     nowarn = ["CA1859", "nullable", "CS1591"],
+    resources = ["src/ILLink/ILLink.Descriptors.Shared.xml"],
+    resource_logical_names = {"ILLink.Descriptors.Shared.xml": "ILLink.Descriptors.xml"},
 )
 
 ref_impl_pair(

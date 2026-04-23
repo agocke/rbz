@@ -27,7 +27,7 @@ live_csharp_library(
     ],
     resx_file = "src/Resources/Strings.resx",
     allow_unsafe_blocks = True,
-    nullable = "annotations",
+    nullable = "enable",
     nowarn = ["1591", "CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "CP0003"],
     visibility = ["//visibility:public"],
 )
