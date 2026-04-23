@@ -33,7 +33,8 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  230 library test suites on Linux (Common,
+  238 library test suites (Common,
+  IcuAppLocal, Invariant, MetricOuterLoop, MetricOuterLoop1,
   Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
@@ -49,6 +50,7 @@ layout.
   Microsoft.Extensions.Configuration.UserSecrets,
   Microsoft.Extensions.Configuration.Xml,
   Microsoft.Extensions.DependencyInjection,
+  Microsoft.Extensions.DependencyModel,
   Microsoft.Extensions.Diagnostics,
   Microsoft.Extensions.Diagnostics.Abstractions,
   Microsoft.Extensions.FileProviders.Composite,
@@ -72,7 +74,9 @@ layout.
   System.ComponentModel.Composition.Registration,
   System.ComponentModel.EventBasedAsync, System.ComponentModel.Primitives,
   System.ComponentModel.TypeConverter, System.Composition,
-  System.Composition.Convention, System.Composition.Runtime,
+  System.Composition.Convention, System.Composition.Hosting,
+  System.Composition.Runtime,
+  System.Composition.TypedParts,
   System.Configuration.ConfigurationManager,
   System.Console, System.Data.Common, System.Data.DataSetExtensions,
   System.Data.Odbc,
@@ -152,6 +156,7 @@ layout.
   System.Security.Cryptography.OpenSsl, System.Security.Cryptography.Pkcs,
   System.Security.Cryptography.ProtectedData,
   System.Security.Cryptography.Xml,
+  System.Security.SecureString,
   System.ServiceModel.Syndication,
   System.Text.Encoding.CodePages, System.Text.Encoding.Extensions,
   System.Text.Encoding,
@@ -163,13 +168,21 @@ layout.
   System.Threading.Tasks, System.Threading.Thread, System.Threading.ThreadPool,
   System.Threading.Timer, System.Transactions.Local, System.ValueTuple,
   System.Web.HttpUtility,
+  System.Xml.Linq.Axes, System.Xml.Linq.Events, System.Xml.Linq.Misc,
+  System.Xml.Linq.Properties, System.Xml.Linq.SDMSample, System.Xml.Linq.Streaming,
+  System.Xml.Linq.TreeManipulation, System.Xml.Linq.xNodeBuilder,
+  System.Xml.Linq.xNodeReader,
+  System.Xml.Schema.Extensions,
   System.Xml.XmlSerializer.ReflectionOnly;
-  plus 6 platform-constrained test suites with BUILD files:
-  Microsoft.Win32.Registry (Windows), System.Resources.Extensions
-  (needs System.Drawing.Common), System.Resources.Extensions.BinaryFormat
-  (needs System.Drawing.Common), System.Runtime.Serialization.Formatters
-  (needs System.Drawing.Common), System.Security.AccessControl (Windows),
-  System.Security.Principal.Windows (Windows)
+  plus 8 platform-constrained test suites with BUILD files:
+  Microsoft.Win32.Registry (Windows),
+  System.Resources.Extensions (needs System.Drawing.Common),
+  System.Resources.Extensions.BinaryFormat (needs System.Drawing.Common),
+  System.Runtime.Serialization.Formatters (needs System.Drawing.Common),
+  System.Security.AccessControl (Windows),
+  System.Security.Principal.Windows (Windows),
+  System.Formats.Asn1 (Linux-only),
+  System.Security.Cryptography.OpenSsl (Linux-only)
 - **Per-component configuration**: independent debug/checked/release for
   CoreCLR and Libraries (matching MSBuild's `-rc`/`-lc` flags)
 - **Runtime layout**: `runtime_layout` rule assembles stripped binaries into
@@ -178,11 +191,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (201 Bazel targets total; 195 currently pass on Linux and 6 are platform-constrained/skipped)
-- Test helper assemblies: 36 helper/support assemblies ported to Bazel
-  (8 loader test helpers, 22 ApplyUpdate helpers, 5 Runtime test helpers,
-  TestUtilities.Unicode) — these are `csharp_library`/`csharp_binary`
-  targets that other tests depend on
+- Remaining library test equivalence diffs (274 known diffs, mostly analyzer/Strings.resx pipeline differences)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -862,12 +871,15 @@ and System.Net.Quic (msquic native library + full Linux implementation).
   or runtime-async support not yet available); all 31 async tests are `manual` because the
   `runtime-async=on` compiler feature they require is not yet supported by the Bazel-built runtime
 - [x] ~23 tests with `target_compatible_with = ["@platforms//os:windows"]` for Windows-only tests
-- [x] 165 library test targets (155 currently passing on Linux; see §1 "What Works" for the full list;
-  includes 5 platform-constrained suites: Microsoft.Win32.Registry (Windows),
+- [x] 238 library test targets (see §1 "What Works" for the full list;
+  includes 8 platform-constrained suites: Microsoft.Win32.Registry (Windows),
   System.Resources.Extensions (needs System.Drawing.Common),
+  System.Resources.Extensions.BinaryFormat (needs System.Drawing.Common),
   System.Runtime.Serialization.Formatters (needs System.Drawing.Common),
   System.Security.AccessControl (Windows),
-  System.Security.Principal.Windows (Windows))
+  System.Security.Principal.Windows (Windows),
+  System.Formats.Asn1 (Linux-only),
+  System.Security.Cryptography.OpenSsl (Linux-only))
 - [ ] Tests with CMakeProjectReference (~273 tests need native code built first)
 - [ ] Tests with ReferenceXUnitWrapperGenerator=false (~554 exe-style tests)
 - [ ] Remaining library unit tests (33 libraries still lack a Bazel test BUILD file)
