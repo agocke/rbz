@@ -1,7 +1,8 @@
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library")
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library", "gen_resx_source")
 load("//src/libraries:defs.bzl", "live_csharp_library")
+load("//src/tests:live_test.bzl", "library_test")
 
-exports_files(glob(["**/*.cs"]) + glob(["Data/**"]) + [
+exports_files(glob(["**/*.cs"]) + glob(["Data/**"]) + glob(["System/Xml/XPath/TestData/**"]) + [
     "System/DirectoryServices/LDAP.Configuration.xml",
 ])
 
@@ -126,4 +127,129 @@ live_csharp_library(
     allow_unsafe_blocks = True,
     visibility = ["//visibility:public"],
     keyfile = OPEN_SNK,
+)
+
+gen_resx_source(
+    name = "common_tests_gen_resx",
+    out = "SR.g.cs",
+    assembly_name = "Common.Tests",
+    resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
+)
+
+library_test(
+    name = "Common.Tests",
+    srcs = [
+        # Test files (unconditional)
+        "Tests/Interop/OSReleaseTests.cs",
+        "Tests/Interop/procfsTests.cs",
+        "Tests/SourceGenerators/SourceWriterTests.cs",
+        "Tests/System/Collections/Generic/ArrayBuilderTests.cs",
+        "Tests/System/IO/ConnectedStreamsTests.cs",
+        "Tests/System/IO/PathInternal.Tests.cs",
+        "Tests/System/IO/RowConfigReaderTests.cs",
+        "Tests/System/IO/StringParserTests.cs",
+        "Tests/System/Net/ArrayBufferTests.cs",
+        "Tests/System/Net/HttpDateParserTests.cs",
+        "Tests/System/Net/HttpKnownHeaderNamesTests.cs",
+        "Tests/System/Net/MultiArrayBufferTests.cs",
+        "Tests/System/Net/aspnetcore/Http2/DynamicTableTest.cs",
+        "Tests/System/Net/aspnetcore/Http2/HPackDecoderTest.cs",
+        "Tests/System/Net/aspnetcore/Http2/HPackIntegerTest.cs",
+        "Tests/System/Net/aspnetcore/Http2/HuffmanDecodingTests.cs",
+        "Tests/System/Net/aspnetcore/Http3/VariableLengthIntegerHelperTests.cs",
+        "Tests/System/PasteArgumentsTests.cs",
+        "Tests/System/Security/IdentityHelperTests.cs",
+        "Tests/System/Text/SimpleRegexTests.cs",
+        "Tests/System/Text/ValueStringBuilderTests.cs",
+        # Local source files
+        "System/IO/ConnectedStreams.cs",
+        "System/Net/Sockets/Fletcher32.cs",
+        # Common test sources
+        "//src/libraries/Common/tests:System/Collections/DictionaryExtensions.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/ByteUtils.cs",
+        # Common production source files
+        "//src/libraries/Common:src/SourceGenerators/SourceWriter.cs",
+        "//src/libraries/Common:src/System/CharArrayHelpers.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ArrayBuilder.cs",
+        "//src/libraries/Common:src/System/IO/PathInternal.CaseSensitivity.cs",
+        "//src/libraries/Common:src/System/IO/PathInternal.cs",
+        "//src/libraries/Common:src/System/IO/RowConfigReader.cs",
+        "//src/libraries/Common:src/System/IO/StringParser.cs",
+        "//src/libraries/Common:src/System/Net/ArrayBuffer.cs",
+        "//src/libraries/Common:src/System/Net/HttpDateParser.cs",
+        "//src/libraries/Common:src/System/Net/HttpKnownHeaderNames.cs",
+        "//src/libraries/Common:src/System/Net/HttpKnownHeaderNames.TryGetHeaderName.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/IHttpStreamHeadersHandler.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/DynamicTable.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/HeaderField.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/HPackDecoder.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/HPackDecodingException.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/HPackEncoder.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/HPackEncodingException.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/Huffman.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/HuffmanDecodingException.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/IntegerDecoder.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/IntegerEncoder.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/H2StaticTable.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/H2StaticTable.Http2.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http2/Hpack/StatusCodes.cs",
+        "//src/libraries/Common:src/System/Net/Http/aspnetcore/Http3/Helpers/VariableLengthIntegerHelper.cs",
+        "//src/libraries/Common:src/System/Net/Logging/NetEventSource.Common.cs",
+        "//src/libraries/Common:src/System/Net/MultiArrayBuffer.cs",
+        "//src/libraries/Common:src/System/Net/StreamBuffer.cs",
+        "//src/libraries/Common:src/System/Obsoletions.cs",
+        "//src/libraries/Common:src/System/Security/IdentityHelper.cs",
+        "//src/libraries/Common:src/System/Text/SimpleRegex.cs",
+        "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
+        # CoreLib shared sources
+        "//src/libraries/System.Private.CoreLib:src/System/PasteArguments.cs",
+        "//src/libraries/System.Private.CoreLib:src/System/PasteArguments.Unix.cs",
+        # Unix/Linux-specific common sources
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.UnixFileSystemTypes.cs",
+        "//src/libraries/Common:src/System/IO/PathInternal.Unix.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.PathConf.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MountPoints.FormatInfo.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.RealPath.cs",
+        "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcMountInfo.cs",
+        "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",
+        "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
+        "//src/libraries/Common:src/Interop/Linux/Interop.Libraries.cs",
+        "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcFsStat.cs",
+        "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcFsStat.TryReadStatusFile.cs",
+        "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcMountInfo.TryParseMountInfoLine.cs",
+        "//src/libraries/Common:src/Interop/Linux/os-release/Interop.OSReleaseFile.cs",
+        # Linux-specific test files
+        "Tests/Interop/cgroupsTests.cs",
+        "//src/libraries/Common:src/Interop/Linux/cgroups/Interop.cgroups.cs",
+        # Unix-specific test files
+        "Tests/System/IO/PathInternal.Unix.Tests.cs",
+        # SR resource support
+        "//src/libraries/Common:src/System/SR.cs",
+        ":common_tests_gen_resx",
+    ],
+    deps = [
+        "//src/libraries/System.IO.FileSystem.DriveInfo:ref_System.IO.FileSystem.DriveInfo",
+        "//src/libraries/System.Diagnostics.Tracing:ref_System.Diagnostics.Tracing",
+        "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",
+        "//src/libraries/System.Net.Http:ref_System.Net.Http",
+        "//src/libraries/System.Net.Sockets:ref_System.Net.Sockets",
+        "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
+        "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
+        "//src/libraries/Common/tests:StreamConformanceTests",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.codeanalysis.common",
+        "@paket.main//microsoft.codeanalysis.csharp.workspaces",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+        "@paket.main//microsoft.dotnet.xunitassert",
+        "@paket.main//microsoft.dotnet.xunitextensions",
+        "@paket.main//xunit.abstractions",
+        "@paket.main//xunit.extensibility.core",
+    ],
+    allow_unsafe_blocks = True,
+    keyfile = OPEN_SNK,
+    size = "large",
 )

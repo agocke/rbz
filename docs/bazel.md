@@ -33,7 +33,8 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  211 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  219 library test suites on Linux (Common,
+  Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -74,11 +75,16 @@ layout.
   System.Composition.Convention, System.Composition.Runtime,
   System.Configuration.ConfigurationManager,
   System.Console, System.Data.Common, System.Data.DataSetExtensions,
+  System.Data.Odbc,
   System.Diagnostics.Contracts, System.Diagnostics.Debug,
-  System.Diagnostics.DiagnosticSource, System.Diagnostics.FileVersionInfo,
+  System.Diagnostics.DiagnosticSource,
+  System.Diagnostics.DiagnosticSource (MetricOuterLoop),
+  System.Diagnostics.DiagnosticSource (MetricOuterLoop1),
+  System.Diagnostics.FileVersionInfo,
   System.Diagnostics.Process, System.Diagnostics.Tools,
   System.Diagnostics.StackTrace, System.Diagnostics.TextWriterTraceListener,
   System.Diagnostics.TraceSource, System.Diagnostics.Tracing,
+  System.DirectoryServices.Protocols,
   System.Drawing.Primitives, System.Dynamic.Runtime,
   System.Formats.Asn1, System.Formats.Cbor,
   System.Formats.Nrbf, System.Formats.Tar, System.Globalization.Calendars,
@@ -89,7 +95,7 @@ layout.
   System.IO.FileSystem,
   System.IO.FileSystem.Watcher, System.IO.Hashing, System.IO.IsolatedStorage,
   System.IO.MemoryMappedFiles, System.IO.UnmanagedMemoryStream,
-  System.IO.Packaging, System.IO.Pipelines, System.IO.Pipes, System.Linq,
+  System.IO.Packaging, System.IO.Pipelines, System.IO.Pipes, System.IO.Ports, System.Linq,
   System.Linq.AsyncEnumerable, System.Linq.Expressions,
   System.Linq.Parallel, System.Linq.Queryable, System.Memory,
   System.Memory.Data, System.Net.Http (EnterpriseTests),
@@ -99,6 +105,7 @@ layout.
   System.Net.NameResolution, System.Net.NameResolution (PalTests),
   System.Net.NetworkInformation, System.Net.Ping, System.Net.Primitives,
   System.Net.Primitives (PalTests), System.Net.Primitives (UnitTests),
+  System.Net.Quic (FunctionalTests),
   System.Net.Requests, System.Net.Security (EnterpriseTests),
   System.Net.Security (FunctionalTests), System.Net.Security (UnitTests),
   System.Net.ServerSentEvents, System.Net.ServicePoint,
@@ -132,7 +139,7 @@ layout.
   System.Runtime.Serialization.Xml.Canonicalization,
   System.Runtime.Serialization.Xml.ReflectionOnly,
   System.Security.Claims, System.Security.Cryptography,
-  System.Security.Cryptography.Cose,
+  System.Security.Cryptography.Cose, System.Security.Cryptography.Csp,
   System.Security.Cryptography.OpenSsl, System.Security.Cryptography.Pkcs,
   System.Security.Cryptography.ProtectedData,
   System.Security.Cryptography.Xml,
@@ -148,8 +155,9 @@ layout.
   System.Threading.Timer, System.Transactions.Local, System.ValueTuple,
   System.Web.HttpUtility,
   System.Xml.XmlSerializer.ReflectionOnly;
-  plus 5 platform-constrained test suites with BUILD files:
+  plus 6 platform-constrained test suites with BUILD files:
   Microsoft.Win32.Registry (Windows), System.Resources.Extensions
+  (needs System.Drawing.Common), System.Resources.Extensions.BinaryFormat
   (needs System.Drawing.Common), System.Runtime.Serialization.Formatters
   (needs System.Drawing.Common), System.Security.AccessControl (Windows),
   System.Security.Principal.Windows (Windows)
@@ -161,7 +169,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (194 Bazel targets total; 189 currently pass on Linux and 5 are platform-constrained/skipped)
+- Library unit tests (199 Bazel targets total; 193 currently pass on Linux and 6 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))

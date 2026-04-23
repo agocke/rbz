@@ -132,6 +132,7 @@ match  System.Runtime.Loader
 match  System.Runtime.Numerics
 diff   System.Runtime.Serialization
 diff   System.Runtime.Serialization.Formatters
+diff   System.Runtime.Serialization.Formatters.Tests
 diff   System.Runtime.Serialization.Json
 diff   System.Runtime.Serialization.Primitives
 diff   System.Runtime.Serialization.Xml
@@ -142,6 +143,7 @@ match  System.Security.Cryptography
 diff   System.Security.Cryptography.Algorithms
 diff   System.Security.Cryptography.Cng
 diff   System.Security.Cryptography.Csp
+diff   System.Security.Cryptography.Csp.Tests
 diff   System.Security.Cryptography.Encoding
 diff   System.Security.Cryptography.OpenSsl
 diff   System.Security.Cryptography.Primitives
@@ -198,6 +200,7 @@ diff   ApplicationNameSetFromArgument
 diff   BuildWebHostInvalidSignature
 diff   BuildWebHostPatternTestSite
 diff   CollectibleAssembly
+diff   Common.Tests
 diff   CreateHostBuilderInvalidSignature
 diff   CreateHostBuilderPatternTestSite
 diff   CreateWebHostBuilderInvalidSignature
@@ -342,11 +345,14 @@ diff   System.Configuration.ConfigurationManager.Tests
 diff   System.Console.Tests
 diff   System.Data.Common.Tests
 diff   System.Data.DataSetExtensions.Tests
+diff   System.Data.Odbc.Tests
 diff   System.Data.Odbc
 diff   System.Data.OleDb
 diff   System.Diagnostics.Contracts.Tests
 diff   System.Diagnostics.Debug.Tests
 diff   System.Diagnostics.DiagnosticSource.Tests
+diff   MetricOuterLoop.Tests
+diff   MetricOuterLoop1.Tests
 diff   System.Diagnostics.EventLog
 diff   System.Diagnostics.FileVersionInfo.TestAssembly
 diff   System.Diagnostics.FileVersionInfo.Tests
@@ -360,6 +366,7 @@ diff   System.Diagnostics.Tracing.Tests
 diff   System.DirectoryServices
 diff   System.DirectoryServices.AccountManagement
 diff   System.DirectoryServices.Protocols
+diff   System.DirectoryServices.Protocols.Tests
 match  System.Dynamic.Runtime.Tests
 diff   System.Drawing.Primitives.Tests
 diff   System.Formats.Asn1.Tests
@@ -388,6 +395,7 @@ diff   System.IO.Pipelines.Tests
 diff   System.IO.Pipes.Tests
 diff   System.IO.UnmanagedMemoryStream.Tests
 diff   System.IO.Ports
+diff   System.IO.Ports.Tests
 match  System.IO.Tests
 diff   System.Linq.AsyncEnumerable.Tests
 diff   System.Linq.Expressions.Tests
@@ -414,6 +422,7 @@ diff   System.Net.Ping.Functional.Tests
 diff   System.Net.Primitives.Functional.Tests
 match  System.Net.Primitives.Pal.Tests
 diff   System.Net.Primitives.UnitTests.Tests
+diff   System.Net.Quic.Functional.Tests
 diff   System.Net.Requests.Tests
 match  System.Net.Security.Enterprise.Tests
 diff   System.Net.Security.Tests
@@ -452,6 +461,8 @@ diff   System.Reflection.InvokeEmit.Tests
 diff   System.Reflection.InvokeInterpreted.Tests
 diff   System.Reflection.TypeExtensions.Tests
 diff   System.Resources.Extensions
+diff   System.Resources.Extensions.BinaryFormat.Tests
+diff   System.Resources.Extensions.Tests
 match  System.Resources.Reader.Tests
 diff   System.Resources.ResourceManager.Tests
 diff   System.Resources.Writer.Tests
