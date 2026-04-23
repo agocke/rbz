@@ -445,7 +445,11 @@ diff   System.Reflection.Extensions.Tests
 diff   System.Reflection.Metadata.Tests
 diff   System.Reflection.MetadataLoadContext
 diff   System.Reflection.MetadataLoadContext.Tests
+diff   System.Reflection.CoreCLR.Tests
+diff   System.Reflection.TestExe
 diff   System.Reflection.Tests
+diff   System.Reflection.InvokeEmit.Tests
+diff   System.Reflection.InvokeInterpreted.Tests
 diff   System.Reflection.TypeExtensions.Tests
 diff   System.Resources.Extensions
 match  System.Resources.Reader.Tests
@@ -473,6 +477,8 @@ diff   System.Runtime.Serialization.Schema.Tests
 diff   System.Runtime.Serialization.Xml.Tests
 diff   System.Runtime.Serialization.Xml.Canonicalization.Tests
 diff   System.Runtime.Serialization.Xml.ReflectionOnly.Tests
+diff   System.Runtime.ReflectionInvokeEmit.Tests
+diff   System.Runtime.ReflectionInvokeInterpreted.Tests
 diff   System.Runtime.Tests
 diff   System.Security.Claims.Tests
 diff   System.Security.Cryptography.Cose

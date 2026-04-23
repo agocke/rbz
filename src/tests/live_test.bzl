@@ -309,6 +309,12 @@ def _generate_runtimeconfigs(ctx, dll, tfm, sdk_version, additional_runfiles):
        Microsoft.DotNet.RemoteExecutor.dll" so it resolves libhostpolicy.so from
        the testhost's shared framework directory.
     """
+
+    # Build additional configProperties from the runtimeconfig_properties attribute.
+    extra_props = ""
+    for key, value in ctx.attr.runtimeconfig_properties.items():
+        extra_props += ',\n      "{}": {}'.format(key, value)
+
     runtimeconfig_content = """\
 {{
   "runtimeOptions": {{
@@ -318,11 +324,11 @@ def _generate_runtimeconfigs(ctx, dll, tfm, sdk_version, additional_runfiles):
       "version": "{version}"
     }},
     "configProperties": {{
-      "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false
+      "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false{extra_props}
     }}
   }}
 }}
-""".format(tfm = tfm, version = sdk_version)
+""".format(tfm = tfm, version = sdk_version, extra_props = extra_props)
 
     # Always generate a runtimeconfig for the test assembly itself.
     test_name = dll.basename.replace(".dll", "")
@@ -578,6 +584,11 @@ _xunit_library_test = rule(
                       "Needed for tests that modify files next to the assembly (e.g. PDB rename). " +
                       "Off by default to avoid the copy overhead.",
                 default = False,
+            ),
+            "runtimeconfig_properties": attr.string_dict(
+                doc = "Additional configProperties for runtimeconfig.json. " +
+                      "Keys are property names, values are JSON literals (e.g. 'true', '\"string\"').",
+                default = {},
             ),
         }),
     test = True,

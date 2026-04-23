@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  206 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  211 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -107,9 +107,10 @@ layout.
   System.Numerics.Tensors, System.Numerics.Vectors, System.ObjectModel,
   System.Private.Uri, System.Private.Uri (ExtendedFunctionalTests),
   System.Private.Uri (UnitTests), System.Private.Xml.Linq,
-  System.Reflection.Context, System.Reflection.DispatchProxy, System.Reflection.Emit,
+  System.Reflection.Context, System.Reflection.CoreCLR, System.Reflection.DispatchProxy, System.Reflection.Emit,
   System.Reflection.Emit.ILGeneration, System.Reflection.Emit.Lightweight,
-  System.Reflection.Extensions, System.Reflection.Metadata,
+  System.Reflection.Extensions, System.Reflection.InvokeEmit,
+  System.Reflection.InvokeInterpreted, System.Reflection.Metadata,
   System.Reflection.MetadataLoadContext, System.Reflection.TypeExtensions,
   System.Reflection,
   System.Resources.Reader, System.Resources.ResourceManager, System.Resources.Writer,
@@ -122,7 +123,8 @@ layout.
   System.Runtime.Loader, System.Runtime.Loader.DefaultContext,
   System.Runtime.Loader.RefEmitLoadContext,
   System.Runtime.Numerics,
-  System.Runtime,
+  System.Runtime, System.Runtime.ReflectionInvokeEmit,
+  System.Runtime.ReflectionInvokeInterpreted,
   System.Runtime.Serialization.Json,
   System.Runtime.Serialization.Json.ReflectionOnly,
   System.Runtime.Serialization.Primitives, System.Runtime.Serialization.Schema,
@@ -839,7 +841,7 @@ and System.Net.Quic (msquic native library + full Linux implementation).
   or runtime-async support not yet available); all 31 async tests are `manual` because the
   `runtime-async=on` compiler feature they require is not yet supported by the Bazel-built runtime
 - [x] ~23 tests with `target_compatible_with = ["@platforms//os:windows"]` for Windows-only tests
-- [x] 160 library test targets (155 currently passing on Linux; see §1 "What Works" for the full list;
+- [x] 165 library test targets (155 currently passing on Linux; see §1 "What Works" for the full list;
   includes 5 platform-constrained suites: Microsoft.Win32.Registry (Windows),
   System.Resources.Extensions (needs System.Drawing.Common),
   System.Runtime.Serialization.Formatters (needs System.Drawing.Common),
