@@ -1,25 +1,22 @@
 exports_files(["Assembly1.cs"])
 
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_binary")
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library")
 
-csharp_binary(
+csharp_library(
     name = "System.Diagnostics.FileVersionInfo.TestAssembly",
     srcs = ["Assembly1.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
+    keyfile = OPEN_SNK,
+    nullable = "annotations",
     nowarn = [
-        # Directory.Build.props global NoWarn
-        "CS8500",
-        "CS8969",
-        "IDE0060",
-        "IDE0100",
-        # Arcade SDK global NoWarn
-        "CS1705",
-        "NU5105",
         # Directory.Build.props IsTestProject NoWarn
         "SYSLIB0011",
         "SYSLIB0050",
         "SYSLIB0051",
-        "IL2121",  "1701", "1702"],
+        "IL2121",
+    ],
+    msbuild_analyzer_config = "style",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     visibility = ["//src/libraries/System.Diagnostics.FileVersionInfo/tests:__subpackages__"],
     deps = [
         "//src/libraries:ref_System.Runtime",

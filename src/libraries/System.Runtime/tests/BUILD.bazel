@@ -253,6 +253,7 @@ library_test(
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/Common/tests:TestUtilities",
     ] + XUNIT_DEPS,
+    os_targeted = "unix",
     keyfile = OPEN_SNK,
     size = "small",
 )
@@ -731,6 +732,16 @@ csharp_library(
     srcs = ["System.Reflection.Tests/TestExe/Program.cs"],
     target_frameworks = ["net10.0"],
     keyfile = OPEN_SNK,
+    nullable = "annotations",
+    nowarn = [
+        "IL2121",
+        "SYSLIB0011",
+        "SYSLIB0050",
+        "SYSLIB0051",
+    ],
+    msbuild_analyzer_config = "style",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    include_default_ruleset = False,
 )
 
 # NOTE: System.Reflection.CoreCLR.Tests depends on TestExe as a project
@@ -943,6 +954,7 @@ library_test(
     runtimeconfig_properties = {
         "System.IO.DisableFileLocking": "true",
     },
+    os_targeted = "unix",
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
     size = "large",
