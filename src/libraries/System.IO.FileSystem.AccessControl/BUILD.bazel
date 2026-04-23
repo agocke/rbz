@@ -27,6 +27,8 @@ netcoreapp_impl_assembly(
             "//src/libraries/System.Collections.NonGeneric:ref_System.Collections.NonGeneric",
         "//src/libraries/System.Memory:ref_System.Memory",
 ],
-    nullable = "annotations",
+    nullable = "enable",
     supported_os_platforms_short = ["windows"],
+    include_editorconfig = False,
+    library_import_generator = False,
 )

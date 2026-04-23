@@ -32,7 +32,8 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
     ],
     resx_file = "src/Resources/Strings.resx",
-    nullable = "annotations",
+    nullable = "enable",
     supported_os_platforms_short = ["windows"],
     include_dll_safe_search_path = True,
+    include_editorconfig = False,
 )

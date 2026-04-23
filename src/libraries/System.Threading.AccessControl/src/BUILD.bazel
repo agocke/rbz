@@ -22,6 +22,7 @@ netcoreapp_impl_assembly(
     resx_file = "Resources/Strings.resx",
     supported_os_platforms_short = ["windows"],
     include_dll_safe_search_path = True,
-    nullable = "annotations",
+    nullable = "enable",
+    include_editorconfig = False,
     assembly_description = "Provides support for managing access and audit control lists for synchronization primitives.\n\nCommonly Used Types:\nSystem.Security.AccessControl.EventWaitHandleAccessRule\nSystem.Security.AccessControl.EventWaitHandleAuditRule\nSystem.Security.AccessControl.MutexAccessRule\nSystem.Security.AccessControl.MutexAuditRule\nSystem.Security.AccessControl.MutexSecurity\nSystem.Security.AccessControl.SemaphoreAccessRule\nSystem.Security.AccessControl.SemaphoreAuditRule\nSystem.Security.AccessControl.SemaphoreSecurity",
 )

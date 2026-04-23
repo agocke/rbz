@@ -30,5 +30,6 @@ netcoreapp_impl_assembly(
     ],
     resx_file = "src/Resources/Strings.resx",
     supported_os_platforms_short = ["windows"],
-    nullable = "annotations",
+    nullable = "enable",
+    include_editorconfig = False,
 )
