@@ -554,3 +554,5 @@ match  ILCompiler.Reflection.ReadyToRun
 diff   System.Text.Json.SourceGeneration
 diff   TestUtilities
 diff Microsoft.Extensions.DependencyModel.Tests
+diff System.Private.Xml.Tests
+diff System.Text.Json.Tests

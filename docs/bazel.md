@@ -33,7 +33,7 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  219 library test suites on Linux (Common,
+  221 library test suites on Linux (Common,
   Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
@@ -113,7 +113,7 @@ layout.
   System.Net.WebProxy, System.Net.WebSockets, System.Net.WebSockets.Client,
   System.Numerics.Tensors, System.Numerics.Vectors, System.ObjectModel,
   System.Private.Uri, System.Private.Uri (ExtendedFunctionalTests),
-  System.Private.Uri (UnitTests), System.Private.Xml.Linq,
+  System.Private.Uri (UnitTests), System.Private.Xml, System.Private.Xml.Linq,
   System.Reflection.Context, System.Reflection.CoreCLR, System.Reflection.DispatchProxy, System.Reflection.Emit,
   System.Reflection.Emit.ILGeneration, System.Reflection.Emit.Lightweight,
   System.Reflection.Extensions, System.Reflection.InvokeEmit,
@@ -146,7 +146,7 @@ layout.
   System.ServiceModel.Syndication,
   System.Text.Encoding.CodePages, System.Text.Encoding.Extensions,
   System.Text.Encoding,
-  System.Text.Encodings.Web, System.Text.RegularExpressions,
+  System.Text.Encodings.Web, System.Text.Json, System.Text.RegularExpressions,
   System.Text.RegularExpressions (UnitTests),
   System.Threading, System.Threading.Channels, System.Threading.Overlapped,
   System.Threading.RateLimiting, System.Threading.Tasks.Dataflow,
@@ -169,7 +169,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (199 Bazel targets total; 193 currently pass on Linux and 6 are platform-constrained/skipped)
+- Library unit tests (201 Bazel targets total; 195 currently pass on Linux and 6 are platform-constrained/skipped)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))

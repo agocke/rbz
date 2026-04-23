@@ -1,6 +1,15 @@
 load("//src/libraries:defs.bzl", "netcoreapp_impl_assembly")
 
-exports_files(["src/ILLink/ILLink.Descriptors.LibraryBuild.xml"])
+exports_files([
+    "src/ILLink/ILLink.Descriptors.LibraryBuild.xml",
+    "src/Utils/DTDs/XHTML10/no_comments/xhtml1-frameset.dtd",
+    "src/Utils/DTDs/XHTML10/no_comments/xhtml1-strict.dtd",
+    "src/Utils/DTDs/XHTML10/no_comments/xhtml1-transitional.dtd",
+    "src/Utils/DTDs/XHTML10/no_comments/xhtml-lat1.ent",
+    "src/Utils/DTDs/XHTML10/no_comments/xhtml-special.ent",
+    "src/Utils/DTDs/XHTML10/no_comments/xhtml-symbol.ent",
+    "src/Utils/DTDs/RSS091/no_comments/rss-0.91.dtd",
+])
 
 netcoreapp_impl_assembly(
     name = "impl_System.Private.Xml",
