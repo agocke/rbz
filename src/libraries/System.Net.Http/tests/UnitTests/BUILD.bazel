@@ -239,6 +239,8 @@ library_test(
         "FxResources.System.Net.Http.Unit.Tests.SR.resources": "FxResources.System.Net.Http.Unit.Tests.SR.resources",
     },
     allow_unsafe_blocks = True,
+    os_targeted = "unix",
     keyfile = OPEN_SNK,
     size = "large",
+)
 )

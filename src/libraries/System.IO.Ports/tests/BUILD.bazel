@@ -27,5 +27,6 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
+    os_targeted = True,
     keyfile = OPEN_SNK,
 )

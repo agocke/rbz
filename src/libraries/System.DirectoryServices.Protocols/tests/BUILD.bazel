@@ -27,5 +27,6 @@ library_test(
     data = [
         "//src/libraries/Common/tests:System/DirectoryServices/LDAP.Configuration.xml",
     ],
+    os_targeted = True,
     keyfile = OPEN_SNK,
 )
