@@ -354,7 +354,7 @@ match  System.Diagnostics.DiagnosticSource.Tests
 match  MetricOuterLoop.Tests
 match  MetricOuterLoop1.Tests
 match  System.Diagnostics.EventLog
-match  System.Diagnostics.FileVersionInfo.TestAssembly
+diff   System.Diagnostics.FileVersionInfo.TestAssembly
 match  System.Diagnostics.FileVersionInfo.Tests
 match  System.Diagnostics.PerformanceCounter
 match  System.Diagnostics.Process.Tests
