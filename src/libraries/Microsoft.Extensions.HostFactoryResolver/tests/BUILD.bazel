@@ -39,7 +39,7 @@ live_csharp_library(
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
-    nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
+    nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "CS8603", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     nullable = "enable",
     treat_warnings_as_errors = True,
     warnings_not_as_errors = ["NU1901", "NU1902", "NU1903", "NU1904"],

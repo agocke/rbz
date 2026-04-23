@@ -18,7 +18,7 @@ diff   Microsoft.CSharp
 match  Microsoft.VisualBasic
 match  Microsoft.Win32.Primitives
 match  Microsoft.Win32.Registry
-diff   System
+match    System
 match  System.AppContext
 match  System.Buffers
 match  System.Buffers.Tests
@@ -35,7 +35,7 @@ match  System.ComponentModel.Primitives
 match  System.ComponentModel.TypeConverter
 match  System.Configuration
 match  System.Console
-diff   System.Core
+match    System.Core
 match  System.Data
 match  System.Data.Common
 match  System.Data.DataSetExtensions
@@ -72,7 +72,7 @@ match  System.IO.MemoryMappedFiles
 match  System.IO.Pipelines
 match  System.IO.Pipes
 match  System.IO.Pipes.AccessControl
-diff   System.IO.UnmanagedMemoryStream
+match    System.IO.UnmanagedMemoryStream
 diff   System.Linq
 match  System.Linq.AsyncEnumerable
 match  System.Linq.Expressions
@@ -150,7 +150,7 @@ match  System.Security.Cryptography.Primitives
 match  System.Security.Cryptography.X509Certificates
 match  System.Security.Principal
 match  System.Security.Principal.Windows
-diff   System.Security.SecureString
+match    System.Security.SecureString
 match  System.ServiceModel.Web
 match  System.ServiceProcess
 match  System.Text.Encoding
@@ -187,8 +187,8 @@ match  System.Xml.XmlDocument
 match  System.Xml.XmlSerializer
 match  System.Xml.XmlSerializer.ReflectionOnly.Tests
 match  WindowsBase
-diff   mscorlib
-diff   netstandard
+match    mscorlib
+match    netstandard
 
 # ── Non-archive assemblies ─────────────────────────────────────────
 # These assemblies are built but not shipped in the runtime archive.
@@ -341,7 +341,7 @@ match  System.Composition.Tests
 match  System.Composition.TypedParts
 match  System.Composition.TypedParts.Tests
 match  System.Configuration.ConfigurationManager
-diff   System.Configuration.ConfigurationManager.Tests
+match    System.Configuration.ConfigurationManager.Tests
 diff   System.Console.Tests
 match  System.Data.Common.Tests
 match  System.Data.DataSetExtensions.Tests
@@ -362,7 +362,7 @@ match  System.Diagnostics.StackTrace.Tests
 match  System.Diagnostics.Tools.Tests
 match  System.Diagnostics.TextWriterTraceListener.Tests
 match  System.Diagnostics.TraceSource.Tests
-diff   System.Diagnostics.Tracing.Tests
+match    System.Diagnostics.Tracing.Tests
 match  System.DirectoryServices
 match  System.DirectoryServices.AccountManagement
 diff   System.DirectoryServices.Protocols
@@ -402,19 +402,19 @@ match  System.Linq.Expressions.Tests
 match  System.Linq.Parallel.Tests
 match  System.Linq.Queryable.Tests
 match  System.Linq.Tests
-diff   System.Management
+match    System.Management
 match  System.Memory.Data
 match  System.Memory.Data.Tests
 match  System.Memory.Tests
 match  System.Net.Http.Enterprise.Tests
 match  System.Net.Http.Functional.Tests
-diff   System.Net.Http.WinHttpHandler
+match    System.Net.Http.WinHttpHandler
 match  System.Net.Http.Json.Functional.Tests
-diff   System.Net.Http.Json.Unit.Tests
+match    System.Net.Http.Json.Unit.Tests
 match  System.Net.Http.Unit.Tests
 diff   System.Net.HttpListener.Tests
 match  System.Net.Mail.Functional.Tests
-diff   System.Net.Mail.Unit.Tests
+match    System.Net.Mail.Unit.Tests
 match  System.Net.NameResolution.Functional.Tests
 diff   System.Net.NameResolution.Pal.Tests
 diff   System.Net.NetworkInformation.Functional.Tests
@@ -506,7 +506,7 @@ match  System.Security.SecureString.Tests
 diff   System.Security.Permissions
 match  System.ServiceModel.Syndication
 match  System.ServiceModel.Syndication.Tests
-diff   System.ServiceProcess.ServiceController
+match    System.ServiceProcess.ServiceController
 diff   System.Speech
 match  System.Text.Encoding.CodePages.Tests
 match  System.Text.Encoding.Extensions.Tests

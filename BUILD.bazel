@@ -6,11 +6,13 @@ load("//eng/bazel:runtime_layout.bzl", "runtime_layout")
 load("//eng/bazel:version.bzl", "PRODUCT_VERSION", "PRODUCT_VERSION_FULL")
 load(
     "//:defs.bzl",
+    "BANNEDAPI_ANALYZERS_REPO",
     "CODEANALYSIS_ANALYZERS_REPO",
     "CODEANALYSIS_CSHARP_CODESTYLE_REPO",
     "CODEANALYSIS_NETANALYZERS_REPO",
     "DOTNET_CODEANALYSIS_REPO",
     "MIBC_FILES",
+    "STATICCS_REPO",
     "STYLECOP_ANALYZERS_UNSTABLE_REPO",
     "XUNIT_ANALYZERS_REPO",
 )
@@ -102,6 +104,31 @@ import_library(
     library_name = "XunitTestAnalyzers",
     refs = xunit_test_analyzer_files,
     libs = xunit_test_analyzer_files,
+    visibility = ["//visibility:public"],
+)
+
+staticcs_analyzer_files = [
+    "@{}//:analyzers/dotnet/cs/StaticCs.Analyzers.dll".format(STATICCS_REPO),
+]
+
+import_library(
+    name = "staticcs_analyzers",
+    library_name = "StaticCsAnalyzers",
+    refs = staticcs_analyzer_files,
+    libs = staticcs_analyzer_files,
+    visibility = ["//visibility:public"],
+)
+
+bannedapi_analyzer_files = [
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.BannedApiAnalyzers.dll".format(BANNEDAPI_ANALYZERS_REPO),
+    "@{}//:analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.BannedApiAnalyzers.dll".format(BANNEDAPI_ANALYZERS_REPO),
+]
+
+import_library(
+    name = "bannedapi_analyzers",
+    library_name = "BannedApiAnalyzers",
+    refs = bannedapi_analyzer_files,
+    libs = bannedapi_analyzer_files,
     visibility = ["//visibility:public"],
 )
 

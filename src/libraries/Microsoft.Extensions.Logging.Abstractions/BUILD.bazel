@@ -1,8 +1,43 @@
+load("//:defs.bzl", "csharp_library")
 load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Extensions.Logging.Abstractions.cs",
 ])
+
+# Source generator: Microsoft.Extensions.Logging.Generators
+# Used by System.Diagnostics.Tracing.Tests.
+csharp_library(
+    name = "LoggingGenerators",
+    out = "Microsoft.Extensions.Logging.Generators",
+    srcs = glob(["gen/**/*.cs"], exclude = ["gen/LoggerMessageGenerator.Roslyn3.11.cs"]) + [
+        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
+        "//src/libraries/Common:src/Roslyn/DiagnosticDescriptorHelper.cs",
+        "//src/libraries/Common:src/Roslyn/GetBestTypeByMetadataName.cs",
+        "//src/libraries/Common:src/System/SR.cs",
+    ],
+    target_frameworks = ["netstandard2.0"],
+    langversion = "preview",
+    cls_compliant = False,
+    defines = ["ROSLYN4_0_OR_GREATER", "ROSLYN4_4_OR_GREATER"],
+    deps = [
+        "@paket.main//microsoft.codeanalysis.common",
+        "@paket.main//microsoft.codeanalysis.csharp",
+        "@paket.main//microsoft.codeanalysis.csharp.workspaces",
+        "@paket.main//system.buffers",
+        "@paket.main//system.collections.immutable",
+        "@paket.main//system.memory",
+    ],
+    nullable = "annotations",
+    resx_file = "gen/Resources/Strings.resx",
+    nowarn = [
+        "CS1572",
+        "CS1574",
+        "CS1734",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 netcoreapp_ref_assembly(
     name = "ref_Microsoft.Extensions.Logging.Abstractions",

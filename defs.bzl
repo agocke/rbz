@@ -31,6 +31,8 @@ CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codest
 DOTNET_CODEANALYSIS_REPO = "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26170.102"
 STYLECOP_ANALYZERS_UNSTABLE_REPO = "nuget.stylecop.analyzers.unstable.v1.2.0.556"
 XUNIT_ANALYZERS_REPO = "nuget.xunit.analyzers.v1.22.0"
+STATICCS_REPO = "nuget.staticcs.v0.2.0"
+BANNEDAPI_ANALYZERS_REPO = "nuget.microsoft.codeanalysis.bannedapianalyzers.v3.3.5-beta1.23270.2"
 
 # ─── Pre-built labels for commonly used assets ───────────────────────────────
 # SNK signing keys are copied to a stable path in //eng:snk/ (via copy_file)

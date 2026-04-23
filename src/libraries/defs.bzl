@@ -336,6 +336,7 @@ def impl_assembly(
     analyzer_configs = [],
     analyzers = [],
     library_import_generator = True,
+    interop_source_generation = None,
     com_interface_generator = False,
     jsimport_generator = True,
     include_editorconfig = True,
@@ -541,6 +542,12 @@ EOF""".format(version = PRODUCT_VERSION),
     # the assembly's dependency on System.Runtime.InteropServices / CoreLib
     # (matching eng/generators.targets). JSImportGenerator is separate because
     # MSBuild flows it through the targeting-pack analyzer set for OOB builds.
+    #
+    # interop_source_generation defaults to library_import_generator when not
+    # set explicitly (None).  Callers that need SourceGeneration without
+    # LibraryImportGenerator (e.g. shim/facade assemblies) can pass
+    # interop_source_generation = True, library_import_generator = False.
+    _interop_source_generation = interop_source_generation if interop_source_generation != None else library_import_generator
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
@@ -548,6 +555,9 @@ EOF""".format(version = PRODUCT_VERSION),
     if library_import_generator:
         _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
+        ]
+    if _interop_source_generation:
+        _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
         ]
     if com_interface_generator:
