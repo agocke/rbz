@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Win32.Registry.AccessControl.cs",
@@ -20,6 +20,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Win32.Registry.AccessControl",
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     com_interface_generator = True,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_RegistryAccessControl",

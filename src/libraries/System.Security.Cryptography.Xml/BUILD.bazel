@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
 load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
@@ -20,6 +20,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Security.Cryptography.Xml",
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     com_interface_generator = True,
     keyfile = OPEN_SNK,
     srcs = [

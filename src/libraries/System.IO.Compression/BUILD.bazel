@@ -95,8 +95,7 @@ netcoreapp_impl_assembly(
     resx_file = "src/Resources/Strings.resx",
     supported_os_platforms = ["unix"],
     keyfile = ECMA_SNK,
-    library_import_generator = False,
-)
+    )
 
 ref_impl_pair(
     name = "live_System.IO.Compression",

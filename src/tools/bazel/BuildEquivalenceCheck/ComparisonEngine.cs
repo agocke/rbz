@@ -430,6 +430,14 @@ public static class ComparisonEngine
         "/utf8output",
         // Bazel output formatting default not emitted by MSBuild
         "/nologo",
+        // rules_dotnet always emits /optimize+ in release mode; MSBuild omits
+        // the flag (optimizer is on by default).  Not a semantic difference.
+        "/optimize+",
+        // rules_dotnet explicitly passes /nullable:disable (MSBuild omits it,
+        // since disable is the default).  That triggers CS8632 on nullable
+        // annotations in shared source files, so csharp_library suppresses it.
+        // MSBuild doesn't need the suppression.  Not a semantic difference.
+        "/nowarn:CS8632",
     };
 
     private static bool IsIgnoredManagedAnalyzer(string analyzer)
