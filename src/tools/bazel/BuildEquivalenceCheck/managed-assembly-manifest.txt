@@ -472,11 +472,11 @@ match  System.Runtime.CompilerServices.Unsafe.Tests
 match  System.Runtime.Handles.Tests
 match  System.Runtime.CompilerServices.VisualC.Tests
 diff   System.Runtime.Extensions.Tests
-match  System.Runtime.InteropServices.RuntimeInformation.Tests
+diff   System.Runtime.InteropServices.RuntimeInformation.Tests
 match  System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
 diff   System.Runtime.Loader.Tests
-match  System.Runtime.Loader.DefaultContext.Tests
+diff   System.Runtime.Loader.DefaultContext.Tests
 diff   System.Runtime.Loader.Noop.Assembly
 match  System.Runtime.Loader.RefEmitLoadContext.Tests
 match  System.Runtime.Numerics.Tests
@@ -599,7 +599,7 @@ diff   System.Reflection.Metadata.ApplyUpdate.Test.ReflectionDeleteMember
 diff   System.Reflection.Metadata.ApplyUpdate.Test.StaticLambdaRegression
 match  Invariant.Tests
 match  System.Diagnostics.DiagnosticSource.Switches.Tests
-match  System.Diagnostics.TraceSource.Config.Tests
+diff   System.Diagnostics.TraceSource.Config.Tests
 match  System.Globalization.CalendarsWithConfigSwitch.Tests
 diff   System.IO.FileSystem.DisabledFileLocking.Tests
 match  System.Runtime.InteropServices.ComDisabled.Tests
