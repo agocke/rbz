@@ -34,8 +34,9 @@ impl_assembly(
     ],
     resx_file = "src/Resources/Strings.resx",
     supported_os_platforms_short = ["windows"],
-    nullable = "disable",
+    nullable = "enable",
     nowarn = MULTITARGET_NOWARN + ["nullable", "CA1865", "CA2249", "CP0003", "CS1591"],
+    allow_unsafe_blocks = True,
 )
 
 ref_impl_pair(

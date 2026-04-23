@@ -15,6 +15,7 @@ exports_files([
 netcoreapp_impl_assembly(
     name = "impl_System.Private.Xml",
     keyfile = OPEN_SNK,
+    com_interface_generator = True,
     nowarn = ["CS1591"],
     srcs = [
         # Common files (from $(CommonPath))

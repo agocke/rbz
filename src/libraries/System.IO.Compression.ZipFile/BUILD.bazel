@@ -1,4 +1,5 @@
 load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "ECMA_SNK")
 
 netcoreapp_ref_assembly(
     name = "ref_System.IO.Compression.ZipFile",
@@ -13,6 +14,8 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.IO.Compression.ZipFile",
+    keyfile = ECMA_SNK,
+    com_interface_generator = True,
     nowarn = ["CS1591"],
     srcs = [
         # Common files (all platforms)
@@ -62,8 +65,6 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
     ],
     resx_file = "src/Resources/Strings.resx",
-    generate_documentation_file = False,
-    library_import_generator = False,
 )
 
 ref_impl_pair(
