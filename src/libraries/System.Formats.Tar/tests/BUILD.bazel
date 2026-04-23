@@ -64,6 +64,7 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
+    additionalfiles = ["//src/libraries/System.Formats.Tar:src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     data = ["@paket.main//system.formats.tar.testdata:content_files"],
     size = "large",

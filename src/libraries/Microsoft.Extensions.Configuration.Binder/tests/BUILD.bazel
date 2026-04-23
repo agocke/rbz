@@ -13,6 +13,7 @@ gen_resx_source(
 
 library_test(
     name = "Microsoft.Extensions.Configuration.Binder.Tests",
+    additionalfiles = ["//src/libraries/Microsoft.Extensions.Configuration.Binder:src/Resources/Strings.resx"],
     nowarn = MULTITARGET_NOWARN,
     srcs = [
         "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/IsExternalInit.cs",

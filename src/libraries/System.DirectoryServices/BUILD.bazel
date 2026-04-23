@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/System.DirectoryServices.cs",
@@ -29,6 +29,8 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.DirectoryServices",
     nowarn = MULTITARGET_NOWARN + ["CA1822", "CA1865", "CP0003", "IDE0059", "NU5128", "CS1591"],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    allow_unsafe_blocks = True,
     include_editorconfig = False,
     pnse = True,
     pnse_message = "SR.DirectoryServices_PlatformNotSupported",

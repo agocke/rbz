@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 load("//:defs.bzl", "OPEN_SNK")
 
 netcoreapp_ref_assembly(
@@ -27,6 +27,8 @@ impl_assembly(
         "ref/System.Diagnostics.EventLog.netcoreapp.cs",
     ],
     srcs = [],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    allow_unsafe_blocks = True,
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries:ref_System.ComponentModel.Primitives",

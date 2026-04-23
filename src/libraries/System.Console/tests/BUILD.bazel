@@ -76,6 +76,7 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
+    additionalfiles = ["//src/libraries/System.Console:src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
     data = [":ncurses_xterm", ":ncurses_screen256color"],

@@ -62,6 +62,7 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
+    additionalfiles = ["//src/libraries/System.Diagnostics.DiagnosticSource:src/Resources/Strings.resx"],
     defines = [
         "MEMORYMARSHAL_SUPPORT",
         "OS_ISBROWSER_SUPPORT",

@@ -11,6 +11,7 @@ gen_resx_source(
 
 library_test(
     name = "Microsoft.Bcl.Cryptography.Tests",
+    additionalfiles = ["//src/libraries/Microsoft.Bcl.Cryptography:src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["SYSLIB5006"],
     srcs = glob(

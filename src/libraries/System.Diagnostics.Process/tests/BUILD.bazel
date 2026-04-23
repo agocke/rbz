@@ -60,6 +60,7 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
+    additionalfiles = ["//src/libraries:System.Diagnostics.Process/src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     size = "large",
     keyfile = OPEN_SNK,

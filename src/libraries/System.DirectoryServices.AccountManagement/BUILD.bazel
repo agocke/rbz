@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 load("//:defs.bzl", "ECMA_SNK")
 
 exports_files(["ref/System.DirectoryServices.AccountManagement.cs"])
@@ -18,6 +18,8 @@ impl_assembly(
     name = "impl_System.DirectoryServices.AccountManagement",
     keyfile = ECMA_SNK,
     nowarn = MULTITARGET_NOWARN + ["CA1822", "CA1859", "CA2249", "CP0003", "IDE0059", "NU5128", "CS1591"],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    allow_unsafe_blocks = True,
     pnse = True,
     pnse_message = "SR.DirectoryServicesAccountManagement_PlatformNotSupported",
     pnse_ref_srcs = ["ref/System.DirectoryServices.AccountManagement.cs"],
