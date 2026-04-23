@@ -75,4 +75,6 @@ library_test(
     os_targeted = True,
     keyfile = OPEN_SNK,
     size = "large",
+    # Requires msquic native library which is not available in the test environment.
+    tags = ["manual"],
 )

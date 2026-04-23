@@ -22,4 +22,6 @@ library_test(
     data = glob(["*.config"]),
     keyfile = OPEN_SNK,
     size = "medium",
+    # Requires System.Diagnostics.EventLog which does not have a Bazel build target yet.
+    tags = ["manual"],
 )

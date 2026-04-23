@@ -30,4 +30,5 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     keyfile = ASPNETCORE_SNK,
+    writable_test_dir = True,
 )

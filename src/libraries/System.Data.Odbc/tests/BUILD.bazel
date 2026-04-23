@@ -25,4 +25,6 @@ library_test(
     ],
     os_targeted = "unix",
     keyfile = OPEN_SNK,
+    # Requires ODBC drivers (libodbc) which are not available in the test environment.
+    tags = ["manual"],
 )

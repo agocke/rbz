@@ -29,4 +29,6 @@ library_test(
     ],
     os_targeted = True,
     keyfile = OPEN_SNK,
+    # Requires libldap which is not available in the test environment.
+    tags = ["manual"],
 )
