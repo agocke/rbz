@@ -340,6 +340,7 @@ def impl_assembly(
     com_interface_generator = False,
     jsimport_generator = True,
     include_editorconfig = True,
+    interceptors_namespaces = None,
     **kwargs
 ):
     base_name = name[len("impl_"):]
@@ -492,9 +493,21 @@ def impl_assembly(
         # Match MSBuild's /features flags
         "/features:strict",
         "/features:nullablePublicOnly",
-        # .NET SDK adds this for TFM >= 10.0 via FrameworkReferenceResolution.targets
-        "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
     ]
+
+    # .NET SDK adds InterceptorsNamespaces for TFM >= 10.0 via
+    # FrameworkReferenceResolution.targets.  Allow callers to override:
+    #   None  → use the default namespace list
+    #   ""    → suppress the flag entirely (assembly doesn't need interceptors)
+    #   other → use the caller-supplied value
+    if interceptors_namespaces == None:
+        compiler_options = compiler_options + [
+            "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
+        ]
+    elif interceptors_namespaces:
+        compiler_options = compiler_options + [
+            "/features:InterceptorsNamespaces=" + interceptors_namespaces,
+        ]
 
     # ── Analyzer infrastructure (matching MSBuild's Analyzers.targets) ──────
     # Generate an empty disabledAnalyzers.config (MSBuild always passes this as

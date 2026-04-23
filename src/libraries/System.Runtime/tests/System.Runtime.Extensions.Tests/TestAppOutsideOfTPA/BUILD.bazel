@@ -1,7 +1,8 @@
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_binary")
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_binary")
 
 csharp_binary(
     name = "TestAppOutsideOfTPA",
+    keyfile = OPEN_SNK,
     srcs = ["Program.cs"],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,

@@ -2,6 +2,7 @@ load("//:defs.bzl", "csharp_library")
 
 csharp_library(
     name = "ILLink.Tasks",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     srcs = glob(["*.cs"]),
     out = "ILLink.Tasks",
     deps = [

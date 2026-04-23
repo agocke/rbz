@@ -17,7 +17,7 @@ impl_assembly(
     keyfile = OPEN_SNK,
     os_targeted = "unix",
     nullable = "disable",
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591", "nullable"],
     defines = ["SERIAL_PORTS"],
     include_dll_safe_search_path = True,
     srcs = glob(

@@ -2,6 +2,7 @@ load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWA
 
 impl_assembly(
     name = "impl_Microsoft.Bcl.TimeProvider",
+    interceptors_namespaces = "",
     srcs = [
         "src/Microsoft.Bcl.TimeProvider.Forwards.cs",
         "src/System/Threading/Tasks/TimeProviderTaskExtensions.cs",

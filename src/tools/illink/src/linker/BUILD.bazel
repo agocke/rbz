@@ -52,6 +52,7 @@ _COMMON_NOWARN = [
 
 csharp_binary(
     name = "illink",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     srcs = _COMMON_SRCS,
     out = "illink",
     deps = [

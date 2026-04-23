@@ -8,6 +8,8 @@ impl_assembly(
     deps = [
         "//src/libraries:ref_System.Runtime",
     ],
+    interceptors_namespaces = "",
+    include_syslib_warnaserror = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable"],
     analyzers = [
         "//src/libraries/System.Runtime.InteropServices:DownlevelLibraryImportGenerator",

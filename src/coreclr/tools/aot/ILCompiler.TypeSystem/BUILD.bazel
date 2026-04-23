@@ -2,6 +2,7 @@ load("//:defs.bzl", "csharp_library")
 
 csharp_library(
     name = "ILCompiler.TypeSystem",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     nowarn = ["1591", "CA1859", "CA1866"],
     srcs = [
         "//src/coreclr/tools/Common:TypeSystem/Common/ArrayMethod.Diagnostic.cs",

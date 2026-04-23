@@ -28,6 +28,7 @@ exports_files(["Compiler/JitHelper.cs"])
 
 csharp_library(
     name = "ILCompiler.Compiler",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     srcs = [
         ":AssemblyInfo",
         ":SharedStringsSR",
