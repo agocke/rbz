@@ -14,7 +14,6 @@ exports_files([
 
 netcoreapp_ref_assembly(
     name = "ref_System.Text.Encodings.Web",
-    library_import_generator = False,
     srcs = [
         "ref/System.Text.Encodings.Web.cs",
     ],
@@ -28,7 +27,7 @@ netcoreapp_ref_assembly(
 netcoreapp_impl_assembly(
     name = "impl_System.Text.Encodings.Web",
     keyfile = OPEN_SNK,
-    com_interface_generator = True,
+    library_import_generator = False,
     srcs = [
         "src/System/IO/TextWriterExtensions.cs",
         "src/System/Text/Encodings/Web/AllowedBmpCodePointsBitmap.cs",
