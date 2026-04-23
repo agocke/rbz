@@ -39,7 +39,6 @@ library_test(
         "//src/libraries/System.Diagnostics.TraceSource:ref_System.Diagnostics.TraceSource",
         "//src/libraries/System.Drawing.Primitives:ref_System.Drawing.Primitives",
         "//src/libraries/System.Runtime.Serialization.Formatters:impl_System.Runtime.Serialization.Formatters",
-        "//src/libraries/System.Security.Permissions:ref_System.Security.Permissions",
         "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
         "//src/libraries/System.Xml.ReaderWriter:ref_System.Xml.ReaderWriter",
         "//src/libraries/Common/tests:TestUtilities",
