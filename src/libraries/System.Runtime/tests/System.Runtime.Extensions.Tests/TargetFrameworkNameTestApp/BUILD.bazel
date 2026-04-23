@@ -1,0 +1,11 @@
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_binary")
+
+csharp_binary(
+    name = "TargetFrameworkNameTestApp",
+    srcs = [
+        "Program.cs",
+        "AssemblyAttributes.cs",
+    ],
+    target_frameworks = [NETCOREAPP_CURRENT],
+    visibility = ["//src/libraries/System.Runtime/tests:__subpackages__"],
+)

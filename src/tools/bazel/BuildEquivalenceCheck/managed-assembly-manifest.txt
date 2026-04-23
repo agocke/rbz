@@ -556,3 +556,44 @@ diff   TestUtilities
 diff Microsoft.Extensions.DependencyModel.Tests
 diff System.Private.Xml.Tests
 diff System.Text.Json.Tests
+
+# ── Loader test helper assemblies ──
+diff   System.Runtime.Loader.Test.Assembly
+diff   System.Runtime.Loader.Test.Assembly2
+diff   System.Runtime.Loader.Test.ContextualReflectionDependency
+diff   System.Runtime.Loader.Test.VersionDowngrade
+diff   LoaderLinkTest.Shared
+diff   LoaderLinkTest.Dynamic
+diff   ReferencedClassLib
+diff   ReferencedClassLibNeutralIsSatellite
+
+# ── Runtime test helper assemblies ──
+diff   TestUtilities.Unicode
+diff   TargetFrameworkNameTestApp
+diff   TestApp
+diff   AssemblyResolveTestApp
+diff   TestAppOutsideOfTPA
+
+# ── ApplyUpdate test helper assemblies ──
+diff   System.Reflection.Metadata.ApplyUpdate.Test.AddFieldRVA
+diff   System.Reflection.Metadata.ApplyUpdate.Test.AddInstanceField
+diff   System.Reflection.Metadata.ApplyUpdate.Test.AddLambdaCapturingThis
+diff   System.Reflection.Metadata.ApplyUpdate.Test.AddNestedClass
+diff   System.Reflection.Metadata.ApplyUpdate.Test.AddStaticField
+diff   System.Reflection.Metadata.ApplyUpdate.Test.AddStaticLambda
+diff   System.Reflection.Metadata.ApplyUpdate.Test.AsyncMethodChange
+diff   System.Reflection.Metadata.ApplyUpdate.Test.ClassWithCustomAttributes
+diff   System.Reflection.Metadata.ApplyUpdate.Test.CustomAttributeDelete
+diff   System.Reflection.Metadata.ApplyUpdate.Test.CustomAttributeUpdate
+diff   System.Reflection.Metadata.ApplyUpdate.Test.FirstCallAfterUpdate
+diff   System.Reflection.Metadata.ApplyUpdate.Test.GenericAddInstanceField
+diff   System.Reflection.Metadata.ApplyUpdate.Test.GenericAddStaticField
+diff   System.Reflection.Metadata.ApplyUpdate.Test.IncreaseMetadataRowSize
+diff   System.Reflection.Metadata.ApplyUpdate.Test.LambdaBodyChange
+diff   System.Reflection.Metadata.ApplyUpdate.Test.LambdaCapturesThis
+diff   System.Reflection.Metadata.ApplyUpdate.Test.MethodBody1
+diff   System.Reflection.Metadata.ApplyUpdate.Test.NewMethodThrows
+diff   System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewMethod
+diff   System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewType
+diff   System.Reflection.Metadata.ApplyUpdate.Test.ReflectionDeleteMember
+diff   System.Reflection.Metadata.ApplyUpdate.Test.StaticLambdaRegression

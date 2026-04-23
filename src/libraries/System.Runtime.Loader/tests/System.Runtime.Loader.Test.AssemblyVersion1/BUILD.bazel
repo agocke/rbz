@@ -1,0 +1,10 @@
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_library")
+
+# MSBuild project name is AssemblyVersion1 but produces
+# System.Runtime.Loader.Test.VersionDowngrade.dll (AssemblyName override).
+csharp_library(
+    name = "System.Runtime.Loader.Test.VersionDowngrade",
+    srcs = ["VersionTestClass.cs"],
+    target_frameworks = [NETCOREAPP_CURRENT],
+    visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
+)

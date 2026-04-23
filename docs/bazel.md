@@ -170,6 +170,10 @@ layout.
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
 - Library unit tests (201 Bazel targets total; 195 currently pass on Linux and 6 are platform-constrained/skipped)
+- Test helper assemblies: 36 helper/support assemblies ported to Bazel
+  (8 loader test helpers, 22 ApplyUpdate helpers, 5 Runtime test helpers,
+  TestUtilities.Unicode) — these are `csharp_library`/`csharp_binary`
+  targets that other tests depend on
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))

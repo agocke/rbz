@@ -1,0 +1,11 @@
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_library")
+
+csharp_library(
+    name = "LoaderLinkTest.Dynamic",
+    srcs = ["SharedInterfaceImplementation.cs"],
+    target_frameworks = [NETCOREAPP_CURRENT],
+    deps = [
+        "//src/libraries/System.Runtime.Loader/tests/LoaderLinkTest.Shared",
+    ],
+    visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
+)
