@@ -13,6 +13,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.IO.Compression",
+    com_interface_generator = True,
     nowarn = ["CS1591"],
     os_targeted = "unix",
     srcs = [

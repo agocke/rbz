@@ -17,6 +17,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Reflection.Context",
+    com_interface_generator = True,
     keyfile = ECMA_SNK,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "NU5128", "CS1591"],
     srcs = glob(["src/**/*.cs"]),

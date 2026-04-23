@@ -130,6 +130,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Text.Json",
+    com_interface_generator = True,
     keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     analyzers = [

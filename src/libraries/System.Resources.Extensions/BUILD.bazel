@@ -19,6 +19,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Resources.Extensions",
+    com_interface_generator = True,
     keyfile = OPEN_SNK,
     allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
