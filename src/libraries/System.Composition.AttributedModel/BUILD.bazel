@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "impl_assembly")
 
 impl_assembly(
     name = "impl_System.Composition.AttributedModel",
@@ -21,6 +21,7 @@ impl_assembly(
         "//src/libraries:ref_System.Runtime",
     ],
     nullable = "disable",
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable"],
     exclude_sr = True,
 )

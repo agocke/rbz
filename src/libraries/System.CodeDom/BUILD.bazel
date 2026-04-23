@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/System.CodeDom.cs",
@@ -157,7 +157,8 @@ impl_assembly(
     defines = ["CODEDOM"],
     resx_file = "src/Resources/Strings.resx",
     nullable = "disable",
-    nowarn = MULTITARGET_NOWARN + ["nullable", "CP0003", "CS1591"],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    nowarn = MULTITARGET_NOWARN + ["nullable", "CP0003"],
 )
 
 ref_impl_pair(

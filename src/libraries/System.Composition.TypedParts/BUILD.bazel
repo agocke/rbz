@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "impl_assembly")
 
 impl_assembly(
     name = "impl_System.Composition.TypedParts",
@@ -18,7 +18,8 @@ impl_assembly(
     ],
     resx_file = "src/Resources/Strings.resx",
     nullable = "disable",
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable"],
     is_trimmable = False,
     is_aot_compatible = False,
 )
