@@ -615,6 +615,7 @@ def csharp_binary(
     generate_documentation_file = False,
     msbuild_analyzer_config = "none",
     include_default_ruleset = True,
+    include_syslib_warnaserror = True,
     interceptors_namespaces = None,
     **kwargs
 ):
@@ -671,8 +672,7 @@ EOF""".format(version = PRODUCT_VERSION),
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-        "/warnaserror+:SYSLIB0011",
-    ]
+    ] + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
     if interceptors_namespaces != None:
         _compiler_options = _compiler_options + [
             "/features:InterceptorsNamespaces=" + interceptors_namespaces,
