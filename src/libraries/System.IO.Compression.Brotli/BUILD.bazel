@@ -51,6 +51,8 @@ netcoreapp_impl_assembly(
     ],
     resx_file = "src/Resources/Strings.resx",
     supported_os_platforms = ["unix"],
+    generate_documentation_file = False,
+    library_import_generator = False,
 )
 
 ref_impl_pair(
