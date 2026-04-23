@@ -2,6 +2,7 @@ load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly"
 
 exports_files([
     "ref/System.Resources.Extensions.cs",
+    "src/Resources/Strings.resx",
 ] + glob(["src/**/*.cs"]))
 
 netcoreapp_ref_assembly(
