@@ -141,6 +141,42 @@ csharp_library(
     visibility = ["//visibility:public"],
 )
 
+csharp_library(
+    name = "DownlevelLibraryImportGenerator",
+    out = "Microsoft.Interop.LibraryImportGenerator.Downlevel",
+    srcs = glob(["gen/DownlevelLibraryImportGenerator/**/*.cs"]) + [
+        "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/IsExternalInit.cs",
+
+        "//src/libraries/Common:src/Roslyn/DiagnosticDescriptorHelper.cs",
+        "//src/libraries/Common:src/Roslyn/GetBestTypeByMetadataName.cs",
+        "//src/libraries/Common:src/System/SR.cs",
+
+        "gen/Common/OperationExtensions.cs",
+        "gen/Common/LibraryImportData.cs",
+        "gen/Common/UnreachableException.cs",
+    ],
+    target_frameworks = ["netstandard2.0"],
+    langversion = "preview",
+    cls_compliant = False,
+    nullable = "annotations",
+    defines = ["MICROSOFT_INTEROP_SOURCEGENERATION", "BAZEL"],
+    deps = [
+        ":Microsoft.Interop.SourceGeneration",
+        "@paket.main//microsoft.codeanalysis.common",
+        "@paket.main//microsoft.codeanalysis.csharp",
+        "@paket.main//system.collections.immutable",
+        "@paket.main//system.memory",
+    ],
+    resx_file = "gen/Common/Resources/Strings.resx",
+    nowarn = [
+        "CS3003",
+        "CS1572",
+        "CS1574",
+        "CS1734",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 netcoreapp_ref_assembly(
     name = "ref_System.Runtime.InteropServices",
     srcs = [

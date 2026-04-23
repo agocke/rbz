@@ -125,6 +125,7 @@ _XPATH_RESOURCE_NAMES = {f.split("/")[-1]: "System.Xml.Tests.TestData." + f.spli
 library_test(
     name = "System.Private.Xml.Tests",
     size = "large",
+    nowarn = ["CS1591"],
     srcs = glob(
         ["**/*.cs"],
         exclude = [

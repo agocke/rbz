@@ -610,6 +610,7 @@ def library_test(
     analyzer_configs = [],
     compiler_options = [],
     features_strict = True,
+    features_nullable_public_only = True,
     os_targeted = False,
     **kwargs
 ):
@@ -691,12 +692,11 @@ EOF""".format(version = PRODUCT_VERSION),
     # Match MSBuild test compiler options
     compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
-        "/features:nullablePublicOnly",
         "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
         "/noconfig",
         "/warn:9999",
         "/ruleset:eng/Default.ruleset",
-    ] + (["/features:strict"] if features_strict else [])
+    ] + (["/features:strict"] if features_strict else []) + (["/features:nullablePublicOnly"] if features_nullable_public_only else [])
 
     _xunit_library_test(
         name = name,

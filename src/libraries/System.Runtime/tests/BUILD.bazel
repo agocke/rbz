@@ -1,5 +1,5 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "OPEN_SNK", "csharp_library")
+load("//:defs.bzl", "OPEN_SNK", "csharp_library", "resgen")
 
 exports_files([
     "System.Runtime.Tests/System/IndexTests.cs",
@@ -242,6 +242,8 @@ library_test(
     srcs = glob(
         ["System.Diagnostics.Debug.Tests/**/*.cs"],
         exclude = [
+            # These files use internal types (DebugProvider, DefaultTraceListener)
+            # from CoreLib impl assembly which is not yet available as a Bazel dep.
             "System.Diagnostics.Debug.Tests/DebugTests.cs",
             "System.Diagnostics.Debug.Tests/DebugTestsNoListeners.cs",
             "System.Diagnostics.Debug.Tests/DebugTestsNoListeners.Interpolation.cs",
@@ -265,20 +267,21 @@ library_test(
         "//src/libraries:ref_System.Threading.Tasks",
         "//src/libraries/Common/tests:TestUtilities",
     ] + XUNIT_DEPS,
-    resources = glob([
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/**/*.txt",
-        "System.Globalization.Extensions.Tests/Normalization/Data/*.txt",
-    ]),
+    resources = glob(
+        ["System.Globalization.Extensions.Tests/IdnMapping/Data/**/*.txt",
+         "System.Globalization.Extensions.Tests/Normalization/Data/*.txt"],
+        exclude = ["System.Globalization.Extensions.Tests/IdnMapping/Data/**/ReadMe.txt"],
+    ),
     resource_logical_names = {
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_6_0/IdnaTest_6.txt": "IdnaTest_6.txt",
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_Win7/IdnaTest_Win7.txt": "IdnaTest_Win7.txt",
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_9_0/IdnaTest_9.txt": "IdnaTest_9.txt",
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_11_0/IdnaTest_11.txt": "IdnaTest_11.txt",
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_13_0/IdnaTest_13.txt": "IdnaTest_13.txt",
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_15_0/IdnaTest_15_0.txt": "IdnaTest_15_0.txt",
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_15_1/IdnaTest_15_1.txt": "IdnaTest_15_1.txt",
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_16_0/IdnaTest_16.txt": "IdnaTest_16.txt",
-        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_17_0/IdnaTest_17.txt": "IdnaTest_17.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_6_0/IdnaTest_6.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_6_0.IdnaTest_6.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_Win7/IdnaTest_Win7.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_Win7.IdnaTest_Win7.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_9_0/IdnaTest_9.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_9_0.IdnaTest_9.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_11_0/IdnaTest_11.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_11_0.IdnaTest_11.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_13_0/IdnaTest_13.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_13_0.IdnaTest_13.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_15_0/IdnaTest_15_0.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_15_0.IdnaTest_15_0.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_15_1/IdnaTest_15_1.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_15_1.IdnaTest_15_1.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_16_0/IdnaTest_16.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_16_0.IdnaTest_16.txt",
+        "System.Globalization.Extensions.Tests/IdnMapping/Data/Unicode_17_0/IdnaTest_17.txt": "System.Globalization.Extensions.Tests.IdnMapping.Data.Unicode_17_0.IdnaTest_17.txt",
         "System.Globalization.Extensions.Tests/Normalization/Data/win8.txt": "NormalizationDataWin8",
         "System.Globalization.Extensions.Tests/Normalization/Data/win7.txt": "NormalizationDataWin7",
     },
@@ -286,8 +289,6 @@ library_test(
     size = "medium",
 )
 
-# NOTE: System.Globalization.Tests depends on TestUtilities.Unicode (not yet in Bazel),
-# so CharUnicodeInfoTests and GraphemeBreakTest that use CodePoint are excluded.
 library_test(
     name = "System.Globalization.Tests",
     srcs = glob(
@@ -297,6 +298,10 @@ library_test(
             "System.Globalization.Tests/Invariant/**",
             "System.Globalization.Tests/IcuAppLocal/**",
             "System.Globalization.Tests/NlsTests/**",
+            "System.Globalization.Tests/CultureInfo/CultureInfoGetCultures.cs",
+            "System.Globalization.Tests/CultureInfo/CultureInfoThreeLetterISOInfo.cs",
+            # CharUnicodeInfoTests and GraphemeBreakTest depend on TestUtilities.Unicode
+            # (CodePoint type) and Microsoft.VisualBasic which are not yet available.
             "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTests.cs",
             "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTests.Generated.cs",
             "System.Globalization.Tests/System/Globalization/CharUnicodeInfoTestData.cs",
@@ -312,6 +317,14 @@ library_test(
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
+    resources = [
+        "@nuget.system.private.runtime.unicodedata.v10.0.0-beta.25418.1//:contentFiles/any/any/16.0.0/ucd/auxiliary/GraphemeBreakTest.txt",
+        "@nuget.system.private.runtime.unicodedata.v10.0.0-beta.25418.1//:contentFiles/any/any/16.0.0/ucd/UnicodeData.txt",
+    ],
+    resource_logical_names = {
+        "GraphemeBreakTest.txt": "GraphemeBreakTest.txt",
+        "UnicodeData.txt": "UnicodeData.txt",
+    },
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
     size = "large",
@@ -385,6 +398,23 @@ library_test(
     tags = ["manual"],
 )
 
+# MSBuild embeds EmbeddedImage.png and EmbeddedTextFile.txt twice each with
+# different logical names. Bazel resource_logical_names only supports one
+# logical name per file path, so copy the files to get distinct paths.
+genrule(
+    name = "reflection_EmbeddedImage1",
+    srcs = ["System.Reflection.Tests/Resources/EmbeddedImage.png"],
+    outs = ["System.Reflection.Tests/Resources/EmbeddedImage1.png"],
+    cmd = "cp $< $@",
+)
+
+genrule(
+    name = "reflection_EmbeddedTextFile1",
+    srcs = ["System.Reflection.Tests/Resources/EmbeddedTextFile.txt"],
+    outs = ["System.Reflection.Tests/Resources/EmbeddedTextFile1.txt"],
+    cmd = "cp $< $@",
+)
+
 library_test(
     name = "System.Reflection.Tests",
     srcs = glob(
@@ -399,21 +429,18 @@ library_test(
             "System.Reflection.Tests/TestAssembly/**",
             "System.Reflection.Tests/TestExe/**",
             "System.Reflection.Tests/UnloadableAssembly/**",
-            # AssemblyTests.cs uses TypeForwardedTo for types from helper projects
+            # These files depend on ForwardedTypesAssembly/TestAssembly helper projects
+            # that are not yet wired as Bazel deps.
             "System.Reflection.Tests/AssemblyTests.cs",
-            # GetTypeTests.cs uses EquivalentValueType from TestAssembly helper project
             "System.Reflection.Tests/GetTypeTests.cs",
-            # AssemblyNameTests.cs uses AssemblyVersion from excluded helper project
             "System.Reflection.Tests/AssemblyNameTests.cs",
-            # FieldInfoTests.cs uses MyClass1 from TestAssembly helper project
             "System.Reflection.Tests/FieldInfoTests.cs",
-            # MethodInfoTests.cs uses TestAssembly namespace
             "System.Reflection.Tests/MethodInfoTests.cs",
-            # MethodCommonTests and MethodInvokerTests use types from MethodInfoTests (excluded)
             "System.Reflection.Tests/MethodCommonTests.cs",
             "System.Reflection.Tests/MethodInvokerTests.cs",
         ],
     ) + [
+        "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly:EquivalentValueType.cs",
         "//src/libraries/Common/tests:System/Reflection/MockParameterInfo.cs",
         "//src/libraries/Common/tests:System/MockType.cs",
         "//src/libraries/Common/tests:System/IO/TempFile.cs",
@@ -429,13 +456,17 @@ library_test(
     ] + XUNIT_DEPS,
     resources = [
         "System.Reflection.Tests/Resources/EmbeddedImage.png",
+        ":reflection_EmbeddedImage1",
         "System.Reflection.Tests/Resources/EmbeddedTextFile.txt",
+        ":reflection_EmbeddedTextFile1",
         "System.Reflection.Tests/Resources/ResourceTextFile.txt",
     ],
     resource_logical_names = {
-        "System.Reflection.Tests/Resources/EmbeddedImage.png": "EmbeddedImage.png",
-        "System.Reflection.Tests/Resources/EmbeddedTextFile.txt": "EmbeddedTextFile.txt",
-        "System.Reflection.Tests/Resources/ResourceTextFile.txt": "ResourceTextFile.txt",
+        "EmbeddedImage.png": "EmbeddedImage.png",
+        "EmbeddedImage1.png": "System.Reflection.Tests.EmbeddedImage1.png",
+        "EmbeddedTextFile.txt": "EmbeddedTextFile.txt",
+        "EmbeddedTextFile1.txt": "System.Reflection.Tests.EmbeddedTextFile1.txt",
+        "ResourceTextFile.txt": "ResourceTextFile.txt",
     },
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
@@ -446,6 +477,28 @@ library_test(
 # System.Resources.Extensions, System.Runtime.Serialization.Formatters, resx-generated
 # code, and satellite assemblies. Ported with available deps; satellite assemblies and
 # .resources content files may need additional work.
+#
+# MSBuild compiles .resx files to .resources before embedding. The neutral
+# .resx files (AToZResx, CustomReader, TestResx) are compiled via resgen;
+# satellite .resx files are passed as /additionalfile only (for analyzers).
+resgen(
+    name = "resgen_AToZResx",
+    out = "AToZResx.resources",
+    resx_file = "System.Resources.ResourceManager.Tests/Resources/AToZResx.resx",
+)
+
+resgen(
+    name = "resgen_CustomReader",
+    out = "CustomReader.resources",
+    resx_file = "System.Resources.ResourceManager.Tests/Resources/CustomReader.resx",
+)
+
+resgen(
+    name = "resgen_TestResx",
+    out = "TestResx.resources",
+    resx_file = "System.Resources.ResourceManager.Tests/Resources/TestResx.resx",
+)
+
 library_test(
     name = "System.Resources.ResourceManager.Tests",
     srcs = glob(
@@ -472,9 +525,20 @@ library_test(
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
-    resources = glob([
+    resources = [
+        ":resgen_AToZResx",
+        ":resgen_CustomReader",
+        ":resgen_TestResx",
+        "System.Resources.ResourceManager.Tests/Resources/TestResx.netstandard17.resources",
+    ],
+    resource_logical_names = {
+        "AToZResx.resources": "System.Resources.Tests.Resources.AToZResx.resources",
+        "CustomReader.resources": "System.Resources.Tests.Resources.CustomReader.resources",
+        "TestResx.resources": "System.Resources.Tests.Resources.TestResx.resources",
+        "TestResx.netstandard17.resources": "System.Resources.Tests.Resources.TestResx.netstandard17.resources",
+    },
+    additionalfiles = glob([
         "System.Resources.ResourceManager.Tests/Resources/*.resx",
-        "System.Resources.ResourceManager.Tests/Resources/*.resources",
     ]),
     data = [
         "System.Resources.ResourceManager.Tests/Resources/TestResx.netstandard17.resources",
@@ -731,6 +795,17 @@ csharp_library(
     srcs = ["System.Reflection.Tests/TestExe/Program.cs"],
     target_frameworks = ["net10.0"],
     keyfile = OPEN_SNK,
+    nullable = "annotations",
+    nowarn = [
+        "IL2121",
+        "SYSLIB0011",
+        "SYSLIB0050",
+        "SYSLIB0051",
+    ],
+    msbuild_analyzer_config = "style",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
 )
 
 # NOTE: System.Reflection.CoreCLR.Tests depends on TestExe as a project
@@ -943,6 +1018,7 @@ library_test(
     runtimeconfig_properties = {
         "System.IO.DisableFileLocking": "true",
     },
+    os_targeted = "unix",
     allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
     size = "large",

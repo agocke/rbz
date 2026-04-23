@@ -1,8 +1,23 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "OPEN_SNK")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source", "resgen")
+
+gen_resx_source(
+    name = "gen_resx",
+    out = "SR.g.cs",
+    assembly_name = "System.Net.NameResolution.Pal.Tests",
+    resx_file = "//src/libraries/System.Net.NameResolution:src/Resources/Strings.resx",
+)
+
+resgen(
+    name = "strings_resx",
+    out = "FxResources.System.Net.NameResolution.Pal.Tests.SR.resources",
+    resx_file = "//src/libraries/System.Net.NameResolution:src/Resources/Strings.resx",
+)
 
 library_test(
     name = "System.Net.NameResolution.Pal.Tests",
+    resources = [":strings_resx"],
+    resource_logical_names = {"FxResources.System.Net.NameResolution.Pal.Tests.SR.resources": "FxResources.System.Net.NameResolution.Pal.Tests.SR.resources"},
     defines = select({
         "@platforms//os:linux": ["UNIX", "UNIX1_0"],
         "@platforms//os:macos": ["UNIX", "UNIX1_0"],
@@ -12,6 +27,7 @@ library_test(
         "AssemblyInfo.cs",
         "NameResolutionPalTests.cs",
         "Fakes/DnsFake.cs",
+        "Fakes/IPAddressFakeExtensions.cs",
         "//src/libraries/System.Net.NameResolution:src/System/Net/IPHostEntry.cs",
         "//src/libraries/Common:src/System/Net/Logging/NetEventSource.Common.cs",
         "//src/libraries/Common:src/System/Net/Sockets/ProtocolType.cs",
@@ -22,6 +38,8 @@ library_test(
         "//src/libraries/Common:src/System/Net/SocketProtocolSupportPal.cs",
         "//src/libraries/Common/tests:System/Net/Configuration.cs",
         "//src/libraries/Common/tests:System/Net/Configuration.Http.cs",
+        "//src/libraries/Common:src/System/SR.cs",
+        ":gen_resx",
     ] + select({
         "@platforms//os:linux": [
             "//src/libraries/System.Net.NameResolution:src/System/Net/NameResolutionPal.Unix.cs",
@@ -76,8 +94,8 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    nowarn = ["SYSLIB1051"],
     allow_unsafe_blocks = True,
+    additionalfiles = ["//src/libraries/System.Net.NameResolution:src/Resources/Strings.resx"],
     size = "large",
     keyfile = OPEN_SNK,
 )

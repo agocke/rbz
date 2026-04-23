@@ -1,4 +1,5 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "ref/System.Net.ServerSentEvents.cs",
@@ -19,6 +20,8 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Net.ServerSentEvents",
+    keyfile = OPEN_SNK,
+    com_interface_generator = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = [
         "src/System/Net/ServerSentEvents/Helpers.cs",

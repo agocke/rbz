@@ -13,6 +13,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Linq",
+    com_interface_generator = True,
     nowarn = ["CS1591"],
     srcs = [
         "src/System/Linq/AppendPrepend.SpeedOpt.cs",
@@ -104,4 +105,6 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Runtime.Intrinsics:ref_System.Runtime.Intrinsics",
     ],
     resx_file = "src/Resources/Strings.resx",
+    resources = ["src/ILLink/ILLink.Descriptors.xml"],
+    resource_logical_names = {"ILLink.Descriptors.xml": "ILLink.Descriptors.xml"},
 )

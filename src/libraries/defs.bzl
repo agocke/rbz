@@ -3,9 +3,11 @@ load(
     "//:defs.bzl",
     "ASPNETCORE_SNK",
     "CI_INFORMATIONAL_VERSION",
+    "ECMA_SNK",
     "MSFT_SNK",
     "NETCOREAPP_CURRENT",
     "OPEN_SNK",
+    "SHAREDLIB1024_SNK",
     "csharp_library",
     "gen_assembly_info",
     "gen_illink_substitutions",
@@ -334,9 +336,11 @@ def impl_assembly(
     analyzer_configs = [],
     analyzers = [],
     library_import_generator = True,
+    interop_source_generation = None,
     com_interface_generator = False,
     jsimport_generator = True,
     include_editorconfig = True,
+    interceptors_namespaces = None,
     **kwargs
 ):
     base_name = name[len("impl_"):]
@@ -489,9 +493,21 @@ def impl_assembly(
         # Match MSBuild's /features flags
         "/features:strict",
         "/features:nullablePublicOnly",
-        # .NET SDK adds this for TFM >= 10.0 via FrameworkReferenceResolution.targets
-        "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
     ]
+
+    # .NET SDK adds InterceptorsNamespaces for TFM >= 10.0 via
+    # FrameworkReferenceResolution.targets.  Allow callers to override:
+    #   None  → use the default namespace list
+    #   ""    → suppress the flag entirely (assembly doesn't need interceptors)
+    #   other → use the caller-supplied value
+    if interceptors_namespaces == None:
+        compiler_options = compiler_options + [
+            "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
+        ]
+    elif interceptors_namespaces:
+        compiler_options = compiler_options + [
+            "/features:InterceptorsNamespaces=" + interceptors_namespaces,
+        ]
 
     # ── Analyzer infrastructure (matching MSBuild's Analyzers.targets) ──────
     # Generate an empty disabledAnalyzers.config (MSBuild always passes this as
@@ -539,6 +555,12 @@ EOF""".format(version = PRODUCT_VERSION),
     # the assembly's dependency on System.Runtime.InteropServices / CoreLib
     # (matching eng/generators.targets). JSImportGenerator is separate because
     # MSBuild flows it through the targeting-pack analyzer set for OOB builds.
+    #
+    # interop_source_generation defaults to library_import_generator when not
+    # set explicitly (None).  Callers that need SourceGeneration without
+    # LibraryImportGenerator (e.g. shim/facade assemblies) can pass
+    # interop_source_generation = True, library_import_generator = False.
+    _interop_source_generation = interop_source_generation if interop_source_generation != None else library_import_generator
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
@@ -546,6 +568,9 @@ EOF""".format(version = PRODUCT_VERSION),
     if library_import_generator:
         _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
+        ]
+    if _interop_source_generation:
+        _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
         ]
     if com_interface_generator:

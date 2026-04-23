@@ -29,7 +29,6 @@ library_test(
 # but the define restricts tests to the net8.0 API subset.
 library_test(
     name = "System.Numerics.Tensors.Net8.Tests",
-    nowarn = MULTITARGET_NOWARN,
     srcs = [
         "Helpers.cs",
         "TensorPrimitives.NonGeneric.Single.cs",

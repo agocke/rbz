@@ -96,7 +96,15 @@ library_test(
     name = "System.Text.Json.Tests",
     size = "large",
     allow_unsafe_blocks = True,
+    features_nullable_public_only = False,
     nowarn = [
+        "CA1510",
+        "CA1511",
+        "CA1512",
+        "CA1513",
+        "CA1845",
+        "CA1846",
+        "CA1847",
         "SYSLIB0020",  # JsonSerializerOptions.IgnoreNullValues is obsolete
         "SYSLIB0049",  # JsonSerializerOptions.AddContext is obsolete
         "JSON001",     # JSON misformatted in string literals
@@ -155,4 +163,5 @@ library_test(
         # Newtonsoft.Json (used for comparison tests)
         "@paket.main//newtonsoft.json",
     ],
+    keyfile = OPEN_SNK,
 )

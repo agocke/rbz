@@ -6,6 +6,7 @@ load(
     "netcoreapp_impl_assembly",
     "netcoreapp_ref_assembly",
 )
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "ref/System.Diagnostics.DiagnosticSource.cs",
@@ -62,6 +63,8 @@ write_file(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Diagnostics.DiagnosticSource",
+    keyfile = OPEN_SNK,
+    com_interface_generator = True,
     srcs = [
         # Unconditional sources
         "src/System/Diagnostics/Activity.cs",

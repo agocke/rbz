@@ -1,6 +1,6 @@
 load("//src/tests:live_test.bzl", "library_test")
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN")
-load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source", "resgen")
 
 gen_resx_source(
     name = "gen_resx",
@@ -9,11 +9,26 @@ gen_resx_source(
     resx_file = "//src/libraries/Microsoft.Bcl.Cryptography:src/Resources/Strings.resx",
 )
 
+resgen(
+    name = "strings_resx",
+    out = "FxResources.Microsoft.Bcl.Cryptography.Tests.SR.resources",
+    resx_file = "//src/libraries/Microsoft.Bcl.Cryptography:src/Resources/Strings.resx",
+)
+
 library_test(
     name = "Microsoft.Bcl.Cryptography.Tests",
+    resources = [":strings_resx"],
+    resource_logical_names = {"FxResources.Microsoft.Bcl.Cryptography.Tests.SR.resources": "FxResources.Microsoft.Bcl.Cryptography.Tests.SR.resources"},
+    additionalfiles = ["//src/libraries/Microsoft.Bcl.Cryptography:src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["SYSLIB5006"],
-    srcs = glob(["*.cs", "X509Certificates/**/*.cs"]) + [
+    srcs = glob(
+        ["*.cs", "X509Certificates/**/*.cs"],
+        exclude = [
+            "PemEncodingFindTests.cs",
+            "PemEncodingTests.cs",
+        ],
+    ) + [
         "//src/libraries/Common:src/Interop/Windows/BCrypt/Interop.Blobs.cs",
         "//src/libraries/Common:src/System/IO/MemoryMappedFiles/MemoryMappedFileMemoryManager.cs",
         "//src/libraries/Common:src/System/Memory/PointerMemoryManager.cs",
@@ -59,6 +74,40 @@ library_test(
         "//src/libraries/Common/tests:System/Security/Cryptography/X509Certificates/MLKemCertTests.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/X509Certificates/TestData.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/X509Certificates/CertificateCreation/PrivateKeyAssociationTests.Shared.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AesGcmTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/CompositeMLDsa/CompositeMLDsaContractTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/CompositeMLDsa/CompositeMLDsaFactoryTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/CompositeMLDsa/CompositeMLDsaImplementationTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/CompositeMLDsa/CompositeMLDsaMockImplementation.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/CompositeMLDsa/CompositeMLDsaTestData.Raw.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/CompositeMLDsa/CompositeMLDsaTestData.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/CompositeMLDsa/CompositeMLDsaTestHelpers.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/CompositeMLDsa/CompositeMLDsaTestsBase.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/EC/EccTestData.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/MLDsa/MLDsaCngTests.Windows.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/MLDsa/MLDsaCngTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/MLDsa/MLDsaImplementationTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/MLDsa/MLDsaTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/MLDsa/MLDsaTestsBase.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/RSA/RSATestHelpers.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/SlhDsa/SlhDsaAlgorithmTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/SlhDsa/SlhDsaContractTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/SlhDsa/SlhDsaFactoryTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/SlhDsa/SlhDsaImplementationTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/SlhDsa/SlhDsaPlatformTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/SlhDsa/SlhDsaTestHelpers.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/AlgorithmImplementations/SlhDsa/SlhDsaTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/CompositeMLDsaAlgorithmTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/MLDsaAlgorithmTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/MLKemCngTests.NotSupported.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/MLKemCngTests.Windows.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/MLKemTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/SP800108HmacCounterKdfTests.ArgValidation.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/SP800108HmacCounterKdfTests.Functional.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/SP800108HmacCounterKdfTests.Helpers.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/SP800108HmacCounterKdfTests.ThreadSafety.cs",
+
+        "//src/libraries/Microsoft.Bcl.Cryptography:src/System/Security/Cryptography/CngIdentifierExtensions.cs",
         ":gen_resx",
     ],
     deps = [
@@ -70,8 +119,8 @@ library_test(
         "//src/libraries/System.Runtime.Numerics:ref_System.Runtime.Numerics",
         "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
         "//src/libraries/System.Security.Cryptography.Pkcs:ref_System.Security.Cryptography.Pkcs",
-        "//src/libraries/System.Security.Cryptography.Xml:ref_System.Security.Cryptography.Xml",
         "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
         "@paket.main//microsoft.dotnet.xunitassert",

@@ -3,6 +3,7 @@ load("//:defs.bzl", "OPEN_SNK")
 
 library_test(
     name = "System.IO.Ports.Tests",
+    nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847"],
     srcs = glob(
         ["**/*.cs"],
         exclude = [

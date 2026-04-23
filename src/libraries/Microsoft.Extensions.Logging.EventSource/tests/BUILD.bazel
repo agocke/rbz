@@ -3,7 +3,7 @@ load("//:defs.bzl", "ASPNETCORE_SNK")
 
 library_test(
     name = "Microsoft.Extensions.Logging.EventSource.Tests",
-    nowarn = ["PKG0001"],
+    nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "PKG0001"],
     srcs = glob(["*.cs"]),
     deps = [
         "//src/libraries/Microsoft.Extensions.DependencyInjection:impl_Microsoft.Extensions.DependencyInjection",

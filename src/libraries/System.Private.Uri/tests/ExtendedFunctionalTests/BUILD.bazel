@@ -3,6 +3,7 @@ load("//:defs.bzl", "OPEN_SNK")
 
 library_test(
     name = "System.Private.Uri.ExtendedFunctional.Tests",
+    nowarn = ["CS1591"],
     srcs = glob(["*.cs"]),
     deps = [
         "//src/libraries/Common/tests:TestUtilities",

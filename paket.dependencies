@@ -18,6 +18,8 @@ nuget Microsoft.CodeAnalysis.CSharp.CodeStyle 4.14.0
 nuget Microsoft.CodeAnalysis.NetAnalyzers 10.0.106
 nuget Microsoft.CodeAnalysis.Workspaces.Common 4.11.0
 nuget Microsoft.DotNet.CodeAnalysis 10.0.0-beta.26170.102
+nuget StaticCs 0.2.0
+nuget Microsoft.CodeAnalysis.BannedApiAnalyzers 3.3.5-beta1.23270.2
 nuget StyleCop.Analyzers 1.2.0-beta.556
 nuget System.Memory 4.5.5
 nuget microsoft.dotnet.arcade.sdk 10.0.0-beta.26170.102

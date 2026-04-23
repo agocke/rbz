@@ -1,8 +1,23 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "OPEN_SNK")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source", "resgen")
+
+gen_resx_source(
+    name = "gen_resx",
+    out = "SR.g.cs",
+    assembly_name = "System.Net.Security.Tests",
+    resx_file = "//src/libraries/System.Net.Security:src/Resources/Strings.resx",
+)
+
+resgen(
+    name = "strings_resx",
+    out = "FxResources.System.Net.Security.Tests.SR.resources",
+    resx_file = "//src/libraries/System.Net.Security:src/Resources/Strings.resx",
+)
 
 library_test(
     name = "System.Net.Security.Tests",
+    resources = [":strings_resx"],
+    resource_logical_names = {"FxResources.System.Net.Security.Tests.SR.resources": "FxResources.System.Net.Security.Tests.SR.resources"},
     defines = ["UNIX", "UNIX1_0"],
     srcs = glob(
         ["**/*.cs"],
@@ -55,6 +70,8 @@ library_test(
         "//src/libraries/Common/tests:System/Security/Cryptography/OpenSslNamedKeys.Helpers.cs",
         "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
         "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
+        "//src/libraries/Common:src/System/SR.cs",
+        ":gen_resx",
     ],
     deps = [
         "//src/libraries/System.Net.Security:ref_System.Net.Security",
@@ -93,6 +110,7 @@ library_test(
     data = ["@paket.main//system.net.testdata:content_files"],
     allow_unsafe_blocks = True,
     size = "large",
+    additionalfiles = ["//src/libraries/System.Net.Security:src/Resources/Strings.resx"],
     keyfile = OPEN_SNK,
     target_compatible_with = ["@platforms//os:linux"],
 )

@@ -191,7 +191,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Remaining library test equivalence diffs (274 known diffs, mostly analyzer/Strings.resx pipeline differences)
+- Remaining library test equivalence diffs (100 known diffs, mostly analyzer/Strings.resx pipeline differences)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -269,7 +269,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 260 of 480 tracked assemblies currently match
+- **Managed assemblies**: 504 of 568 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -322,6 +322,10 @@ areas:
   `Microsoft.Extensions.FileProviders.Composite`,
   `Microsoft.Extensions.FileSystemGlobbing`, `Microsoft.Extensions.Hosting`,
   and `Microsoft.Extensions.Hosting.Abstractions`.
+  Strong-name signing fixes: `System.Private.Xml`, `System.Text.Json`,
+  `System.Text.Json.SourceGeneration`, and `System.Data.OleDb` now use
+  `Open.snk` (via explicit `keyfile = OPEN_SNK`) matching MSBuild's default
+  `StrongNameKeyId` for source projects in `src/libraries/`.
   Of the 220 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
@@ -427,7 +431,7 @@ release/10.0 commits and bazel merge commits.
    `paket.dependencies`, and updates:
    - `paket.dependencies` — the source of truth for NuGet package versions
    - `defs.bzl` — centralized versioned repo-name constants (e.g.,
-     `ARCADE_SDK_REPO`, `OPEN_SNK`, `MSFT_SNK`)
+     `ARCADE_SDK_REPO`, `OPEN_SNK`, `MSFT_SNK`, `SHAREDLIB1024_SNK`)
    - `MODULE.bazel` — `use_repo()` entries for versioned repos
 
    **Ordering constraint:** `MODULE.bazel` must be temporarily reverted to its
@@ -928,12 +932,16 @@ Mono-only platforms (Browser/WASM, WASI, Tizen) are also excluded.
 - [x] `MODULE.bazel` — Bzlmod workspace, depends on rules_cc@0.2.14, rules_dotnet, bazel_skylib@1.8.2
 - [x] `.bazelrc` — Compiler flags matching CMake for linux-x64, per-component config system
 - [x] `BUILD.bazel` (root) — Root package, string_flag build settings, config_settings, runtime layout
-- [x] `defs.bzl` — Shared macros (csharp_library wrapper, gen_resx_source, resgen)
+- [x] `defs.bzl` — Shared macros (csharp_library wrapper, csharp_binary wrapper, gen_resx_source, resgen)
 - [x] `src/libraries/defs.bzl` — Library macros (netcoreapp_ref_assembly, impl_assembly, netcoreapp_impl_assembly, gen_facades, ref_impl_pair)
 - [x] `src/tests/defs.bzl` — Test infrastructure (live_csharp_library, test runner)
 - [x] Compiler flag parity verified against CMake (`-g`, `-O3`, `-std=gnu11`/`-std=c++17`, all warning flags, all defines)
 - [x] Managed C# compiler flag parity: `/warnaserror+`, `/warn:9999` matching MSBuild's
-  `TreatWarningsAsErrors=true` and `WarningLevel=9999` from `Directory.Build.props`
+  `TreatWarningsAsErrors=true` and `WarningLevel=9999` from `Directory.Build.props`.
+  Both the `csharp_library` and `csharp_binary` wrappers apply the full set of MSBuild
+  defaults (`/checksumalgorithm:SHA256`, `/noconfig`, `/features:strict`,
+  `/features:nullablePublicOnly`, global `nowarn`, `warnings_not_as_errors`,
+  `msbuild_analyzer_config` support)
 - [x] CI mode (`--config=ci`): `/pathmap` normalization matching MSBuild's
   `ContinuousIntegrationBuild=true` / `DeterministicSourcePaths=true` for deterministic PDB
   paths (`/_/artifacts/obj/...`). Managed DLL content is byte-identical to MSBuild CI output

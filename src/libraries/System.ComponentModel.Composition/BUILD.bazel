@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "ECMA_SNK")
 
 exports_files([
     "ref/System.ComponentModel.Composition.cs",
@@ -19,6 +20,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.ComponentModel.Composition",
+    keyfile = ECMA_SNK,
     srcs = glob(["src/**/*.cs"]) + [
         # Common linked files
         "//src/libraries/Common:src/System/Composition/Diagnostics/CompositionTraceId.cs",
@@ -42,8 +44,8 @@ impl_assembly(
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
     ],
     resx_file = "src/Resources/Strings.resx",
-    nullable = "disable",
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "NU5128", "CS1591"],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "NU5128", "CS1591"],
 )
 
 ref_impl_pair(

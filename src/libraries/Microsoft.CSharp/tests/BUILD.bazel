@@ -10,6 +10,7 @@ library_test(
     ],
     # Match MSBuild csproj: <Features>$(Features.Replace('strict', '')</Features>
     # Tests intentionally use underlying-enum arithmetic that strict mode rejects.
+    features_nullable_public_only = False,
     features_strict = False,
     deps = [
         "//src/libraries:ref_Microsoft.CSharp",

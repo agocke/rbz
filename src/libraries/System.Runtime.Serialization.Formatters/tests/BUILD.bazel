@@ -101,6 +101,7 @@ library_test(
         "SYSLIB0050",
         "SYSLIB0051",
     ],
+    os_targeted = True,
     keyfile = OPEN_SNK,
     size = "medium",
 )

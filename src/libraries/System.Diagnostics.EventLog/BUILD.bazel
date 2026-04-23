@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 netcoreapp_ref_assembly(
     name = "ref_System.Diagnostics.EventLog",
@@ -18,6 +19,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Diagnostics.EventLog",
+    keyfile = OPEN_SNK,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_EventLog",
     pnse_ref_srcs = [
@@ -25,6 +27,8 @@ impl_assembly(
         "ref/System.Diagnostics.EventLog.netcoreapp.cs",
     ],
     srcs = [],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    allow_unsafe_blocks = True,
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries:ref_System.ComponentModel.Primitives",

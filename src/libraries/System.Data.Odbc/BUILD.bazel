@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files(["ref/System.Data.Odbc.cs"])
 
@@ -15,10 +16,11 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Data.Odbc",
+    keyfile = OPEN_SNK,
     pnse = True,
     pnse_message = "SR.Odbc_PlatformNotSupported",
     pnse_ref_srcs = ["ref/System.Data.Odbc.cs"],
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591", "CA1838", "CA2249", "SA1121"],
     srcs = [],
     deps = [
         "//src/libraries:ref_System.Runtime",
@@ -27,6 +29,10 @@ impl_assembly(
         "//src/libraries/System.Data.Common:ref_System.Data.Common",
     ],
     resx_file = "src/Resources/Strings.resx",
+    allow_unsafe_blocks = True,
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    resources = ["src/Resources/System.Data.Odbc.OdbcMetaData.xml"],
+    resource_logical_names = {"System.Data.Odbc.OdbcMetaData.xml": "System.Data.Odbc.OdbcMetaData.xml"},
     supported_os_platforms_short = ["windows"],
 )
 

@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files(["ref/Microsoft.Win32.SystemEvents.cs"])
 
@@ -13,10 +14,13 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Win32.SystemEvents",
+    keyfile = OPEN_SNK,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_SystemEvents",
     pnse_ref_srcs = ["ref/Microsoft.Win32.SystemEvents.cs"],
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    allow_unsafe_blocks = True,
     srcs = [],
     deps = [
         "//src/libraries:ref_System.Runtime",

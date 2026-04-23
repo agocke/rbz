@@ -1,3 +1,4 @@
+load("//:defs.bzl", "OPEN_SNK")
 load("//src/tests:live_test.bzl", "library_test")
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN")
 
@@ -34,4 +35,5 @@ library_test(
     allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["8002", "IL2040"],
     nullable = "enable",
+    keyfile = OPEN_SNK,
 )

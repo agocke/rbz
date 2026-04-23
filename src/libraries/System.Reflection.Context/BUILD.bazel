@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "ECMA_SNK")
 
 exports_files([
     "ref/System.Reflection.Context.cs",
@@ -16,6 +17,9 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Reflection.Context",
+    analyzers = COMMON_GENERATOR_ANALYZERS,
+    com_interface_generator = True,
+    keyfile = ECMA_SNK,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "NU5128", "CS1591"],
     srcs = glob(["src/**/*.cs"]),
     deps = [

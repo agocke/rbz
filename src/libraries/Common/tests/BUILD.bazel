@@ -1,4 +1,4 @@
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library", "gen_resx_source")
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library", "gen_resx_source", "resgen")
 load("//src/libraries:defs.bzl", "live_csharp_library")
 load("//src/tests:live_test.bzl", "library_test")
 
@@ -59,6 +59,8 @@ csharp_library(
     ],
     allow_unsafe_blocks = True,
     treat_warnings_as_errors = False,
+    include_syslib_warnaserror = False,
+    include_default_ruleset = False,
     visibility = ["//visibility:public"],
     keyfile = OPEN_SNK,
 )
@@ -92,6 +94,10 @@ csharp_library(
     name = "XmlCoreTest",
     srcs = glob(["System/Xml/XmlCoreTest/*.cs"]),
     target_frameworks = [NETCOREAPP_CURRENT],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     deps = [
         ":TestUtilities",
         ":XmlDiff",
@@ -125,6 +131,17 @@ live_csharp_library(
         "@paket.main//xunit.extensibility.core",
     ],
     allow_unsafe_blocks = True,
+    analyzers = [
+        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+        "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     visibility = ["//visibility:public"],
     keyfile = OPEN_SNK,
 )
@@ -136,8 +153,16 @@ gen_resx_source(
     resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
 )
 
+resgen(
+    name = "strings_resx",
+    out = "FxResources.Common.Tests.SR.resources",
+    resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
+)
+
 library_test(
     name = "Common.Tests",
+    resources = [":strings_resx"],
+    resource_logical_names = {"FxResources.Common.Tests.SR.resources": "FxResources.Common.Tests.SR.resources"},
     srcs = [
         # Test files (unconditional)
         "Tests/Interop/OSReleaseTests.cs",
@@ -249,6 +274,7 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
+    additionalfiles = ["//src/libraries/System.Net.Http:src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     os_targeted = True,
     keyfile = OPEN_SNK,

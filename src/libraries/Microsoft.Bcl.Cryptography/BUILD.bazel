@@ -2,6 +2,7 @@ load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWA
 
 exports_files([
     "src/Resources/Strings.resx",
+    "src/System/Security/Cryptography/CngIdentifierExtensions.cs",
 ])
 
 # For net10.0, this library is essentially a set of type forwarders plus

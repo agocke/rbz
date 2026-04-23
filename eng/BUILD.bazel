@@ -52,6 +52,13 @@ copy_file(
 )
 
 copy_file(
+    name = "35MSSharedLib1024_snk",
+    src = "@{}//:tools/snk/35MSSharedLib1024.snk".format(ARCADE_SDK_REPO),
+    out = "snk/35MSSharedLib1024.snk",
+    visibility = ["//visibility:public"],
+)
+
+copy_file(
     name = "SilverlightPlatformPublicKey_snk",
     src = "@{}//:tools/snk/SilverlightPlatformPublicKey.snk".format(ARCADE_SDK_REPO),
     out = "snk/SilverlightPlatformPublicKey.snk",
