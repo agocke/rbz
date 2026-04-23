@@ -1,5 +1,4 @@
-load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary", "csharp_library")
-load("//:defs.bzl", "resgen")
+load("//:defs.bzl", "csharp_binary", "csharp_library", "resgen")
 
 # Generate compiled resource from Strings.resx.
 # The source accessor is already provided by Resources/Strings.Designer.cs.
@@ -41,6 +40,14 @@ _COMMON_NOWARN = [
     "IDE0060",
     "IDE0100",
     "NU5105",
+    # ILLink.Shared sources use a different file header than the root .editorconfig expects.
+    "IDE0073",
+    # NativeAOT/illink code has unsealed internal types flagged by CA1852.
+    "CA1852",
+    # ILLink.Shared sources missing explicit access modifiers.
+    "SA1400",
+    # Missing assembly-level CLSCompliant attribute.
+    "CA1824",
 ]
 
 csharp_binary(
@@ -59,6 +66,12 @@ csharp_binary(
     target_frameworks = ["net10.0"],
     nowarn = _COMMON_NOWARN + ["CS1591", "NU5131"],
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//:staticcs_analyzers",
+        "//:bannedapi_analyzers",
+    ],
+    msbuild_analyzer_config = "source",
 )
 
 # Library target for use as a dependency by tests and ILLink.Tasks.
@@ -78,4 +91,10 @@ csharp_library(
     target_frameworks = ["net10.0"],
     nowarn = _COMMON_NOWARN + ["CS1591", "NU5131"],
     visibility = ["//src/tools/illink:__subpackages__"],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//:staticcs_analyzers",
+        "//:bannedapi_analyzers",
+    ],
+    msbuild_analyzer_config = "source",
 )

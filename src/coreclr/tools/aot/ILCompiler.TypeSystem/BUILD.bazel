@@ -236,4 +236,10 @@ csharp_library(
     ],
     target_frameworks = ["net10.0"],
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+        "//:bannedapi_analyzers",
+    ],
+    msbuild_analyzer_config = "source",
 )

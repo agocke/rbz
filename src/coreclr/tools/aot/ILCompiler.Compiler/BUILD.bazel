@@ -635,6 +635,12 @@ csharp_library(
         "@paket.main//microsoft.diasymreader",
     ],
     target_frameworks = ["net10.0"],
-    nowarn = ["1591", "CA1859", "CA1866", "CA1867"],
+    nowarn = ["1591", "CA1859", "CA1866", "CA1867", "IDE0073", "SYSLIB1054", "SA1400"],
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+        "//:staticcs_analyzers",
+    ],
+    msbuild_analyzer_config = "source",
 )

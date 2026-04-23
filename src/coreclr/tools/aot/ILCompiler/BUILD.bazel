@@ -33,4 +33,9 @@ csharp_binary(
     ],
     target_frameworks = ["net10.0"],
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+    ],
+    msbuild_analyzer_config = "source",
 )

@@ -1,4 +1,4 @@
-load("@rules_dotnet//dotnet:defs.bzl", "csharp_library")
+load("//:defs.bzl", "csharp_library")
 
 csharp_library(
     name = "ILLink.Tasks",
@@ -12,6 +12,10 @@ csharp_library(
     ],
     nullable = "disable",
     target_frameworks = ["net10.0"],
-    nowarn = ["CS1591", "CS1701", "CS1702", "CS1705", "CS8500", "CS8969", "CP0003", "IDE0060", "IDE0100", "NU5105", "NU5128", "NU5129"],
+    nowarn = ["CS1591", "CS1701", "CS1702", "CS1705", "CS8500", "CS8969", "CP0003", "IDE0060", "IDE0100", "NU5105", "NU5128", "NU5129", "IDE0073", "SA1400"],
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//:source_build_analyzers",
+    ],
+    msbuild_analyzer_config = "source",
 )
