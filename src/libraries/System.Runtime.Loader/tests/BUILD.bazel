@@ -1,5 +1,13 @@
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "OPEN_SNK")
+load("//:defs.bzl", "OPEN_SNK", "resgen")
+
+# MSBuild compiles MainStrings.resx to .resources before embedding.
+# Satellite .resx files (.en, .es-MX) are passed as additionalfiles only.
+resgen(
+    name = "resgen_MainStrings",
+    out = "MainStrings.resources",
+    resx_file = "MainStrings.resx",
+)
 
 library_test(
     name = "System.Runtime.Loader.Tests",
@@ -23,7 +31,11 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     allow_unsafe_blocks = True,
-    resources = glob(["MainStrings*.resx"]),
+    resources = [":resgen_MainStrings"],
+    resource_logical_names = {
+        "MainStrings.resources": "System.Runtime.Loader.Tests.MainStrings.resources",
+    },
+    additionalfiles = glob(["MainStrings*.resx"]),
     keyfile = OPEN_SNK,
     size = "large",
 )
