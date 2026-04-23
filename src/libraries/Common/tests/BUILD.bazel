@@ -59,6 +59,8 @@ csharp_library(
     ],
     allow_unsafe_blocks = True,
     treat_warnings_as_errors = False,
+    include_syslib_warnaserror = False,
+    include_default_ruleset = False,
     visibility = ["//visibility:public"],
     keyfile = OPEN_SNK,
 )

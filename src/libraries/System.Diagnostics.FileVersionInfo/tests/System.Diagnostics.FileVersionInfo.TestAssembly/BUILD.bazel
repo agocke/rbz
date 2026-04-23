@@ -8,6 +8,8 @@ csharp_library(
     target_frameworks = [NETCOREAPP_CURRENT],
     keyfile = OPEN_SNK,
     nullable = "annotations",
+    include_syslib_warnaserror = False,
+    include_default_ruleset = False,
     nowarn = [
         # Directory.Build.props IsTestProject NoWarn
         "SYSLIB0011",
