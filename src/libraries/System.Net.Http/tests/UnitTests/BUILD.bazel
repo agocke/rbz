@@ -24,8 +24,6 @@ library_test(
         ["**/*.cs"],
         exclude = [
             "Fakes/MacProxy.cs",
-            "HttpWindowsProxyTest.cs",
-            "DiagnosticsHelperTest.cs",
         ],
     ) + [
         # Common source files
