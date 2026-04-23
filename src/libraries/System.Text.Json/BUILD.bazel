@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "OPEN_SNK", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
 load("//:defs.bzl", "csharp_library")
 
 exports_files([
@@ -12,6 +12,7 @@ exports_files([
 csharp_library(
     name = "JsonSourceGenerator",
     out = "System.Text.Json.SourceGeneration",
+    keyfile = OPEN_SNK,
     srcs = [
         # Generator core files
         "gen/JsonSourceGenerator.Roslyn4.0.cs",
@@ -129,6 +130,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Text.Json",
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     analyzers = [
         "//src/libraries/System.Text.RegularExpressions:RegexGenerator",

@@ -35,6 +35,7 @@ live_csharp_library(
     name = "MockHostTypes",
     srcs = glob(["MockHostTypes/*.cs"]),
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
     nullable = "enable",
 )
 
@@ -43,6 +44,8 @@ csharp_binary(
     srcs = ["ApplicationNameSetFromArgument/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -52,6 +55,8 @@ csharp_binary(
     srcs = ["BuildWebHostInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -61,6 +66,8 @@ csharp_binary(
     srcs = ["BuildWebHostPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -70,6 +77,8 @@ csharp_binary(
     srcs = ["CreateHostBuilderInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -79,6 +88,8 @@ csharp_binary(
     srcs = ["CreateHostBuilderPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -88,6 +99,8 @@ csharp_binary(
     srcs = ["CreateWebHostBuilderInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -97,6 +110,8 @@ csharp_binary(
     srcs = ["CreateWebHostBuilderPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -106,6 +121,8 @@ csharp_binary(
     srcs = ["NoSpecialEntryPointPattern/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -115,6 +132,8 @@ csharp_binary(
     srcs = ["NoSpecialEntryPointPatternBuildsThenThrows/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -124,6 +143,8 @@ csharp_binary(
     srcs = ["NoSpecialEntryPointPatternExits/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -133,6 +154,8 @@ csharp_binary(
     srcs = ["NoSpecialEntryPointPatternHangs/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -142,6 +165,8 @@ csharp_binary(
     srcs = ["NoSpecialEntryPointPatternMainNoArgs/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -151,6 +176,8 @@ csharp_binary(
     srcs = ["NoSpecialEntryPointPatternThrows/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -160,6 +187,8 @@ csharp_binary(
     srcs = ["TopLevelStatements/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )
@@ -169,6 +198,8 @@ csharp_binary(
     srcs = ["TopLevelStatementsTestsTimeout/Program.cs"],
     deps = _hosting_deps,
     keyfile = OPEN_SNK,
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     nowarn = MULTITARGET_NOWARN,
     target_frameworks = ["net10.0"],
 )

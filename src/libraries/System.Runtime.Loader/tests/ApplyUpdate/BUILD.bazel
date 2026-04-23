@@ -1,8 +1,13 @@
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_library")
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library")
 
 # ApplyUpdate test helper assemblies used for hot-reload / EnC testing.
 # Each is a tiny class library with a single source file in the
 # System.Runtime.Loader.Tests namespace.
+#
+# These are test-support projects (IsTestSupportProject=true in MSBuild),
+# so they use /nullable:annotations, /optimize-, and disable several
+# obsolete-API warnings (SYSLIB0011/0050/0051, IL2121) rather than the
+# Arcade SDK defaults applied to source projects.
 
 _APPLY_UPDATE_HELPERS = [
     ("System.Reflection.Metadata.ApplyUpdate.Test.AddFieldRVA", "System.Reflection.Metadata.ApplyUpdate.Test.AddFieldRVA/AddFieldRVA.cs"),
@@ -34,4 +39,20 @@ _APPLY_UPDATE_HELPERS = [
     srcs = [src],
     target_frameworks = [NETCOREAPP_CURRENT],
     visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
+    keyfile = OPEN_SNK,
+    nullable = "annotations",
+    nowarn = [
+        "IL2121",
+        "SYSLIB0011",
+        "SYSLIB0050",
+        "SYSLIB0051",
+    ],
+    # ApplyUpdate/Directory.Build.props sets Optimize=false for EnC delta
+    # generation; /optimize- must come after any default /optimize+ from
+    # rules_dotnet so that last-wins semantics apply.
+    compiler_options = ["/optimize-"],
+    msbuild_analyzer_config = "style",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
 ) for name, src in _APPLY_UPDATE_HELPERS]

@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "netcoreapp_impl_assembly")
+load("//src/libraries:defs.bzl", "OPEN_SNK", "netcoreapp_impl_assembly")
 
 exports_files([
     "src/ILLink/ILLink.Descriptors.LibraryBuild.xml",
@@ -13,6 +13,7 @@ exports_files([
 
 netcoreapp_impl_assembly(
     name = "impl_System.Private.Xml",
+    keyfile = OPEN_SNK,
     nowarn = ["CS1591"],
     srcs = [
         # Common files (from $(CommonPath))

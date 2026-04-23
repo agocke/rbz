@@ -322,6 +322,10 @@ areas:
   `Microsoft.Extensions.FileProviders.Composite`,
   `Microsoft.Extensions.FileSystemGlobbing`, `Microsoft.Extensions.Hosting`,
   and `Microsoft.Extensions.Hosting.Abstractions`.
+  Strong-name signing fixes: `System.Private.Xml`, `System.Text.Json`,
+  `System.Text.Json.SourceGeneration`, and `System.Data.OleDb` now use
+  `Open.snk` (via explicit `keyfile = OPEN_SNK`) matching MSBuild's default
+  `StrongNameKeyId` for source projects in `src/libraries/`.
   Of the 220 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
@@ -928,12 +932,16 @@ Mono-only platforms (Browser/WASM, WASI, Tizen) are also excluded.
 - [x] `MODULE.bazel` — Bzlmod workspace, depends on rules_cc@0.2.14, rules_dotnet, bazel_skylib@1.8.2
 - [x] `.bazelrc` — Compiler flags matching CMake for linux-x64, per-component config system
 - [x] `BUILD.bazel` (root) — Root package, string_flag build settings, config_settings, runtime layout
-- [x] `defs.bzl` — Shared macros (csharp_library wrapper, gen_resx_source, resgen)
+- [x] `defs.bzl` — Shared macros (csharp_library wrapper, csharp_binary wrapper, gen_resx_source, resgen)
 - [x] `src/libraries/defs.bzl` — Library macros (netcoreapp_ref_assembly, impl_assembly, netcoreapp_impl_assembly, gen_facades, ref_impl_pair)
 - [x] `src/tests/defs.bzl` — Test infrastructure (live_csharp_library, test runner)
 - [x] Compiler flag parity verified against CMake (`-g`, `-O3`, `-std=gnu11`/`-std=c++17`, all warning flags, all defines)
 - [x] Managed C# compiler flag parity: `/warnaserror+`, `/warn:9999` matching MSBuild's
-  `TreatWarningsAsErrors=true` and `WarningLevel=9999` from `Directory.Build.props`
+  `TreatWarningsAsErrors=true` and `WarningLevel=9999` from `Directory.Build.props`.
+  Both the `csharp_library` and `csharp_binary` wrappers apply the full set of MSBuild
+  defaults (`/checksumalgorithm:SHA256`, `/noconfig`, `/features:strict`,
+  `/features:nullablePublicOnly`, global `nowarn`, `warnings_not_as_errors`,
+  `msbuild_analyzer_config` support)
 - [x] CI mode (`--config=ci`): `/pathmap` normalization matching MSBuild's
   `ContinuousIntegrationBuild=true` / `DeterministicSourcePaths=true` for deterministic PDB
   paths (`/_/artifacts/obj/...`). Managed DLL content is byte-identical to MSBuild CI output

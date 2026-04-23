@@ -6,6 +6,8 @@ csharp_binary(
         "Program.cs",
         "AssemblyAttributes.cs",
     ],
+    msbuild_analyzer_config = "style",
+    nullable = "annotations",
     target_frameworks = [NETCOREAPP_CURRENT],
     visibility = ["//src/libraries/System.Runtime/tests:__subpackages__"],
 )
