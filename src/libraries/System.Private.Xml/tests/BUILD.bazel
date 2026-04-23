@@ -130,6 +130,8 @@ library_test(
         exclude = [
             "XmlReaderLib/**",
             "TrimmingTests/**",
+            # XmlPreloadedResolverGetEntity needs DTD files at Utils/DTDs/ that aren't in the repo
+            "XmlResolver/System.Xml.XmlResolver.Tests/XmlPreloadedResolverGetEntity.cs",
             # XmlWriterApi/TestExtensions.cs overrides DataAttribute.GetData(MethodInfo)
             # from xunit.extensibility.core (netstandard1.1). This requires the
             # System.Reflection facade assembly for MethodInfo type unification, which
@@ -277,4 +279,5 @@ library_test(
         "@paket.main//xunit.extensibility.execution",
     ],
     keyfile = OPEN_SNK,
+    writable_test_dir = True,
 )

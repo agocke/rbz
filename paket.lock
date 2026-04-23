@@ -139,6 +139,7 @@ NUGET
     System.IO.Packaging.TestData (10.0.0-beta.25418.1)
     System.Net.TestData (10.0.0-beta.25418.1)
     System.Private.Runtime.UnicodeData (10.0.0-beta.25418.1)
+    System.Runtime.Numerics.TestData (10.0.0-beta.25418.1)
     System.Security.Cryptography.X509Certificates.TestData (10.0.0-beta.25418.1)
     System.Text.RegularExpressions.TestData (10.0.0-beta.25418.1)
 
