@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "OPEN_SNK", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/System.Security.Cryptography.Xml.cs",
@@ -19,6 +19,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Security.Cryptography.Xml",
+    keyfile = OPEN_SNK,
     srcs = [
         # Common linked files
         "//src/libraries/Common:src/System/HexConverter.cs",

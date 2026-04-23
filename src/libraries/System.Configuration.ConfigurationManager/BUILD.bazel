@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "OPEN_SNK", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
 
 exports_files([
     "src/Resources/Strings.resx",
@@ -34,6 +34,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Configuration.ConfigurationManager",
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN + ["CA2249", "CP0003", "nullable", "CS1591"],
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/System/IO/TempFileCollection.cs",

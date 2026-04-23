@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "ECMA_SNK", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/System.ComponentModel.Composition.cs",
@@ -19,6 +19,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.ComponentModel.Composition",
+    keyfile = ECMA_SNK,
     srcs = glob(["src/**/*.cs"]) + [
         # Common linked files
         "//src/libraries/Common:src/System/Composition/Diagnostics/CompositionTraceId.cs",

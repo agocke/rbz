@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "OPEN_SNK", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 netcoreapp_ref_assembly(
     name = "ref_System.IO.Ports",
@@ -13,6 +13,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.IO.Ports",
+    keyfile = OPEN_SNK,
     os_targeted = "unix",
     nullable = "disable",
     nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],

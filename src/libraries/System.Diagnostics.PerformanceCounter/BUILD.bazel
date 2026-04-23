@@ -1,4 +1,4 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "OPEN_SNK", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/System.Diagnostics.PerformanceCounter.cs",
@@ -21,6 +21,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Diagnostics.PerformanceCounter",
+    keyfile = OPEN_SNK,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_PerfCounters",
     pnse_ref_srcs = [

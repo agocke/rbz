@@ -16,6 +16,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Net.Http.WinHttpHandler",
+    include_editorconfig = False,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_WinHttpHandler",
     pnse_ref_srcs = ["ref/System.Net.Http.WinHttpHandler.cs"],

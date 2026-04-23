@@ -41,6 +41,7 @@ MSFT_SNK = "//eng:snk/MSFT.snk"
 OPEN_SNK = "//eng:snk/Open.snk"
 ASPNETCORE_SNK = "//eng:snk/AspNetCore.snk"
 ECMA_SNK = "//eng:snk/ECMA.snk"
+SHAREDLIB1024_SNK = "//eng:snk/35MSSharedLib1024.snk"
 SILVERLIGHT_SNK = "//eng:snk/SilverlightPlatformPublicKey.snk"
 DEFAULT_RULESET = "//eng:Default.ruleset"
 

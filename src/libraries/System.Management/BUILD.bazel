@@ -24,6 +24,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Management",
+    include_editorconfig = False,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_SystemManagement",
     pnse_ref_srcs = [

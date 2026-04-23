@@ -427,7 +427,7 @@ release/10.0 commits and bazel merge commits.
    `paket.dependencies`, and updates:
    - `paket.dependencies` — the source of truth for NuGet package versions
    - `defs.bzl` — centralized versioned repo-name constants (e.g.,
-     `ARCADE_SDK_REPO`, `OPEN_SNK`, `MSFT_SNK`)
+     `ARCADE_SDK_REPO`, `OPEN_SNK`, `MSFT_SNK`, `SHAREDLIB1024_SNK`)
    - `MODULE.bazel` — `use_repo()` entries for versioned repos
 
    **Ordering constraint:** `MODULE.bazel` must be temporarily reverted to its
