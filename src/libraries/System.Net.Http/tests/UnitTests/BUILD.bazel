@@ -243,4 +243,3 @@ library_test(
     keyfile = OPEN_SNK,
     size = "large",
 )
-)
