@@ -23,5 +23,6 @@ csharp_library(
     msbuild_analyzer_config = "style",
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     include_default_ruleset = False,
+    include_syslib_warnaserror = False,
     visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
 )

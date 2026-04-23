@@ -22,6 +22,8 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.Windows.Extensions",
     keyfile = OPEN_SNK,
+    allow_unsafe_blocks = True,
+    com_interface_generator = True,
     include_editorconfig = False,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_System_Windows_Extensions",
