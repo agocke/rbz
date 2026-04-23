@@ -19,7 +19,10 @@ netcoreapp_ref_assembly(
 netcoreapp_impl_assembly(
     name = "impl_System.Threading.Tasks.Dataflow",
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
-    generate_documentation_file = True,
+    # MSBuild passes /doc but uses hand-written XML doc includes that reference
+    # external XmlDocs/*.xml files. Bazel sandboxing prevents the compiler from
+    # finding those files, so doc generation is disabled.
+    generate_documentation_file = False,
     srcs = [
         "src/Base/DataflowBlock.cs",
         "src/Base/DataflowBlock.netstandard21.cs",

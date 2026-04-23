@@ -164,7 +164,7 @@ match  System.Threading.AccessControl
 match  System.Threading.Channels
 match  System.Threading.Overlapped
 match  System.Threading.Tasks
-match  System.Threading.Tasks.Dataflow
+diff   System.Threading.Tasks.Dataflow
 match  System.Threading.Tasks.Extensions
 match  System.Threading.Tasks.Parallel
 match  System.Threading.Thread
