@@ -11,7 +11,7 @@ gen_resx_source(
 
 resgen(
     name = "strings_resx",
-    out = "SR.resources",
+    out = "FxResources.System.Configuration.ConfigurationManager.Tests.SR.resources",
     resx_file = "//src/libraries/System.Configuration.ConfigurationManager:src/Resources/Strings.resx",
 )
 
@@ -50,10 +50,11 @@ library_test(
     ],
     defines = ["LEGACY_GETRESOURCESTRING_USER"],
     keyfile = OPEN_SNK,
+    additionalfiles = ["//src/libraries/System.Configuration.ConfigurationManager:src/Resources/Strings.resx"],
     resources = [":strings_resx"],
     size = "large",
     resource_logical_names = {
-        "SR.resources": "FxResources.System.Configuration.ConfigurationManager.Tests.SR.resources",
+        "FxResources.System.Configuration.ConfigurationManager.Tests.SR.resources": "FxResources.System.Configuration.ConfigurationManager.Tests.SR.resources",
     },
     tags = ["no-sandbox"],
 )
