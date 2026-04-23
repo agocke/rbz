@@ -89,6 +89,10 @@ impl_assembly(
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
     ],
     resx_file = "src/Resources/Strings.resx",
+    analyzers = [
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
     com_interface_generator = True,
     nullable = "disable",
     allow_unsafe_blocks = True,

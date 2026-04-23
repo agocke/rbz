@@ -4,6 +4,16 @@ load("//:defs.bzl", "ASPNETCORE_SNK")
 live_csharp_library(
     name = "Microsoft.Extensions.DependencyInjection.Specification.Tests",
     srcs = glob(["**/*.cs"]),
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+        "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
     deps = [
         "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
         "//src/libraries/System.Threading:ref_System.Threading",

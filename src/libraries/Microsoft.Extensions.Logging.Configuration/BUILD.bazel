@@ -21,7 +21,10 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Logging.Configuration",
-    analyzers = COMMON_GENERATOR_ANALYZERS,
+    analyzers = COMMON_GENERATOR_ANALYZERS + [
+        "//src/libraries/Microsoft.Extensions.Configuration.Binder:ConfigurationBinderSourceGeneration",
+    ],
+    interceptors_namespaces = ";Microsoft.Extensions.Configuration.Binder.SourceGeneration",
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/ProviderAliasUtilities/ProviderAliasUtilities.cs",

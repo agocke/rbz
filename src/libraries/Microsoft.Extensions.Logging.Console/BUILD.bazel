@@ -22,7 +22,10 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Logging.Console",
-    analyzers = COMMON_GENERATOR_ANALYZERS,
+    analyzers = COMMON_GENERATOR_ANALYZERS + [
+        "//src/libraries/Microsoft.Extensions.Configuration.Binder:ConfigurationBinderSourceGeneration",
+    ],
+    interceptors_namespaces = ";Microsoft.Extensions.Configuration.Binder.SourceGeneration",
     nowarn = MULTITARGET_NOWARN + ["CP0003", "SYSLIB1100", "SYSLIB1101"],
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/Logging/NullExternalScopeProvider.cs",
@@ -38,6 +41,7 @@ impl_assembly(
     defines = ["NO_SUPPRESS_GC_TRANSITION"],
     deps = [
         "//src/libraries:ref_System.Runtime",
+        "//src/libraries/Microsoft.Extensions.Configuration:ref_Microsoft.Extensions.Configuration",
         "//src/libraries/Microsoft.Extensions.Configuration.Abstractions:ref_Microsoft.Extensions.Configuration.Abstractions",
         "//src/libraries/Microsoft.Extensions.Configuration.Binder:ref_Microsoft.Extensions.Configuration.Binder",
         "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",

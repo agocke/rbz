@@ -94,6 +94,7 @@ netcoreapp_impl_assembly(
     keyfile = OPEN_SNK,
     assembly_version = "2.1.0.0",
     generate_documentation_file = False,
+    interop_source_generation = True,
     library_import_generator = False,
     com_interface_generator = True,
 )

@@ -49,6 +49,10 @@ impl_assembly(
         "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
     ],
     resx_file = "src/Resources/Strings.resx",
+    analyzers = [
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
     com_interface_generator = True,
     allow_unsafe_blocks = True,
     supported_os_platforms = ["unix"],

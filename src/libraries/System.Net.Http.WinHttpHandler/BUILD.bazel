@@ -30,6 +30,11 @@ impl_assembly(
         "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
     ],
     resx_file = "src/Resources/Strings.resx",
+    analyzers = [
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
+    com_interface_generator = True,
     supported_os_platforms_short = ["windows"],
     allow_unsafe_blocks = True,
 )
