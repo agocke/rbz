@@ -43,7 +43,7 @@ csharp_binary(
         "@paket.main//system.commandline",
     ],
     target_frameworks = ["net10.0"],
-    nowarn = ["1701", "1702", "8002", "IL2121", "NU1701", "NU5105"],
+    nowarn = ["1701", "1702", "8002", "CS8632", "IL2121", "NU1701", "NU5105"],
     is_aot_compatible = True,
     visibility = ["//visibility:public"],
 )
