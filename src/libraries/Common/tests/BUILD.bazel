@@ -94,6 +94,10 @@ csharp_library(
     name = "XmlCoreTest",
     srcs = glob(["System/Xml/XmlCoreTest/*.cs"]),
     target_frameworks = [NETCOREAPP_CURRENT],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     deps = [
         ":TestUtilities",
         ":XmlDiff",
@@ -127,7 +131,12 @@ live_csharp_library(
         "@paket.main//xunit.extensibility.core",
     ],
     allow_unsafe_blocks = True,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    treat_warnings_as_errors = True,
     visibility = ["//visibility:public"],
+    warnings_not_as_errors = ["NU1901", "NU1902", "NU1903", "NU1904"],
     keyfile = OPEN_SNK,
 )
 

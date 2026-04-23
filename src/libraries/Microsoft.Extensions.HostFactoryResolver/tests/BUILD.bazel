@@ -34,19 +34,28 @@ _mock_host_type_deps = _hosting_deps + [":MockHostTypes"]
 live_csharp_library(
     name = "MockHostTypes",
     srcs = glob(["MockHostTypes/*.cs"]),
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
+    nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     nullable = "enable",
+    treat_warnings_as_errors = True,
+    warnings_not_as_errors = ["NU1901", "NU1902", "NU1903", "NU1904"],
 )
 
 csharp_binary(
     name = "ApplicationNameSetFromArgument",
     srcs = ["ApplicationNameSetFromArgument/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -54,10 +63,13 @@ csharp_binary(
     name = "BuildWebHostInvalidSignature",
     srcs = ["BuildWebHostInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -65,10 +77,13 @@ csharp_binary(
     name = "BuildWebHostPatternTestSite",
     srcs = ["BuildWebHostPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -76,10 +91,13 @@ csharp_binary(
     name = "CreateHostBuilderInvalidSignature",
     srcs = ["CreateHostBuilderInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -87,10 +105,13 @@ csharp_binary(
     name = "CreateHostBuilderPatternTestSite",
     srcs = ["CreateHostBuilderPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -98,10 +119,13 @@ csharp_binary(
     name = "CreateWebHostBuilderInvalidSignature",
     srcs = ["CreateWebHostBuilderInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -109,10 +133,13 @@ csharp_binary(
     name = "CreateWebHostBuilderPatternTestSite",
     srcs = ["CreateWebHostBuilderPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -120,10 +147,13 @@ csharp_binary(
     name = "NoSpecialEntryPointPattern",
     srcs = ["NoSpecialEntryPointPattern/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -131,10 +161,13 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternBuildsThenThrows",
     srcs = ["NoSpecialEntryPointPatternBuildsThenThrows/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -142,10 +175,13 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternExits",
     srcs = ["NoSpecialEntryPointPatternExits/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -153,10 +189,13 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternHangs",
     srcs = ["NoSpecialEntryPointPatternHangs/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -164,10 +203,13 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternMainNoArgs",
     srcs = ["NoSpecialEntryPointPatternMainNoArgs/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -175,10 +217,13 @@ csharp_binary(
     name = "NoSpecialEntryPointPatternThrows",
     srcs = ["NoSpecialEntryPointPatternThrows/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -186,10 +231,13 @@ csharp_binary(
     name = "TopLevelStatements",
     srcs = ["TopLevelStatements/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 
@@ -197,10 +245,13 @@ csharp_binary(
     name = "TopLevelStatementsTestsTimeout",
     srcs = ["TopLevelStatementsTestsTimeout/Program.cs"],
     deps = _hosting_deps,
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
     nullable = "annotations",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     target_frameworks = ["net10.0"],
 )
 

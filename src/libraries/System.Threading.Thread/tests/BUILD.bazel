@@ -4,6 +4,9 @@ load("//:defs.bzl", "OPEN_SNK", "csharp_binary")
 csharp_binary(
     name = "STAMain",
     srcs = ["STAMain/STAMain.cs"],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     msbuild_analyzer_config = "style",
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     nullable = "annotations",
@@ -13,6 +16,9 @@ csharp_binary(
 csharp_binary(
     name = "MTAMain",
     srcs = ["MTAMain/MTAMain.cs"],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     msbuild_analyzer_config = "style",
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     nullable = "annotations",
@@ -22,6 +28,9 @@ csharp_binary(
 csharp_binary(
     name = "DefaultApartmentStateMain",
     srcs = ["DefaultApartmentStateMain/DefaultApartmentStateMain.cs"],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     msbuild_analyzer_config = "style",
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     nullable = "annotations",

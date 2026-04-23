@@ -105,6 +105,4 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Runtime.Intrinsics:ref_System.Runtime.Intrinsics",
     ],
     resx_file = "src/Resources/Strings.resx",
-    generate_documentation_file = False,
-    library_import_generator = False,
 )

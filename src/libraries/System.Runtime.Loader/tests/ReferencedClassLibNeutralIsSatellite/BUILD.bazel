@@ -4,6 +4,10 @@ csharp_library(
     name = "ReferencedClassLibNeutralIsSatellite",
     srcs = ["ReferencedClassLibNeutralIsSatellite.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     resources = glob(["ReferencedStrings*.resx"]),
     visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
 )
