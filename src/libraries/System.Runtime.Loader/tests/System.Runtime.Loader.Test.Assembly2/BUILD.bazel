@@ -1,0 +1,10 @@
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_library")
+
+# Assembly2 compiles the same TestClass.cs from the Test.Assembly directory.
+csharp_library(
+    name = "System.Runtime.Loader.Test.Assembly2",
+    srcs = ["//src/libraries/System.Runtime.Loader/tests/System.Runtime.Loader.Test.Assembly:TestClass.cs"],
+    target_frameworks = [NETCOREAPP_CURRENT],
+    allow_unsafe_blocks = True,
+    visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
+)

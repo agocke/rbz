@@ -28,6 +28,7 @@ impl_assembly(
         "//src/libraries/System.Private.CoreLib:src/System/Numerics/Hashing/HashHelpers.cs",
     ],
     analyzers = COMMON_GENERATOR_ANALYZERS,
+    internals_visible_to = [],
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.Collections:ref_System.Collections",

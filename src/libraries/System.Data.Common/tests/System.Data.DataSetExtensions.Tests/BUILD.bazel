@@ -20,7 +20,7 @@ library_test(
     data = [
         "Mono/testdataset1.xml",
     ],
-    nowarn = ["0168", "0169", "0219", "0414", "0649", "SYSLIB0011", "SYSLIB0051"],
+    nowarn = ["SYSLIB0011", "SYSLIB0051"],
     size = "large",
     keyfile = OPEN_SNK,
 )

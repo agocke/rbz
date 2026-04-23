@@ -74,3 +74,33 @@ library_test(
     size = "large",
     target_compatible_with = ["@platforms//:incompatible"],
 )
+
+# Disabled.Tests: BinaryFormatter disabled switch test.
+# The EnableUnsafeBinaryFormatterSerialization switch is removed (i.e., not set)
+# so BinaryFormatter should be disabled by default. The Bazel runtimeconfig
+# already sets it to false, which achieves the same effect.
+library_test(
+    name = "System.Runtime.Serialization.Formatters.Disabled.Tests",
+    srcs = [
+        "Disabled/DisableBitTests.cs",
+        "TestConfiguration.cs",
+    ],
+    deps = [
+        "//src/libraries/System.Runtime.Serialization.Formatters:impl_System.Runtime.Serialization.Formatters",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
+        "@paket.main//microsoft.dotnet.xunitassert",
+        "@paket.main//microsoft.dotnet.xunitextensions",
+        "@paket.main//xunit.abstractions",
+        "@paket.main//xunit.extensibility.core",
+    ],
+    nowarn = [
+        "SYSLIB0011",
+        "SYSLIB0050",
+        "SYSLIB0051",
+    ],
+    keyfile = OPEN_SNK,
+    size = "medium",
+)

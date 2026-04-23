@@ -1,0 +1,11 @@
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_binary")
+
+csharp_binary(
+    name = "TestAppOutsideOfTPA",
+    srcs = ["Program.cs"],
+    target_frameworks = [NETCOREAPP_CURRENT],
+    deps = [
+        "//src/libraries/System.Runtime/tests/System.Runtime.Extensions.Tests/AssemblyResolveTestApp",
+    ],
+    visibility = ["//src/libraries/System.Runtime/tests:__subpackages__"],
+)

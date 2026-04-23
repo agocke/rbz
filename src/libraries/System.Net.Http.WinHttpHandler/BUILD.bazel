@@ -1,6 +1,6 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
-exports_files(["ref/System.Net.Http.WinHttpHandler.cs"])
+exports_files(["ref/System.Net.Http.WinHttpHandler.cs"] + glob(["src/**/*.cs"]) + glob(["tests/UnitTests/*.cs"]))
 
 netcoreapp_ref_assembly(
     name = "ref_System.Net.Http.WinHttpHandler",

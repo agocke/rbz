@@ -11,6 +11,5 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    nowarn = ["SYSLIB0013"],
     keyfile = OPEN_SNK,
 )

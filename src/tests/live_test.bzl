@@ -309,6 +309,12 @@ def _generate_runtimeconfigs(ctx, dll, tfm, sdk_version, additional_runfiles):
        Microsoft.DotNet.RemoteExecutor.dll" so it resolves libhostpolicy.so from
        the testhost's shared framework directory.
     """
+
+    # Build additional configProperties from the runtimeconfig_properties attribute.
+    extra_props = ""
+    for key, value in ctx.attr.runtimeconfig_properties.items():
+        extra_props += ',\n      "{}": {}'.format(key, value)
+
     runtimeconfig_content = """\
 {{
   "runtimeOptions": {{
@@ -318,11 +324,11 @@ def _generate_runtimeconfigs(ctx, dll, tfm, sdk_version, additional_runfiles):
       "version": "{version}"
     }},
     "configProperties": {{
-      "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false
+      "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false{extra_props}
     }}
   }}
 }}
-""".format(tfm = tfm, version = sdk_version)
+""".format(tfm = tfm, version = sdk_version, extra_props = extra_props)
 
     # Always generate a runtimeconfig for the test assembly itself.
     test_name = dll.basename.replace(".dll", "")
@@ -579,6 +585,11 @@ _xunit_library_test = rule(
                       "Off by default to avoid the copy overhead.",
                 default = False,
             ),
+            "runtimeconfig_properties": attr.string_dict(
+                doc = "Additional configProperties for runtimeconfig.json. " +
+                      "Keys are property names, values are JSON literals (e.g. 'true', '\"string\"').",
+                default = {},
+            ),
         }),
     test = True,
     toolchains = [
@@ -599,10 +610,30 @@ def library_test(
     analyzer_configs = [],
     compiler_options = [],
     features_strict = True,
+    os_targeted = False,
     **kwargs
 ):
     """Test macro for library tests that compiles as library and runs via xunit.console.dll."""
     deps = deps + LIVE_REFPACK_DEPS
+
+    # Assemblies whose MSBuild TFM includes an OS suffix receive OS-specific
+    # implicit defines.  Match that in Bazel via select().
+    # os_targeted can be True/"linux" for net10.0-linux, or "unix" for net10.0-unix.
+    defines = kwargs.pop("defines", [])
+    if os_targeted == "unix" or os_targeted == "Unix":
+        defines = defines + select({
+            "@platforms//os:linux": ["UNIX", "UNIX1_0"],
+            "@platforms//os:macos": ["UNIX", "UNIX1_0"],
+            "//conditions:default": [],
+        })
+    elif os_targeted:
+        defines = defines + select({
+            "@platforms//os:linux": ["LINUX", "LINUX1_0"],
+            "@platforms//os:macos": ["OSX", "OSX1_0"],
+            "//conditions:default": [],
+        })
+    if defines:
+        kwargs["defines"] = defines
     # Match MSBuild default: src/libraries/Directory.Build.props sets
     # <Nullable>annotations</Nullable> for test projects.
     nullable = kwargs.pop("nullable", "annotations")

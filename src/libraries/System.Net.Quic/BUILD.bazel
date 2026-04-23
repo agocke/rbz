@@ -1,6 +1,17 @@
 load("//src/libraries:defs.bzl", "netcoreapp_impl_assembly", "netcoreapp_ref_assembly")
 
-exports_files(["src/System/Net/Quic/Internal/ResettableValueTaskSource.cs"])
+exports_files([
+    "src/System/Net/Quic/Internal/ResettableValueTaskSource.cs",
+    "src/System/Net/Quic/QuicDefaults.cs",
+    "src/System/Net/Quic/Interop/QUIC_SETTINGS.IEquattable.cs",
+    "src/System/Net/Quic/Interop/msquic.cs",
+    "src/System/Net/Quic/Interop/msquic_extensions.cs",
+    "src/System/Net/Quic/Interop/msquic_generated.cs",
+    "src/System/Net/Quic/Interop/msquic_generated_linux.cs",
+    "src/System/Net/Quic/Interop/msquic_generated_macos.cs",
+    "src/System/Net/Quic/Interop/msquic_generated_windows.cs",
+    "src/Resources/Strings.resx",
+])
 
 netcoreapp_ref_assembly(
     name = "ref_System.Net.Quic",

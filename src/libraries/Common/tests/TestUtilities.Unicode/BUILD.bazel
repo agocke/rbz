@@ -1,0 +1,43 @@
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "UNICODE_DATA_REPO", "csharp_library")
+
+csharp_library(
+    name = "TestUtilities.Unicode",
+    srcs = [
+        "System/Text/Unicode/BidiClass.cs",
+        "System/Text/Unicode/CodePoint.cs",
+        "System/Text/Unicode/CodePointFlags.cs",
+        "System/Text/Unicode/GraphemeClusterBreakProperty.cs",
+        "System/Text/Unicode/ParsedUnicodeData.cs",
+        "System/Text/Unicode/PropsFileEntry.cs",
+        "System/Text/Unicode/Resources.cs",
+        "System/Text/Unicode/UnicodeData.cs",
+        "System/Text/Unicode/UnicodeDataFileEntry.cs",
+    ],
+    target_frameworks = [NETCOREAPP_CURRENT],
+    allow_unsafe_blocks = True,
+    nullable = "enable",
+    resources = [
+        "@{}//:contentFiles/any/any/16.0.0/ucd/CaseFolding.txt".format(UNICODE_DATA_REPO),
+        "@{}//:contentFiles/any/any/16.0.0/ucd/PropList.txt".format(UNICODE_DATA_REPO),
+        "@{}//:contentFiles/any/any/16.0.0/ucd/UnicodeData.txt".format(UNICODE_DATA_REPO),
+        "@{}//:contentFiles/any/any/16.0.0/ucd/auxiliary/GraphemeBreakProperty.txt".format(UNICODE_DATA_REPO),
+        "@{}//:contentFiles/any/any/16.0.0/ucd/extracted/DerivedBidiClass.txt".format(UNICODE_DATA_REPO),
+        "@{}//:contentFiles/any/any/16.0.0/ucd/extracted/DerivedName.txt".format(UNICODE_DATA_REPO),
+        "@{}//:contentFiles/any/any/16.0.0/ucd/emoji/emoji-data.txt".format(UNICODE_DATA_REPO),
+    ],
+    resource_logical_names = {
+        "CaseFolding.txt": "CaseFolding.txt",
+        "PropList.txt": "PropList.txt",
+        "UnicodeData.txt": "UnicodeData.txt",
+        "GraphemeBreakProperty.txt": "GraphemeBreakProperty.txt",
+        "DerivedBidiClass.txt": "DerivedBidiClass.txt",
+        "DerivedName.txt": "DerivedName.txt",
+        "emoji-data.txt": "emoji-data.txt",
+    },
+    deps = [
+        "@paket.main//microsoft.dotnet.xunitassert",
+        "@paket.main//microsoft.dotnet.xunitextensions",
+        "@paket.main//xunit.extensibility.core",
+    ],
+    visibility = ["//visibility:public"],
+)

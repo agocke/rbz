@@ -1,0 +1,11 @@
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_library")
+
+exports_files(["TestClass.cs"])
+
+csharp_library(
+    name = "System.Runtime.Loader.Test.Assembly",
+    srcs = ["TestClass.cs"],
+    target_frameworks = [NETCOREAPP_CURRENT],
+    allow_unsafe_blocks = True,
+    visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
+)

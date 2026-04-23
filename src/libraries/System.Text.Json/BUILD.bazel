@@ -6,6 +6,7 @@ exports_files([
     "ref/System.Text.Json.netcoreapp.cs",
     "ref/System.Text.Json.Typeforwards.netcoreapp.cs",
     "src/ILLink/ILLink.Descriptors.LibraryBuild.xml",
+    "src/System/Text/Json/BitStack.cs",
 ])
 
 csharp_library(

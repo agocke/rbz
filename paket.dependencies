@@ -73,6 +73,8 @@ nuget Newtonsoft.Json 13.0.3
 nuget FsCheck 2.14.3
 nuget FsCheck.Xunit 2.14.3
 nuget System.Data.SqlClient 4.9.0
+nuget AwesomeAssertions 8.0.2
+nuget System.Runtime.Numerics.TestData 10.0.0-beta.25418.1
 
 group illink
 source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json
