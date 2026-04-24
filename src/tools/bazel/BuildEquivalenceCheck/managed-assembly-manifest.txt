@@ -196,24 +196,24 @@ match    netstandard
 # uses precise deps, or because of stub vs full impl differences,
 # generated content differences, or source generator targeting variations.
 
-diff   ApplicationNameSetFromArgument
-diff   BuildWebHostInvalidSignature
-diff   BuildWebHostPatternTestSite
-diff   CollectibleAssembly
+match  ApplicationNameSetFromArgument
+match  BuildWebHostInvalidSignature
+match  BuildWebHostPatternTestSite
+match  CollectibleAssembly
 match  Common.Tests
-diff   CreateHostBuilderInvalidSignature
-diff   CreateHostBuilderPatternTestSite
-diff   CreateWebHostBuilderInvalidSignature
-diff   CreateWebHostBuilderPatternTestSite
+match  CreateHostBuilderInvalidSignature
+match  CreateHostBuilderPatternTestSite
+match  CreateWebHostBuilderInvalidSignature
+match  CreateWebHostBuilderPatternTestSite
 match  DefaultApartmentStateMain
-diff   ILCompiler.Compiler
+match  ILCompiler.Compiler
 match  ILCompiler.DependencyAnalysisFramework
 match  ILCompiler.Diagnostics
 match  ILCompiler.MetadataTransform
-diff   ILCompiler.ReadyToRun
+match  ILCompiler.ReadyToRun
 match  ILCompiler.RyuJit
-diff   ILCompiler.TypeSystem
-diff   ILLink.Tasks
+match  ILCompiler.TypeSystem
+match  ILLink.Tasks
 match  MTAMain
 diff   Microsoft.Bcl.AsyncInterfaces
 match  Microsoft.Bcl.AsyncInterfaces.Tests
@@ -251,7 +251,7 @@ match  Microsoft.Extensions.Configuration.Xml
 match  Microsoft.Extensions.Configuration.Xml.Tests
 match  Microsoft.Extensions.DependencyInjection
 match  Microsoft.Extensions.DependencyInjection.Abstractions
-diff   Microsoft.Extensions.DependencyInjection.Specification.Tests
+match  Microsoft.Extensions.DependencyInjection.Specification.Tests
 match  Microsoft.Extensions.DependencyInjection.Tests
 match  Microsoft.Extensions.DependencyModel
 match  Microsoft.Extensions.Diagnostics
@@ -300,18 +300,19 @@ match  Microsoft.Extensions.Primitives.Tests
 match  Microsoft.Win32.Primitives.Tests
 match  Microsoft.Win32.Registry.AccessControl
 match  Microsoft.Win32.SystemEvents
-diff   MockHostTypes
-diff   NoSpecialEntryPointPattern
-diff   NoSpecialEntryPointPatternBuildsThenThrows
-diff   NoSpecialEntryPointPatternExits
-diff   NoSpecialEntryPointPatternHangs
-diff   NoSpecialEntryPointPatternMainNoArgs
-diff   NoSpecialEntryPointPatternThrows
+match  MockHostTypes
+match  NoSpecialEntryPointPattern
+match  NoSpecialEntryPointPatternBuildsThenThrows
+match  NoSpecialEntryPointPatternExits
+match  NoSpecialEntryPointPatternHangs
+match  NoSpecialEntryPointPatternMainNoArgs
+match  NoSpecialEntryPointPatternThrows
 match  STAMain
-diff   SerializableAssembly
-diff   StreamConformanceTests
-diff   TopLevelStatements
-diff   TopLevelStatementsTestsTimeout
+match  SerializableAssembly
+diff   SerializationTypes
+match  StreamConformanceTests
+match  TopLevelStatements
+match  TopLevelStatementsTestsTimeout
 match  System.CodeDom
 match  System.CodeDom.Tests
 match  System.Collections.Concurrent.Tests
@@ -354,7 +355,7 @@ match  System.Diagnostics.DiagnosticSource.Tests
 match  MetricOuterLoop.Tests
 match  MetricOuterLoop1.Tests
 match  System.Diagnostics.EventLog
-diff   System.Diagnostics.FileVersionInfo.TestAssembly
+match  System.Diagnostics.FileVersionInfo.TestAssembly
 match  System.Diagnostics.FileVersionInfo.Tests
 match  System.Diagnostics.PerformanceCounter
 match  System.Diagnostics.Process.Tests
@@ -445,7 +446,7 @@ match  System.Private.Uri.Functional.Tests
 match  System.Private.Uri.Unit.Tests
 match  System.Reflection.Context
 match  System.Reflection.Context.Tests
-diff   System.Reflection.DispatchProxy.TestDependency
+match  System.Reflection.DispatchProxy.TestDependency
 match  System.Reflection.DispatchProxy.Tests
 match  System.Reflection.Emit.ILGeneration.Tests
 match  System.Reflection.Emit.Lightweight.Tests
@@ -485,7 +486,7 @@ match  System.Runtime.Serialization.Json.Tests
 match  System.Runtime.Serialization.Primitives.Tests
 match  System.Runtime.Serialization.Schema
 match  System.Runtime.Serialization.Schema.Tests
-diff   System.Runtime.Serialization.Xml.Tests
+match  System.Runtime.Serialization.Xml.Tests
 match  System.Runtime.Serialization.Xml.Canonicalization.Tests
 match  System.Runtime.Serialization.Xml.ReflectionOnly.Tests
 match  System.Runtime.ReflectionInvokeEmit.Tests
@@ -543,16 +544,16 @@ match  System.Xml.Linq.xNodeBuilder.Tests
 match  System.Xml.Linq.xNodeReader.Tests
 # TestLibrary  # netstandard2.0, filtered
 # ExceptionTestAssembly  # netstandard2.0, filtered
-diff   XDocument.Common
-diff   XmlCoreTest
+match  XDocument.Common
+match  XmlCoreTest
 diff   crossgen2
-diff   ilc
-diff   illink
+match  ilc
+match  illink
 
 # ── Unlisted assemblies added during equivalence improvement ──
 match  ILCompiler.Reflection.ReadyToRun
 diff   System.Text.Json.SourceGeneration
-diff   TestUtilities
+match  TestUtilities
 match  Microsoft.Extensions.DependencyModel.Tests
 diff   System.Private.Xml.Tests
 diff   System.Text.Json.Tests
@@ -561,16 +562,16 @@ diff   System.Text.Json.Tests
 match  System.Runtime.Loader.Test.Assembly
 match  System.Runtime.Loader.Test.Assembly2
 match  System.Runtime.Loader.Test.ContextualReflectionDependency
-diff   System.Runtime.Loader.Test.VersionDowngrade
+match  System.Runtime.Loader.Test.VersionDowngrade
 match  LoaderLinkTest.Shared
 match  LoaderLinkTest.Dynamic
-diff   ReferencedClassLib
-diff   ReferencedClassLibNeutralIsSatellite
+match  ReferencedClassLib
+match  ReferencedClassLibNeutralIsSatellite
 
 # ── Runtime test helper assemblies ──
-diff   TestUtilities.Unicode
+match  TestUtilities.Unicode
 match  TargetFrameworkNameTestApp
-diff   TestApp
+match  TestApp
 match  AssemblyResolveTestApp
 match  TestAppOutsideOfTPA
 

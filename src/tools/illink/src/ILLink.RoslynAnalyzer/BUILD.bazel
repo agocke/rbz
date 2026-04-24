@@ -41,7 +41,7 @@ csharp_library(
         ":resgen_srm_strings",
     ],
     resource_logical_names = {
-        "SharedStrings.resources": "ILLink.Shared.SharedStrings.resources",
+        "ILLink.Shared.SharedStrings.resources": "ILLink.Shared.SharedStrings.resources",
         "System.Reflection.Metadata.Strings.resources": "System.Reflection.Metadata.Strings.resources",
     },
     target_frameworks = ["netstandard2.0"],
