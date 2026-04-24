@@ -109,7 +109,11 @@ gen_resx_source = rule(
         "assembly_name": attr.string(mandatory = True),
         "resource_name": attr.string(mandatory = False, default = ""),
         "resource_class_name": attr.string(mandatory = False, default = ""),
-        "include_default_values": attr.bool(default = True),
+        # MSBuild only includes default resource values in Debug builds
+        # (eng/resources.targets:11).  Default to False (Release) so that
+        # direct callers match Release MSBuild output.  The csharp_library
+        # wrapper passes an explicit select() to vary by libs_config.
+        "include_default_values": attr.bool(default = False),
         "omit_getresourcestring": attr.bool(default = False),
         "resx_file": attr.label(
             mandatory = True,

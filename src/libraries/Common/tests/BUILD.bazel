@@ -164,13 +164,13 @@ gen_resx_source(
     name = "common_tests_gen_resx",
     out = "SR.g.cs",
     assembly_name = "Common.Tests",
-    resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
+    resx_file = "Resources/Strings.resx",
 )
 
 resgen(
     name = "strings_resx",
     out = "FxResources.Common.Tests.SR.resources",
-    resx_file = "//src/libraries/System.Net.Http:src/Resources/Strings.resx",
+    resx_file = "Resources/Strings.resx",
 )
 
 library_test(
@@ -288,7 +288,7 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    additionalfiles = ["//src/libraries/System.Net.Http:src/Resources/Strings.resx"],
+    additionalfiles = ["Resources/Strings.resx"],
     allow_unsafe_blocks = True,
     os_targeted = True,
     keyfile = OPEN_SNK,
