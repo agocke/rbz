@@ -40,9 +40,13 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     allow_unsafe_blocks = True,
-    resources = [":resgen_MainStrings"],
+    resources = [
+        ":resgen_MainStrings",
+        "//src/libraries/System.Runtime.Loader/tests/System.Runtime.Loader.Test.AssemblyVersion1:System.Runtime.Loader.Test.VersionDowngrade",
+    ],
     resource_logical_names = {
         "System.Runtime.Loader.Tests.MainStrings.resources": "System.Runtime.Loader.Tests.MainStrings.resources",
+        "System.Runtime.Loader.Test.AssemblyVersion1.dll": "System.Runtime.Loader.Tests.AssemblyVersion1.dll",
     },
     additionalfiles = glob(["MainStrings*.resx"]),
     keyfile = OPEN_SNK,
