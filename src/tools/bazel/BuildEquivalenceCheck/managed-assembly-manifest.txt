@@ -571,7 +571,7 @@ match  ReferencedClassLibNeutralIsSatellite
 # ── Runtime test helper assemblies ──
 match  TestUtilities.Unicode
 match  TargetFrameworkNameTestApp
-diff   TestApp
+match  TestApp
 match  AssemblyResolveTestApp
 match  TestAppOutsideOfTPA
 

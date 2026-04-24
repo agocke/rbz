@@ -14,31 +14,25 @@ library_test(
     srcs = glob(
         ["*.cs"],
         exclude = [
-            # ApplyUpdate tests require hot-reload infrastructure and many
-            # dependent assemblies that are not available in Bazel.
+            # ApplyUpdateTest references ApplyUpdate.Test.* assemblies
+            # that are not available in Bazel.
             "ApplyUpdateTest.cs",
-            "ApplyUpdateUtil.cs",
-            "MetadataUpdateHandlerAttributeTest.cs",
-            # These tests depend on external test assemblies (LoaderLinkTest.Shared,
-            # ContextualReflectionDependency, ReferencedClassLib, etc.) not in Bazel.
-            "AssemblyLoadContextTest.cs",
-            "AssemblyResolutionDowngradeTest.cs",
-            "CollectibleAssemblyLoadContextTest.cs",
-            "ContextualReflection.cs",
-            "LoaderLinkTest.cs",
-            "ResourceAssemblyLoadContext.cs",
-            "SatelliteAssemblies.cs",
         ],
     ) + [
         "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
     ],
     deps = [
         "//src/libraries/System.Reflection.Metadata:ref_System.Reflection.Metadata",
+        "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
         "//src/libraries/Common/tests:TestUtilities",
+        "//src/libraries/System.Runtime.Loader/tests/ContextualReflectionDependency:System.Runtime.Loader.Test.ContextualReflectionDependency",
+        "//src/libraries/System.Runtime.Loader/tests/LoaderLinkTest.Shared",
+        "//src/libraries/System.Runtime.Loader/tests/ReferencedClassLib",
+        "//src/libraries/System.Runtime.Loader/tests/ReferencedClassLibNeutralIsSatellite",
         "@paket.main//microsoft.dotnet.remoteexecutor",
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//microsoft.dotnet.xunitextensions",
