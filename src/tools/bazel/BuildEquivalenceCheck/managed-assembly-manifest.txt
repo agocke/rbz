@@ -308,7 +308,8 @@ match  NoSpecialEntryPointPatternHangs
 match  NoSpecialEntryPointPatternMainNoArgs
 match  NoSpecialEntryPointPatternThrows
 match  STAMain
-diff   SerializableAssembly
+match  SerializableAssembly
+diff   SerializationTypes
 match  StreamConformanceTests
 match  TopLevelStatements
 match  TopLevelStatementsTestsTimeout
@@ -485,7 +486,7 @@ match  System.Runtime.Serialization.Json.Tests
 match  System.Runtime.Serialization.Primitives.Tests
 match  System.Runtime.Serialization.Schema
 match  System.Runtime.Serialization.Schema.Tests
-diff   System.Runtime.Serialization.Xml.Tests
+match  System.Runtime.Serialization.Xml.Tests
 match  System.Runtime.Serialization.Xml.Canonicalization.Tests
 match  System.Runtime.Serialization.Xml.ReflectionOnly.Tests
 match  System.Runtime.ReflectionInvokeEmit.Tests
@@ -543,8 +544,8 @@ match  System.Xml.Linq.xNodeBuilder.Tests
 match  System.Xml.Linq.xNodeReader.Tests
 # TestLibrary  # netstandard2.0, filtered
 # ExceptionTestAssembly  # netstandard2.0, filtered
-diff   XDocument.Common
-diff   XmlCoreTest
+match  XDocument.Common
+match  XmlCoreTest
 diff   crossgen2
 diff   ilc
 diff   illink
@@ -561,11 +562,11 @@ diff   System.Text.Json.Tests
 match  System.Runtime.Loader.Test.Assembly
 match  System.Runtime.Loader.Test.Assembly2
 match  System.Runtime.Loader.Test.ContextualReflectionDependency
-diff   System.Runtime.Loader.Test.VersionDowngrade
+match  System.Runtime.Loader.Test.VersionDowngrade
 match  LoaderLinkTest.Shared
 match  LoaderLinkTest.Dynamic
-diff   ReferencedClassLib
-diff   ReferencedClassLibNeutralIsSatellite
+match  ReferencedClassLib
+match  ReferencedClassLibNeutralIsSatellite
 
 # ── Runtime test helper assemblies ──
 match  TestUtilities.Unicode
