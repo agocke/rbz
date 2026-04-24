@@ -206,14 +206,14 @@ match  CreateHostBuilderPatternTestSite
 match  CreateWebHostBuilderInvalidSignature
 match  CreateWebHostBuilderPatternTestSite
 match  DefaultApartmentStateMain
-diff   ILCompiler.Compiler
+match  ILCompiler.Compiler
 match  ILCompiler.DependencyAnalysisFramework
 match  ILCompiler.Diagnostics
 match  ILCompiler.MetadataTransform
-diff   ILCompiler.ReadyToRun
+match  ILCompiler.ReadyToRun
 match  ILCompiler.RyuJit
-diff   ILCompiler.TypeSystem
-diff   ILLink.Tasks
+match  ILCompiler.TypeSystem
+match  ILLink.Tasks
 match  MTAMain
 diff   Microsoft.Bcl.AsyncInterfaces
 match  Microsoft.Bcl.AsyncInterfaces.Tests
@@ -547,8 +547,8 @@ match  System.Xml.Linq.xNodeReader.Tests
 match  XDocument.Common
 match  XmlCoreTest
 diff   crossgen2
-diff   ilc
-diff   illink
+match  ilc
+match  illink
 
 # ── Unlisted assemblies added during equivalence improvement ──
 match  ILCompiler.Reflection.ReadyToRun

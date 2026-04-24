@@ -1,4 +1,12 @@
-load("//:defs.bzl", "csharp_library")
+load("//:defs.bzl", "csharp_library", "resgen")
+
+resgen(
+    name = "TypeSystemResources",
+    out = "Internal.TypeSystem.Resources.resources",
+    resx_file = "//src/coreclr/tools/Common:TypeSystem/Common/Properties/Resources.resx",
+)
+
+exports_files(["BannedSymbols.txt"])
 
 csharp_library(
     name = "ILCompiler.TypeSystem",
@@ -231,7 +239,15 @@ csharp_library(
         "//src/coreclr/tools/Common:TypeSystem/Sorting/TypeDesc.Sorting.cs",
         "//src/coreclr/tools/Common:TypeSystem/Sorting/TypeSystemComparer.cs",
     ],
-    compiler_options = ["/unsafe"],
+    compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
+    resources = [":TypeSystemResources"],
+    resource_logical_names = {
+        "Internal.TypeSystem.Resources.resources": "Internal.TypeSystem.Strings.resources",
+    },
+    additionalfiles = [
+        ":BannedSymbols.txt",
+        "//src/coreclr/tools/Common:TypeSystem/Common/Properties/Resources.resx",
+    ],
     deps = [
         "@paket.main//microsoft.diasymreader",
     ],

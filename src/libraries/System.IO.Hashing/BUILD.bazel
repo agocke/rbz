@@ -1,5 +1,5 @@
 load("//src/libraries:defs.bzl", "live_csharp_library", "netcoreapp_ref_assembly")
-load("//:defs.bzl", "OPEN_SNK")
+load("//:defs.bzl", "OPEN_SNK", "gen_illink_substitutions")
 
 netcoreapp_ref_assembly(
     name = "ref_System.IO.Hashing",
@@ -11,6 +11,13 @@ netcoreapp_ref_assembly(
         "//src/libraries:ref_System.Runtime",
     ],
     nowarn = ["CS0809"],
+)
+
+gen_illink_substitutions(
+    name = "illink_System.IO.Hashing",
+    out = "live_System.IO.Hashing/ILLink.Substitutions.xml",
+    assembly_name = "System.IO.Hashing",
+    resource_name = "FxResources.System.IO.Hashing.SR",
 )
 
 live_csharp_library(
@@ -28,7 +35,7 @@ live_csharp_library(
     ],
     resx_file = "src/Resources/Strings.resx",
     additionalfiles = ["src/Resources/Strings.resx"],
-    resources = ["src/ILLink.Substitutions.xml"],
+    resources = [":illink_System.IO.Hashing"],
     resource_logical_names = {
         "ILLink.Substitutions.xml": "ILLink.Substitutions.xml",
     },
