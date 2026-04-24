@@ -73,7 +73,9 @@ public static class BazelAqueryParser
             var args = ParseArguments(action);
             var record = ParseManagedArguments(args, targetLabel, repoRoot);
 
-            if (record is not null && seen.Add(record.AssemblyName))
+            // Dedup by assembly name + target label so both ref and impl
+            // targets for the same assembly survive into the comparison engine.
+            if (record is not null && seen.Add(record.AssemblyName + "|" + targetLabel))
                 records.Add(record);
         }
 

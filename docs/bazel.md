@@ -256,9 +256,11 @@ target type.
 Managed assemblies are tracked via a **manifest file**
 (`managed-assembly-manifest.txt`) that lists every expected assembly as either
 `match` (must be identical) or `diff` (known difference). The check fails on
-regressions (match→diff), unlisted assemblies, or missing entries. Native diffs
-are **informational only** unless a native manifest is provided via
-`--native-manifest`.
+regressions (match→diff), unlisted assemblies, or missing entries. Reference
+assemblies (`ref_` targets) and implementation assemblies (`impl_`/`live_`
+targets) are compared independently — ref entries use a `.ref` suffix in the
+manifest (e.g. `match  System.Runtime.ref`). Native diffs are **informational
+only** unless a native manifest is provided via `--native-manifest`.
 
 ### Known equivalence gaps
 
@@ -269,7 +271,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 504 of 568 tracked assemblies currently match
+- **Managed assemblies**: 504 of 750 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
