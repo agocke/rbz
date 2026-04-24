@@ -21,6 +21,7 @@ library_test(
     resource_logical_names = {"FxResources.Microsoft.Bcl.Cryptography.Tests.SR.resources": "FxResources.Microsoft.Bcl.Cryptography.Tests.SR.resources"},
     additionalfiles = ["//src/libraries/Microsoft.Bcl.Cryptography:src/Resources/Strings.resx"],
     allow_unsafe_blocks = True,
+    data = ["@paket.main//system.security.cryptography.x509certificates.testdata:content_files"],
     nowarn = MULTITARGET_NOWARN + ["SYSLIB5006"],
     srcs = glob(
         ["*.cs", "X509Certificates/**/*.cs"],
