@@ -19,8 +19,9 @@ library_test(
             "ApplyUpdateTest.cs",
             "ApplyUpdateUtil.cs",
             "MetadataUpdateHandlerAttributeTest.cs",
-            # These tests depend on external test assemblies (LoaderLinkTest.Shared,
-            # ContextualReflectionDependency, ReferencedClassLib, etc.) not in Bazel.
+            # These tests depend on external test assemblies deployed at
+            # specific runtime paths (satellite assemblies, loader link tests,
+            # contextual reflection) not yet supported in Bazel.
             "AssemblyLoadContextTest.cs",
             "AssemblyResolutionDowngradeTest.cs",
             "CollectibleAssemblyLoadContextTest.cs",

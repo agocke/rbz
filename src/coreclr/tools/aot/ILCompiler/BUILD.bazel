@@ -22,7 +22,7 @@ csharp_binary(
         "//src/coreclr/tools/Common:TypeSystem/IL/HelperExtensions.cs",
         ":AssemblyInfo",
     ],
-    compiler_options = ["/unsafe"],
+    compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
     deps = [
         "//src/coreclr/tools/aot/ILCompiler.Compiler",
         "//src/coreclr/tools/aot/ILCompiler.DependencyAnalysisFramework",
@@ -39,4 +39,6 @@ csharp_binary(
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
     ],
     msbuild_analyzer_config = "source",
+    include_library_nowarn = False,
+    editorconfig_name = "ILCompiler_inbuild",
 )

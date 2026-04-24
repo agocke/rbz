@@ -191,7 +191,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Remaining library test equivalence diffs (100 known diffs, mostly analyzer/Strings.resx pipeline differences)
+- Remaining library test equivalence diffs (35 known diffs, mostly TFM/platform defines, source file, and infrastructure differences)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -271,7 +271,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 504 of 750 tracked assemblies currently match
+- **Managed assemblies**: 541 of 750 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -328,6 +328,16 @@ areas:
   `System.Text.Json.SourceGeneration`, and `System.Data.OleDb` now use
   `Open.snk` (via explicit `keyfile = OPEN_SNK`) matching MSBuild's default
   `StrongNameKeyId` for source projects in `src/libraries/`.
+  NativeAOT tool assemblies (`ilc`, `illink`, `ILLink.Tasks`,
+  `ILCompiler.Compiler`, `ILCompiler.ReadyToRun`, `ILCompiler.TypeSystem`)
+  now also match: resource naming, keyfile signing (`/publicsign+` for
+  `35MSSharedLib1024.snk`), `/warnaserror+:NU1605`, `additionalfile` parity,
+  and `editorconfig_name` overrides align Bazel with MSBuild. MSBuild uses
+  `/skipanalyzers+` on these tools (analyzers referenced but never run);
+  Bazel uses `extra_editorconfig_content` to embed equivalent diagnostic
+  suppressions in the generated editorconfig (comparison checks filename
+  only). `crossgen2` remains a diff due to the `crossgen2.aot.globalconfig`
+  injected by rules_dotnet for `is_aot_compatible=True`.
   Of the 220 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern

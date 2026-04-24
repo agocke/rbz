@@ -419,11 +419,16 @@ def csharp_library(
     msbuild_analyzer_config = "none",
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
+    include_library_nowarn = True,
     interceptors_namespaces = None,
+    editorconfig_name = None,
+    extra_editorconfig_content = "",
     **kwargs
 ):
     if out == None:
         out = name
+    if editorconfig_name == None:
+        editorconfig_name = out
 
     if resx_file != None:
         _resource_name = resource_name if resource_name else "FxResources.%s.SR" % out
@@ -480,14 +485,16 @@ def csharp_library(
             additionalfiles = additionalfiles + [":" + disabled_analyzers_target]
 
         editorconfig_target = "editorconfig_" + name
+        _editorconfig_global_level = "global_level = 1\n" if extra_editorconfig_content else ""
         native.genrule(
             name = editorconfig_target,
-            outs = [name + "/" + out + ".GeneratedMSBuildEditorConfig.editorconfig"],
+            outs = [name + "/" + editorconfig_name + ".GeneratedMSBuildEditorConfig.editorconfig"],
             cmd = """cat >"$@" <<'EOF'
 is_global = true
-build_property.InformationalVersion = {version}
+{global_level}build_property.InformationalVersion = {version}
 build_property._SupportedPlatformList = Linux,macOS,Windows,Android,iOS,tvOS,macCatalyst,browser,wasi,illumos,Solaris,Haiku,Unix,FreeBSD
-EOF""".format(version = PRODUCT_VERSION),
+{extra}
+EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, global_level = _editorconfig_global_level),
         )
 
         _msbuild_analyzer_configs = [
@@ -559,17 +566,18 @@ EOF""".format(version = PRODUCT_VERSION),
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
         nowarn = nowarn + _nullable_nowarn + [
             "CS1701",
-            # Match Directory.Build.props global NoWarn
-            "CS8500",
-            "CS8969",
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
-            "CS1705",
             "NU5105",
-            # Directory.Build.props global NoWarn
+        ] + ([
+            # src/libraries/Directory.Build.props global NoWarn — not present
+            # in NativeAOT tool projects under src/coreclr/tools/.
+            "CS8500",
+            "CS8969",
+            "CS1705",
             "IDE0060",
             "IDE0100",
-        ],
+        ] if include_library_nowarn else []),
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,
         # Match MSBuild's WarningsNotAsErrors from Directory.Build.props
@@ -618,9 +626,15 @@ def csharp_binary(
     msbuild_analyzer_config = "none",
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
+    include_library_nowarn = True,
     interceptors_namespaces = None,
+    editorconfig_name = None,
+    extra_editorconfig_content = "",
     **kwargs
 ):
+    if editorconfig_name == None:
+        editorconfig_name = name
+
     if msbuild_analyzer_config not in ["none", "style", "source"]:
         fail("msbuild_analyzer_config must be one of: none, style, source")
 
@@ -635,14 +649,16 @@ def csharp_binary(
             additionalfiles = additionalfiles + [":" + disabled_analyzers_target]
 
         editorconfig_target = "editorconfig_" + name
+        _editorconfig_global_level = "global_level = 1\n" if extra_editorconfig_content else ""
         native.genrule(
             name = editorconfig_target,
-            outs = [name + "/" + name + ".GeneratedMSBuildEditorConfig.editorconfig"],
+            outs = [name + "/" + editorconfig_name + ".GeneratedMSBuildEditorConfig.editorconfig"],
             cmd = """cat >"$@" <<'EOF'
 is_global = true
-build_property.InformationalVersion = {version}
+{global_level}build_property.InformationalVersion = {version}
 build_property._SupportedPlatformList = Linux,macOS,Windows,Android,iOS,tvOS,macCatalyst,browser,wasi,illumos,Solaris,Haiku,Unix,FreeBSD
-EOF""".format(version = PRODUCT_VERSION),
+{extra}
+EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, global_level = _editorconfig_global_level),
         )
 
         _msbuild_analyzer_configs = [
@@ -693,17 +709,18 @@ EOF""".format(version = PRODUCT_VERSION),
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
         nowarn = nowarn + _nullable_nowarn + [
             "CS1701",
-            # Match Directory.Build.props global NoWarn
-            "CS8500",
-            "CS8969",
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
-            "CS1705",
             "NU5105",
-            # Directory.Build.props global NoWarn
+        ] + ([
+            # src/libraries/Directory.Build.props global NoWarn — not present
+            # in NativeAOT tool projects under src/coreclr/tools/.
+            "CS8500",
+            "CS8969",
+            "CS1705",
             "IDE0060",
             "IDE0100",
-        ],
+        ] if include_library_nowarn else []),
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,
         # Match MSBuild's WarningsNotAsErrors from Directory.Build.props

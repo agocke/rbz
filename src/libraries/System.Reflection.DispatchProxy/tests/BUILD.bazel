@@ -16,7 +16,9 @@ live_csharp_library(
     include_syslib_warnaserror = False,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
-    nowarn = ["CS8603", "CS8610", "CS8765", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
+    msbuild_analyzer_config = "style",
+    nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
+    nullable = "annotations",
     srcs = [
         "TestDependency/InternalsVisibleTo.cs",
         "TestDependency/TestTypes.cs",
