@@ -1,4 +1,4 @@
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "UNICODE_DATA_REPO", "csharp_library")
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "UNICODE_DATA_REPO", "csharp_library")
 
 csharp_library(
     name = "TestUtilities.Unicode",
@@ -18,8 +18,9 @@ csharp_library(
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
+    msbuild_analyzer_config = "style",
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    nullable = "enable",
+    nullable = "annotations",
     resources = [
         "@{}//:contentFiles/any/any/16.0.0/ucd/CaseFolding.txt".format(UNICODE_DATA_REPO),
         "@{}//:contentFiles/any/any/16.0.0/ucd/PropList.txt".format(UNICODE_DATA_REPO),
@@ -41,7 +42,10 @@ csharp_library(
     deps = [
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//microsoft.dotnet.xunitextensions",
+        "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
+        "@paket.main//xunit.extensibility.execution",
     ],
+    keyfile = OPEN_SNK,
     visibility = ["//visibility:public"],
 )
