@@ -1,14 +1,20 @@
-load("//src/libraries:defs.bzl", "live_csharp_library")
+load("//:defs.bzl", "OPEN_SNK", "csharp_library")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN")
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "OPEN_SNK")
 
 # Separate helper assembly loaded at runtime via Assembly.LoadFrom() by
 # StackTraceTests.ToString_ShowILOffset.  Built without debug info to match
 # MSBuild's <DebugType>None</DebugType>.
-live_csharp_library(
+csharp_library(
     name = "ExceptionTestAssembly",
     keyfile = OPEN_SNK,
     srcs = ["ExceptionTestAssembly/ExceptionTestAssembly.cs"],
+    target_frameworks = ["netstandard2.0"],
+    nullable = "annotations",
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    msbuild_analyzer_config = "style",
+    nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     # MSBuild uses DebugType=None but rules_dotnet always declares a .pdb
     # output.  Omit /debug- and let the default PDB be generated; the test
     # assertions about IL offsets still pass with debug info present.

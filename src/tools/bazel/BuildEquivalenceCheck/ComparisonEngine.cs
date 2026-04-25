@@ -307,13 +307,9 @@ public static class ComparisonEngine
         //   1. net10.0-linux (highest — exact Linux match)
         //   2. net10.0-unix  (covers Linux)
         //   3. plain net10.0 (fallback — often a PNSE stub)
+        //   4. netstandard2.0 (fallback for tools/test helpers with no net10.0 build)
         var msbuildImpl = msbuildRecords
             .Where(r => !r.IsReferenceAssembly)
-            // Exclude netstandard2.0 builds — Bazel always targets net10.0.
-            // When MSBuild multi-targets, the netstandard build is for NuGet
-            // packaging, not the runtime archive.  Comparing it against the
-            // net10.0 Bazel build produces meaningless diffs.
-            .Where(r => !r.OutputPath.Contains("netstandard2.0", StringComparison.OrdinalIgnoreCase))
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
                 g.OrderByDescending(r => TfmPriority(r.OutputPath))
@@ -330,7 +326,6 @@ public static class ComparisonEngine
         // ── Ref assemblies ─────────────────────────────────────────────
         var msbuildRef = msbuildRecords
             .Where(r => r.IsReferenceAssembly)
-            .Where(r => !r.OutputPath.Contains("netstandard2.0", StringComparison.OrdinalIgnoreCase))
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
                 g.OrderByDescending(r => TfmPriority(r.OutputPath))
