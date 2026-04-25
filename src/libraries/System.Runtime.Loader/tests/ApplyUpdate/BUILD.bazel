@@ -30,7 +30,7 @@ _APPLY_UPDATE_HELPERS = [
     ("System.Reflection.Metadata.ApplyUpdate.Test.NewMethodThrows", "System.Reflection.Metadata.ApplyUpdate.Test.NewMethodThrows/NewMethodThrows.cs"),
     ("System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewMethod", "System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewMethod/ReflectionAddNewMethod.cs"),
     ("System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewType", "System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewType/ReflectionAddNewType.cs"),
-    ("System.Reflection.Metadata.ApplyUpdate.Test.ReflectionDeleteMember", "System.Reflection.Metadata.ApplyUpdate.Test.ReflectionDeleteMember/ReflectionDeleteMember.cs"),
+    # ReflectionDeleteMember was added in release/10.0 after the ancestor branch point.
     ("System.Reflection.Metadata.ApplyUpdate.Test.StaticLambdaRegression", "System.Reflection.Metadata.ApplyUpdate.Test.StaticLambdaRegression/StaticLambdaRegression.cs"),
 ]
 

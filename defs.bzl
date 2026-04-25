@@ -509,7 +509,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         if msbuild_analyzer_config == "source":
             _msbuild_analyzer_configs = _msbuild_analyzer_configs + [
                 "//eng:CodeAnalysis.src.globalconfig",
-                "//src/tools/bazel:analysislevel_11_default.globalconfig",
+                "//src/tools/bazel:analysislevel_10_default.globalconfig",
             ]
 
         analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
@@ -581,6 +581,9 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
             "CS1705",
             "IDE0060",
             "IDE0100",
+            # IDE0031 fires on older SDK (10.0.100-rc.1) but not on newer
+            # releases; suppress to maintain compatibility across SDK versions.
+            "IDE0031",
         ] if include_library_nowarn else []),
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,
@@ -673,7 +676,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         if msbuild_analyzer_config == "source":
             _msbuild_analyzer_configs = _msbuild_analyzer_configs + [
                 "//eng:CodeAnalysis.src.globalconfig",
-                "//src/tools/bazel:analysislevel_11_default.globalconfig",
+                "//src/tools/bazel:analysislevel_10_default.globalconfig",
             ]
 
         analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
@@ -724,6 +727,9 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
             "CS1705",
             "IDE0060",
             "IDE0100",
+            # IDE0031 fires on older SDK (10.0.100-rc.1) but not on newer
+            # releases; suppress to maintain compatibility across SDK versions.
+            "IDE0031",
         ] if include_library_nowarn else []),
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,

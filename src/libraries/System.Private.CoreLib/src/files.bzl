@@ -807,7 +807,7 @@ coreclr_files = [
     "System/Runtime/CompilerServices/MethodImplOptions.cs",
     "System/Runtime/CompilerServices/ModuleInitializerAttribute.cs",
     "System/Runtime/CompilerServices/MetadataUpdateOriginalTypeAttribute.cs",
-    "System/Runtime/CompilerServices/MetadataUpdateDeletedAttribute.cs",
+    # MetadataUpdateDeletedAttribute.cs was added in release/10.0 after the ancestor branch point.
     "System/Runtime/CompilerServices/NullableAttribute.cs",
     "System/Runtime/CompilerServices/NullableContextAttribute.cs",
     "System/Runtime/CompilerServices/NullablePublicOnlyAttribute.cs",

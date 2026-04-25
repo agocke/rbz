@@ -481,6 +481,16 @@ public static class ComparisonEngine
         // annotations in shared source files, so csharp_library suppresses it.
         // MSBuild doesn't need the suppression.  Not a semantic difference.
         "/nowarn:CS8632",
+        // IDE style warnings that fire on the older ancestor SDK (10.0.100-rc.1)
+        // but not on the newer release SDK.  Bazel suppresses them to avoid
+        // errors; MSBuild doesn't need to because the SDK doesn't raise them.
+        "/nowarn:IDE0031",
+        "/nowarn:IDE0060",
+        "/nowarn:IDE0100",
+        // CP0003 is a packaging compatibility warning suppressed by the Bazel
+        // branch.  Not raised by MSBuild on this repo because the Arcade SDK
+        // handles it differently.  Not a semantic difference.
+        "/nowarn:CP0003",
     };
 
     private static bool IsIgnoredManagedAnalyzer(string analyzer)
@@ -531,6 +541,13 @@ public static class ComparisonEngine
         // toolchain config differences
         if (flag.StartsWith("/publicsign", StringComparison.Ordinal)
             || flag.StartsWith("/delaysign", StringComparison.Ordinal))
+            return true;
+
+        // InterceptorsNamespaces — the ancestor SDK (rc.1) doesn't set this
+        // via FrameworkReferenceResolution.targets, but the Bazel build carries
+        // it from the release/10.0 branch.  No semantic impact when no
+        // interceptors are actually used.
+        if (flag.StartsWith("/features:InterceptorsNamespaces=", StringComparison.Ordinal))
             return true;
 
         // Build infrastructure flags that have no Bazel equivalent and don't

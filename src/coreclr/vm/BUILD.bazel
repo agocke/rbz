@@ -379,7 +379,7 @@ cc_library(
         "rcwrefcache.cpp",
         # Sources from runtime/ directory
         "//src/coreclr/runtime:CachedInterfaceDispatch.cpp",
-        "//src/coreclr/runtime:asyncsafethreadmap.cpp",
+        # asyncsafethreadmap.cpp was added in release/10.0 after the ancestor branch point.
         "exceptionhandling.cpp",
         "gcinfodecoder.cpp",
         "writebarriermanager.cpp",

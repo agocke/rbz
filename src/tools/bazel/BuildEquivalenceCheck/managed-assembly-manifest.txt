@@ -777,7 +777,6 @@ match  System.Reflection.Metadata.ApplyUpdate.Test.MethodBody1
 match  System.Reflection.Metadata.ApplyUpdate.Test.NewMethodThrows
 match  System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewMethod
 match  System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewType
-match  System.Reflection.Metadata.ApplyUpdate.Test.ReflectionDeleteMember
 match  System.Reflection.Metadata.ApplyUpdate.Test.StaticLambdaRegression
 match  Invariant.Tests
 match  System.Diagnostics.DiagnosticSource.Switches.Tests

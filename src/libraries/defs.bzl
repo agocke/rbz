@@ -496,15 +496,13 @@ def impl_assembly(
     ]
 
     # .NET SDK adds InterceptorsNamespaces for TFM >= 10.0 via
-    # FrameworkReferenceResolution.targets.  Allow callers to override:
-    #   None  → use the default namespace list
-    #   ""    → suppress the flag entirely (assembly doesn't need interceptors)
+    # FrameworkReferenceResolution.targets.  The ancestor SDK (rc.1) does not
+    # set this for regular library/test projects, so default to suppressing it.
+    # Allow callers to override:
+    #   None  → suppress the flag entirely (ancestor default)
+    #   ""    → suppress the flag entirely
     #   other → use the caller-supplied value
-    if interceptors_namespaces == None:
-        compiler_options = compiler_options + [
-            "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
-        ]
-    elif interceptors_namespaces:
+    if interceptors_namespaces != None and interceptors_namespaces != "":
         compiler_options = compiler_options + [
             "/features:InterceptorsNamespaces=" + interceptors_namespaces,
         ]

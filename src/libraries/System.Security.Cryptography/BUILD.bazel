@@ -222,6 +222,7 @@ netcoreapp_impl_assembly(
         "src/System/Security/Cryptography/DSASignatureFormatter.cs",
         "src/System/Security/Cryptography/ECAlgorithm.cs",
         "src/System/Security/Cryptography/EccKeyFormatHelper.cs",
+        "//src/libraries/Common:src/System/Security/Cryptography/EccKeyFormatHelper.cs",
         "src/System/Security/Cryptography/ECCurve.cs",
         "src/System/Security/Cryptography/ECCurve.ECCurveType.cs",
         "src/System/Security/Cryptography/ECCurve.NamedCurves.cs",

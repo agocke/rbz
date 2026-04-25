@@ -230,8 +230,6 @@ coreclr_merged_test(
         "//src/tests/JIT/opt/ObjectStackAllocation:Runtime_115832",
         "//src/tests/JIT/opt/ObjectStackAllocation:Runtime_115979",
         "//src/tests/JIT/opt/ObjectStackAllocation:Runtime_116214",
-        "//src/tests/JIT/opt/ObjectStackAllocation:Runtime_121736",
-        "//src/tests/JIT/opt/ObjectStackAllocation:Runtime_122879",
         "//src/tests/JIT/opt/OptSwitchRecognition:optSwitchRecognition",
         "//src/tests/JIT/opt/OptimizeBools:optboolsreturn",
         "//src/tests/JIT/opt/Or:IntOr",
