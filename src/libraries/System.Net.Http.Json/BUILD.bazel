@@ -1,4 +1,5 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "src/Resources/Strings.resx",
@@ -50,4 +51,6 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Text.Json:ref_System.Text.Json",
     ],
     assembly_description = "Provides extension methods for System.Net.Http.HttpClient and System.Net.Http.HttpContent that perform automatic serialization and deserialization using System.Text.Json.\n\nCommonly Used Types:\nSystem.Net.Http.Json.HttpClientJsonExtensions\nSystem.Net.Http.Json.HttpContentJsonExtensions\nSystem.Net.Http.Json.JsonContent",
+    keyfile = OPEN_SNK,
+    library_import_generator = False,
 )

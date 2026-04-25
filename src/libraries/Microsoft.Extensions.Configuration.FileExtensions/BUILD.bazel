@@ -22,7 +22,6 @@ impl_assembly(
     name = "impl_Microsoft.Extensions.Configuration.FileExtensions",
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]),
-    allow_unsafe_blocks = False,
     analyzers = [
         "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
         "//src/libraries/System.Text.Json:JsonSourceGenerator",

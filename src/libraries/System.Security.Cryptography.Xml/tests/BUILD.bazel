@@ -28,7 +28,10 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    resources = glob(["*.xml"]),
+    resources = glob(
+        ["*.xml"],
+        exclude = ["ILLink.Descriptors.xml"],
+    ),
     nullable = "disable",
     nowarn = MULTITARGET_NOWARN + ["SYSLIB0057"],
     size = "large",

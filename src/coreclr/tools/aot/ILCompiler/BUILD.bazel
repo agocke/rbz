@@ -11,6 +11,7 @@ EOF""",
 
 csharp_binary(
     name = "ilc",
+    interceptors_namespaces = ";Microsoft.AspNetCore.Http.Generated;Microsoft.Extensions.Configuration.Binder.SourceGeneration;Microsoft.Extensions.Validation.Generated",
     nowarn = ["1701", "1702", "8002", "IL2121", "NU1701", "NU5105"],
     srcs = glob(
         ["**/*.cs"],
@@ -21,7 +22,7 @@ csharp_binary(
         "//src/coreclr/tools/Common:TypeSystem/IL/HelperExtensions.cs",
         ":AssemblyInfo",
     ],
-    compiler_options = ["/unsafe"],
+    compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
     deps = [
         "//src/coreclr/tools/aot/ILCompiler.Compiler",
         "//src/coreclr/tools/aot/ILCompiler.DependencyAnalysisFramework",
@@ -33,4 +34,11 @@ csharp_binary(
     ],
     target_frameworks = ["net10.0"],
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+    ],
+    msbuild_analyzer_config = "source",
+    include_library_nowarn = False,
+    editorconfig_name = "ILCompiler_inbuild",
 )

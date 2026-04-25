@@ -21,7 +21,6 @@ impl_assembly(
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     exclude_sr = True,
     srcs = glob(["src/**/*.cs"]),
-    allow_unsafe_blocks = False,
     analyzers = [
         "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
         "//src/libraries/System.Text.Json:JsonSourceGenerator",

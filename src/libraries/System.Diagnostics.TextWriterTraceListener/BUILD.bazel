@@ -21,6 +21,9 @@ netcoreapp_impl_assembly(
         "src/System/Diagnostics/TextWriterTraceListener.cs",
         "src/System/Diagnostics/XmlWriterTraceListener.cs",
     ],
+    analyzers = [
+        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+    ],
     resx_file = "src/Resources/Strings.resx",
     deps = [
         "//src/libraries:ref_System.ComponentModel.Primitives",

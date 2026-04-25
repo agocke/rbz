@@ -430,6 +430,14 @@ public static class ComparisonEngine
         "/utf8output",
         // Bazel output formatting default not emitted by MSBuild
         "/nologo",
+        // rules_dotnet always emits /optimize+ in release mode; MSBuild omits
+        // the flag (optimizer is on by default).  Not a semantic difference.
+        "/optimize+",
+        // rules_dotnet explicitly passes /nullable:disable (MSBuild omits it,
+        // since disable is the default).  That triggers CS8632 on nullable
+        // annotations in shared source files, so csharp_library suppresses it.
+        // MSBuild doesn't need the suppression.  Not a semantic difference.
+        "/nowarn:CS8632",
     };
 
     private static bool IsIgnoredManagedAnalyzer(string analyzer)
@@ -500,6 +508,11 @@ public static class ComparisonEngine
             || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal))
             return true;
 
+        // Unevaluated MSBuild property expressions that leaked into msbuild-records
+        // (e.g. "/features:$(Features.Replace('nullablePublicOnly', ''))")
+        if (flag.Contains("$(", StringComparison.Ordinal))
+            return true;
+
         return false;
     }
 
@@ -565,9 +578,18 @@ public static class ComparisonEngine
         bool unsafeEnabled = false;
         bool checkedEnabled = false;
         string? nullableMode = null;
+        var interceptorNamespaces = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var flag in flags)
         {
+            // Merge all /features:InterceptorsNamespaces= entries into one canonical flag
+            if (flag.StartsWith("/features:InterceptorsNamespaces=", StringComparison.Ordinal))
+            {
+                var value = flag["/features:InterceptorsNamespaces=".Length..];
+                foreach (var ns in value.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                    interceptorNamespaces.Add(ns);
+                continue;
+            }
             if (flag is "/unsafe" or "/unsafe+")
             {
                 unsafeEnabled = true;
@@ -633,6 +655,9 @@ public static class ComparisonEngine
 
         if (maxWarnLevel >= 0)
             result.Add($"/warn:{maxWarnLevel}");
+
+        if (interceptorNamespaces.Count > 0)
+            result.Add("/features:InterceptorsNamespaces=;" + string.Join(";", interceptorNamespaces));
 
         return result;
     }
@@ -766,9 +791,10 @@ public static class ComparisonEngine
         });
 
         // Filter out MSBuild-generated InternalsVisibleTo.cs files.
-        // In Bazel, IVT attributes are set via the internals_visible_to parameter.
-        onlyInMSBuild.RemoveWhere(f => Path.GetFileName(f).EndsWith("InternalsVisibleTo.cs", StringComparison.Ordinal));
-        onlyInBazel.RemoveWhere(f => Path.GetFileName(f).EndsWith("InternalsVisibleTo.cs", StringComparison.Ordinal));
+        // In Bazel, IVT attributes are set via the internals_visible_to parameter,
+        // which generates a file named internalsvisibleto.cs (lowercase).
+        onlyInMSBuild.RemoveWhere(f => Path.GetFileName(f).EndsWith("InternalsVisibleTo.cs", StringComparison.OrdinalIgnoreCase));
+        onlyInBazel.RemoveWhere(f => Path.GetFileName(f).EndsWith("internalsvisibleto.cs", StringComparison.OrdinalIgnoreCase));
 
         // Filter out test SDK and polyfill source files that MSBuild includes
         // but Bazel doesn't need (test SDK entry point, netstandard polyfills).

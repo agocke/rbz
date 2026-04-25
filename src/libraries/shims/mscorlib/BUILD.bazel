@@ -85,4 +85,8 @@ netcoreapp_impl_assembly(
     os_targeted = True,
     exclude_sr = True,
     keyfile = ECMA_SNK,
+    generate_documentation_file = False,
+    interop_source_generation = True,
+    library_import_generator = False,
+    com_interface_generator = True,
 )

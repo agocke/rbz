@@ -10,7 +10,7 @@ gen_resx_source(
 
 resgen(
     name = "strings_resx",
-    out = "SR.resources",
+    out = "FxResources.System.Net.Mail.Unit.Tests.SR.resources",
     resx_file = "//src/libraries/System.Net.Mail:src/Resources/Strings.resx",
 )
 
@@ -123,9 +123,10 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     allow_unsafe_blocks = True,
+    additionalfiles = ["//src/libraries/System.Net.Mail:src/Resources/Strings.resx"],
     keyfile = OPEN_SNK,
     resources = [":strings_resx"],
     resource_logical_names = {
-        "SR.resources": "FxResources.System.Net.Mail.Unit.Tests.SR.resources",
+        "FxResources.System.Net.Mail.Unit.Tests.SR.resources": "FxResources.System.Net.Mail.Unit.Tests.SR.resources",
     },
 )

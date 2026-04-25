@@ -8,6 +8,15 @@ impl_assembly(
     deps = [
         "//src/libraries:ref_System.Runtime",
     ],
-    nowarn = MULTITARGET_NOWARN + ["CP0003"],
+    interceptors_namespaces = "",
+    include_syslib_warnaserror = False,
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable"],
+    analyzers = [
+        "//src/libraries/System.Runtime.InteropServices:DownlevelLibraryImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+    ],
     exclude_sr = True,
+    library_import_generator = False,
+    jsimport_generator = False,
+    allow_unsafe_blocks = True,
 )

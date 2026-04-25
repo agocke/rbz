@@ -1,4 +1,5 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "ECMA_SNK")
 
 exports_files([
     "ref/System.ComponentModel.Composition.Registration.cs",
@@ -19,6 +20,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.ComponentModel.Composition.Registration",
+    keyfile = ECMA_SNK,
     srcs = [
         "src/System/ComponentModel/Composition/Registration/ExportBuilder.cs",
         "src/System/ComponentModel/Composition/Registration/ImportBuilder.cs",
@@ -48,6 +50,7 @@ impl_assembly(
     ],
     resx_file = "src/Resources/Strings.resx",
     nullable = "disable",
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "NU5128", "CS1591"],
 )
 

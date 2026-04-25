@@ -1,15 +1,24 @@
-load("//:defs.bzl", "OPEN_SNK", "gen_resx_source")
+load("//:defs.bzl", "OPEN_SNK", "gen_resx_source", "resgen")
 load("//src/tests:live_test.bzl", "library_test")
 
 gen_resx_source(
     name = "gen_resx",
     out = "SR.g.cs",
-    assembly_name = "System.Text.RegularExpressions",
+    assembly_name = "System.Text.RegularExpressions.Unit.Tests",
+    resx_file = "//src/libraries/System.Text.RegularExpressions:src/Resources/Strings.resx",
+)
+
+resgen(
+    name = "strings_resx",
+    out = "FxResources.System.Text.RegularExpressions.Unit.Tests.SR.resources",
     resx_file = "//src/libraries/System.Text.RegularExpressions:src/Resources/Strings.resx",
 )
 
 library_test(
     name = "System.Text.RegularExpressions.Unit.Tests",
+    resources = [":strings_resx"],
+    resource_logical_names = {"FxResources.System.Text.RegularExpressions.Unit.Tests.SR.resources": "FxResources.System.Text.RegularExpressions.Unit.Tests.SR.resources"},
+    additionalfiles = ["//src/libraries/System.Text.RegularExpressions:src/Resources/Strings.resx"],
     srcs = glob(["**/*.cs"]) + [
         # Common source files
         "//src/libraries/Common:src/System/HexConverter.cs",

@@ -36,6 +36,9 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     allow_unsafe_blocks = True,
+    analyzers = [
+        "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+    ],
     size = "large",
     keyfile = OPEN_SNK,
 )

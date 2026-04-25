@@ -3,7 +3,7 @@ load("//:defs.bzl", "OPEN_SNK", "resgen")
 
 resgen(
     name = "TestResx",
-    out = "TestResx.resources",
+    out = "Resources.TestResx.resources",
     resx_file = "Resources/TestResx.resx",
 )
 
@@ -40,7 +40,8 @@ library_test(
     ],
     defines = ["FUNCTIONAL_TESTS"],
     resources = [":TestResx"],
-    resource_logical_names = {"TestResx.resources": "Resources.TestResx.resources"},
+    resource_logical_names = {"Resources.TestResx.resources": "Resources.TestResx.resources"},
+    additionalfiles = ["Resources/TestResx.resx"],
     keyfile = OPEN_SNK,
     assembly_version = "9.9.9.9",
     nowarn = ["SYSLIB0011"],

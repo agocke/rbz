@@ -19,6 +19,7 @@ genrule(
 
 csharp_library(
     name = "ILCompiler.ReadyToRun",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     nowarn = ["1591"],
     srcs = [
         ":AssemblyInfo",
@@ -305,7 +306,7 @@ csharp_library(
         "//src/coreclr/tools/Common:Compiler/GenericCycleDetection/ModuleCycleInfo.cs",
     ],
     defines = ["READYTORUN"],
-    compiler_options = ["/unsafe"],
+    compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
     deps = [
         "//src/coreclr/tools/aot/ILCompiler.DependencyAnalysisFramework",
         "//src/coreclr/tools/aot/ILCompiler.Diagnostics",
@@ -314,4 +315,10 @@ csharp_library(
     ],
     target_frameworks = ["net10.0"],
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+        "//:staticcs_analyzers",
+    ],
+    msbuild_analyzer_config = "style",
+    include_default_ruleset = False,
 )

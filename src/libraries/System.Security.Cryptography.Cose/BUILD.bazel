@@ -1,4 +1,6 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl",
+    "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 netcoreapp_ref_assembly(
     name = "ref_System.Security.Cryptography.Cose",
@@ -14,6 +16,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Security.Cryptography.Cose",
+    keyfile = OPEN_SNK,
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/System/Experimentals.cs",

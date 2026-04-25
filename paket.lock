@@ -2,6 +2,7 @@ STORAGE: NONE
 RESTRICTION: == net10.0
 NUGET
   remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json
+    AwesomeAssertions (8.0.2)
     Castle.Core (5.2.1)
       System.Diagnostics.EventLog (>= 6.0)
     FsCheck (2.14.3)
@@ -18,6 +19,7 @@ NUGET
       Microsoft.VisualStudio.Setup.Configuration.Interop (>= 3.2.2146)
       System.Collections.Immutable (>= 7.0)
       System.Configuration.ConfigurationManager (>= 7.0)
+    Microsoft.CodeAnalysis.BannedApiAnalyzers (3.3.5-beta1.23270.2)
     Microsoft.CodeAnalysis.Common (4.11.0)
       Microsoft.CodeAnalysis.Analyzers (>= 3.3.4)
       System.Collections.Immutable (>= 8.0)
@@ -69,6 +71,7 @@ NUGET
     runtime.win-arm64.runtime.native.System.Data.SqlClient.sni (4.4.0)
     runtime.win-x64.runtime.native.System.Data.SqlClient.sni (4.4.0)
     runtime.win-x86.runtime.native.System.Data.SqlClient.sni (4.4.0)
+    StaticCS (0.2.0)
     StyleCop.Analyzers (1.2.0-beta.556)
       StyleCop.Analyzers.Unstable (>= 1.2.0.556)
     StyleCop.Analyzers.Unstable (1.2.0.556)
@@ -97,7 +100,7 @@ NUGET
     System.Data.SqlClient (4.9.0)
       runtime.native.System.Data.SqlClient.sni (>= 4.4)
     System.Diagnostics.EventLog (8.0.1)
-    System.Formats.Asn1 (10.0.6)
+    System.Formats.Asn1 (10.0.7)
     System.IO.Pipelines (8.0.0)
     System.Memory (4.5.5)
     System.Reflection.Metadata (9.0.0)
@@ -118,10 +121,10 @@ NUGET
   remote: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json
     Microsoft.DotNet.Arcade.Sdk (10.0.0-beta.26170.102)
     Microsoft.DotNet.CodeAnalysis (10.0.0-beta.26170.102)
-    microsoft.dotnet.genfacades (10.0.0-beta.26170.102)
+    Microsoft.DotNet.GenFacades (10.0.0-beta.26170.102)
     Microsoft.DotNet.RemoteExecutor (10.0.0-beta.26170.102)
       Microsoft.Diagnostics.Runtime (>= 1.0.5)
-    microsoft.dotnet.sharedframework.sdk (10.0.0-beta.26170.102)
+    Microsoft.DotNet.SharedFramework.Sdk (10.0.0-beta.26170.102)
     Microsoft.DotNet.XUnitAssert (2.9.3-beta.26170.102)
     Microsoft.DotNet.XUnitConsoleRunner (2.9.3-beta.26170.102)
     Microsoft.DotNet.XUnitExtensions (10.0.0-beta.26170.102)
@@ -138,6 +141,7 @@ NUGET
     System.IO.Packaging.TestData (10.0.0-beta.25418.1)
     System.Net.TestData (10.0.0-beta.25418.1)
     System.Private.Runtime.UnicodeData (10.0.0-beta.25418.1)
+    System.Runtime.Numerics.TestData (10.0.0-beta.25418.1)
     System.Security.Cryptography.X509Certificates.TestData (10.0.0-beta.25418.1)
     System.Text.RegularExpressions.TestData (10.0.0-beta.25418.1)
 
@@ -181,7 +185,7 @@ NUGET
       System.Collections.Immutable (>= 9.0)
       System.Memory (>= 4.5.5)
     System.Runtime.CompilerServices.Unsafe (6.1.2)
-    System.Text.Encoding.CodePages (9.0.14)
+    System.Text.Encoding.CodePages (9.0.15)
       System.Memory (>= 4.5.5)
       System.Runtime.CompilerServices.Unsafe (>= 6.0)
     System.Threading.Tasks.Extensions (4.6.3)

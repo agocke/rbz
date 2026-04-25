@@ -18,12 +18,13 @@ gen_resx_source(
 
 resgen(
     name = "Resources",
-    out = "crossgen2.Properties.Resources.resources",
+    out = "crossgen2_inbuild.Properties.Resources.resources",
     resx_file = "Properties/Resources.resx",
 )
 
 csharp_binary(
     name = "crossgen2",
+    interceptors_namespaces = ";Microsoft.AspNetCore.Http.Generated;Microsoft.Extensions.Configuration.Binder.SourceGeneration;Microsoft.Extensions.Validation.Generated",
     srcs = glob(["*.cs"]) + [
         "//src/coreclr/tools/Common:CommandLineHelpers.cs",
         "//src/coreclr/tools/Common:InstructionSetHelpers.cs",
@@ -32,7 +33,10 @@ csharp_binary(
         ":AssemblyInfo",
     ],
     resources = [":Resources"],
-    compiler_options = ["/unsafe"],
+    resource_logical_names = {
+        "crossgen2_inbuild.Properties.Resources.resources": "crossgen2_inbuild.Properties.Resources.resources",
+    },
+    compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
     deps = [
         "//src/coreclr/tools/aot/ILCompiler.Diagnostics",
         "//src/coreclr/tools/aot/ILCompiler.DependencyAnalysisFramework",
@@ -42,7 +46,11 @@ csharp_binary(
         "@paket.main//system.commandline",
     ],
     target_frameworks = ["net10.0"],
-    nowarn = ["1701", "1702", "8002", "IL2121", "NU1701", "NU5105"],
+    nowarn = ["1701", "1702", "8002", "CS8632", "IL2121", "NU1701", "NU5105"],
+    include_library_nowarn = False,
+    include_default_ruleset = False,
+    msbuild_analyzer_config = "style",
+    editorconfig_name = "crossgen2_inbuild",
     is_aot_compatible = True,
     visibility = ["//visibility:public"],
 )

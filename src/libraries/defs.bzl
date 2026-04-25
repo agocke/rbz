@@ -3,9 +3,11 @@ load(
     "//:defs.bzl",
     "ASPNETCORE_SNK",
     "CI_INFORMATIONAL_VERSION",
+    "ECMA_SNK",
     "MSFT_SNK",
     "NETCOREAPP_CURRENT",
     "OPEN_SNK",
+    "SHAREDLIB1024_SNK",
     "csharp_library",
     "gen_assembly_info",
     "gen_illink_substitutions",
@@ -40,6 +42,15 @@ LIVE_NETCOREAPP_DEPS = [
 MULTITARGET_NOWARN = [
     "CA1510", "CA1511", "CA1512", "CA1513",
     "CA1845", "CA1846", "CA1847",
+]
+
+# MSBuild flows these SDK-shipped source generators into a broad set of source
+# library projects via the targeting pack. Reuse the shared list for assemblies
+# that need that analyzer parity in compare-bazel.
+COMMON_GENERATOR_ANALYZERS = [
+    "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+    "//src/libraries/System.Text.Json:JsonSourceGenerator",
+    "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
 ]
 
 # ── Core_Root library set ─────────────────────────────────────────────
@@ -300,7 +311,7 @@ def impl_assembly(
     cls_compliant = True,
     is_trimmable = True,
     is_aot_compatible = True,
-    allow_unsafe_blocks = True,
+    allow_unsafe_blocks = False,
     nullable = "enable",
     internals_visible_to = [],
     resources = [],
@@ -325,9 +336,11 @@ def impl_assembly(
     analyzer_configs = [],
     analyzers = [],
     library_import_generator = True,
+    interop_source_generation = None,
     com_interface_generator = False,
     jsimport_generator = True,
     include_editorconfig = True,
+    interceptors_namespaces = None,
     **kwargs
 ):
     base_name = name[len("impl_"):]
@@ -480,9 +493,21 @@ def impl_assembly(
         # Match MSBuild's /features flags
         "/features:strict",
         "/features:nullablePublicOnly",
-        # .NET SDK adds this for TFM >= 10.0 via FrameworkReferenceResolution.targets
-        "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
     ]
+
+    # .NET SDK adds InterceptorsNamespaces for TFM >= 10.0 via
+    # FrameworkReferenceResolution.targets.  Allow callers to override:
+    #   None  → use the default namespace list
+    #   ""    → suppress the flag entirely (assembly doesn't need interceptors)
+    #   other → use the caller-supplied value
+    if interceptors_namespaces == None:
+        compiler_options = compiler_options + [
+            "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
+        ]
+    elif interceptors_namespaces:
+        compiler_options = compiler_options + [
+            "/features:InterceptorsNamespaces=" + interceptors_namespaces,
+        ]
 
     # ── Analyzer infrastructure (matching MSBuild's Analyzers.targets) ──────
     # Generate an empty disabledAnalyzers.config (MSBuild always passes this as
@@ -530,6 +555,12 @@ EOF""".format(version = PRODUCT_VERSION),
     # the assembly's dependency on System.Runtime.InteropServices / CoreLib
     # (matching eng/generators.targets). JSImportGenerator is separate because
     # MSBuild flows it through the targeting-pack analyzer set for OOB builds.
+    #
+    # interop_source_generation defaults to library_import_generator when not
+    # set explicitly (None).  Callers that need SourceGeneration without
+    # LibraryImportGenerator (e.g. shim/facade assemblies) can pass
+    # interop_source_generation = True, library_import_generator = False.
+    _interop_source_generation = interop_source_generation if interop_source_generation != None else library_import_generator
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
@@ -537,6 +568,9 @@ EOF""".format(version = PRODUCT_VERSION),
     if library_import_generator:
         _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
+        ]
+    if _interop_source_generation:
+        _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
         ]
     if com_interface_generator:
@@ -618,7 +652,7 @@ ref_impl_pair = rule(
     }
 )
 
-def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False, **kwargs):
+def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False, allow_unsafe_blocks = None, **kwargs):
     """Wrapper for impl_assembly for assemblies in the shared framework (IsNETCoreAppSrc).
 
     Defaults skip_locals_init to True (includes SkipLocalsInit.cs), matching
@@ -626,10 +660,17 @@ def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False
     Defaults jsimport_generator to False because shared-framework builds use the
     live generator outputs instead of the targeting-pack analyzer bundle that
     carries JSImportGenerator for OOB/test builds.
+
+    When skip_locals_init is True (the default), allow_unsafe_blocks is also
+    defaulted to True because [module: SkipLocalsInit] requires /unsafe in C#,
+    matching MSBuild which always sets AllowUnsafeBlocks for such assemblies.
     """
+    if allow_unsafe_blocks == None:
+        allow_unsafe_blocks = skip_locals_init
     impl_assembly(
         skip_locals_init = skip_locals_init,
         jsimport_generator = jsimport_generator,
+        allow_unsafe_blocks = allow_unsafe_blocks,
         **kwargs
     )
 

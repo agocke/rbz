@@ -28,6 +28,7 @@ exports_files(["Compiler/JitHelper.cs"])
 
 csharp_library(
     name = "ILCompiler.Compiler",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     srcs = [
         ":AssemblyInfo",
         ":SharedStringsSR",
@@ -623,11 +624,14 @@ csharp_library(
         "//src/tools/illink/src/ILLink.Shared:TypeSystemProxy/TypeProxy.cs",
         "//src/tools/illink/src/ILLink.Shared:TypeSystemProxy/WellKnownType.cs",
     ],
-    compiler_options = ["/unsafe"],
+    compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
     resources = [":SharedStringsResources"],
     resource_logical_names = {
         "ILLink.Shared.SharedStrings.resources": "ILLink.Shared.SharedStrings.resources",
     },
+    additionalfiles = [
+        "//src/tools/illink/src/ILLink.Shared:SharedStrings.resx",
+    ],
     deps = [
         "//src/coreclr/tools/aot/ILCompiler.DependencyAnalysisFramework",
         "//src/coreclr/tools/aot/ILCompiler.MetadataTransform",
@@ -636,5 +640,16 @@ csharp_library(
     ],
     target_frameworks = ["net10.0"],
     nowarn = ["1591", "CA1859", "CA1866", "CA1867"],
+    extra_editorconfig_content = "\n".join([
+        "dotnet_diagnostic.IDE0073.severity = none",
+        "dotnet_diagnostic.SA1400.severity = none",
+        "dotnet_diagnostic.SYSLIB1054.severity = none",
+    ]),
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+        "//:staticcs_analyzers",
+    ],
+    msbuild_analyzer_config = "source",
 )

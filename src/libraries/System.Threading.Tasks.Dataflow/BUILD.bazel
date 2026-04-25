@@ -1,4 +1,5 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "MSFT_SNK", "OPEN_SNK")
 
 exports_files([
     "ref/System.Threading.Tasks.Dataflow.cs",
@@ -18,7 +19,9 @@ netcoreapp_ref_assembly(
 netcoreapp_impl_assembly(
     name = "impl_System.Threading.Tasks.Dataflow",
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
-    # MSBuild sets UseCompilerGeneratedDocXmlFile=false; uses hand-written XML docs.
+    # MSBuild passes /doc but uses hand-written XML doc includes that reference
+    # external XmlDocs/*.xml files. Bazel sandboxing prevents the compiler from
+    # finding those files, so doc generation is disabled.
     generate_documentation_file = False,
     srcs = [
         "src/Base/DataflowBlock.cs",
@@ -73,6 +76,8 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
     ],
     resx_file = "src/Resources/Strings.resx",
+    keyfile = MSFT_SNK,
+    library_import_generator = False,
     assembly_description = "TPL Dataflow promotes actor/agent-oriented designs through primitives for in-process message passing, dataflow, and pipelining. TDF builds upon the APIs and scheduling infrastructure provided by the Task Parallel Library (TPL), and integrates with the language support for asynchrony provided by C#, Visual Basic, and F#.\n\nCommonly Used Types:\nSystem.Threading.Tasks.Dataflow.ActionBlock<TInput>\nSystem.Threading.Tasks.Dataflow.BatchBlock<T>\nSystem.Threading.Tasks.Dataflow.BatchedJoinBlock<T1, T2>\nSystem.Threading.Tasks.Dataflow.BatchedJoinBlock<T1, T2, T3>\nSystem.Threading.Tasks.Dataflow.BroadcastBlock<T>\nSystem.Threading.Tasks.Dataflow.BufferBlock<T>\nSystem.Threading.Tasks.Dataflow.DataflowBlock\nSystem.Threading.Tasks.Dataflow.JoinBlock<T1, T2>\nSystem.Threading.Tasks.Dataflow.JoinBlock<T1, T2, T3>\nSystem.Threading.Tasks.Dataflow.TransformBlock<TInput, TOutput>\nSystem.Threading.Tasks.Dataflow.TransformManyBlock<TInput, TOutput>\nSystem.Threading.Tasks.Dataflow.WriteOnceBlock<T>",
 )
 

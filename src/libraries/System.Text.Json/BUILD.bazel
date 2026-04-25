@@ -1,16 +1,18 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
-load("//:defs.bzl", "csharp_library")
+load("//:defs.bzl", "csharp_library", "OPEN_SNK")
 
 exports_files([
     "ref/System.Text.Json.cs",
     "ref/System.Text.Json.netcoreapp.cs",
     "ref/System.Text.Json.Typeforwards.netcoreapp.cs",
     "src/ILLink/ILLink.Descriptors.LibraryBuild.xml",
+    "src/System/Text/Json/BitStack.cs",
 ])
 
 csharp_library(
     name = "JsonSourceGenerator",
     out = "System.Text.Json.SourceGeneration",
+    keyfile = OPEN_SNK,
     srcs = [
         # Generator core files
         "gen/JsonSourceGenerator.Roslyn4.0.cs",
@@ -106,6 +108,13 @@ csharp_library(
         "CS0436",
         "CS1574",
     ],
+    analyzers = [
+        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
+        "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -128,6 +137,8 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Text.Json",
+    com_interface_generator = True,
+    keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     analyzers = [
         "//src/libraries/System.Text.RegularExpressions:RegexGenerator",

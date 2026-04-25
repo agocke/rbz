@@ -16,6 +16,7 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Security.Principal.Windows",
+    com_interface_generator = True,
     nowarn = ["CS1591"],
     pnse = True,
     srcs = [
@@ -33,4 +34,6 @@ netcoreapp_impl_assembly(
     resx_file = "src/Resources/Strings.resx",
     supported_os_platforms_short = ["windows"],
     include_dll_safe_search_path = True,
+    nullable = "annotations",
+    include_editorconfig = False,
 )

@@ -1,7 +1,16 @@
-load("//:defs.bzl", "csharp_library")
+load("//:defs.bzl", "csharp_library", "resgen")
+
+resgen(
+    name = "TypeSystemResources",
+    out = "Internal.TypeSystem.Resources.resources",
+    resx_file = "//src/coreclr/tools/Common:TypeSystem/Common/Properties/Resources.resx",
+)
+
+exports_files(["BannedSymbols.txt"])
 
 csharp_library(
     name = "ILCompiler.TypeSystem",
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     nowarn = ["1591", "CA1859", "CA1866"],
     srcs = [
         "//src/coreclr/tools/Common:TypeSystem/Common/ArrayMethod.Diagnostic.cs",
@@ -230,10 +239,24 @@ csharp_library(
         "//src/coreclr/tools/Common:TypeSystem/Sorting/TypeDesc.Sorting.cs",
         "//src/coreclr/tools/Common:TypeSystem/Sorting/TypeSystemComparer.cs",
     ],
-    compiler_options = ["/unsafe"],
+    compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
+    resources = [":TypeSystemResources"],
+    resource_logical_names = {
+        "Internal.TypeSystem.Resources.resources": "Internal.TypeSystem.Strings.resources",
+    },
+    additionalfiles = [
+        ":BannedSymbols.txt",
+        "//src/coreclr/tools/Common:TypeSystem/Common/Properties/Resources.resx",
+    ],
     deps = [
         "@paket.main//microsoft.diasymreader",
     ],
     target_frameworks = ["net10.0"],
     visibility = ["//visibility:public"],
+    analyzers = [
+        "//:source_build_analyzers",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+        "//:bannedapi_analyzers",
+    ],
+    msbuild_analyzer_config = "source",
 )

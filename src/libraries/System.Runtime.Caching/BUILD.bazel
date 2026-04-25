@@ -16,7 +16,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Runtime.Caching",
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "NU5128", "nullable", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "NU5128", "CS1591", "nullable"],
     srcs = [
         "src/System/Runtime/Caching/Counters.cs",
         "src/System/Runtime/Caching/CacheEntryChangeMonitor.cs",
@@ -89,6 +89,11 @@ impl_assembly(
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
     ],
     resx_file = "src/Resources/Strings.resx",
+    analyzers = [
+        "//src/libraries/System.Text.Json:JsonSourceGenerator",
+        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
+    com_interface_generator = True,
     nullable = "disable",
     allow_unsafe_blocks = True,
 )

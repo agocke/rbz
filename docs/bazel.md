@@ -33,8 +33,9 @@ layout.
   80 ILLink-only assemblies (mostly shims) produce identical-size output.
 - **Build tools**: ResGen, GenerateResxSource, GenFacades, GenerateDepsFile, ilasm, LibraryImportGenerator
 - **Tests**: corehost native tests, xUnit-based managed test infrastructure,
-  184 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
-  184 library test suites on Linux (Microsoft.Bcl.AsyncInterfaces,
+  238 library test suites (Common,
+  IcuAppLocal, Invariant, MetricOuterLoop, MetricOuterLoop1,
+  Microsoft.Bcl.AsyncInterfaces,
   Microsoft.Bcl.Cryptography, Microsoft.Bcl.Memory, Microsoft.Bcl.Numerics, Microsoft.Bcl.TimeProvider,
   Microsoft.CSharp,
   Microsoft.Extensions.Caching.Memory,
@@ -43,11 +44,13 @@ layout.
   Microsoft.Extensions.Configuration.CommandLine,
   Microsoft.Extensions.Configuration.EnvironmentVariables,
   Microsoft.Extensions.Configuration.FileExtensions,
+  Microsoft.Extensions.Configuration.Functional,
   Microsoft.Extensions.Configuration.Ini,
   Microsoft.Extensions.Configuration.Json,
   Microsoft.Extensions.Configuration.UserSecrets,
   Microsoft.Extensions.Configuration.Xml,
   Microsoft.Extensions.DependencyInjection,
+  Microsoft.Extensions.DependencyModel,
   Microsoft.Extensions.Diagnostics,
   Microsoft.Extensions.Diagnostics.Abstractions,
   Microsoft.Extensions.FileProviders.Composite,
@@ -59,6 +62,7 @@ layout.
   Microsoft.Extensions.Logging,
   Microsoft.Extensions.Logging.Console,
   Microsoft.Extensions.Logging.EventSource,
+  Microsoft.Extensions.Logging.Testing,
   Microsoft.Extensions.Options,
   Microsoft.Extensions.Options.ConfigurationExtensions,
   Microsoft.Extensions.Primitives,
@@ -70,70 +74,115 @@ layout.
   System.ComponentModel.Composition.Registration,
   System.ComponentModel.EventBasedAsync, System.ComponentModel.Primitives,
   System.ComponentModel.TypeConverter, System.Composition,
-  System.Composition.Convention, System.Composition.Runtime,
+  System.Composition.Convention, System.Composition.Hosting,
+  System.Composition.Runtime,
+  System.Composition.TypedParts,
   System.Configuration.ConfigurationManager,
   System.Console, System.Data.Common, System.Data.DataSetExtensions,
-  System.Diagnostics.Contracts,
-  System.Diagnostics.DiagnosticSource, System.Diagnostics.FileVersionInfo,
+  System.Data.Odbc,
+  System.Diagnostics.Contracts, System.Diagnostics.Debug,
+  System.Diagnostics.DiagnosticSource,
+  System.Diagnostics.DiagnosticSource (MetricOuterLoop),
+  System.Diagnostics.DiagnosticSource (MetricOuterLoop1),
+  System.Diagnostics.DiagnosticSource.Switches,
+  System.Diagnostics.FileVersionInfo,
   System.Diagnostics.Process, System.Diagnostics.Tools,
   System.Diagnostics.StackTrace, System.Diagnostics.TextWriterTraceListener,
-  System.Diagnostics.TraceSource, System.Diagnostics.Tracing,
+  System.Diagnostics.TraceSource, System.Diagnostics.TraceSource.Config,
+  System.Diagnostics.Tracing,
+  System.DirectoryServices.Protocols,
   System.Drawing.Primitives, System.Dynamic.Runtime,
   System.Formats.Asn1, System.Formats.Cbor,
   System.Formats.Nrbf, System.Formats.Tar, System.Globalization.Calendars,
+  System.Globalization, System.Globalization.CalendarsWithConfigSwitch,
+  System.Globalization.Extensions,
+  Invariant,
   System.IO, System.IO.Compression, System.IO.Compression.Brotli,
   System.IO.Compression.ZipFile,
   System.IO.FileSystem.DriveInfo, System.IO.FileSystem.Primitives,
+  System.IO.FileSystem,
+  System.IO.FileSystem.DisabledFileLocking,
   System.IO.FileSystem.Watcher, System.IO.Hashing, System.IO.IsolatedStorage,
   System.IO.MemoryMappedFiles, System.IO.UnmanagedMemoryStream,
-  System.IO.Packaging, System.IO.Pipelines, System.IO.Pipes, System.Linq,
+  System.IO.Packaging, System.IO.Pipelines, System.IO.Pipes, System.IO.Ports, System.Linq,
   System.Linq.AsyncEnumerable, System.Linq.Expressions,
   System.Linq.Parallel, System.Linq.Queryable, System.Memory,
   System.Memory.Data, System.Net.Http (EnterpriseTests),
-  System.Net.Http (FunctionalTests), System.Net.Http.Json,
+  System.Net.Http (FunctionalTests), System.Net.Http (UnitTests), System.Net.Http.Json,
   System.Net.Http.Json (FunctionalTests), System.Net.HttpListener,
   System.Net.Mail, System.Net.Mail (UnitTests),
   System.Net.NameResolution, System.Net.NameResolution (PalTests),
   System.Net.NetworkInformation, System.Net.Ping, System.Net.Primitives,
-  System.Net.Primitives (PalTests), System.Net.Requests,
-  System.Net.Security (EnterpriseTests), System.Net.ServerSentEvents,
+  System.Net.Primitives (PalTests), System.Net.Primitives (UnitTests),
+  System.Net.Quic (FunctionalTests),
+  System.Net.Requests, System.Net.Security (EnterpriseTests),
+  System.Net.Security (FunctionalTests), System.Net.Security (UnitTests),
+  System.Net.ServerSentEvents, System.Net.ServicePoint,
   System.Net.Sockets, System.Net.WebClient, System.Net.WebHeaderCollection,
   System.Net.WebProxy, System.Net.WebSockets, System.Net.WebSockets.Client,
-  System.Numerics.Tensors, System.Numerics.Vectors, System.ObjectModel,
+  System.Numerics.Tensors, System.Numerics.Tensors.Net8,
+  System.Numerics.Vectors, System.ObjectModel,
   System.Private.Uri, System.Private.Uri (ExtendedFunctionalTests),
-  System.Private.Uri (UnitTests), System.Private.Xml.Linq,
-  System.Reflection.Context, System.Reflection.DispatchProxy, System.Reflection.Emit,
+  System.Private.Uri (UnitTests), System.Private.Xml, System.Private.Xml.Linq,
+  System.Reflection.Context, System.Reflection.CoreCLR, System.Reflection.DispatchProxy, System.Reflection.Emit,
   System.Reflection.Emit.ILGeneration, System.Reflection.Emit.Lightweight,
-  System.Reflection.Extensions, System.Reflection.Metadata,
+  System.Reflection.Extensions, System.Reflection.InvokeEmit,
+  System.Reflection.InvokeInterpreted, System.Reflection.Metadata,
   System.Reflection.MetadataLoadContext, System.Reflection.TypeExtensions,
-  System.Resources.Reader, System.Resources.Writer, System.Runtime.Caching,
+  System.Reflection,
+  System.Resources.Reader, System.Resources.ResourceManager, System.Resources.Writer,
+  System.Runtime.Caching,
   System.Runtime.CompilerServices.Unsafe,
-  System.Runtime.CompilerServices.VisualC, System.Runtime.Handles,
-  System.Runtime.InteropServices (UnitTests), System.Runtime.Intrinsics,
-  System.Runtime.Loader, System.Runtime.Numerics,
+  System.Runtime.CompilerServices.VisualC, System.Runtime.Extensions, System.Runtime.Handles,
+  System.Runtime.InteropServices (UnitTests),
+  System.Runtime.InteropServices.ComDisabled,
+  System.Runtime.InteropServices.RuntimeInformation,
+  System.Runtime.Intrinsics,
+  System.Runtime.Loader, System.Runtime.Loader.DefaultContext,
+  System.Runtime.Loader.RefEmitLoadContext,
+  System.Runtime.Numerics,
+  System.Runtime, System.Runtime.InvariantTimezone,
+  System.Runtime.ReflectionInvokeEmit,
+  System.Runtime.ReflectionInvokeInterpreted,
+  System.Runtime.Serialization.Formatters.Disabled,
   System.Runtime.Serialization.Json,
+  System.Runtime.Serialization.Json.ReflectionOnly,
   System.Runtime.Serialization.Primitives, System.Runtime.Serialization.Schema,
   System.Runtime.Serialization.Xml,
+  System.Runtime.Serialization.Xml.Canonicalization,
+  System.Runtime.Serialization.Xml.ReflectionOnly,
   System.Security.Claims, System.Security.Cryptography,
-  System.Security.Cryptography.Cose,
+  System.Security.Cryptography.Cose, System.Security.Cryptography.Csp,
   System.Security.Cryptography.OpenSsl, System.Security.Cryptography.Pkcs,
   System.Security.Cryptography.ProtectedData,
   System.Security.Cryptography.Xml,
+  System.Security.SecureString,
   System.ServiceModel.Syndication,
   System.Text.Encoding.CodePages, System.Text.Encoding.Extensions,
-  System.Text.Encodings.Web, System.Text.RegularExpressions,
+  System.Text.Encoding,
+  System.Text.Encodings.Web, System.Text.Json, System.Text.RegularExpressions,
   System.Text.RegularExpressions (UnitTests),
   System.Threading, System.Threading.Channels, System.Threading.Overlapped,
   System.Threading.RateLimiting, System.Threading.Tasks.Dataflow,
   System.Threading.Tasks.Extensions, System.Threading.Tasks.Parallel,
   System.Threading.Tasks, System.Threading.Thread, System.Threading.ThreadPool,
   System.Threading.Timer, System.Transactions.Local, System.ValueTuple,
-  System.Web.HttpUtility;
-  plus 5 platform-constrained test suites with BUILD files:
-  Microsoft.Win32.Registry (Windows), System.Resources.Extensions
-  (needs System.Drawing.Common), System.Runtime.Serialization.Formatters
-  (needs System.Drawing.Common), System.Security.AccessControl (Windows),
-  System.Security.Principal.Windows (Windows)
+  System.Web.HttpUtility,
+  System.Xml.Linq.Axes, System.Xml.Linq.Events, System.Xml.Linq.Misc,
+  System.Xml.Linq.Properties, System.Xml.Linq.SDMSample, System.Xml.Linq.Streaming,
+  System.Xml.Linq.TreeManipulation, System.Xml.Linq.xNodeBuilder,
+  System.Xml.Linq.xNodeReader,
+  System.Xml.Schema.Extensions,
+  System.Xml.XmlSerializer.ReflectionOnly;
+  plus 8 platform-constrained test suites with BUILD files:
+  Microsoft.Win32.Registry (Windows),
+  System.Resources.Extensions (needs System.Drawing.Common),
+  System.Resources.Extensions.BinaryFormat (needs System.Drawing.Common),
+  System.Runtime.Serialization.Formatters (needs System.Drawing.Common),
+  System.Security.AccessControl (Windows),
+  System.Security.Principal.Windows (Windows),
+  System.Formats.Asn1 (Linux-only),
+  System.Security.Cryptography.OpenSsl (Linux-only)
 - **Per-component configuration**: independent debug/checked/release for
   CoreCLR and Libraries (matching MSBuild's `-rc`/`-lc` flags)
 - **Runtime layout**: `runtime_layout` rule assembles stripped binaries into
@@ -142,7 +191,7 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Library unit tests (189 Bazel targets total; 184 currently pass on Linux and 5 are platform-constrained/skipped)
+- Remaining library test equivalence diffs (35 known diffs, mostly TFM/platform defines, source file, and infrastructure differences)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -220,7 +269,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 240 of 480 tracked assemblies currently match
+- **Managed assemblies**: 541 of 569 tracked assemblies currently match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -233,7 +282,7 @@ areas:
   individual entries for consistent comparison.
   The matching assemblies include `System.Private.CoreLib` (full analyzer
   and flag parity including the ILLink.RoslynAnalyzer built from source) and
-  71 library assemblies matched via infrastructure in `impl_assembly`
+  91 library assemblies matched via infrastructure in `impl_assembly`
   (`src/libraries/defs.bzl`), which automatically generates per-assembly
   `disabledAnalyzers.config`, `GeneratedMSBuildEditorConfig.editorconfig`,
   passes the standard Roslyn analyzers, ILLink analyzer, the
@@ -253,8 +302,41 @@ areas:
   helper/test-support assemblies outside that library infrastructure. Strong-name
   signing now also matches MSBuild for the `Microsoft.Extensions.Caching.*` and
   `Microsoft.Extensions.Configuration.*` assembly families, moving 12 more
-  tracked assemblies to `match`.
-  Of the 240 remaining known diffs:
+  tracked assemblies to `match`. SDK analyzer parity for the
+  ComInterface/JSON/Regex generators now also matches 10 more libraries:
+  `Microsoft.Bcl.Cryptography`, `Microsoft.Bcl.Memory`,
+  `Microsoft.Extensions.FileProviders.Physical`,
+  `Microsoft.Extensions.Hosting.Systemd`,
+  `Microsoft.Extensions.Hosting.WindowsServices`,
+  `Microsoft.Extensions.Logging.Abstractions`,
+  `Microsoft.Extensions.Logging.EventSource`,
+  `Microsoft.Extensions.Primitives`,
+  `System.Diagnostics.TextWriterTraceListener`, and
+  `System.IO.Packaging`. Explicit `/unsafe` parity plus the same shared
+  analyzer set now also moves 10 core `Microsoft.Extensions.*` libraries to
+  `match`: `Microsoft.Extensions.DependencyInjection`,
+  `Microsoft.Extensions.DependencyInjection.Abstractions`,
+  `Microsoft.Extensions.DependencyModel`, `Microsoft.Extensions.Diagnostics`,
+  `Microsoft.Extensions.Diagnostics.Abstractions`,
+  `Microsoft.Extensions.FileProviders.Abstractions`,
+  `Microsoft.Extensions.FileProviders.Composite`,
+  `Microsoft.Extensions.FileSystemGlobbing`, `Microsoft.Extensions.Hosting`,
+  and `Microsoft.Extensions.Hosting.Abstractions`.
+  Strong-name signing fixes: `System.Private.Xml`, `System.Text.Json`,
+  `System.Text.Json.SourceGeneration`, and `System.Data.OleDb` now use
+  `Open.snk` (via explicit `keyfile = OPEN_SNK`) matching MSBuild's default
+  `StrongNameKeyId` for source projects in `src/libraries/`.
+  NativeAOT tool assemblies (`ilc`, `illink`, `ILLink.Tasks`,
+  `ILCompiler.Compiler`, `ILCompiler.ReadyToRun`, `ILCompiler.TypeSystem`)
+  now also match: resource naming, keyfile signing (`/publicsign+` for
+  `35MSSharedLib1024.snk`), `/warnaserror+:NU1605`, `additionalfile` parity,
+  and `editorconfig_name` overrides align Bazel with MSBuild. MSBuild uses
+  `/skipanalyzers+` on these tools (analyzers referenced but never run);
+  Bazel uses `extra_editorconfig_content` to embed equivalent diagnostic
+  suppressions in the generated editorconfig (comparison checks filename
+  only). `crossgen2` remains a diff due to the `crossgen2.aot.globalconfig`
+  injected by rules_dotnet for `is_aot_compatible=True`.
+  Of the 220 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
@@ -359,7 +441,7 @@ release/10.0 commits and bazel merge commits.
    `paket.dependencies`, and updates:
    - `paket.dependencies` — the source of truth for NuGet package versions
    - `defs.bzl` — centralized versioned repo-name constants (e.g.,
-     `ARCADE_SDK_REPO`, `OPEN_SNK`, `MSFT_SNK`)
+     `ARCADE_SDK_REPO`, `OPEN_SNK`, `MSFT_SNK`, `SHAREDLIB1024_SNK`)
    - `MODULE.bazel` — `use_repo()` entries for versioned repos
 
    **Ordering constraint:** `MODULE.bazel` must be temporarily reverted to its
@@ -803,12 +885,15 @@ and System.Net.Quic (msquic native library + full Linux implementation).
   or runtime-async support not yet available); all 31 async tests are `manual` because the
   `runtime-async=on` compiler feature they require is not yet supported by the Bazel-built runtime
 - [x] ~23 tests with `target_compatible_with = ["@platforms//os:windows"]` for Windows-only tests
-- [x] 155 library test targets (150 currently passing on Linux; see §1 "What Works" for the full list;
-  includes 5 platform-constrained suites: Microsoft.Win32.Registry (Windows),
+- [x] 238 library test targets (see §1 "What Works" for the full list;
+  includes 8 platform-constrained suites: Microsoft.Win32.Registry (Windows),
   System.Resources.Extensions (needs System.Drawing.Common),
+  System.Resources.Extensions.BinaryFormat (needs System.Drawing.Common),
   System.Runtime.Serialization.Formatters (needs System.Drawing.Common),
   System.Security.AccessControl (Windows),
-  System.Security.Principal.Windows (Windows))
+  System.Security.Principal.Windows (Windows),
+  System.Formats.Asn1 (Linux-only),
+  System.Security.Cryptography.OpenSsl (Linux-only))
 - [ ] Tests with CMakeProjectReference (~273 tests need native code built first)
 - [ ] Tests with ReferenceXUnitWrapperGenerator=false (~554 exe-style tests)
 - [ ] Remaining library unit tests (33 libraries still lack a Bazel test BUILD file)
@@ -857,12 +942,16 @@ Mono-only platforms (Browser/WASM, WASI, Tizen) are also excluded.
 - [x] `MODULE.bazel` — Bzlmod workspace, depends on rules_cc@0.2.14, rules_dotnet, bazel_skylib@1.8.2
 - [x] `.bazelrc` — Compiler flags matching CMake for linux-x64, per-component config system
 - [x] `BUILD.bazel` (root) — Root package, string_flag build settings, config_settings, runtime layout
-- [x] `defs.bzl` — Shared macros (csharp_library wrapper, gen_resx_source, resgen)
+- [x] `defs.bzl` — Shared macros (csharp_library wrapper, csharp_binary wrapper, gen_resx_source, resgen)
 - [x] `src/libraries/defs.bzl` — Library macros (netcoreapp_ref_assembly, impl_assembly, netcoreapp_impl_assembly, gen_facades, ref_impl_pair)
 - [x] `src/tests/defs.bzl` — Test infrastructure (live_csharp_library, test runner)
 - [x] Compiler flag parity verified against CMake (`-g`, `-O3`, `-std=gnu11`/`-std=c++17`, all warning flags, all defines)
 - [x] Managed C# compiler flag parity: `/warnaserror+`, `/warn:9999` matching MSBuild's
-  `TreatWarningsAsErrors=true` and `WarningLevel=9999` from `Directory.Build.props`
+  `TreatWarningsAsErrors=true` and `WarningLevel=9999` from `Directory.Build.props`.
+  Both the `csharp_library` and `csharp_binary` wrappers apply the full set of MSBuild
+  defaults (`/checksumalgorithm:SHA256`, `/noconfig`, `/features:strict`,
+  `/features:nullablePublicOnly`, global `nowarn`, `warnings_not_as_errors`,
+  `msbuild_analyzer_config` support)
 - [x] CI mode (`--config=ci`): `/pathmap` normalization matching MSBuild's
   `ContinuousIntegrationBuild=true` / `DeterministicSourcePaths=true` for deterministic PDB
   paths (`/_/artifacts/obj/...`). Managed DLL content is byte-identical to MSBuild CI output

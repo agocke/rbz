@@ -31,6 +31,8 @@ CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codest
 DOTNET_CODEANALYSIS_REPO = "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26170.102"
 STYLECOP_ANALYZERS_UNSTABLE_REPO = "nuget.stylecop.analyzers.unstable.v1.2.0.556"
 XUNIT_ANALYZERS_REPO = "nuget.xunit.analyzers.v1.22.0"
+STATICCS_REPO = "nuget.staticcs.v0.2.0"
+BANNEDAPI_ANALYZERS_REPO = "nuget.microsoft.codeanalysis.bannedapianalyzers.v3.3.5-beta1.23270.2"
 
 # ─── Pre-built labels for commonly used assets ───────────────────────────────
 # SNK signing keys are copied to a stable path in //eng:snk/ (via copy_file)
@@ -41,6 +43,7 @@ MSFT_SNK = "//eng:snk/MSFT.snk"
 OPEN_SNK = "//eng:snk/Open.snk"
 ASPNETCORE_SNK = "//eng:snk/AspNetCore.snk"
 ECMA_SNK = "//eng:snk/ECMA.snk"
+SHAREDLIB1024_SNK = "//eng:snk/35MSSharedLib1024.snk"
 SILVERLIGHT_SNK = "//eng:snk/SilverlightPlatformPublicKey.snk"
 DEFAULT_RULESET = "//eng:Default.ruleset"
 
@@ -415,11 +418,17 @@ def csharp_library(
     generate_documentation_file = False,
     msbuild_analyzer_config = "none",
     include_default_ruleset = True,
+    include_syslib_warnaserror = True,
+    include_library_nowarn = True,
     interceptors_namespaces = None,
+    editorconfig_name = None,
+    extra_editorconfig_content = "",
     **kwargs
 ):
     if out == None:
         out = name
+    if editorconfig_name == None:
+        editorconfig_name = out
 
     if resx_file != None:
         _resource_name = resource_name if resource_name else "FxResources.%s.SR" % out
@@ -476,14 +485,16 @@ def csharp_library(
             additionalfiles = additionalfiles + [":" + disabled_analyzers_target]
 
         editorconfig_target = "editorconfig_" + name
+        _editorconfig_global_level = "global_level = 1\n" if extra_editorconfig_content else ""
         native.genrule(
             name = editorconfig_target,
-            outs = [name + "/" + out + ".GeneratedMSBuildEditorConfig.editorconfig"],
+            outs = [name + "/" + editorconfig_name + ".GeneratedMSBuildEditorConfig.editorconfig"],
             cmd = """cat >"$@" <<'EOF'
 is_global = true
-build_property.InformationalVersion = {version}
+{global_level}build_property.InformationalVersion = {version}
 build_property._SupportedPlatformList = Linux,macOS,Windows,Android,iOS,tvOS,macCatalyst,browser,wasi,illumos,Solaris,Haiku,Unix,FreeBSD
-EOF""".format(version = PRODUCT_VERSION),
+{extra}
+EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, global_level = _editorconfig_global_level),
         )
 
         _msbuild_analyzer_configs = [
@@ -526,8 +537,14 @@ EOF""".format(version = PRODUCT_VERSION),
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-        "/warnaserror+:SYSLIB0011",
     ]
+    if include_syslib_warnaserror:
+        _compiler_options = _compiler_options + [
+            # Arcade SDK promotes SYSLIB0011 to an error.  Test-support
+            # assemblies that don't flow through Arcade's targets should
+            # set include_syslib_warnaserror = False.
+            "/warnaserror+:SYSLIB0011",
+        ]
     if interceptors_namespaces != None:
         _compiler_options = _compiler_options + [
             "/features:InterceptorsNamespaces=" + interceptors_namespaces,
@@ -549,17 +566,18 @@ EOF""".format(version = PRODUCT_VERSION),
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
         nowarn = nowarn + _nullable_nowarn + [
             "CS1701",
-            # Match Directory.Build.props global NoWarn
-            "CS8500",
-            "CS8969",
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
-            "CS1705",
             "NU5105",
-            # Directory.Build.props global NoWarn
+        ] + ([
+            # src/libraries/Directory.Build.props global NoWarn — not present
+            # in NativeAOT tool projects under src/coreclr/tools/.
+            "CS8500",
+            "CS8969",
+            "CS1705",
             "IDE0060",
             "IDE0100",
-        ],
+        ] if include_library_nowarn else []),
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,
         # Match MSBuild's WarningsNotAsErrors from Directory.Build.props
@@ -594,12 +612,135 @@ EOF""".format(version = PRODUCT_VERSION),
 
 def csharp_binary(
     name,
+    srcs = [],
+    nowarn = [],
     use_shared_compilation = True,
+    compiler_options = [],
+    compile_data = [],
+    additionalfiles = [],
+    analyzer_configs = [],
+    analyzers = [],
+    treat_warnings_as_errors = True,
+    warnings_not_as_errors = [],
+    generate_documentation_file = False,
+    msbuild_analyzer_config = "none",
+    include_default_ruleset = True,
+    include_syslib_warnaserror = True,
+    include_library_nowarn = True,
+    interceptors_namespaces = None,
+    editorconfig_name = None,
+    extra_editorconfig_content = "",
     **kwargs
 ):
+    if editorconfig_name == None:
+        editorconfig_name = name
+
+    if msbuild_analyzer_config not in ["none", "style", "source"]:
+        fail("msbuild_analyzer_config must be one of: none, style, source")
+
+    if msbuild_analyzer_config != "none":
+        if msbuild_analyzer_config == "source":
+            disabled_analyzers_target = "disabled_analyzers_" + name
+            native.genrule(
+                name = disabled_analyzers_target,
+                outs = [name + "/disabledAnalyzers.config"],
+                cmd = ": > \"$@\"",
+            )
+            additionalfiles = additionalfiles + [":" + disabled_analyzers_target]
+
+        editorconfig_target = "editorconfig_" + name
+        _editorconfig_global_level = "global_level = 1\n" if extra_editorconfig_content else ""
+        native.genrule(
+            name = editorconfig_target,
+            outs = [name + "/" + editorconfig_name + ".GeneratedMSBuildEditorConfig.editorconfig"],
+            cmd = """cat >"$@" <<'EOF'
+is_global = true
+{global_level}build_property.InformationalVersion = {version}
+build_property._SupportedPlatformList = Linux,macOS,Windows,Android,iOS,tvOS,macCatalyst,browser,wasi,illumos,Solaris,Haiku,Unix,FreeBSD
+{extra}
+EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, global_level = _editorconfig_global_level),
+        )
+
+        _msbuild_analyzer_configs = [
+            ":" + editorconfig_target,
+            "//src/tools/bazel:analysislevelstyle_default.globalconfig",
+            "//:.editorconfig",
+        ]
+        if msbuild_analyzer_config == "source":
+            _msbuild_analyzer_configs = _msbuild_analyzer_configs + [
+                "//eng:CodeAnalysis.src.globalconfig",
+                "//src/tools/bazel:analysislevel_11_default.globalconfig",
+            ]
+
+        analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
+
+    # rules_dotnet explicitly passes /nullable:disable for assemblies with
+    # nullable="disable", but MSBuild omits /nullable entirely (disable is
+    # the default).  The explicit flag triggers CS8632 on nullable
+    # annotations (e.g. string?) in shared source files.
+    _nullable_nowarn = ["CS8632"] if kwargs.get("nullable") == "disable" else []
+
+    _compiler_options = compiler_options + [
+        "/checksumalgorithm:SHA256",
+        "/platform:AnyCPU",
+        "/features:strict",
+        "/features:nullablePublicOnly",
+        "/noconfig",
+        # rules_dotnet restricts warning_level to [0..5] so we use
+        # compiler_options to emit /warn:9999, matching MSBuild's
+        # WarningLevel=9999.
+        "/warn:9999",
+    ] + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
+    if interceptors_namespaces != None:
+        _compiler_options = _compiler_options + [
+            "/features:InterceptorsNamespaces=" + interceptors_namespaces,
+        ]
+    if include_default_ruleset:
+        _compiler_options = _compiler_options + [
+            # Microsoft.DotNet.CodeAnalysis package supplies this ruleset to
+            # source-build projects. compile_data makes it available in the sandbox.
+            "/ruleset:eng/Default.ruleset",
+        ]
+
     _base_csharp_binary(
         name = name,
+        srcs = srcs,
         use_shared_compilation = use_shared_compilation,
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
+        nowarn = nowarn + _nullable_nowarn + [
+            "CS1701",
+            # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
+            "CS1702",
+            "NU5105",
+        ] + ([
+            # src/libraries/Directory.Build.props global NoWarn — not present
+            # in NativeAOT tool projects under src/coreclr/tools/.
+            "CS8500",
+            "CS8969",
+            "CS1705",
+            "IDE0060",
+            "IDE0100",
+        ] if include_library_nowarn else []),
+        # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
+        treat_warnings_as_errors = treat_warnings_as_errors,
+        # Match MSBuild's WarningsNotAsErrors from Directory.Build.props
+        # (NuGet audit warnings demoted from errors for non-official builds).
+        # rules_dotnet forbids warnings_not_as_errors when treat_warnings_as_errors
+        # is false, so only add them when warnaserror is enabled.
+        warnings_not_as_errors = (warnings_not_as_errors + [
+            "NU1901",
+            "NU1902",
+            "NU1903",
+            "NU1904",
+        ]) if treat_warnings_as_errors else warnings_not_as_errors,
+        # MSBuild does not generate XML doc files for EXE projects by default.
+        generate_documentation_file = generate_documentation_file,
+        # Match MSBuild's csc defaults. rules_dotnet emits its own baseline
+        # flags, so keep these late in the command line for last-wins behavior.
+        compiler_options = _compiler_options,
+        compile_data = compile_data + ([DEFAULT_RULESET] if include_default_ruleset else []),
+        additionalfiles = additionalfiles,
+        analyzer_configs = analyzer_configs,
+        analyzers = analyzers,
         **kwargs
     )

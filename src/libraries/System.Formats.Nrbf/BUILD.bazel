@@ -1,4 +1,6 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl",
+    "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 exports_files([
     "ref/System.Formats.Nrbf.cs",
@@ -22,6 +24,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Formats.Nrbf",
+    keyfile = OPEN_SNK,
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = [
         "src/System/Formats/Nrbf/AllowedRecordType.cs",

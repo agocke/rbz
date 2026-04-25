@@ -1,4 +1,6 @@
-load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl",
+    "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "impl_assembly", "netcoreapp_ref_assembly", "ref_impl_pair")
+load("//:defs.bzl", "OPEN_SNK")
 
 netcoreapp_ref_assembly(
     name = "ref_System.Numerics.Tensors",
@@ -15,6 +17,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Numerics.Tensors",
+    keyfile = OPEN_SNK,
+    analyzers = COMMON_GENERATOR_ANALYZERS,
     srcs = glob(
         ["src/**/*.cs"],
         exclude = ["src/System/Numerics/Tensors/netstandard/**"],
