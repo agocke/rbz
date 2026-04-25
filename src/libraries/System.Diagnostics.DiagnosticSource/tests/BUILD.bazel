@@ -6,13 +6,13 @@ gen_resx_source(
     name = "gen_resx",
     out = "SR.g.cs",
     assembly_name = "System.Diagnostics.DiagnosticSource.Tests",
-    resx_file = "//src/libraries/System.Diagnostics.DiagnosticSource:src/Resources/Strings.resx",
+    resx_file = "Resources/Strings.resx",
 )
 
 resgen(
     name = "strings_resx",
     out = "FxResources.System.Diagnostics.DiagnosticSource.Tests.SR.resources",
-    resx_file = "//src/libraries/System.Diagnostics.DiagnosticSource:src/Resources/Strings.resx",
+    resx_file = "Resources/Strings.resx",
 )
 
 library_test(
@@ -70,7 +70,7 @@ library_test(
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
     ],
-    additionalfiles = ["//src/libraries/System.Diagnostics.DiagnosticSource:src/Resources/Strings.resx"],
+    additionalfiles = ["Resources/Strings.resx"],
     defines = [
         "MEMORYMARSHAL_SUPPORT",
         "OS_ISBROWSER_SUPPORT",

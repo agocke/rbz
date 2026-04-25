@@ -120,6 +120,7 @@ csharp_library(
 
 netcoreapp_ref_assembly(
     name = "ref_System.Text.Json",
+    keyfile = OPEN_SNK,
     srcs = [
         "ref/System.Text.Json.cs",
         "ref/System.Text.Json.netcoreapp.cs",

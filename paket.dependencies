@@ -71,6 +71,7 @@ nuget System.Threading.Channels 8.0.0
 nuget optimization.linux-x64.mibc.runtime 1.0.0-prerelease.26080.1
 nuget optimization.linux-arm64.mibc.runtime 1.0.0-prerelease.26080.1
 nuget Moq 4.18.4
+nuget JsonSchema.Net 7.0.2
 nuget Newtonsoft.Json 13.0.3
 nuget FsCheck 2.14.3
 nuget FsCheck.Xunit 2.14.3

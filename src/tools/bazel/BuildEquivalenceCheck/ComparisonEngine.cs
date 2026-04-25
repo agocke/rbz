@@ -301,14 +301,13 @@ public static class ComparisonEngine
         List<ManagedCompilationRecord> msbuildRecords,
         List<ManagedCompilationRecord> bazelRecords)
     {
-        // For MSBuild, prefer impl assemblies over ref assemblies when both exist.
-        // When multiple impl records exist for the same assembly (multi-targeted),
-        // prefer the platform-specific TFM since that's what goes in the runtime
-        // archive and what Bazel builds. Priority:
+        // ── Impl assemblies ────────────────────────────────────────────
+        // For MSBuild, prefer platform-specific TFM since that's what goes
+        // in the runtime archive and what Bazel builds. Priority:
         //   1. net10.0-linux (highest — exact Linux match)
         //   2. net10.0-unix  (covers Linux)
         //   3. plain net10.0 (fallback — often a PNSE stub)
-        var msbuildByName = msbuildRecords
+        var msbuildImpl = msbuildRecords
             .Where(r => !r.IsReferenceAssembly)
             // Exclude netstandard2.0 builds — Bazel always targets net10.0.
             // When MSBuild multi-targets, the netstandard build is for NuGet
@@ -320,35 +319,79 @@ public static class ComparisonEngine
                 g.OrderByDescending(r => TfmPriority(r.OutputPath))
                 .First());
 
-        // For Bazel, prefer impl_ targets (the actual implementation assemblies)
-        // over ref_ targets (reference assemblies used only as compile inputs).
-        var bazelByName = bazelRecords
-            .Where(r => r.TargetLabel.Contains(":impl_") || r.TargetLabel.Contains("/impl_")
-                || (!r.TargetLabel.Contains(":ref_") && !r.TargetLabel.Contains("/ref_")))
+        // For Bazel impl: prefer impl_ targets, then live_ targets, then
+        // anything that is not a ref_ target.
+        var bazelImpl = bazelRecords
+            .Where(r => !IsRefTarget(r.TargetLabel))
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
-                g.OrderByDescending(r => r.TargetLabel.Contains(":impl_") || r.TargetLabel.Contains("/impl_")).First());
+                g.OrderByDescending(r => IsImplTarget(r.TargetLabel)).First());
 
+        // ── Ref assemblies ─────────────────────────────────────────────
+        var msbuildRef = msbuildRecords
+            .Where(r => r.IsReferenceAssembly)
+            .Where(r => !r.OutputPath.Contains("netstandard2.0", StringComparison.OrdinalIgnoreCase))
+            .GroupBy(r => r.AssemblyName)
+            .ToDictionary(g => g.Key, g =>
+                g.OrderByDescending(r => TfmPriority(r.OutputPath))
+                .First());
+
+        var bazelRef = bazelRecords
+            .Where(r => IsRefTarget(r.TargetLabel))
+            .GroupBy(r => r.AssemblyName)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        // ── Compare impl assemblies ────────────────────────────────────
+        CompareVariant(report, msbuildImpl, bazelImpl, variant: null);
+
+        // ── Compare ref assemblies ─────────────────────────────────────
+        CompareVariant(report, msbuildRef, bazelRef, variant: "ref");
+    }
+
+    /// <summary>
+    /// Returns true if the Bazel target label identifies a reference assembly target.
+    /// </summary>
+    private static bool IsRefTarget(string label) =>
+        label.Contains(":ref_") || label.Contains("/ref_");
+
+    /// <summary>
+    /// Returns true if the Bazel target label identifies an explicit impl assembly target.
+    /// </summary>
+    private static bool IsImplTarget(string label) =>
+        label.Contains(":impl_") || label.Contains("/impl_");
+
+    /// <summary>
+    /// Compares one variant (impl or ref) of managed assemblies between MSBuild and Bazel.
+    /// When <paramref name="variant"/> is non-null, comparison keys are suffixed
+    /// (e.g. "System.Runtime.ref") so ref and impl can coexist in the same report.
+    /// </summary>
+    private static void CompareVariant(
+        EquivalenceReport report,
+        Dictionary<string, ManagedCompilationRecord> msbuildByName,
+        Dictionary<string, ManagedCompilationRecord> bazelByName,
+        string? variant)
+    {
         var allNames = msbuildByName.Keys.Union(bazelByName.Keys).Order().ToList();
 
         foreach (var name in allNames)
         {
+            var reportName = variant is null ? name : $"{name}.{variant}";
             var inMSBuild = msbuildByName.TryGetValue(name, out var msbuild);
             var inBazel = bazelByName.TryGetValue(name, out var bazel);
 
             if (inMSBuild && !inBazel)
             {
-                report.OnlyInMSBuild.Add(name);
+                report.OnlyInMSBuild.Add(reportName);
                 continue;
             }
 
             if (!inMSBuild && inBazel)
             {
-                report.OnlyInBazelManaged.Add(name);
+                report.OnlyInBazelManaged.Add(reportName);
                 continue;
             }
 
-            var result = CompareManagedRecords(name, msbuild!, bazel!);
+            var result = CompareManagedRecords(reportName, msbuild!, bazel!);
             report.ManagedResults.Add(result);
         }
     }
