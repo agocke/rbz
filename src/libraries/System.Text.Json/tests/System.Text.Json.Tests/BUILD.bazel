@@ -10,7 +10,7 @@ gen_resx_source(
 
 resgen(
     name = "strings_resx",
-    out = "SR.resources",
+    out = "FxResources.System.Text.Json.Tests.SR.resources",
     resx_file = "Resources/Strings.resx",
 )
 
@@ -48,8 +48,9 @@ _COMMON_TEST_FILES = [
     "//src/libraries/System.Text.Json/tests:Common/JsonCreationHandlingTests.Generic.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonCreationHandlingTests.Object.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonNumberTestData.cs",
+    "//src/libraries/System.Text.Json/tests:Common/JsonSchemaExporterTests.cs",
+    "//src/libraries/System.Text.Json/tests:Common/JsonSchemaExporterTests.TestTypes.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonSerializerWrapper.cs",
-    # JsonSchemaExporterTests excluded: requires JsonSchema.Net NuGet (not in paket.dependencies)
     "//src/libraries/System.Text.Json/tests:Common/JsonTestHelper.cs",
     "//src/libraries/System.Text.Json/tests:Common/JsonTestSerializerOptions.cs",
     "//src/libraries/System.Text.Json/tests:Common/MetadataTests.cs",
@@ -114,8 +115,6 @@ library_test(
         exclude = [
             # TrimmingTests are not applicable under Bazel
             "TrimmingTests/**",
-            # JsonSchemaExporterTests require JsonSchema.Net NuGet (not in paket.dependencies)
-            "Serialization/JsonSchemaExporterTests.cs",
         ],
     ) + _COMMON_TEST_FILES + [
         ":gen_resx",
@@ -128,7 +127,8 @@ library_test(
         "//src/libraries/Common/tests:System/DateTimeTestHelpers.cs",
     ],
     resources = [":strings_resx"],
-    resource_logical_names = {"SR.resources": "System.Text.Json.Tests.Resources.Strings.resources"},
+    resource_logical_names = {"FxResources.System.Text.Json.Tests.SR.resources": "FxResources.System.Text.Json.Tests.SR.resources"},
+    additionalfiles = ["Resources/Strings.resx"],
     deps = [
         "//src/libraries/System.Text.Json:ref_System.Text.Json",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
@@ -153,6 +153,7 @@ library_test(
         "//src/libraries/System.Runtime.Serialization.Formatters:ref_System.Runtime.Serialization.Formatters",
         "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",
         "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
+        "//src/libraries/System.Xml.XDocument:ref_System.Xml.XDocument",
         "//src/libraries/Common/tests:TestUtilities",
         # xunit and test framework
         "@paket.main//microsoft.dotnet.remoteexecutor",
@@ -162,6 +163,10 @@ library_test(
         "@paket.main//xunit.extensibility.core",
         # Newtonsoft.Json (used for comparison tests)
         "@paket.main//newtonsoft.json",
+        # JsonSchema.Net (used for JsonSchemaExporterTests)
+        "@paket.main//jsonschema.net",
+        "@paket.main//jsonpointer.net",
+        "@paket.main//json.more.net",
     ],
     keyfile = OPEN_SNK,
 )

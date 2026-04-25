@@ -737,7 +737,7 @@ diff   System.Text.Json.SourceGeneration
 match  TestUtilities
 match  Microsoft.Extensions.DependencyModel.Tests
 diff   System.Private.Xml.Tests
-diff   System.Text.Json.Tests
+match  System.Text.Json.Tests
 
 # ── Loader test helper assemblies ──
 match  System.Runtime.Loader.Test.Assembly
