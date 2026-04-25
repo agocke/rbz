@@ -7,6 +7,11 @@ csharp_library(
         "Class1.cs",
         "ClassesSample.cs",
     ],
-    target_frameworks = [NETCOREAPP_CURRENT],
+    target_frameworks = ["netstandard2.0"],
+    nullable = "annotations",
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    msbuild_analyzer_config = "style",
+    nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     visibility = ["//src/libraries/System.Runtime/tests:__subpackages__"],
 )

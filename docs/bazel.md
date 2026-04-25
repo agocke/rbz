@@ -231,7 +231,9 @@ Clang is the default compiler (matching CMake).
 CMake/MSBuild. It compares every compilation unit's source files, preprocessor
 defines, compiler flags, references, and other inputs. Both scripts pass `--ci`
 to MSBuild and `--config=ci` to Bazel so that deterministic source paths are
-enabled and PDB paths are normalized. The default configuration is **release**.
+enabled and PDB paths are normalized. The default configuration is **release**,
+and the MSBuild leg uses `--rebuild` so the `.binlog` data is never stale from
+an incremental compile.
 
 ```bash
 # Run comparison (builds both systems automatically)
@@ -338,13 +340,15 @@ areas:
   suppressions in the generated editorconfig (comparison checks filename
   only). `crossgen2` remains a diff due to the `crossgen2.aot.globalconfig`
   injected by rules_dotnet for `is_aot_compatible=True`.
-  Of the 220 remaining known diffs:
+  Of the 228 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
     while MSBuild uses the full targeting pack
-  - **netstandard2.0 targets**: 8 assemblies (source generators, test helpers)
-    target netstandard2.0 in MSBuild; these are filtered from comparison
+  - **netstandard2.0 targets**: source generators, tools, and test helpers may
+    still compare as `netstandard2.0` on the MSBuild side when no `net10.0`
+    build exists; the equivalence check now falls back to those records instead
+    of filtering them out entirely
   - `System.SR.cs` generation now matches MSBuild: `include_default_values`
     is config-dependent (True for debug, False for release) per
     `eng/resources.targets`

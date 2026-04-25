@@ -71,13 +71,13 @@ csharp_library(
     name = "XmlModuleCore",
     out = "ModuleCore",
     srcs = glob(["System/Xml/ModuleCore/*.cs"]),
-    target_frameworks = [NETCOREAPP_CURRENT],
     deps = [
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
         "@paket.main//xunit.extensibility.execution",
     ],
+    target_frameworks = [NETCOREAPP_CURRENT],
     visibility = ["//visibility:public"],
     keyfile = OPEN_SNK,
 )

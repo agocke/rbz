@@ -436,11 +436,9 @@ match  Microsoft.Extensions.Options.Tests
 match  Microsoft.Extensions.Primitives
 diff   Microsoft.Extensions.Primitives.ref
 match  Microsoft.Extensions.Primitives.Tests
-# Assemblies below target netstandard2.0 in MSBuild and are filtered from
-# comparison (Bazel targets them differently). Removed from active manifest.
-# Microsoft.Interop.ComInterfaceGenerator
-# Microsoft.Interop.LibraryImportGenerator
-# Microsoft.Interop.SourceGeneration
+# Assemblies below target netstandard2.0 in MSBuild may still be compared when
+# no net10.0 MSBuild record exists. Track them explicitly here instead of
+# filtering them out of the managed comparison set.
 match  Microsoft.Win32.Primitives.Tests
 match  Microsoft.Win32.Registry.AccessControl
 diff   Microsoft.Win32.Registry.AccessControl.ref
@@ -470,7 +468,7 @@ match  System.Collections.Tests
 match  System.ComponentModel.Annotations.Tests
 match  System.ComponentModel.Composition
 diff   System.ComponentModel.Composition.ref
-# System.ComponentModel.Composition.Noop.Assembly  # netstandard2.0, filtered
+diff   System.ComponentModel.Composition.Noop.Assembly
 match  System.ComponentModel.Composition.Registration
 diff   System.ComponentModel.Composition.Registration.ref
 match  System.ComponentModel.Composition.Registration.Tests
@@ -606,7 +604,7 @@ diff   System.Numerics.Tensors.ref
 match  System.Numerics.Tensors.Tests
 match  System.Numerics.Vectors.Tests
 match  System.ObjectModel.Tests
-# System.Private.CoreLib.Generators  # netstandard2.0, filtered
+diff   System.Private.CoreLib.Generators
 match  System.Private.Uri.ExtendedFunctional.Tests
 match  System.Private.Uri.Functional.Tests
 match  System.Private.Uri.Unit.Tests
@@ -692,7 +690,7 @@ match  System.Text.Encoding.CodePages.Tests
 match  System.Text.Encoding.Extensions.Tests
 match  System.Text.Encoding.Tests
 match  System.Text.Encodings.Web.Tests
-# System.Text.RegularExpressions.Generator  # netstandard2.0, filtered
+diff   System.Text.RegularExpressions.Generator
 diff   System.Text.RegularExpressions.Tests
 match  System.Text.RegularExpressions.Unit.Tests
 match  System.Threading.Channels.Tests
@@ -723,8 +721,8 @@ match  System.Xml.Linq.TreeManipulation.Tests
 match  System.Xml.Schema.Extensions.Tests
 match  System.Xml.Linq.xNodeBuilder.Tests
 match  System.Xml.Linq.xNodeReader.Tests
-# TestLibrary  # netstandard2.0, filtered
-# ExceptionTestAssembly  # netstandard2.0, filtered
+diff   TestLibrary
+diff   ExceptionTestAssembly
 match  XDocument.Common
 match  XmlCoreTest
 diff   crossgen2
@@ -732,9 +730,23 @@ match  ilc
 match  illink
 
 # ── Unlisted assemblies added during equivalence improvement ──
+diff   BaseLibManaged
+diff   ILLink.RoslynAnalyzer
 match  ILCompiler.Reflection.ReadyToRun
+diff   Microsoft.Composition.Demos.ExtendedCollectionImports
+diff   Microsoft.Extensions.Configuration.Binder.SourceGeneration
+diff   Microsoft.Extensions.Logging.Generators
+diff   Microsoft.Interop.ComInterfaceGenerator
+diff   Microsoft.Interop.JavaScript.JSImportGenerator
+diff   Microsoft.Interop.LibraryImportGenerator
+diff   Microsoft.Interop.LibraryImportGenerator.Downlevel
+diff   Microsoft.Interop.SourceGeneration
+diff   ModuleCore
 diff   System.Text.Json.SourceGeneration
+diff   TestAssembly
 match  TestUtilities
+diff   XDocument.Test.ModuleCore
+diff   XmlDiff
 match  Microsoft.Extensions.DependencyModel.Tests
 diff   System.Private.Xml.Tests
 match  System.Text.Json.Tests
@@ -753,7 +765,7 @@ match  ReferencedClassLibNeutralIsSatellite
 match  TestUtilities.Unicode
 match  TargetFrameworkNameTestApp
 match  TestApp
-match  AssemblyResolveTestApp
+diff   AssemblyResolveTestApp
 match  TestAppOutsideOfTPA
 
 # ── ApplyUpdate test helper assemblies ──
