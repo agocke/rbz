@@ -424,6 +424,7 @@ def csharp_library(
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
     include_library_nowarn = True,
+    skip_analyzers = False,
     interceptors_namespaces = None,
     editorconfig_name = None,
     extra_editorconfig_content = "",
@@ -514,6 +515,9 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
 
         analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
 
+        if resx_file != None and resx_file not in additionalfiles:
+            additionalfiles = additionalfiles + [resx_file]
+
     # rules_dotnet explicitly passes /nullable:disable for assemblies with
     # nullable="disable", but MSBuild omits /nullable entirely (disable is
     # the default).  The explicit flag triggers CS8632 on nullable
@@ -531,6 +535,16 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
     _pathmap_key = "%s/%s/%s" % (_pkg, name, NETCOREAPP_CURRENT)
     _pathmap_value = "/_/artifacts/obj/%s/Release/%s" % (out, NETCOREAPP_CURRENT)
 
+    # Derive signing flags from keyfile. MSBuild only emits /delaysign-
+    # and /publicsign when SignAssembly is true (i.e. a keyfile is present).
+    # Open.snk and AspNetCore.snk are full key pairs → /publicsign-.
+    # MSFT.snk, ECMA.snk, etc. are public-only → /publicsign+.
+    _keyfile = kwargs.get("keyfile")
+    _signing_flags = []
+    if _keyfile != None:
+        _publicsign = "/publicsign-" if _keyfile in (OPEN_SNK, ASPNETCORE_SNK) else "/publicsign+"
+        _signing_flags = ["/delaysign-", _publicsign]
+
     _compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
         "/platform:AnyCPU",
@@ -541,7 +555,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-    ]
+        # MSBuild SDK defaults that csc always receives from the .NET SDK.
+        "/fullpaths",
+        "/errorreport:prompt",
+    ] + _signing_flags
+    if skip_analyzers:
+        _compiler_options = _compiler_options + ["/skipanalyzers+"]
     if include_syslib_warnaserror:
         _compiler_options = _compiler_options + [
             # Arcade SDK promotes SYSLIB0011 to an error.  Test-support
@@ -631,6 +650,7 @@ def csharp_binary(
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
     include_library_nowarn = True,
+    skip_analyzers = False,
     interceptors_namespaces = None,
     editorconfig_name = None,
     extra_editorconfig_content = "",
@@ -684,6 +704,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
     # annotations (e.g. string?) in shared source files.
     _nullable_nowarn = ["CS8632"] if kwargs.get("nullable") == "disable" else []
 
+    _keyfile = kwargs.get("keyfile")
+    _signing_flags = []
+    if _keyfile != None:
+        _publicsign = "/publicsign-" if _keyfile in (OPEN_SNK, ASPNETCORE_SNK) else "/publicsign+"
+        _signing_flags = ["/delaysign-", _publicsign]
+
     _compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
         "/platform:AnyCPU",
@@ -694,7 +720,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-    ] + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
+        # MSBuild SDK defaults that csc always receives from the .NET SDK.
+        "/fullpaths",
+        "/errorreport:prompt",
+    ] + _signing_flags + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
+    if skip_analyzers:
+        _compiler_options = _compiler_options + ["/skipanalyzers+"]
     if interceptors_namespaces != None:
         _compiler_options = _compiler_options + [
             "/features:InterceptorsNamespaces=" + interceptors_namespaces,

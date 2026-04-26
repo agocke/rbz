@@ -38,10 +38,18 @@ public static class BinlogParser
             return null;
 
         // Resolve relative source paths against the project directory, not CWD.
-        var projectDirectory = task.GetNearestParent<Project>()?.ProjectDirectory ?? repoRoot;
+        var project = task.GetNearestParent<Project>();
+        var projectDirectory = project?.ProjectDirectory ?? repoRoot;
 
         var args = SplitCommandLine(commandLine);
-        return ParseCscArguments(args, projectDirectory, repoRoot);
+        var record = ParseCscArguments(args, projectDirectory, repoRoot);
+
+        // Populate TargetFramework from the Project node's evaluation data —
+        // this is the canonical $(TargetFramework) property from the csproj.
+        if (record is not null && !string.IsNullOrEmpty(project?.TargetFramework))
+            record.TargetFramework = project.TargetFramework;
+
+        return record;
     }
 
     /// <summary>

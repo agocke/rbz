@@ -696,6 +696,11 @@ EOF""".format(version = PRODUCT_VERSION),
         "/noconfig",
         "/warn:9999",
         "/ruleset:eng/Default.ruleset",
+        # MSBuild SDK defaults that csc always receives from the .NET SDK.
+        "/fullpaths",
+        "/errorreport:prompt",
+        "/delaysign-",
+        "/publicsign-",
     ] + (["/features:strict"] if features_strict else []) + (["/features:nullablePublicOnly"] if features_nullable_public_only else [])
 
     _xunit_library_test(

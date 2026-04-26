@@ -16,6 +16,7 @@ load("defs.bzl",
 nowarn = [ "CS8500", "CS8969" ]
 
 exports_files([
+    "Microsoft.VisualBasic.Core/ref/Microsoft.VisualBasic.Core.cs",
     "System.Diagnostics.Process/src/Resources/Strings.resx",
     "System.Private.Uri/src/Resources/Strings.resx",
     "System.Private.Uri/src/System/IriHelper.cs",

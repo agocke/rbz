@@ -52,6 +52,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     editorconfig_name = "crossgen2_inbuild",
     is_aot_compatible = True,
+    skip_analyzers = True,
     visibility = ["//visibility:public"],
 )
 

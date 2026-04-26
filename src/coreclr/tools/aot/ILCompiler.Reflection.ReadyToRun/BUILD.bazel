@@ -6,6 +6,7 @@ csharp_library(
     name = "ILCompiler.Reflection.ReadyToRun",
     msbuild_analyzer_config = "style",
     include_default_ruleset = False,
+    skip_analyzers = True,
     compiler_options = ["/warnaserror+:NU1605"],
     srcs = glob(["**/*.cs"]) + [
         "//src/coreclr/tools/Common:Internal/Runtime/CorConstants.cs",

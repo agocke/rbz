@@ -12,9 +12,6 @@ netcoreapp_ref_assembly(
         "ref/System.Security.Cryptography.Pkcs.cs",
         "ref/System.Security.Cryptography.Pkcs.netstandard21.cs",
     ],
-    nowarn = [
-        "SYSLIB5006",
-    ],
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.Collections:ref_System.Collections",

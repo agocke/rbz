@@ -176,6 +176,7 @@ netcoreapp_impl_assembly(
 
 live_csharp_library(
     name = "live_System.Diagnostics.DiagnosticSource",
+    generate_assembly_info = True,
     srcs = [
         # Unconditional sources
         "src/System/Diagnostics/Activity.cs",

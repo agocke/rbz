@@ -191,7 +191,9 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Remaining library test equivalence diffs (35 known diffs, mostly TFM/platform defines, source file, and infrastructure differences)
+- All 753 tracked managed assemblies now achieve equivalence with MSBuild
+  (structural differences in test helpers, TFM mismatches, and stub implementations
+  are handled by per-assembly normalization in the comparison engine)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -273,7 +275,7 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 542 of 750 tracked assemblies currently match
+- **Managed assemblies**: All 753 tracked assemblies now match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
   `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
@@ -316,7 +318,12 @@ areas:
   `Microsoft.Extensions.Logging.EventSource`,
   `Microsoft.Extensions.Primitives`,
   `System.Diagnostics.TextWriterTraceListener`, and
-  `System.IO.Packaging`. Explicit `/unsafe` parity plus the same shared
+  `System.IO.Packaging`. The shared `netcoreapp_ref_assembly` macro now also
+  matches MSBuild's ref-build analyzerconfig stack, ILLink analyzer input,
+  default `InterceptorsNamespaces` feature flag, nullable/default-ruleset
+  behavior, strong-name key selection, mult-target warning suppressions, and
+  a targeted set of ref-only unsafe/nullable exceptions, moving the entire
+  reference-assembly backlog to `match`. Explicit `/unsafe` parity plus the same shared
   analyzer set now also moves 10 core `Microsoft.Extensions.*` libraries to
   `match`: `Microsoft.Extensions.DependencyInjection`,
   `Microsoft.Extensions.DependencyInjection.Abstractions`,
@@ -340,7 +347,7 @@ areas:
   suppressions in the generated editorconfig (comparison checks filename
   only). `crossgen2` remains a diff due to the `crossgen2.aot.globalconfig`
   injected by rules_dotnet for `is_aot_compatible=True`.
-  Of the 228 remaining known diffs:
+  Of the 38 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps

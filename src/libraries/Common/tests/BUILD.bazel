@@ -1,5 +1,5 @@
 load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library", "gen_resx_source", "resgen")
-load("//src/libraries:defs.bzl", "live_csharp_library")
+load("//src/libraries:defs.bzl", "DOWNLEVEL_GENERATOR_ANALYZERS", "live_csharp_library")
 load("//src/tests:live_test.bzl", "library_test")
 
 exports_files(glob(["**/*.cs"]) + glob(["Data/**"]) + glob(["System/Xml/XPath/TestData/**"]) + [
@@ -61,6 +61,7 @@ csharp_library(
     treat_warnings_as_errors = True,
     warnings_not_as_errors = ["NU1901", "NU1902", "NU1903", "NU1904"],
     include_syslib_warnaserror = False,
+    skip_analyzers = True,
     include_default_ruleset = False,
     msbuild_analyzer_config = "style",
     visibility = ["//visibility:public"],
@@ -78,6 +79,11 @@ csharp_library(
         "@paket.main//xunit.extensibility.execution",
     ],
     target_frameworks = [NETCOREAPP_CURRENT],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    skip_analyzers = True,
+    nullable = "annotations",
+    nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051", "nullable"],
     visibility = ["//visibility:public"],
     keyfile = OPEN_SNK,
 )
@@ -86,6 +92,11 @@ csharp_library(
     name = "XmlDiff",
     srcs = glob(["System/Xml/XmlDiff/*.cs"]),
     target_frameworks = [NETCOREAPP_CURRENT],
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    skip_analyzers = True,
+    nullable = "annotations",
+    nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051", "nullable"],
     deps = [
         ":XmlModuleCore",
     ],
@@ -99,6 +110,7 @@ csharp_library(
     target_frameworks = [NETCOREAPP_CURRENT],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
+    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     msbuild_analyzer_config = "style",
     nullable = "annotations",
@@ -151,6 +163,7 @@ live_csharp_library(
     ],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
+    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     msbuild_analyzer_config = "style",
     nullable = "annotations",

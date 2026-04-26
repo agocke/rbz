@@ -251,6 +251,7 @@ public static class BazelAqueryParser
         string targetType = "library";
         string langVersion = "";
         string? assemblyName = null;
+        string? outputPath = null;
 
         foreach (var arg in args)
         {
@@ -292,7 +293,8 @@ public static class BazelAqueryParser
             }
             else if (arg.StartsWith("/out:"))
             {
-                assemblyName = ExtractAssemblyName(arg[5..]);
+                outputPath = arg[5..];
+                assemblyName = ExtractAssemblyName(outputPath);
             }
             else if (arg is "/unsafe+" or "/unsafe-")
             {
@@ -340,6 +342,8 @@ public static class BazelAqueryParser
             LangVersion = langVersion,
             BuildSystem = "bazel",
             TargetLabel = targetLabel,
+            OutputPath = outputPath ?? "",
+            TargetFramework = ExtractTfmFromOutputPath(outputPath),
         };
     }
 
@@ -351,6 +355,29 @@ public static class BazelAqueryParser
         if (fileName.StartsWith("live_", StringComparison.Ordinal))
             fileName = fileName["live_".Length..];
         return fileName;
+    }
+
+    /// <summary>
+    /// Extracts the target framework moniker from a Bazel /out: path.
+    /// rules_dotnet places the TFM as the parent directory of the output DLL,
+    /// e.g. ".../net10.0/Foo.dll" → "net10.0", ".../netstandard2.0/Bar.dll" → "netstandard2.0".
+    /// </summary>
+    private static string ExtractTfmFromOutputPath(string? outputPath)
+    {
+        if (string.IsNullOrEmpty(outputPath))
+            return "";
+
+        // The parent directory of the DLL is the TFM.
+        var dir = Path.GetDirectoryName(outputPath);
+        if (string.IsNullOrEmpty(dir))
+            return "";
+
+        var tfm = Path.GetFileName(dir);
+        // Sanity check: TFMs start with "net" (net10.0, netstandard2.0, net48, etc.)
+        if (tfm.StartsWith("net", StringComparison.OrdinalIgnoreCase))
+            return tfm;
+
+        return "";
     }
 
     internal static string NormalizeBazelPath(string path, string repoRoot)

@@ -1,4 +1,4 @@
-load("//:defs.bzl", "csharp_library")
+load("//:defs.bzl", "MSFT_SNK", "csharp_library")
 
 exports_files([
     "ref/System.Runtime.InteropServices.JavaScript.cs",
@@ -7,6 +7,8 @@ exports_files([
 csharp_library(
     name = "JSImportGenerator",
     out = "Microsoft.Interop.JavaScript.JSImportGenerator",
+    keyfile = MSFT_SNK,
+    compiler_options = ["/publicsign+"],
     srcs = glob(["gen/JSImportGenerator/**/*.cs"]) + [
         "//src/libraries/Common:src/Roslyn/DiagnosticDescriptorHelper.cs",
         "//src/libraries/Common:src/System/SR.cs",

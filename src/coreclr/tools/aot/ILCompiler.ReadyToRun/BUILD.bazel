@@ -321,4 +321,5 @@ csharp_library(
     ],
     msbuild_analyzer_config = "style",
     include_default_ruleset = False,
+    skip_analyzers = True,
 )
