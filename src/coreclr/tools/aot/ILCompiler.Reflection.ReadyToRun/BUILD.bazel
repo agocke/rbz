@@ -17,7 +17,7 @@ gen_assembly_info(
 
 gen_target_framework_attrs(
     name = "tfmattrs_ILCompiler.Reflection.ReadyToRun",
-    out = ".NETCoreApp.AssemblyAttributes.cs",
+    out = ".NETCoreApp,Version=v8.0.AssemblyAttributes.cs",
     major_version = "8",
     minor_version = "0",
 )

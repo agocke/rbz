@@ -1258,8 +1258,10 @@ public static class ComparisonEngine
             // For AssemblyInfo/AssemblyAttributes files, compare assembly attribute
             // lines as a set (order-insensitive).  MSBuild emits attributes in
             // different orders depending on project type.
-            var normalizedKey = NormalizeGeneratedFileName(Path.GetFileName(msbuildNormalized));
-            if (normalizedKey is "AssemblyInfo.cs" or "AssemblyAttributes.cs")
+            var fn = Path.GetFileName(msbuildNormalized);
+            if (fn.EndsWith("AssemblyInfo.cs", StringComparison.Ordinal)
+                || fn.EndsWith("AssemblyAttributes.cs", StringComparison.Ordinal)
+                || fn.EndsWith("InternalsVisibleTo.cs", StringComparison.OrdinalIgnoreCase))
             {
                 return AssemblyAttributesMatch(msbuildContent, bazelContent);
             }
@@ -1332,8 +1334,20 @@ public static class ComparisonEngine
             // patch component to "0" for comparison purposes.
             normalized = System.Text.RegularExpressions.Regex.Replace(
                 normalized,
-                @"(AssemblyInformationalVersionAttribute\(""\d+\.\d+\.)\d+",
+                @"(AssemblyInformationalVersion(?:Attribute)?\(""\d+\.\d+\.)\d+",
                 "${1}0");
+
+            // Strip trailing "Attribute" from type names for canonical comparison.
+            // MSBuild uses the long form (e.g. NeutralResourcesLanguageAttribute)
+            // while Bazel/rules_dotnet may use the short form.
+            normalized = System.Text.RegularExpressions.Regex.Replace(
+                normalized,
+                @"(\w)Attribute(\()",
+                "${1}${2}");
+
+            // Normalize C# verbatim string prefix: MSBuild uses @"..." while
+            // rules_dotnet uses plain "..." for InternalsVisibleTo values.
+            normalized = normalized.Replace("(@\"", "(\"");
 
             return normalized;
         }
@@ -1367,21 +1381,6 @@ public static class ComparisonEngine
     {
         if (fileName is "System.SR.cs" or "SR.g.cs" or "SharedStrings.g.cs" or "ILLink.Shared.SharedStrings.cs")
             return "System.SR.cs";
-
-        // AssemblyAttributes files: MSBuild names them after the TFM
-        // (e.g. ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs") while
-        // Bazel names them ".NETCoreApp.AssemblyAttributes.cs".  Normalize
-        // to a canonical suffix for filename-based matching.
-        if (fileName.EndsWith("AssemblyAttributes.cs", StringComparison.Ordinal))
-            return "AssemblyAttributes.cs";
-
-        // AssemblyInfo files: MSBuild names them "{ProjectName}.AssemblyInfo.cs"
-        // while Bazel genrules may use "{AssemblyName}.AssemblyInfo.cs" or
-        // "AssemblyInfo.g.cs".  The project and assembly names can differ
-        // (e.g. crossgen2_inbuild vs crossgen2).  Normalize to canonical.
-        if (fileName.EndsWith("AssemblyInfo.cs", StringComparison.Ordinal)
-            || fileName == "AssemblyInfo.g.cs")
-            return "AssemblyInfo.cs";
 
         // InternalsVisibleTo files: MSBuild generates "{ProjectName}.InternalsVisibleTo.cs",
         // Bazel generates "internalsvisibleto.cs" (lowercase).

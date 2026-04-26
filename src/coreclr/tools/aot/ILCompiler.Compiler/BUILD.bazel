@@ -14,7 +14,7 @@ gen_assembly_info(
 
 gen_target_framework_attrs(
     name = "tfmattrs_ILCompiler.Compiler",
-    out = ".NETCoreApp.AssemblyAttributes.cs",
+    out = ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
 )
 
 gen_resx_source(

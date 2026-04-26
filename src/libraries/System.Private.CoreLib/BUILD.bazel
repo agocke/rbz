@@ -27,7 +27,7 @@ gen_assembly_info(
 
 gen_target_framework_attrs(
     name = "tfmattrs_System.Private.CoreLib.Generators",
-    out = ".NETStandard.AssemblyAttributes.cs",
+    out = ".NETStandard,Version=v2.0.AssemblyAttributes.cs",
     framework_type = "netstandard",
     major_version = "2",
     minor_version = "0",

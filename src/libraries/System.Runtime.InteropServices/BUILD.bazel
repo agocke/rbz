@@ -30,7 +30,7 @@ gen_assembly_info(
 
 gen_target_framework_attrs(
     name = "tfmattrs_Microsoft.Interop.SourceGeneration",
-    out = "SourceGeneration.NETStandard.AssemblyAttributes.cs",
+    out = "SourceGeneration/.NETStandard,Version=v2.0.AssemblyAttributes.cs",
     framework_type = "netstandard",
     major_version = "2",
     minor_version = "0",
@@ -39,7 +39,7 @@ gen_target_framework_attrs(
 # Assembly info for LibraryImportGenerator
 gen_assembly_info(
     name = "assemblyinfo_LibraryImportGenerator",
-    out = "Microsoft.Interop.LibraryImportGenerator.AssemblyInfo.cs",
+    out = "LibraryImportGenerator.AssemblyInfo.cs",
     assembly_name = "Microsoft.Interop.LibraryImportGenerator",
     assembly_version = "42.42.42.42",
     cls_compliant = False,
@@ -51,7 +51,7 @@ gen_assembly_info(
 
 gen_target_framework_attrs(
     name = "tfmattrs_LibraryImportGenerator",
-    out = "LibraryImportGenerator.NETStandard.AssemblyAttributes.cs",
+    out = "LibraryImportGenerator/.NETStandard,Version=v2.0.AssemblyAttributes.cs",
     framework_type = "netstandard",
     major_version = "2",
     minor_version = "0",
@@ -60,7 +60,7 @@ gen_target_framework_attrs(
 # Assembly info for DownlevelLibraryImportGenerator
 gen_assembly_info(
     name = "assemblyinfo_DownlevelLibraryImportGenerator",
-    out = "Microsoft.Interop.LibraryImportGenerator.Downlevel.AssemblyInfo.cs",
+    out = "DownlevelLibraryImportGenerator.AssemblyInfo.cs",
     assembly_name = "Microsoft.Interop.LibraryImportGenerator.Downlevel",
     assembly_version = "42.42.42.42",
     cls_compliant = False,
@@ -72,7 +72,7 @@ gen_assembly_info(
 
 gen_target_framework_attrs(
     name = "tfmattrs_DownlevelLibraryImportGenerator",
-    out = "Downlevel.NETStandard.AssemblyAttributes.cs",
+    out = "Downlevel/.NETStandard,Version=v2.0.AssemblyAttributes.cs",
     framework_type = "netstandard",
     major_version = "2",
     minor_version = "0",
