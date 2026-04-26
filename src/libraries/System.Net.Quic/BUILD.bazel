@@ -21,7 +21,6 @@ netcoreapp_ref_assembly(
     ],
     deps = [
         "//src/libraries:ref_System.Runtime",
-        "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
         "//src/libraries/System.Collections:ref_System.Collections",
         "//src/libraries/System.Memory:ref_System.Memory",
         "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",

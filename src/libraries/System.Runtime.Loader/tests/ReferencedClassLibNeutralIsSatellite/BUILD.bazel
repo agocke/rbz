@@ -6,6 +6,7 @@ csharp_library(
     target_frameworks = [NETCOREAPP_CURRENT],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
+    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     msbuild_analyzer_config = "style",
     nullable = "annotations",

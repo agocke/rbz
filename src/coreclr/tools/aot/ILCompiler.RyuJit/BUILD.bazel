@@ -11,6 +11,7 @@ csharp_library(
     nowarn = ["1591"],
     msbuild_analyzer_config = "style",
     include_default_ruleset = False,
+    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     compiler_options = ["/warnaserror+:NU1605"],
     srcs = [

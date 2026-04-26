@@ -14,6 +14,7 @@ library_test(
         "//src/libraries/Common/tests:XmlDiff",
         "//src/libraries/System.Private.Xml.Linq/tests:XDocument.Common",
         "//src/libraries/System.Private.Xml.Linq/tests:XDocument.Test.ModuleCore",
+        "//src/libraries/shims/netstandard:impl_netstandard",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//microsoft.dotnet.xunitextensions",

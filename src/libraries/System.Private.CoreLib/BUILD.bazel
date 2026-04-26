@@ -1,6 +1,7 @@
 
 load(
     "//:defs.bzl",
+    "OPEN_SNK",
     "csharp_library"
 )
 
@@ -13,6 +14,7 @@ exports_files(glob(["src/**/*.cs"]))
 
 csharp_library(
     name = "System.Private.CoreLib.Generators",
+    keyfile = OPEN_SNK,
     srcs = glob(["gen/*.cs"]) + [
         "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/IsExternalInit.cs",
         "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
@@ -21,7 +23,6 @@ csharp_library(
     target_frameworks = ["netstandard2.0"],
     langversion = "preview",
     nullable = "enable",
-    allow_unsafe_blocks = True,
     deps = [
         "@paket.main//microsoft.codeanalysis.common",
         "@paket.main//microsoft.codeanalysis.csharp",
@@ -45,6 +46,6 @@ csharp_library(
         "CS1591",
         "nullable",
     ],
-    defines = [ "MICROSOFT_INTEROP_SOURCEGENERATION", "BAZEL" ],
+    defines = ["BAZEL"],
     visibility = ["//visibility:public"],
 )

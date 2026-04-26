@@ -92,8 +92,9 @@ csharp_library(
     langversion = "preview",
     defines = ["BUILDING_SOURCE_GENERATOR", "ROSLYN4_0_OR_GREATER", "ROSLYN4_4_OR_GREATER"],
     cls_compliant = False,
-    nullable = "annotations",
+    nullable = "enable",
     allow_unsafe_blocks = True,
+    interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     deps = [
         "@paket.main//microsoft.codeanalysis.common",
         "@paket.main//microsoft.codeanalysis.csharp",
@@ -104,16 +105,23 @@ csharp_library(
         "@paket.main//system.buffers",
         "@paket.main//system.runtime.compilerservices.unsafe",
     ],
-    nowarn = [
-        "CS0436",
-        "CS1574",
-    ],
     analyzers = [
+        "//:source_build_analyzers",
         "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
         "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
         "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
         "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
         "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
+    ],
+    additionalfiles = glob(["gen/Resources/*.resx"]),
+    msbuild_analyzer_config = "source",
+    include_library_nowarn = False,
+    editorconfig_name = "System.Text.Json.SourceGeneration.Roslyn4.4",
+    extra_editorconfig_content = "dotnet_diagnostic.RS1036.severity = none",
+    nowarn = MULTITARGET_NOWARN + [
+        "CS1574",
+        "RS1041",
+        "nullable",
     ],
     visibility = ["//visibility:public"],
 )

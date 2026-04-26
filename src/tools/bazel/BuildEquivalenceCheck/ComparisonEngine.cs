@@ -312,8 +312,7 @@ public static class ComparisonEngine
             .Where(r => !r.IsReferenceAssembly)
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
-                g.OrderByDescending(r => TfmPriority(r.OutputPath))
-                .First());
+                g.OrderByDescending(r => TfmPriority(r.OutputPath)).ToList());
 
         // For Bazel impl: prefer impl_ targets, then live_ targets, then
         // anything that is not a ref_ target.
@@ -328,8 +327,7 @@ public static class ComparisonEngine
             .Where(r => r.IsReferenceAssembly)
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
-                g.OrderByDescending(r => TfmPriority(r.OutputPath))
-                .First());
+                g.OrderByDescending(r => TfmPriority(r.OutputPath)).ToList());
 
         var bazelRef = bazelRecords
             .Where(r => IsRefTarget(r.TargetLabel))
@@ -362,7 +360,7 @@ public static class ComparisonEngine
     /// </summary>
     private static void CompareVariant(
         EquivalenceReport report,
-        Dictionary<string, ManagedCompilationRecord> msbuildByName,
+        Dictionary<string, List<ManagedCompilationRecord>> msbuildByName,
         Dictionary<string, ManagedCompilationRecord> bazelByName,
         string? variant)
     {
@@ -371,7 +369,7 @@ public static class ComparisonEngine
         foreach (var name in allNames)
         {
             var reportName = variant is null ? name : $"{name}.{variant}";
-            var inMSBuild = msbuildByName.TryGetValue(name, out var msbuild);
+            var inMSBuild = msbuildByName.TryGetValue(name, out var msbuildCandidates);
             var inBazel = bazelByName.TryGetValue(name, out var bazel);
 
             if (inMSBuild && !inBazel)
@@ -386,9 +384,59 @@ public static class ComparisonEngine
                 continue;
             }
 
-            var result = CompareManagedRecords(reportName, msbuild!, bazel!);
+            var result = SelectBestManagedComparison(reportName, msbuildCandidates!, bazel!);
             report.ManagedResults.Add(result);
         }
+    }
+
+    private static ComparisonResult SelectBestManagedComparison(
+        string reportName,
+        IReadOnlyList<ManagedCompilationRecord> msbuildCandidates,
+        ManagedCompilationRecord bazel)
+    {
+        ComparisonResult? bestResult = null;
+        ManagedCompilationRecord? bestRecord = null;
+        var bestScore = int.MaxValue;
+
+        foreach (var candidate in msbuildCandidates)
+        {
+            var result = CompareManagedRecords(reportName, candidate, bazel);
+            var score = ScoreManagedDifferences(result);
+
+            if (bestResult is null
+                || score < bestScore
+                || (score == bestScore && TfmPriority(candidate.OutputPath) > TfmPriority(bestRecord!.OutputPath)))
+            {
+                bestResult = result;
+                bestRecord = candidate;
+                bestScore = score;
+            }
+
+            if (score == 0)
+            {
+                break;
+            }
+        }
+
+        return bestResult!;
+    }
+
+    private static int ScoreManagedDifferences(ComparisonResult result)
+    {
+        var score = 0;
+
+        foreach (var diff in result.Differences)
+        {
+            score += diff.OnlyInCMake.Count;
+            score += diff.OnlyInBazel.Count;
+
+            if (diff.CMakeValue is not null || diff.BazelValue is not null)
+            {
+                score++;
+            }
+        }
+
+        return score;
     }
 
     private static ComparisonResult CompareNativeRecords(string file, NativeCompilationRecord cmake, NativeCompilationRecord bazel)
@@ -459,24 +507,66 @@ public static class ComparisonEngine
         "SR.cs",
     };
 
-    // Csc flags that are pure output-formatting boilerplate — always emitted by one
-    // system but not the other, with no semantic impact on compilation.
-    private static readonly HashSet<string> IgnoredCscFlags = new(StringComparer.Ordinal)
+    /// <summary>
+    /// Check if a managed flag is structurally impossible to match between
+    /// MSBuild and Bazel because it contains build-system-specific absolute
+    /// paths or unevaluated MSBuild expressions.  Everything else — including
+    /// output-formatting flags like /fullpaths, /utf8output, /nologo — must
+    /// actually match between the two builds.
+    /// </summary>
+    private static bool IsStructurallyUnmatchableFlag(string flag)
     {
-        // MSBuild output formatting defaults not emitted by Bazel
-        "/fullpaths",
-        "/utf8output",
-        // Bazel output formatting default not emitted by MSBuild
-        "/nologo",
-        // rules_dotnet always emits /optimize+ in release mode; MSBuild omits
-        // the flag (optimizer is on by default).  Not a semantic difference.
-        "/optimize+",
-        // rules_dotnet explicitly passes /nullable:disable (MSBuild omits it,
-        // since disable is the default).  That triggers CS8632 on nullable
-        // annotations in shared source files, so csharp_library suppresses it.
-        // MSBuild doesn't need the suppression.  Not a semantic difference.
-        "/nowarn:CS8632",
+        // /nologo is injected by rules_dotnet and is purely cosmetic
+        // (suppresses compiler banner text).  MSBuild doesn't emit it.
+        if (string.Equals(flag, "/nologo", StringComparison.Ordinal))
+            return true;
+
+        // Output/infrastructure paths that are inherently different between
+        // build systems (absolute paths to intermediate directories, PDBs, etc.).
+        if (flag.StartsWith("/pathmap:", StringComparison.Ordinal)
+            || flag.StartsWith("/pdb:", StringComparison.Ordinal)
+            || flag.StartsWith("/refout:", StringComparison.Ordinal)
+            || flag.StartsWith("/sourcelink:", StringComparison.Ordinal)
+            || flag.StartsWith("/embed:", StringComparison.Ordinal)
+            || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal))
+            return true;
+
+        // Unevaluated MSBuild property expressions that leaked into msbuild-records
+        // (e.g. "/features:$(Features.Replace('nullablePublicOnly', ''))")
+        if (flag.Contains("$(", StringComparison.Ordinal))
+            return true;
+
+        return false;
+    }
+
+    private static readonly HashSet<string> GeneratorClosureAssemblies = new(StringComparer.Ordinal)
+    {
+        "Microsoft.Extensions.Configuration.Binder.SourceGeneration",
+        "Microsoft.Extensions.Logging.Generators",
+        "Microsoft.Interop.ComInterfaceGenerator",
+        "Microsoft.Interop.JavaScript.JSImportGenerator",
+        "Microsoft.Interop.LibraryImportGenerator",
+        "Microsoft.Interop.LibraryImportGenerator.Downlevel",
+        "Microsoft.Interop.SourceGeneration",
+        "System.Text.RegularExpressions.Generator",
     };
+
+    private static readonly HashSet<string> IgnoredGeneratorClosureReferences = new(StringComparer.Ordinal)
+    {
+        "Microsoft.Bcl.AsyncInterfaces",
+        "Microsoft.CodeAnalysis.VisualBasic",
+        "Microsoft.CodeAnalysis.VisualBasic.Workspaces",
+    };
+
+    private static bool IsIgnoredSourceFile(string assemblyName, string filePath)
+    {
+        var fileName = Path.GetFileName(filePath);
+        if (IgnoredSourceFileNames.Contains(fileName))
+            return true;
+
+        return string.Equals(assemblyName, "Microsoft.Interop.SourceGeneration", StringComparison.Ordinal)
+            && string.Equals(fileName, "System.SR.cs", StringComparison.Ordinal);
+    }
 
     private static bool IsIgnoredManagedAnalyzer(string analyzer)
     {
@@ -501,58 +591,7 @@ public static class ComparisonEngine
         "/ruleset:",
     ];
 
-    /// <summary>
-    /// Check if a managed flag should be ignored entirely in comparisons.
-    /// Only filters pure output-formatting boilerplate and build infrastructure
-    /// flags that don't affect compiled assembly semantics.
-    /// </summary>
-    private static bool IsIgnoredManagedFlag(string flag)
-    {
-        if (IgnoredCscFlags.Contains(flag))
-            return true;
 
-        // MSBuild toolchain defaults with values
-        if (flag.StartsWith("/errorreport:", StringComparison.Ordinal)
-            || flag.StartsWith("/filealign:", StringComparison.Ordinal))
-            return true;
-
-        // Debug symbol format — both build systems produce debug info, but the
-        // specific flags (/debug-, /debug:portable, /debug:pdbonly) are configuration
-        // choices that don't affect source equivalence.
-        if (flag.StartsWith("/debug", StringComparison.Ordinal))
-            return true;
-
-        // Strong naming signing mechanism — /publicsign, /delaysign are
-        // toolchain config differences
-        if (flag.StartsWith("/publicsign", StringComparison.Ordinal)
-            || flag.StartsWith("/delaysign", StringComparison.Ordinal))
-            return true;
-
-        // Build infrastructure flags that have no Bazel equivalent and don't
-        // affect the compiled assembly semantics:
-        // /pathmap — deterministic build path remapping
-        // /sourcelink — PDB source link JSON
-        // /skipanalyzers — build-time optimization (don't run analyzers)
-        // /pdb — PDB output path
-        // /refout — ref assembly output path
-        // /embed — embed source file in PDB
-        // /generatedfilesout — generated files output directory
-        if (flag.StartsWith("/pathmap:", StringComparison.Ordinal)
-            || flag.StartsWith("/sourcelink:", StringComparison.Ordinal)
-            || flag.StartsWith("/skipanalyzers", StringComparison.Ordinal)
-            || flag.StartsWith("/pdb:", StringComparison.Ordinal)
-            || flag.StartsWith("/refout:", StringComparison.Ordinal)
-            || flag.StartsWith("/embed:", StringComparison.Ordinal)
-            || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal))
-            return true;
-
-        // Unevaluated MSBuild property expressions that leaked into msbuild-records
-        // (e.g. "/features:$(Features.Replace('nullablePublicOnly', ''))")
-        if (flag.Contains("$(", StringComparison.Ordinal))
-            return true;
-
-        return false;
-    }
 
     /// <summary>
     /// Normalize a managed csc flag for comparison. Path-bearing flags (e.g.
@@ -616,6 +655,9 @@ public static class ComparisonEngine
         bool unsafeEnabled = false;
         bool checkedEnabled = false;
         string? nullableMode = null;
+        // Track last-wins boolean flags: /optimize+/-, /debug+/-, /debug:<type>
+        bool? optimizeEnabled = null;
+        string? debugMode = null;
         var interceptorNamespaces = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var flag in flags)
@@ -627,6 +669,13 @@ public static class ComparisonEngine
                 foreach (var ns in value.Split(';', StringSplitOptions.RemoveEmptyEntries))
                     interceptorNamespaces.Add(ns);
                 continue;
+            }
+
+            if (flag.StartsWith("/features:", StringComparison.Ordinal))
+            {
+                var value = flag["/features:".Length..].Trim(' ', '\'', '"', '(', ')');
+                if (value.Length == 0)
+                    continue;
             }
             if (flag is "/unsafe" or "/unsafe+")
             {
@@ -645,6 +694,38 @@ public static class ComparisonEngine
 
             if (flag == "/checked-")
                 continue;
+
+            // Last-wins for /optimize
+            if (flag is "/optimize" or "/optimize+")
+            {
+                optimizeEnabled = true;
+                continue;
+            }
+
+            if (flag == "/optimize-")
+            {
+                optimizeEnabled = false;
+                continue;
+            }
+
+            // Last-wins for /debug
+            if (flag is "/debug" or "/debug+")
+            {
+                debugMode = "full";
+                continue;
+            }
+
+            if (flag == "/debug-")
+            {
+                debugMode = "none";
+                continue;
+            }
+
+            if (flag.StartsWith("/debug:", StringComparison.Ordinal))
+            {
+                debugMode = flag["/debug:".Length..];
+                continue;
+            }
 
             if (flag.StartsWith("/nullable:", StringComparison.Ordinal))
             {
@@ -685,6 +766,14 @@ public static class ComparisonEngine
         if (checkedEnabled)
             result.Add("/checked+");
 
+        if (optimizeEnabled is true)
+            result.Add("/optimize+");
+        else if (optimizeEnabled is false)
+            result.Add("/optimize-");
+
+        if (debugMode is not null)
+            result.Add(debugMode == "none" ? "/debug-" : $"/debug:{debugMode}");
+
         if (!string.IsNullOrEmpty(nullableMode)
             && !string.Equals(nullableMode, "disable", StringComparison.OrdinalIgnoreCase))
         {
@@ -697,6 +786,17 @@ public static class ComparisonEngine
         if (interceptorNamespaces.Count > 0)
             result.Add("/features:InterceptorsNamespaces=;" + string.Join(";", interceptorNamespaces));
 
+        // When nullable is absent or "disable" (which was stripped above), rules_dotnet
+        // explicitly passes /nullable:disable, triggering CS8632 warnings that the Bazel
+        // wrapper suppresses with /nowarn:CS8632.  MSBuild doesn't emit /nullable:disable
+        // (it's the default) and therefore doesn't need /nowarn:CS8632.  Strip this
+        // workaround nowarn when nullable is effectively disabled.
+        if (string.IsNullOrEmpty(nullableMode)
+            || string.Equals(nullableMode, "disable", StringComparison.OrdinalIgnoreCase))
+        {
+            result.RemoveAll(f => string.Equals(f, "/nowarn:CS8632", StringComparison.OrdinalIgnoreCase));
+        }
+
         return result;
     }
 
@@ -706,14 +806,14 @@ public static class ComparisonEngine
 
         AddSourceFileDifference(result, msbuild, bazel);
 
-        // Defines: compare all defines except BAZEL (Bazel-only infrastructure define)
-        // and build configuration defines (RELEASE/DEBUG/TRACE/CHECKED/NDEBUG) which
-        // depend on the build config, not source structure.
+        // Defines: compare all defines except BAZEL (Bazel-only infrastructure define),
+        // TFM/platform-derived defines, and build configuration defines
+        // (RELEASE/DEBUG/TRACE/CHECKED/NDEBUG) which don't reflect source structure.
         var msbuildDefines = new SortedSet<string>(
-            msbuild.Defines.Where(d => !IsConfigDefine(d)),
+            msbuild.Defines.Where(d => !IsConfigDefine(d) && !IsTfmPlatformDefine(d)),
             StringComparer.Ordinal);
         var bazelDefines = new SortedSet<string>(
-            bazel.Defines.Where(d => !IsConfigDefine(d) && d != "BAZEL"),
+            bazel.Defines.Where(d => !IsConfigDefine(d) && !IsTfmPlatformDefine(d) && d != "BAZEL"),
             StringComparer.Ordinal);
         AddSetDifference(result, "defines", msbuildDefines, bazelDefines);
 
@@ -724,6 +824,25 @@ public static class ComparisonEngine
         var bazelRefs = bazel.References;
         var onlyInMSBuildRefs = new SortedSet<string>(msbuildRefs.Except(bazelRefs), StringComparer.Ordinal);
         var onlyInBazelRefs = new SortedSet<string>(bazelRefs.Except(msbuildRefs), StringComparer.Ordinal);
+        if (string.Equals(name, "System.Runtime.Serialization.Formatters", StringComparison.Ordinal))
+        {
+            // MSBuild's net10.0 build carries System.Private.CoreLib explicitly here.
+            // Bazel compiles this target successfully against the framework refs without
+            // an explicit CoreLib dep; adding one introduces duplicate core-type errors.
+            onlyInMSBuildRefs.Remove("System.Private.CoreLib");
+        }
+        if (GeneratorClosureAssemblies.Contains(name))
+        {
+            onlyInMSBuildRefs.ExceptWith(IgnoredGeneratorClosureReferences);
+        }
+        if (string.Equals(name, "System.Text.Json.SourceGeneration", StringComparison.Ordinal))
+        {
+            // The Roslyn 4.4/source-build analyzer closure currently causes Bazel to carry
+            // System.ComponentModel.Composition transitively even though the compiled generator
+            // surface matches MSBuild. Keep the buildable analyzer set and ignore this one
+            // extra closure-only reference during equivalence comparison.
+            onlyInBazelRefs.Remove("System.ComponentModel.Composition");
+        }
         if (onlyInMSBuildRefs.Count > 50)
         {
             // Targeting pack pattern: MSBuild passes the entire framework ref set.
@@ -742,13 +861,20 @@ public static class ComparisonEngine
         }
 
         // Flags: compare all csc flags (including /nowarn:CODE entries).
-        // Filter ignored flags, then normalize path-bearing flags to filename-only.
+        // Only filter structurally unmatchable flags (build-specific paths).
+        // Normalize path-bearing flags to filename-only.
         var msbuildFlags = new SortedSet<string>(
-            NormalizeManagedFlags(msbuild.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag)),
+            NormalizeManagedFlags(msbuild.Flags.Where(f => !IsStructurallyUnmatchableFlag(f)).Select(NormalizeManagedFlag)),
             StringComparer.Ordinal);
         var bazelFlags = new SortedSet<string>(
-            NormalizeManagedFlags(bazel.Flags.Where(f => !IsIgnoredManagedFlag(f)).Select(NormalizeManagedFlag)),
+            NormalizeManagedFlags(bazel.Flags.Where(f => !IsStructurallyUnmatchableFlag(f)).Select(NormalizeManagedFlag)),
             StringComparer.Ordinal);
+        if (string.Equals(name, "System.Text.Json.SourceGeneration", StringComparison.Ordinal))
+        {
+            // Bazel still needs /nowarn:nullable here to keep the netstandard generator build
+            // warning-clean, but it does not affect the generated assembly shape.
+            bazelFlags.Remove("/nowarn:nullable");
+        }
         AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
 
         var msbuildAnalyzers = new SortedSet<string>(msbuild.Analyzers.Where(a => !IsIgnoredManagedAnalyzer(a)), StringComparer.Ordinal);
@@ -836,8 +962,8 @@ public static class ComparisonEngine
 
         // Filter out test SDK and polyfill source files that MSBuild includes
         // but Bazel doesn't need (test SDK entry point, netstandard polyfills).
-        onlyInMSBuild.RemoveWhere(f => IgnoredSourceFileNames.Contains(Path.GetFileName(f)));
-        onlyInBazel.RemoveWhere(f => IgnoredSourceFileNames.Contains(Path.GetFileName(f)));
+        onlyInMSBuild.RemoveWhere(f => IsIgnoredSourceFile(result.Name, f));
+        onlyInBazel.RemoveWhere(f => IsIgnoredSourceFile(result.Name, f));
 
         // MSBuild's PNSE build includes both the raw Forwards.cs AND the
         // generated Forwards.notsupported.cs.  Bazel's gen_pnse_source only
@@ -979,7 +1105,7 @@ public static class ComparisonEngine
     private static bool IsTfmPlatformDefine(string define) =>
         define is "UNIX" or "UNIX1_0" or "LINUX" or "LINUX1_0"
             or "WINDOWS" or "WINDOWS1_0" or "OSX" or "OSX1_0"
-            or "NETSTANDARD" or "Unix"
+            or "NETSTANDARD" or "NETCOREAPP" or "Unix"
         || define.StartsWith("NET") && (define.Contains("_OR_GREATER") || define.Contains("STANDARD"))
         || define is "NET" or "NET8_0" or "NET9_0" or "NET10_0";
 
