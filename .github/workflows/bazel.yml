@@ -2,9 +2,9 @@ name: Bazel Build & Test
 
 on:
   push:
-    branches: [ bazel ]
+    branches: [ bazel, bazel-to-main ]
   pull_request:
-    branches: [ bazel, bazel-mac ]
+    branches: [ bazel, bazel-to-main ]
 
 jobs:
   build:
