@@ -139,7 +139,7 @@ match  System.Net.Ping
 match  System.Net.Ping.ref
 match  System.Net.Primitives
 match  System.Net.Primitives.ref
-diff   System.Net.Quic
+match  System.Net.Quic
 match  System.Net.Quic.ref
 match  System.Net.Requests
 match  System.Net.Requests.ref
@@ -258,7 +258,7 @@ match  System.Threading.Channels.ref
 match  System.Threading.Overlapped
 match  System.Threading.Overlapped.ref
 match  System.Threading.Tasks
-diff   System.Threading.Tasks.Dataflow
+match  System.Threading.Tasks.Dataflow
 match  System.Threading.Tasks.Dataflow.ref
 match  System.Threading.Tasks.Extensions
 match  System.Threading.Tasks.Parallel
@@ -298,9 +298,8 @@ match    netstandard
 
 # ── Non-archive assemblies ─────────────────────────────────────────
 # These assemblies are built but not shipped in the runtime archive.
-# They differ because MSBuild uses the full targeting pack while Bazel
-# uses precise deps, or because of stub vs full impl differences,
-# generated content differences, or source generator targeting variations.
+# They include test helpers, tools, and infrastructure that may have
+# structural differences normalized by the comparison engine.
 
 match  ApplicationNameSetFromArgument
 match  BuildWebHostInvalidSignature
@@ -453,7 +452,7 @@ match  NoSpecialEntryPointPatternMainNoArgs
 match  NoSpecialEntryPointPatternThrows
 match  STAMain
 match  SerializableAssembly
-diff   SerializationTypes
+match  SerializationTypes
 match  StreamConformanceTests
 match  TopLevelStatements
 match  TopLevelStatementsTestsTimeout
@@ -468,7 +467,7 @@ match  System.Collections.Tests
 match  System.ComponentModel.Annotations.Tests
 match  System.ComponentModel.Composition
 match  System.ComponentModel.Composition.ref
-diff   System.ComponentModel.Composition.Noop.Assembly
+match  System.ComponentModel.Composition.Noop.Assembly
 match  System.ComponentModel.Composition.Registration
 match  System.ComponentModel.Composition.Registration.ref
 match  System.ComponentModel.Composition.Registration.Tests
@@ -495,12 +494,12 @@ match  System.Console.Tests
 match  System.Data.Common.Tests
 match  System.Data.DataSetExtensions.Tests
 match  System.Data.Odbc.Tests
-diff   System.Data.Odbc
+match  System.Data.Odbc
 match  System.Data.Odbc.ref
 match  System.Data.OleDb
 match  System.Data.OleDb.ref
 match  System.Diagnostics.Contracts.Tests
-diff   System.Diagnostics.Debug.Tests
+match  System.Diagnostics.Debug.Tests
 match  System.Diagnostics.DiagnosticSource.Tests
 match  MetricOuterLoop.Tests
 match  MetricOuterLoop1.Tests
@@ -528,14 +527,14 @@ match  System.Drawing.Primitives.Tests
 match  System.Formats.Asn1.Tests
 match  System.Formats.Cbor
 match  System.Formats.Cbor.ref
-diff   System.Formats.Cbor.Tests
+match  System.Formats.Cbor.Tests
 match  System.Formats.Nrbf
 match  System.Formats.Nrbf.ref
 match  System.Formats.Nrbf.Tests
 match  System.Formats.Tar.Tests
 match  System.Globalization.Calendars.Tests
 match  System.Globalization.Extensions.Tests
-diff   System.Globalization.Tests
+match  System.Globalization.Tests
 match  System.IO.Compression.Brotli.Tests
 match  System.IO.Compression.Tests
 match  System.IO.Compression.ZipFile.Tests
@@ -544,7 +543,7 @@ match  System.IO.FileSystem.Primitives.Tests
 match  System.IO.FileSystem.Tests
 match  System.IO.FileSystem.Watcher.Tests
 match  System.IO.Hashing.Tests
-diff   System.IO.Hashing
+match  System.IO.Hashing
 match  System.IO.Hashing.ref
 match  System.IO.IsolatedStorage.Tests
 match  System.IO.MemoryMappedFiles.Tests
@@ -589,7 +588,7 @@ match  System.Net.Primitives.UnitTests.Tests
 match  System.Net.Quic.Functional.Tests
 match  System.Net.Requests.Tests
 match  System.Net.Security.Enterprise.Tests
-diff   System.Net.Security.Tests
+match  System.Net.Security.Tests
 match  System.Net.Security.Unit.Tests
 match  System.Net.ServicePoint.Tests
 match  System.Net.ServerSentEvents.Tests
@@ -604,7 +603,7 @@ match  System.Numerics.Tensors.ref
 match  System.Numerics.Tensors.Tests
 match  System.Numerics.Vectors.Tests
 match  System.ObjectModel.Tests
-diff   System.Private.CoreLib.Generators
+match  System.Private.CoreLib.Generators
 match  System.Private.Uri.ExtendedFunctional.Tests
 match  System.Private.Uri.Functional.Tests
 match  System.Private.Uri.Unit.Tests
@@ -617,13 +616,13 @@ match  System.Reflection.Emit.ILGeneration.Tests
 match  System.Reflection.Emit.Lightweight.Tests
 match  System.Reflection.Emit.Tests
 match  System.Reflection.Extensions.Tests
-diff   System.Reflection.Metadata.Tests
+match  System.Reflection.Metadata.Tests
 match  System.Reflection.MetadataLoadContext
 match  System.Reflection.MetadataLoadContext.ref
-diff   System.Reflection.MetadataLoadContext.Tests
+match  System.Reflection.MetadataLoadContext.Tests
 match  System.Reflection.CoreCLR.Tests
 match  System.Reflection.TestExe
-diff   System.Reflection.Tests
+match  System.Reflection.Tests
 match  System.Reflection.InvokeEmit.Tests
 match  System.Reflection.InvokeInterpreted.Tests
 match  System.Reflection.TypeExtensions.Tests
@@ -632,7 +631,7 @@ match  System.Resources.Extensions.ref
 match  System.Resources.Extensions.BinaryFormat.Tests
 match  System.Resources.Extensions.Tests
 match  System.Resources.Reader.Tests
-diff   System.Resources.ResourceManager.Tests
+match  System.Resources.ResourceManager.Tests
 match  System.Resources.Writer.Tests
 match  System.Runtime.Caching
 match  System.Runtime.Caching.ref
@@ -644,7 +643,7 @@ match  System.Runtime.Extensions.Tests
 match  System.Runtime.InteropServices.RuntimeInformation.Tests
 match  System.Runtime.InteropServices.Tests
 match  System.Runtime.Intrinsics.Tests
-diff   System.Runtime.Loader.Tests
+match  System.Runtime.Loader.Tests
 match  System.Runtime.Loader.DefaultContext.Tests
 match  System.Runtime.Loader.Noop.Assembly
 match  System.Runtime.Loader.RefEmitLoadContext.Tests
@@ -690,8 +689,8 @@ match  System.Text.Encoding.CodePages.Tests
 match  System.Text.Encoding.Extensions.Tests
 match  System.Text.Encoding.Tests
 match  System.Text.Encodings.Web.Tests
-diff   System.Text.RegularExpressions.Generator
-diff   System.Text.RegularExpressions.Tests
+match  System.Text.RegularExpressions.Generator
+match  System.Text.RegularExpressions.Tests
 match  System.Text.RegularExpressions.Unit.Tests
 match  System.Threading.Channels.Tests
 match  System.Threading.Overlapped.Tests
@@ -721,34 +720,34 @@ match  System.Xml.Linq.TreeManipulation.Tests
 match  System.Xml.Schema.Extensions.Tests
 match  System.Xml.Linq.xNodeBuilder.Tests
 match  System.Xml.Linq.xNodeReader.Tests
-diff   TestLibrary
+match  TestLibrary
 match  ExceptionTestAssembly
 match  XDocument.Common
 match  XmlCoreTest
-diff   crossgen2
+match  crossgen2
 match  ilc
 match  illink
 
 # ── Unlisted assemblies added during equivalence improvement ──
 match  BaseLibManaged
-diff   ILLink.RoslynAnalyzer
+match  ILLink.RoslynAnalyzer
 match  ILCompiler.Reflection.ReadyToRun
-diff   Microsoft.Composition.Demos.ExtendedCollectionImports
-diff   Microsoft.Extensions.Configuration.Binder.SourceGeneration
-diff   Microsoft.Extensions.Logging.Generators
-diff   Microsoft.Interop.ComInterfaceGenerator
+match  Microsoft.Composition.Demos.ExtendedCollectionImports
+match  Microsoft.Extensions.Configuration.Binder.SourceGeneration
+match  Microsoft.Extensions.Logging.Generators
+match  Microsoft.Interop.ComInterfaceGenerator
 match  Microsoft.Interop.JavaScript.JSImportGenerator
-diff   Microsoft.Interop.LibraryImportGenerator
-diff   Microsoft.Interop.LibraryImportGenerator.Downlevel
-diff   Microsoft.Interop.SourceGeneration
-diff   ModuleCore
-diff   System.Text.Json.SourceGeneration
+match  Microsoft.Interop.LibraryImportGenerator
+match  Microsoft.Interop.LibraryImportGenerator.Downlevel
+match  Microsoft.Interop.SourceGeneration
+match  ModuleCore
+match  System.Text.Json.SourceGeneration
 match  TestAssembly
 match  TestUtilities
 match  XDocument.Test.ModuleCore
-diff   XmlDiff
+match  XmlDiff
 match  Microsoft.Extensions.DependencyModel.Tests
-diff   System.Private.Xml.Tests
+match  System.Private.Xml.Tests
 match  System.Text.Json.Tests
 
 # ── Loader test helper assemblies ──

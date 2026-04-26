@@ -42,6 +42,7 @@ csharp_library(
     include_syslib_warnaserror = False,
     extra_editorconfig_content = "dotnet_diagnostic.RS1036.severity = none",
     nowarn = [
+        "CS3001",
         "CS3021",
         "CS1591",
         "nullable",

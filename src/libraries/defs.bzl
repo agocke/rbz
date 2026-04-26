@@ -1007,9 +1007,14 @@ def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False
 def live_csharp_library(
     name,
     deps = [],
+    srcs = [],
     nullable = "enable",
     compiler_options = [],
     treat_warnings_as_errors = False,
+    cls_compliant = None,
+    is_trimmable = None,
+    is_aot_compatible = None,
+    generate_assembly_info = False,
     **kwargs
 ):
     deps = deps + LIVE_REFPACK_DEPS
@@ -1020,8 +1025,31 @@ def live_csharp_library(
         "/features:nullablePublicOnly",
     ]
 
+    # Optionally generate AssemblyInfo.cs matching MSBuild's output
+    # (CLSCompliant, IsTrimmable, etc.) for production libraries.
+    # Test helpers should leave generate_assembly_info = False.
+    if generate_assembly_info:
+        out = kwargs.get("out", name)
+        assembly_info_target = "assemblyinfo_" + name
+        _cls = cls_compliant if cls_compliant != None else True
+        _trim = is_trimmable if is_trimmable != None else True
+        _aot = is_aot_compatible if is_aot_compatible != None else True
+        gen_assembly_info(
+            name = assembly_info_target,
+            out = name + "/" + out + ".AssemblyInfo.cs",
+            assembly_name = out,
+            informational_version = CI_INFORMATIONAL_VERSION,
+            cls_compliant = _cls,
+            is_trimmable = _trim,
+            is_aot_compatible = _aot,
+            ref_deps = deps,
+            include_neutral_resources_language = kwargs.get("resx_file") != None,
+        )
+        srcs = srcs + [":" + assembly_info_target]
+
     csharp_library(
         name = name,
+        srcs = srcs,
         deps = deps,
         nullable = nullable,
         langversion = "preview",
