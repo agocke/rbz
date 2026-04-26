@@ -2,7 +2,9 @@
 load(
     "//:defs.bzl",
     "OPEN_SNK",
-    "csharp_library"
+    "csharp_library",
+    "gen_assembly_info",
+    "gen_target_framework_attrs",
 )
 
 exports_files([
@@ -12,6 +14,25 @@ exports_files([
 ])
 exports_files(glob(["src/**/*.cs"]))
 
+gen_assembly_info(
+    name = "assemblyinfo_System.Private.CoreLib.Generators",
+    out = "System.Private.CoreLib.Generators.AssemblyInfo.cs",
+    assembly_name = "System.Private.CoreLib.Generators",
+    assembly_version = "42.42.42.42",
+    is_trimmable = False,
+    is_aot_compatible = False,
+    include_neutral_resources_language = False,
+    include_dll_safe_search_path = 0,
+)
+
+gen_target_framework_attrs(
+    name = "tfmattrs_System.Private.CoreLib.Generators",
+    out = ".NETStandard.AssemblyAttributes.cs",
+    framework_type = "netstandard",
+    major_version = "2",
+    minor_version = "0",
+)
+
 csharp_library(
     name = "System.Private.CoreLib.Generators",
     keyfile = OPEN_SNK,
@@ -19,6 +40,8 @@ csharp_library(
         "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/IsExternalInit.cs",
         "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
         "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
+        ":assemblyinfo_System.Private.CoreLib.Generators",
+        ":tfmattrs_System.Private.CoreLib.Generators",
     ],
     target_frameworks = ["netstandard2.0"],
     langversion = "preview",
