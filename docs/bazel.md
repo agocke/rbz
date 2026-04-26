@@ -275,17 +275,20 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: All 753 tracked assemblies now match
-  MSBuild's CSC command line on source files, defines, references, analyzers,
-  language version, target type, and flags (including `/nowarn:`, `/noconfig`,
-  `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
-  flags (`/fullpaths`, `/utf8output`, `/nologo`), debug symbol format, and
-  build infrastructure (`/pathmap:`, `/sourcelink:`, etc.) are filtered
-  before comparison. Path-bearing flags are normalized to filename-only for
-  cross-build-system comparison. Warning flags are normalized: duplicate
-  `/warn:` entries keep the highest value (matching csc last-wins behavior),
-  and comma-separated `/warnaserror+:X,Y` entries are expanded into
-  individual entries for consistent comparison.
+- **Managed assemblies**: Of 753 tracked assemblies, 17 have known diffs due to
+  `/embed:`, `/sourcelink:`, and `/pdb:` flags that differ structurally between
+  MSBuild and Bazel (MSBuild embeds auto-generated files; Bazel explicitly passes
+  `/pdb:`). All other tracked assemblies match MSBuild's CSC command line on
+  source files, defines, references, analyzers, language version, target type,
+  and flags (including `/nowarn:`, `/noconfig`, `/nostdlib+`, `/warnaserror`,
+  `/warn:`, `/ruleset:`). Path-bearing flags (`/keyfile:`, `/doc:`, `/embed:`,
+  `/pdb:`, `/sourcelink:`, `/resource:`, `/analyzerconfig:`, `/additionalfile:`,
+  `/ruleset:`, etc.) are normalized to filename-only for cross-build-system
+  comparison. Only truly unmatchable infrastructure flags (`/pathmap:`,
+  `/refout:`, `/generatedfilesout:`, `/nologo`) are filtered. Warning flags
+  are normalized: duplicate `/warn:` entries keep the highest value (matching
+  csc last-wins behavior), and comma-separated `/warnaserror+:X,Y` entries are
+  expanded into individual entries for consistent comparison.
   The matching assemblies include `System.Private.CoreLib` (full analyzer
   and flag parity including the ILLink.RoslynAnalyzer built from source) and
   91 library assemblies matched via infrastructure in `impl_assembly`

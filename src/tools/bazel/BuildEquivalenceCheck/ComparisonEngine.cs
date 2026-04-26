@@ -525,12 +525,9 @@ public static class ComparisonEngine
             return true;
 
         // Output/infrastructure paths that are inherently different between
-        // build systems (absolute paths to intermediate directories, PDBs, etc.).
+        // build systems and have no meaningful filename to compare.
         if (flag.StartsWith("/pathmap:", StringComparison.Ordinal)
-            || flag.StartsWith("/pdb:", StringComparison.Ordinal)
             || flag.StartsWith("/refout:", StringComparison.Ordinal)
-            || flag.StartsWith("/sourcelink:", StringComparison.Ordinal)
-            || flag.StartsWith("/embed:", StringComparison.Ordinal)
             || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal))
             return true;
 
@@ -606,12 +603,20 @@ public static class ComparisonEngine
     /// </summary>
     private static readonly string[] PathBearingFlagPrefixes =
     [
-        "/analyzerconfig:",
         "/additionalfile:",
+        "/analyzerconfig:",
+        "/appconfig:",
         "/doc:",
+        "/embed:",
         "/keyfile:",
+        "/linkresource:",
+        "/pdb:",
         "/resource:",
         "/ruleset:",
+        "/sourcelink:",
+        "/win32icon:",
+        "/win32manifest:",
+        "/win32res:",
     ];
 
 
@@ -623,6 +628,8 @@ public static class ComparisonEngine
     /// regardless of build-system output layout.
     /// For /resource: flags, only the first segment (the file path) is
     /// normalized; the optional logical name and accessibility are preserved.
+    /// Bazel's "live_" output prefix is stripped so that live_Foo.pdb
+    /// compares equal to Foo.pdb.
     /// </summary>
     private static string NormalizeManagedFlag(string flag)
     {
@@ -641,7 +648,7 @@ public static class ComparisonEngine
                 {
                     var filePart = value[..commaIdx];
                     var rest = value[(commaIdx + 1)..];
-                    var fileName = Path.GetFileName(filePart);
+                    var fileName = StripLivePrefix(Path.GetFileName(filePart));
 
                     // csc treats /resource:file,SameName as equivalent to
                     // /resource:file when the logical name is just the file
@@ -656,11 +663,18 @@ public static class ComparisonEngine
                 }
             }
 
-            return prefix + Path.GetFileName(value);
+            return prefix + StripLivePrefix(Path.GetFileName(value));
         }
 
         return flag;
     }
+
+    /// <summary>
+    /// Strip the "live_" prefix that Bazel ref_impl_pair targets add to
+    /// output filenames (e.g. live_Foo.pdb → Foo.pdb).
+    /// </summary>
+    private static string StripLivePrefix(string fileName) =>
+        fileName.StartsWith("live_", StringComparison.Ordinal) ? fileName["live_".Length..] : fileName;
 
     /// <summary>
     /// Normalize managed flags for consistent comparison:
