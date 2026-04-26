@@ -2,8 +2,41 @@ load("//src/libraries:defs.bzl", "DOWNLEVEL_GENERATOR_ANALYZERS", "MULTITARGET_N
 load("//src/tests:live_test.bzl", "library_test")
 load("//:defs.bzl", "OPEN_SNK", "csharp_library")
 
-csharp_library(
+# In MSBuild these target netstandard2.0, but they use ProjectReference to the
+# source System.Composition projects.  In Bazel we must reference the same impl
+# assemblies the test uses so that type identities match at runtime (otherwise
+# List<ExportDescriptorProvider>.Add throws ArrayTypeMismatchException).
+
+live_csharp_library(
     name = "TestLibrary",
+    keyfile = OPEN_SNK,
+    srcs = ["TestLibrary/TestClass.cs"],
+    nullable = "annotations",
+    deps = [
+        "//src/libraries/System.Composition.AttributedModel:impl_System.Composition.AttributedModel",
+    ],
+)
+
+live_csharp_library(
+    name = "Microsoft.Composition.Demos.ExtendedCollectionImports",
+    keyfile = OPEN_SNK,
+    srcs = glob(["Microsoft.Composition.Demos.ExtendedCollectionImports/**/*.cs"]),
+    nullable = "annotations",
+    deps = [
+        "//src/libraries/System.Composition.AttributedModel:impl_System.Composition.AttributedModel",
+        "//src/libraries/System.Composition.Hosting:impl_System.Composition.Hosting",
+        "//src/libraries/System.Composition.Runtime:impl_System.Composition.Runtime",
+        "//src/libraries/System.Composition.TypedParts:impl_System.Composition.TypedParts",
+    ],
+)
+
+# netstandard2.0 equivalents for compare-bazel equivalence checking only.
+# These match MSBuild's netstandard2.0 compilation but are NOT used by the
+# test runner (the live_csharp_library versions above are used instead).
+
+csharp_library(
+    name = "TestLibrary_netstandard2.0",
+    out = "TestLibrary",
     analyzers = DOWNLEVEL_GENERATOR_ANALYZERS,
     keyfile = OPEN_SNK,
     srcs = ["TestLibrary/TestClass.cs"],
@@ -15,12 +48,13 @@ csharp_library(
     msbuild_analyzer_config = "style",
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051", "nullable", "CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847"],
     deps = [
-        "@paket.main//system.composition.attributedmodel",
+        "//src/libraries/System.Composition.AttributedModel:System.Composition.AttributedModel_netstandard2.0",
     ],
 )
 
 csharp_library(
-    name = "Microsoft.Composition.Demos.ExtendedCollectionImports",
+    name = "Microsoft.Composition.Demos.ExtendedCollectionImports_netstandard2.0",
+    out = "Microsoft.Composition.Demos.ExtendedCollectionImports",
     analyzers = DOWNLEVEL_GENERATOR_ANALYZERS,
     keyfile = OPEN_SNK,
     srcs = glob(["Microsoft.Composition.Demos.ExtendedCollectionImports/**/*.cs"]),
@@ -32,10 +66,10 @@ csharp_library(
     msbuild_analyzer_config = "style",
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051", "nullable", "CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847"],
     deps = [
-        "@paket.main//system.composition.attributedmodel",
-        "@paket.main//system.composition.hosting",
-        "@paket.main//system.composition.runtime",
-        "@paket.main//system.composition.typedparts",
+        "//src/libraries/System.Composition.AttributedModel:System.Composition.AttributedModel_netstandard2.0",
+        "//src/libraries/System.Composition.Hosting:System.Composition.Hosting_netstandard2.0",
+        "//src/libraries/System.Composition.Runtime:System.Composition.Runtime_netstandard2.0",
+        "//src/libraries/System.Composition.TypedParts:System.Composition.TypedParts_netstandard2.0",
     ],
 )
 

@@ -312,22 +312,25 @@ public static class ComparisonEngine
             .Where(r => !r.IsReferenceAssembly)
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
-                g.OrderByDescending(r => TfmPriority(r.OutputPath)).ToList());
+                g.OrderByDescending(r => TfmPriority(r)).ToList());
 
-        // For Bazel impl: prefer impl_ targets, then live_ targets, then
-        // anything that is not a ref_ target.
+        // For Bazel impl: prefer impl_ targets, then netstandard2.0 targets
+        // (matching MSBuild's test helpers), then anything else that is not a
+        // ref_ target.
         var bazelImpl = bazelRecords
             .Where(r => !IsRefTarget(r.TargetLabel))
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
-                g.OrderByDescending(r => IsImplTarget(r.TargetLabel)).First());
+                g.OrderByDescending(r => IsImplTarget(r.TargetLabel))
+                 .ThenByDescending(r => r.TargetFramework.StartsWith("netstandard", StringComparison.OrdinalIgnoreCase))
+                 .First());
 
         // ── Ref assemblies ─────────────────────────────────────────────
         var msbuildRef = msbuildRecords
             .Where(r => r.IsReferenceAssembly)
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
-                g.OrderByDescending(r => TfmPriority(r.OutputPath)).ToList());
+                g.OrderByDescending(r => TfmPriority(r)).ToList());
 
         var bazelRef = bazelRecords
             .Where(r => IsRefTarget(r.TargetLabel))
@@ -405,7 +408,7 @@ public static class ComparisonEngine
 
             if (bestResult is null
                 || score < bestScore
-                || (score == bestScore && TfmPriority(candidate.OutputPath) > TfmPriority(bestRecord!.OutputPath)))
+                || (score == bestScore && TfmPriority(candidate) > TfmPriority(bestRecord!)))
             {
                 bestResult = result;
                 bestRecord = candidate;
@@ -1345,7 +1348,36 @@ public static class ComparisonEngine
     /// over the plain net10.0 TFM which is often a PNSE stub.
     /// Stub assemblies (shims/stubs) are deprioritized below all other builds.
     /// </summary>
-    private static int TfmPriority(string outputPath)
+    /// <summary>
+    /// Assigns a priority to a compilation record's target framework.
+    /// Higher priority = more preferred for comparison.
+    /// Uses the explicit <see cref="ManagedCompilationRecord.TargetFramework"/>
+    /// property when available, falling back to heuristic path matching.
+    /// </summary>
+    private static int TfmPriority(ManagedCompilationRecord record)
+    {
+        var tfm = record.TargetFramework;
+        if (!string.IsNullOrEmpty(tfm))
+        {
+            // Stub assemblies (shims/stubs) are type-forward wrappers, not the real impl.
+            if (record.OutputPath.Contains("/stub/", StringComparison.OrdinalIgnoreCase))
+                return -1;
+
+            if (tfm.EndsWith("-linux", StringComparison.OrdinalIgnoreCase))
+                return 3;
+            if (tfm.EndsWith("-unix", StringComparison.OrdinalIgnoreCase))
+                return 2;
+            if (tfm.EndsWith("-osx", StringComparison.OrdinalIgnoreCase))
+                return 1;
+
+            return 0;
+        }
+
+        // Fallback: infer from output path for records without explicit TFM.
+        return TfmPriorityFromPath(record.OutputPath);
+    }
+
+    private static int TfmPriorityFromPath(string outputPath)
     {
         // Stub assemblies (shims/stubs) are type-forward wrappers, not the real impl.
         if (outputPath.Contains("/stub/", StringComparison.OrdinalIgnoreCase))
