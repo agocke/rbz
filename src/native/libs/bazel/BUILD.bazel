@@ -1,5 +1,5 @@
 exports_files([
-    "darwin-arm64/pal_config.h",
-    "darwin-x64/pal_config.h",
+    "osx-arm64/pal_config.h",
+    "osx-x64/pal_config.h",
     "linux-glibc-x64/pal_config.h",
 ])

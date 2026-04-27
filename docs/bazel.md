@@ -628,14 +628,14 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 - [ ] `src/native/external/llvm-libunwind/BUILD.bazel`
   - [ ] LLVM's libunwind, alternative to GNU libunwind
 
-### 2.8 Bundled GNU libunwind — ✅ DONE (linux-x64, darwin-arm64)
+### 2.8 Bundled GNU libunwind — ✅ DONE (linux-x64, osx-arm64)
 - [x] `src/native/external/libunwind/BUILD.bazel`
   - [x] `libunwind_generic` cc_library (G-prefix sources: remote/generic unwind)
   - [x] `libunwind_local` cc_library (L-prefix sources: local-only unwind)
   - [x] `libunwind` combined cc_library
-  - [x] `libunwind_dac_macos` cc_library (darwin-arm64: DAC remote-only unwind)
+  - [x] `libunwind_dac_macos` cc_library (osx-arm64: DAC remote-only unwind)
   - [x] `bazel/linux-glibc-x64/include/config.h` (hardcoded linux-x64)
-  - [x] `bazel/darwin-arm64/include/config.h` (hardcoded darwin-arm64)
+  - [x] `bazel/osx-arm64/include/config.h` (hardcoded osx-arm64)
   - [x] Generated `libunwind-common.h`, `libunwind.h`, `tdep/libunwind_i.h`
 
 ### 2.8 rapidjson — ✅ DONE
