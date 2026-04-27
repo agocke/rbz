@@ -1,0 +1,29 @@
+load("//:defs.bzl", "csharp_library")
+
+exports_files(["PEReaderExtensions.cs"])
+
+csharp_library(
+    name = "ILCompiler.Reflection.ReadyToRun",
+    msbuild_analyzer_config = "style",
+    include_default_ruleset = False,
+    compiler_options = ["/warnaserror+:NU1605"],
+    srcs = glob(["**/*.cs"]) + [
+        "//src/coreclr/tools/Common:Internal/Runtime/CorConstants.cs",
+        "//src/coreclr/tools/Common:Internal/Runtime/ModuleHeaders.cs",
+        "//src/coreclr/tools/Common:Internal/Runtime/ReadyToRunConstants.cs",
+        "//src/coreclr/tools/Common:Internal/Runtime/ReadyToRunInstructionSet.cs",
+        "//src/coreclr/tools/Common:Pgo/PgoFormat.cs",
+    ],
+    allow_unsafe_blocks = True,
+    nowarn = ["1591", "8002", "NU1701"],
+    analyzers = [
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+    ],
+    target_frameworks = ["net8.0"],
+    deps = [
+        "@paket.main//system.collections.immutable",
+        "@paket.main//system.reflection.metadata",
+        "@paket.main//system.runtime.compilerservices.unsafe",
+    ],
+    visibility = ["//visibility:public"],
+)
