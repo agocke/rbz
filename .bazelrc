@@ -165,15 +165,6 @@ build:linux --linkopt=-fuse-ld=lld
 # macOS-specific settings
 # =====================================================================
 build:macos --config=unix
-# Cross-compile for arm64 even when the host is Intel x64.
-# --platforms sets the Bazel target platform so select(@platforms//cpu:arm64)
-# rules resolve correctly.  --cpu=darwin_arm64 ensures the Apple CC toolchain
-# actually emits arm64 code.  --extra_execution_platforms lets analysis of
-# test targets succeed (the execution platform must satisfy the target
-# platform constraints); actual test execution is skipped on Intel CI runners.
-build:macos --platforms=//platforms:macos_arm64
-build:macos --cpu=darwin_arm64
-build:macos --extra_execution_platforms=//platforms:macos_arm64
 # Deployment target — match CMake's eng/native/configureplatform.cmake
 build:macos --macos_minimum_os=12.0
 
