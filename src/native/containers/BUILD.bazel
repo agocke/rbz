@@ -26,12 +26,14 @@ _HEADERS = glob(["*.h"]) + [
 ]
 
 _CONFIG_HDR = select({
-    "@platforms//os:macos": ["bazel/darwin-arm64/dn-config.h"],
+    "//:macos_arm64": ["bazel/darwin-arm64/dn-config.h"],
+    "//:macos_x64": ["bazel/darwin-x64/dn-config.h"],
     "//conditions:default": ["bazel/linux-glibc-x64/dn-config.h"],
 })
 
 _CONFIG_INCLUDES = select({
-    "@platforms//os:macos": ["bazel/darwin-arm64"],
+    "//:macos_arm64": ["bazel/darwin-arm64"],
+    "//:macos_x64": ["bazel/darwin-x64"],
     "//conditions:default": ["bazel/linux-glibc-x64"],
 })
 

@@ -14,9 +14,13 @@ package(default_visibility = ["//src/native/corehost:__subpackages__"])
 cc_library(
     name = "configure_headers",
     hdrs = select({
-        "@platforms//os:macos": [
+        "//:macos_arm64": [
             "bazel/darwin-arm64/_version.c",
             "bazel/darwin-arm64/configure.h",
+        ],
+        "//:macos_x64": [
+            "bazel/darwin-x64/_version.c",
+            "bazel/darwin-x64/configure.h",
         ],
         "@platforms//os:windows": [
             "bazel/windows-x64/_version.c",
@@ -28,7 +32,8 @@ cc_library(
         ],
     }),
     strip_include_prefix = select({
-        "@platforms//os:macos": "bazel/darwin-arm64",
+        "//:macos_arm64": "bazel/darwin-arm64",
+        "//:macos_x64": "bazel/darwin-x64",
         "@platforms//os:windows": "bazel/windows-x64",
         "//conditions:default": "bazel/linux-glibc-x64",
     }),
@@ -37,12 +42,14 @@ cc_library(
 cc_library(
     name = "hostmisc_config",
     hdrs = select({
-        "@platforms//os:macos": ["bazel/darwin-arm64/config.h"],
+        "//:macos_arm64": ["bazel/darwin-arm64/config.h"],
+        "//:macos_x64": ["bazel/darwin-x64/config.h"],
         "@platforms//os:windows": ["bazel/windows-x64/config.h"],
         "//conditions:default": ["bazel/linux-glibc-x64/config.h"],
     }),
     strip_include_prefix = select({
-        "@platforms//os:macos": "bazel/darwin-arm64",
+        "//:macos_arm64": "bazel/darwin-arm64",
+        "//:macos_x64": "bazel/darwin-x64",
         "@platforms//os:windows": "bazel/windows-x64",
         "//conditions:default": "bazel/linux-glibc-x64",
     }),

@@ -23,7 +23,8 @@ cc_library(
         "utf8.c",
         "xoshiro128pp.c",
     ] + select({
-        "@platforms//os:macos": ["bazel/darwin-arm64/minipalconfig.h"],
+        "//:macos_arm64": ["bazel/darwin-arm64/minipalconfig.h"],
+        "//:macos_x64": ["bazel/darwin-x64/minipalconfig.h"],
         "@platforms//os:windows": ["bazel/windows-x64/minipalconfig.h"],
         "//conditions:default": ["bazel/linux-glibc-x64/minipalconfig.h"],
     }) + glob(
@@ -33,7 +34,8 @@ cc_library(
     copts = CLR_CONFIG_COPTS + PLATFORM_COPTS + NATIVE_CONFIG_COPTS,
     # includes = [".."] is already set below; add platform-specific config headers
     includes = [".."] + select({
-        "@platforms//os:macos": ["bazel/darwin-arm64"],
+        "//:macos_arm64": ["bazel/darwin-arm64"],
+        "//:macos_x64": ["bazel/darwin-x64"],
         "@platforms//os:windows": ["bazel/windows-x64"],
         "//conditions:default": ["bazel/linux-glibc-x64"],
     }),

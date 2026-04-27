@@ -117,7 +117,8 @@ _GC_INCLUDES = [
     ".",
     "env",
 ] + select({
-    "@platforms//os:macos": ["unix/bazel/darwin-arm64"],
+    "//:macos_arm64": ["unix/bazel/darwin-arm64"],
+    "//:macos_x64": ["unix/bazel/darwin-x64"],
     "//conditions:default": ["unix/bazel/linux-glibc-x64"],
 })
 
@@ -143,7 +144,8 @@ cc_library(
         "unix/events.cpp",
         "unix/cgroup.cpp",
     ] + select({
-        "@platforms//os:macos": ["unix/bazel/darwin-arm64/config.gc.h"],
+        "//:macos_arm64": ["unix/bazel/darwin-arm64/config.gc.h"],
+        "//:macos_x64": ["unix/bazel/darwin-x64/config.gc.h"],
         "//conditions:default": ["unix/bazel/linux-glibc-x64/config.gc.h"],
     }),
     copts = _GC_COPTS + CLR_CONFIG_COPTS,

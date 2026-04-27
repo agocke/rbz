@@ -75,12 +75,14 @@ genrule(
 genrule(
     name = "gen_config_h",
     srcs = select({
-        "@platforms//os:macos": ["Runtime/unix/bazel/darwin-arm64/config.h"],
+        "//:macos_arm64": ["Runtime/unix/bazel/darwin-arm64/config.h"],
+        "//:macos_x64": ["Runtime/unix/bazel/darwin-x64/config.h"],
         "//conditions:default": ["Runtime/unix/bazel/config.h"],
     }),
     outs = ["config.h"],
     cmd = select({
-        "@platforms//os:macos": "cp $(location Runtime/unix/bazel/darwin-arm64/config.h) $@",
+        "//:macos_arm64": "cp $(location Runtime/unix/bazel/darwin-arm64/config.h) $@",
+        "//:macos_x64": "cp $(location Runtime/unix/bazel/darwin-x64/config.h) $@",
         "//conditions:default": "cp $(location Runtime/unix/bazel/config.h) $@",
     }),
 )
@@ -172,7 +174,8 @@ _GC_UNIX_SRCS = [
     "//src/coreclr/gc:unix/events.cpp",
     "//src/coreclr/gc:unix/cgroup.cpp",
 ] + select({
-    "@platforms//os:macos": ["//src/coreclr/gc:unix/bazel/darwin-arm64/config.gc.h"],
+    "//:macos_arm64": ["//src/coreclr/gc:unix/bazel/darwin-arm64/config.gc.h"],
+    "//:macos_x64": ["//src/coreclr/gc:unix/bazel/darwin-x64/config.gc.h"],
     "//conditions:default": ["//src/coreclr/gc:unix/bazel/linux-glibc-x64/config.gc.h"],
 })
 
@@ -332,7 +335,8 @@ _GENERATED_SRCS = []
 _GC_UNIX_INCLUDES = [
     "../gc/unix",
 ] + select({
-    "@platforms//os:macos": ["../gc/unix/bazel/darwin-arm64"],
+    "//:macos_arm64": ["../gc/unix/bazel/darwin-arm64"],
+    "//:macos_x64": ["../gc/unix/bazel/darwin-x64"],
     "//conditions:default": ["../gc/unix/bazel/linux-glibc-x64"],
 })
 
