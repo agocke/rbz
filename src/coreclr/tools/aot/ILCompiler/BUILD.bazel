@@ -1,12 +1,20 @@
-load("//:defs.bzl", "FILE_VERSION", "INFORMATIONAL_VERSION", "csharp_binary")
+load("//:defs.bzl", "csharp_binary", "gen_assembly_info", "gen_target_framework_attrs")
 
-genrule(
-    name = "AssemblyInfo",
-    outs = ["AssemblyInfo.g.cs"],
-    cmd = """cat > $@ << 'EOF'
-[assembly: System.Reflection.AssemblyFileVersion(""" + '"' + FILE_VERSION + '"' + """)]
-[assembly: System.Reflection.AssemblyInformationalVersion(""" + '"' + INFORMATIONAL_VERSION + '"' + """)]
-EOF""",
+gen_assembly_info(
+    name = "assemblyinfo_ilc",
+    out = "ILCompiler_inbuild.AssemblyInfo.cs",
+    assembly_name = "ilc",
+    cls_compliant = False,
+    is_aot_compatible = False,
+    include_serviceable = False,
+    include_description = False,
+    assembly_configuration = "Release",
+    include_dll_safe_search_path = 0,
+)
+
+gen_target_framework_attrs(
+    name = "tfmattrs_ilc",
+    out = ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
 )
 
 csharp_binary(
@@ -20,7 +28,8 @@ csharp_binary(
         "//src/coreclr/tools/Common:CommandLineHelpers.cs",
         "//src/coreclr/tools/Common:InstructionSetHelpers.cs",
         "//src/coreclr/tools/Common:TypeSystem/IL/HelperExtensions.cs",
-        ":AssemblyInfo",
+        ":assemblyinfo_ilc",
+        ":tfmattrs_ilc",
     ],
     compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
     deps = [

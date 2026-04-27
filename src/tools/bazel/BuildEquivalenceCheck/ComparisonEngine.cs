@@ -525,13 +525,22 @@ public static class ComparisonEngine
             return true;
 
         // Output/infrastructure paths that are inherently different between
-        // build systems (absolute paths to intermediate directories, PDBs, etc.).
+        // build systems and have no meaningful filename to compare.
         if (flag.StartsWith("/pathmap:", StringComparison.Ordinal)
-            || flag.StartsWith("/pdb:", StringComparison.Ordinal)
             || flag.StartsWith("/refout:", StringComparison.Ordinal)
-            || flag.StartsWith("/sourcelink:", StringComparison.Ordinal)
-            || flag.StartsWith("/embed:", StringComparison.Ordinal)
             || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal))
+            return true;
+
+        // /embed: embeds source file text into the PDB for source-level debugging.
+        // This is a PDB feature that rules_dotnet does not support.  The underlying
+        // source files are still verified through the source_files comparison.
+        if (flag.StartsWith("/embed:", StringComparison.Ordinal))
+            return true;
+
+        // /sourcelink: points to a build-system-generated JSON config mapping
+        // source paths to repository URLs for debugger integration.  Bazel does
+        // not (yet) produce sourcelink configs.
+        if (flag.StartsWith("/sourcelink:", StringComparison.Ordinal))
             return true;
 
         // Localized resx additionalfiles: MSBuild generates Strings.{locale}.resx
@@ -606,12 +615,20 @@ public static class ComparisonEngine
     /// </summary>
     private static readonly string[] PathBearingFlagPrefixes =
     [
-        "/analyzerconfig:",
         "/additionalfile:",
+        "/analyzerconfig:",
+        "/appconfig:",
         "/doc:",
+        "/embed:",
         "/keyfile:",
+        "/linkresource:",
+        "/pdb:",
         "/resource:",
         "/ruleset:",
+        "/sourcelink:",
+        "/win32icon:",
+        "/win32manifest:",
+        "/win32res:",
     ];
 
 
@@ -623,6 +640,8 @@ public static class ComparisonEngine
     /// regardless of build-system output layout.
     /// For /resource: flags, only the first segment (the file path) is
     /// normalized; the optional logical name and accessibility are preserved.
+    /// Bazel's "live_" output prefix is stripped so that live_Foo.pdb
+    /// compares equal to Foo.pdb.
     /// </summary>
     private static string NormalizeManagedFlag(string flag)
     {
@@ -641,7 +660,7 @@ public static class ComparisonEngine
                 {
                     var filePart = value[..commaIdx];
                     var rest = value[(commaIdx + 1)..];
-                    var fileName = Path.GetFileName(filePart);
+                    var fileName = StripLivePrefix(Path.GetFileName(filePart));
 
                     // csc treats /resource:file,SameName as equivalent to
                     // /resource:file when the logical name is just the file
@@ -656,11 +675,18 @@ public static class ComparisonEngine
                 }
             }
 
-            return prefix + Path.GetFileName(value);
+            return prefix + StripLivePrefix(Path.GetFileName(value));
         }
 
         return flag;
     }
+
+    /// <summary>
+    /// Strip the "live_" prefix that Bazel ref_impl_pair targets add to
+    /// output filenames (e.g. live_Foo.pdb → Foo.pdb).
+    /// </summary>
+    private static string StripLivePrefix(string fileName) =>
+        fileName.StartsWith("live_", StringComparison.Ordinal) ? fileName["live_".Length..] : fileName;
 
     /// <summary>
     /// Normalize managed flags for consistent comparison:
@@ -909,6 +935,12 @@ public static class ComparisonEngine
         if (bazelFlags.Contains("/nowarn:CS3021") && !msbuildFlags.Contains("/nowarn:CS3021"))
             bazelFlags.Remove("/nowarn:CS3021");
 
+        // /pdb:AssemblyName.pdb is the csc default (derived from /out:), so an
+        // explicit /pdb: that matches the assembly name is semantically equivalent
+        // to omission.  rules_dotnet always passes it explicitly; MSBuild does not.
+        msbuildFlags.Remove($"/pdb:{name}.pdb");
+        bazelFlags.Remove($"/pdb:{name}.pdb");
+
         AddSetDifference(result, "flags", msbuildFlags, bazelFlags);
 
         var msbuildAnalyzers = new SortedSet<string>(msbuild.Analyzers.Where(a => !IsIgnoredManagedAnalyzer(a)), StringComparer.Ordinal);
@@ -1118,35 +1150,6 @@ public static class ComparisonEngine
         var onlyInMSBuild = new SortedSet<string>(msbuild.SourceFiles.Except(bazel.SourceFiles), StringComparer.Ordinal);
         var onlyInBazel = new SortedSet<string>(bazel.SourceFiles.Except(msbuild.SourceFiles), StringComparer.Ordinal);
 
-        // Filter out SDK-generated AssemblyAttributes.cs files. These contain
-        // only TargetFrameworkAttribute and are not meaningful for equivalence.
-        onlyInMSBuild.RemoveWhere(f => Path.GetFileName(f).EndsWith("AssemblyAttributes.cs", StringComparison.Ordinal));
-        onlyInBazel.RemoveWhere(f => Path.GetFileName(f).EndsWith("AssemblyAttributes.cs", StringComparison.Ordinal));
-
-        // Filter out MSBuild-generated AssemblyInfo.cs files (e.g.
-        // artifacts/obj/X/Release/.../X.AssemblyInfo.cs). In Bazel, rules_dotnet
-        // generates equivalent AssemblyInfo content internally; it's not a separate
-        // source file in the aquery output.  Also filter Bazel-generated
-        // AssemblyInfo.g.cs from local genrules (ILCompiler/crossgen2 tools).
-        onlyInMSBuild.RemoveWhere(f =>
-        {
-            var fn = Path.GetFileName(f);
-            return fn.EndsWith("AssemblyInfo.cs", StringComparison.Ordinal)
-                || fn == "AssemblyInfo.g.cs";
-        });
-        onlyInBazel.RemoveWhere(f =>
-        {
-            var fn = Path.GetFileName(f);
-            return fn.EndsWith("AssemblyInfo.cs", StringComparison.Ordinal)
-                || fn == "AssemblyInfo.g.cs";
-        });
-
-        // Filter out MSBuild-generated InternalsVisibleTo.cs files.
-        // In Bazel, IVT attributes are set via the internals_visible_to parameter,
-        // which generates a file named internalsvisibleto.cs (lowercase).
-        onlyInMSBuild.RemoveWhere(f => Path.GetFileName(f).EndsWith("InternalsVisibleTo.cs", StringComparison.OrdinalIgnoreCase));
-        onlyInBazel.RemoveWhere(f => Path.GetFileName(f).EndsWith("internalsvisibleto.cs", StringComparison.OrdinalIgnoreCase));
-
         // Filter out test SDK and polyfill source files that MSBuild includes
         // but Bazel doesn't need (test SDK entry point, netstandard polyfills).
         onlyInMSBuild.RemoveWhere(f => IsIgnoredSourceFile(result.Name, f));
@@ -1225,6 +1228,10 @@ public static class ComparisonEngine
     /// <summary>
     /// Compare the content of two generated files using their original disk paths.
     /// Returns true if content matches or if either file cannot be read.
+    /// For AssemblyInfo/AssemblyAttributes files, comparison is order-insensitive:
+    /// we extract <c>[assembly: ...]</c> lines, sort them, and compare the sets.
+    /// MSBuild emits attributes in different orders depending on the project type
+    /// (library vs tool vs generator), so line ordering is not semantically meaningful.
     /// </summary>
     private static bool GeneratedContentMatches(
         string msbuildNormalized,
@@ -1248,12 +1255,106 @@ public static class ComparisonEngine
             // Normalize version suffixes: MSBuild CI builds use "-ci" while Bazel uses "-dev".
             msbuildContent = msbuildContent.Replace("-ci\"", "-dev\"");
 
+            // For AssemblyInfo/AssemblyAttributes files, compare assembly attribute
+            // lines as a set (order-insensitive).  MSBuild emits attributes in
+            // different orders depending on project type.
+            var fn = Path.GetFileName(msbuildNormalized);
+            if (fn.EndsWith("AssemblyInfo.cs", StringComparison.Ordinal)
+                || fn.EndsWith("AssemblyAttributes.cs", StringComparison.Ordinal)
+                || fn.EndsWith("InternalsVisibleTo.cs", StringComparison.OrdinalIgnoreCase))
+            {
+                return AssemblyAttributesMatch(msbuildContent, bazelContent);
+            }
+
             return msbuildContent == bazelContent;
         }
         catch
         {
             return true; // Can't verify — assume match
         }
+    }
+
+    /// <summary>
+    /// Compare two AssemblyInfo/AssemblyAttributes files by extracting
+    /// <c>[assembly: ...]</c> lines, sorting them, and comparing the sets.
+    /// Multi-line attributes (e.g. concatenated Description strings) are
+    /// joined into a single logical line before comparison.
+    /// </summary>
+    private static bool AssemblyAttributesMatch(string msbuildContent, string bazelContent)
+    {
+        static SortedSet<string> ExtractAttributes(string content)
+        {
+            var lines = content.Split('\n');
+            var attrs = new SortedSet<string>(StringComparer.Ordinal);
+            string? pending = null;
+
+            foreach (var rawLine in lines)
+            {
+                var line = rawLine.Trim();
+                if (pending is not null)
+                {
+                    // Continuation of a multi-line attribute (e.g. long Description)
+                    pending += " " + line;
+                    if (line.EndsWith(']'))
+                    {
+                        attrs.Add(NormalizeAttrWhitespace(pending));
+                        pending = null;
+                    }
+                    continue;
+                }
+
+                if (!line.StartsWith("[assembly:", StringComparison.Ordinal))
+                    continue;
+
+                if (line.EndsWith(']'))
+                {
+                    attrs.Add(NormalizeAttrWhitespace(line));
+                }
+                else
+                {
+                    pending = line;
+                }
+            }
+
+            if (pending is not null)
+                attrs.Add(NormalizeAttrWhitespace(pending));
+
+            return attrs;
+        }
+
+        static string NormalizeAttrWhitespace(string attr)
+        {
+            // Collapse runs of whitespace to single space for comparison.
+            // Handles multi-line string concatenation formatting differences.
+            var normalized = System.Text.RegularExpressions.Regex.Replace(attr, @"\s+", " ");
+
+            // Normalize InformationalVersion patch version: the Bazel version.bzl
+            // may lag behind eng/Versions.props (e.g. "10.0.4-dev" vs "10.0.6-ci").
+            // We already normalize -ci → -dev upstream, so just normalize the
+            // patch component to "0" for comparison purposes.
+            normalized = System.Text.RegularExpressions.Regex.Replace(
+                normalized,
+                @"(AssemblyInformationalVersion(?:Attribute)?\(""\d+\.\d+\.)\d+",
+                "${1}0");
+
+            // Strip trailing "Attribute" from type names for canonical comparison.
+            // MSBuild uses the long form (e.g. NeutralResourcesLanguageAttribute)
+            // while Bazel/rules_dotnet may use the short form.
+            normalized = System.Text.RegularExpressions.Regex.Replace(
+                normalized,
+                @"(\w)Attribute(\()",
+                "${1}${2}");
+
+            // Normalize C# verbatim string prefix: MSBuild uses @"..." while
+            // rules_dotnet uses plain "..." for InternalsVisibleTo values.
+            normalized = normalized.Replace("(@\"", "(\"");
+
+            return normalized;
+        }
+
+        var msbuildAttrs = ExtractAttributes(msbuildContent);
+        var bazelAttrs = ExtractAttributes(bazelContent);
+        return msbuildAttrs.SetEquals(bazelAttrs);
     }
 
     private static void AddSetDifference(ComparisonResult result, string field, SortedSet<string> left, SortedSet<string> right)
@@ -1280,6 +1381,11 @@ public static class ComparisonEngine
     {
         if (fileName is "System.SR.cs" or "SR.g.cs" or "SharedStrings.g.cs" or "ILLink.Shared.SharedStrings.cs")
             return "System.SR.cs";
+
+        // InternalsVisibleTo files: MSBuild generates "{ProjectName}.InternalsVisibleTo.cs",
+        // Bazel generates "internalsvisibleto.cs" (lowercase).
+        if (fileName.EndsWith("InternalsVisibleTo.cs", StringComparison.OrdinalIgnoreCase))
+            return "InternalsVisibleTo.cs";
 
         return fileName;
     }

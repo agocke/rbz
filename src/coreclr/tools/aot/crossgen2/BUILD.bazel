@@ -1,11 +1,22 @@
-load("//:defs.bzl", "FILE_VERSION", "csharp_binary")
+load("//:defs.bzl", "csharp_binary", "gen_assembly_info", "gen_target_framework_attrs")
 load("//:defs.bzl", "gen_resx_source", "resgen")
 load("@rules_dotnet//dotnet:defs.bzl", "publish_binary")
 
-genrule(
-    name = "AssemblyInfo",
-    outs = ["AssemblyInfo.g.cs"],
-    cmd = "echo '[assembly: System.Reflection.AssemblyFileVersion(\"" + FILE_VERSION + "\")]' > $@",
+gen_assembly_info(
+    name = "assemblyinfo_crossgen2",
+    out = "crossgen2_inbuild.AssemblyInfo.cs",
+    assembly_name = "crossgen2",
+    cls_compliant = False,
+    is_aot_compatible = False,
+    include_serviceable = False,
+    include_description = False,
+    assembly_configuration = "Release",
+    include_dll_safe_search_path = 0,
+)
+
+gen_target_framework_attrs(
+    name = "tfmattrs_crossgen2",
+    out = ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
 )
 
 gen_resx_source(
@@ -30,7 +41,8 @@ csharp_binary(
         "//src/coreclr/tools/Common:InstructionSetHelpers.cs",
         "//src/libraries/Common:src/System/SR.cs",
         ":SR",
-        ":AssemblyInfo",
+        ":assemblyinfo_crossgen2",
+        ":tfmattrs_crossgen2",
     ],
     resources = [":Resources"],
     resource_logical_names = {

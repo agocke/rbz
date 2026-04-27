@@ -1,5 +1,5 @@
 
-load("//:defs.bzl", "MSFT_SNK", "csharp_library", "resgen")
+load("//:defs.bzl", "MSFT_SNK", "csharp_library", "gen_assembly_info", "gen_target_framework_attrs", "resgen")
 
 load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
 
@@ -13,6 +13,69 @@ resgen(
     name = "MicrosoftInteropSourceGenerationResources",
     out = "FxResources.Microsoft.Interop.SourceGeneration.SR.resources",
     resx_file = "gen/Common/Resources/Strings.resx",
+)
+
+# Assembly info for Microsoft.Interop.SourceGeneration
+gen_assembly_info(
+    name = "assemblyinfo_Microsoft.Interop.SourceGeneration",
+    out = "Microsoft.Interop.SourceGeneration.AssemblyInfo.cs",
+    assembly_name = "Microsoft.Interop.SourceGeneration",
+    assembly_version = "42.42.42.42",
+    cls_compliant = False,
+    is_trimmable = False,
+    is_aot_compatible = False,
+    include_neutral_resources_language = False,
+    include_dll_safe_search_path = 0,
+)
+
+gen_target_framework_attrs(
+    name = "tfmattrs_Microsoft.Interop.SourceGeneration",
+    out = "SourceGeneration/.NETStandard,Version=v2.0.AssemblyAttributes.cs",
+    framework_type = "netstandard",
+    major_version = "2",
+    minor_version = "0",
+)
+
+# Assembly info for LibraryImportGenerator
+gen_assembly_info(
+    name = "assemblyinfo_LibraryImportGenerator",
+    out = "LibraryImportGenerator.AssemblyInfo.cs",
+    assembly_name = "Microsoft.Interop.LibraryImportGenerator",
+    assembly_version = "42.42.42.42",
+    cls_compliant = False,
+    is_trimmable = False,
+    is_aot_compatible = False,
+    include_neutral_resources_language = False,
+    include_dll_safe_search_path = 0,
+)
+
+gen_target_framework_attrs(
+    name = "tfmattrs_LibraryImportGenerator",
+    out = "LibraryImportGenerator/.NETStandard,Version=v2.0.AssemblyAttributes.cs",
+    framework_type = "netstandard",
+    major_version = "2",
+    minor_version = "0",
+)
+
+# Assembly info for DownlevelLibraryImportGenerator
+gen_assembly_info(
+    name = "assemblyinfo_DownlevelLibraryImportGenerator",
+    out = "DownlevelLibraryImportGenerator.AssemblyInfo.cs",
+    assembly_name = "Microsoft.Interop.LibraryImportGenerator.Downlevel",
+    assembly_version = "42.42.42.42",
+    cls_compliant = False,
+    is_trimmable = False,
+    is_aot_compatible = False,
+    include_neutral_resources_language = False,
+    include_dll_safe_search_path = 0,
+)
+
+gen_target_framework_attrs(
+    name = "tfmattrs_DownlevelLibraryImportGenerator",
+    out = "Downlevel/.NETStandard,Version=v2.0.AssemblyAttributes.cs",
+    framework_type = "netstandard",
+    major_version = "2",
+    minor_version = "0",
 )
 
 csharp_library(
@@ -36,6 +99,8 @@ csharp_library(
 
         "tests/Common/MarshalDirection.cs",
         "gen/Common/UnreachableException.cs",
+        ":assemblyinfo_Microsoft.Interop.SourceGeneration",
+        ":tfmattrs_Microsoft.Interop.SourceGeneration",
     ],
     target_frameworks = ["netstandard2.0"],
     langversion = "preview",
@@ -97,6 +162,8 @@ csharp_library(
         "gen/Common/FixAllContextExtensions.cs",
         "gen/Common/LibraryImportData.cs",
         "gen/Common/UnreachableException.cs",
+        ":assemblyinfo_LibraryImportGenerator",
+        ":tfmattrs_LibraryImportGenerator",
     ],
     target_frameworks = ["netstandard2.0"],
     langversion = "preview",
@@ -220,6 +287,8 @@ csharp_library(
         "gen/Common/OperationExtensions.cs",
         "gen/Common/LibraryImportData.cs",
         "gen/Common/UnreachableException.cs",
+        ":assemblyinfo_DownlevelLibraryImportGenerator",
+        ":tfmattrs_DownlevelLibraryImportGenerator",
     ],
     target_frameworks = ["netstandard2.0"],
     langversion = "preview",

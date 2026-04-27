@@ -11,7 +11,7 @@ load(
     "coreclr_x64_files", "coreclr_arm64_files"
 )
 
-load("//:defs.bzl", "MIBC_FILES", "SILVERLIGHT_SNK", "csharp_library", "gen_assembly_info", "gen_resx_source", "resgen")
+load("//:defs.bzl", "MIBC_FILES", "SILVERLIGHT_SNK", "csharp_library", "gen_assembly_info", "gen_resx_source", "gen_target_framework_attrs", "resgen")
 load("//eng/bazel:version.bzl", "PRODUCT_VERSION")
 
 nowarn = [ "CS0419", "CS0649", "CS1591", "CS8500", "CS8969" ]
@@ -31,6 +31,11 @@ gen_assembly_info(
     include_serviceable = False,
     include_neutral_resources_language = False,
     is_aot_compatible = False,
+)
+
+gen_target_framework_attrs(
+    name = "corelib_tfm_attrs",
+    out = ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
 )
 
 genrule(
@@ -276,6 +281,7 @@ csharp_library(
     ],
     srcs = [
         ":corelib_assembly_info",
+        ":corelib_tfm_attrs",
         ":corelib_system_sr",
         "src/Internal/Runtime/CompilerHelpers/ThrowHelpers.cs",
         "src/Internal/Runtime/InteropServices/ComActivationContextInternal.cs",

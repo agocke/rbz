@@ -29,6 +29,10 @@ load(
 
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 
+# Derive major.minor from PRODUCT_VERSION for TFM filenames
+# (e.g., "10.0.4" -> "10.0" -> ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs")
+_TFM_VERSION = ".".join(PRODUCT_VERSION.split(".")[:2])
+
 LIVE_NETCOREAPP_DEPS = [
 #    "//src/libraries:live_System.Runtime",
 #    "//src/libraries:live_System.Console",
@@ -753,7 +757,7 @@ def impl_assembly(
     tfm_attrs_target = "tfmattrs_" + base_name
     gen_target_framework_attrs(
         name = tfm_attrs_target,
-        out = name + "/.NETCoreApp.AssemblyAttributes.cs",
+        out = name + "/.NETCoreApp,Version=v" + _TFM_VERSION + ".AssemblyAttributes.cs",
     )
     srcs = srcs + [":" + tfm_attrs_target]
 
