@@ -148,26 +148,34 @@ _PAL_SOURCES = [
 
 _PAL_ASM_SOURCES = select({
     "@platforms//cpu:arm64": [
-        "src/arch/arm64/context.S",
         "src/arch/arm64/context2.S",
         "src/arch/arm64/debugbreak.S",
-        "src/arch/arm64/dispatchexceptionwrapper.S",
         "src/arch/arm64/exceptionhelper.S",
     ],
     "@platforms//cpu:x86_64": [
         "src/arch/amd64/context2.S",
         "src/arch/amd64/debugbreak.S",
         "src/arch/amd64/exceptionhelper.S",
-        "src/arch/amd64/callsignalhandlerwrapper.S",
     ],
 })
 
+# Apple uses mach exceptions + context.S + dispatchexceptionwrapper.S
+# Non-Apple uses signal handlers + callsignalhandlerwrapper.S
 _PAL_PLATFORM_SOURCES = select({
-    "@platforms//os:macos": [
+    "//:macos_arm64": [
+        "src/arch/arm64/context.S",
+        "src/arch/arm64/dispatchexceptionwrapper.S",
+        "src/exception/machexception.cpp",
+        "src/exception/machmessage.cpp",
+    ],
+    "//:macos_x64": [
+        "src/arch/amd64/context.S",
+        "src/arch/amd64/dispatchexceptionwrapper.S",
         "src/exception/machexception.cpp",
         "src/exception/machmessage.cpp",
     ],
     "//conditions:default": [
+        "src/arch/amd64/callsignalhandlerwrapper.S",
         "src/arch/amd64/signalhandlerhelper.cpp",
     ],
 })
