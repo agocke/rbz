@@ -9,12 +9,10 @@ PLATFORM_DEFINES = [
 ] + select({
     "@platforms//os:macos": [
         "HOST_64BIT",
-        "HOST_ARM64",
         "HOST_UNIX",
         "HOST_APPLE",
         "HOST_OSX",
         "TARGET_64BIT",
-        "TARGET_ARM64",
         "TARGET_UNIX",
         "TARGET_APPLE",
         "TARGET_OSX",
@@ -51,6 +49,16 @@ PLATFORM_DEFINES = [
         "TARGET_UNIX",
         "TARGET_LINUX",
     ],
+}) + select({
+    "@platforms//cpu:arm64": [
+        "HOST_ARM64",
+        "TARGET_ARM64",
+    ],
+    "@platforms//cpu:x86_64": [
+        "HOST_AMD64",
+        "TARGET_AMD64",
+    ],
+    "//conditions:default": [],
 })
 
 # Platform-specific compiler flags matching CMake configurecompiler.cmake.
