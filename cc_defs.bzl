@@ -7,7 +7,7 @@
 PLATFORM_DEFINES = [
     "DISABLE_CONTRACTS",
 ] + select({
-    "@platforms//os:macos": [
+    "//:macos_arm64": [
         "HOST_64BIT",
         "HOST_ARM64",
         "HOST_UNIX",
@@ -23,6 +23,22 @@ PLATFORM_DEFINES = [
         "_DARWIN_C_SOURCE",
         "__DARWIN_NON_CANCELABLE=1",
         # src/native/libs/CMakeLists.txt — macOS networking
+        "__APPLE_USE_RFC_3542",
+    ],
+    "//:macos_x64": [
+        "HOST_64BIT",
+        "HOST_AMD64",
+        "HOST_UNIX",
+        "HOST_APPLE",
+        "HOST_OSX",
+        "TARGET_64BIT",
+        "TARGET_AMD64",
+        "TARGET_UNIX",
+        "TARGET_APPLE",
+        "TARGET_OSX",
+        "_XOPEN_SOURCE",
+        "_DARWIN_C_SOURCE",
+        "__DARWIN_NON_CANCELABLE=1",
         "__APPLE_USE_RFC_3542",
     ],
     "@platforms//os:windows": [
