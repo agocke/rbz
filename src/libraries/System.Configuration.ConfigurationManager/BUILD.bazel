@@ -29,7 +29,6 @@ netcoreapp_ref_assembly(
         "//src/libraries/System.ObjectModel:ref_System.ObjectModel",
         "//src/libraries/System.Xml.ReaderWriter:ref_System.Xml.ReaderWriter",
         "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
-        "//src/libraries/System.Security.Permissions:ref_System.Security.Permissions",
     ],
 )
 

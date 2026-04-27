@@ -44,6 +44,7 @@ netcoreapp_impl_assembly(
 
 live_csharp_library(
     name = "live_System.Reflection.DispatchProxy",
+    generate_assembly_info = True,
     srcs = [
         "src/System/Reflection/DispatchProxy.cs",
         "src/System/Reflection/DispatchProxyGenerator.cs",

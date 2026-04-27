@@ -6,7 +6,6 @@ netcoreapp_ref_assembly(
         "ref/System.ComponentModel.Annotations.cs",
     ],
     deps = [
-        "//src/libraries:ref_System.ComponentModel.Primitives",
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.ComponentModel:ref_System.ComponentModel",
         "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",

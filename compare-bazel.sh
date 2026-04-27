@@ -118,8 +118,8 @@ for cfg in "${configs[@]}"; do
 
     # ----- Step 1: Build with CMake/MSBuild -----
     if [[ -z "$msbuild_json" && "$skip_build" != "true" ]]; then
-        log "Building with CMake/MSBuild (./build.sh clr+libs+libs.tests --ci -c $cfg -rc $cfg -lc $cfg -bl)..."
-        "$scriptroot/build.sh" clr+libs+libs.tests --ci -c "$cfg" -rc "$cfg" -lc "$cfg" -bl
+        log "Building with CMake/MSBuild (./build.sh clr+libs+libs.tests --ci -c $cfg -rc $cfg -lc $cfg -bl --rebuild)..."
+        "$scriptroot/build.sh" clr+libs+libs.tests --ci -c "$cfg" -rc "$cfg" -lc "$cfg" -bl --rebuild
     fi
 
     # ----- Step 2: Build with Bazel + extract aquery -----

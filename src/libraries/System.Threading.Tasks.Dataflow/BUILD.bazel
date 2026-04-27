@@ -18,11 +18,11 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Threading.Tasks.Dataflow",
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
-    # MSBuild passes /doc but uses hand-written XML doc includes that reference
-    # external XmlDocs/*.xml files. Bazel sandboxing prevents the compiler from
-    # finding those files, so doc generation is disabled.
-    generate_documentation_file = False,
+    # MSBuild passes /doc; the sources use <include> references to external
+    # XmlDocs/*.xml files that are unavailable in the Bazel sandbox.
+    # CS1589 suppresses the resulting "unable to include XML fragment" warnings.
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1589", "CS1591"],
+    generate_documentation_file = True,
     srcs = [
         "src/Base/DataflowBlock.cs",
         "src/Base/DataflowBlock.netstandard21.cs",

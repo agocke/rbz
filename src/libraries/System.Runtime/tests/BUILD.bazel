@@ -806,6 +806,7 @@ csharp_library(
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
+    skip_analyzers = True,
 )
 
 # NOTE: System.Reflection.CoreCLR.Tests depends on TestExe as a project
@@ -851,6 +852,7 @@ library_test(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/Common/tests:TestUtilities",
+        "//src/libraries/shims/netstandard:impl_netstandard",
         "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
@@ -882,6 +884,7 @@ library_test(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/Common/tests:TestUtilities",
+        "//src/libraries/shims/netstandard:impl_netstandard",
         "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,

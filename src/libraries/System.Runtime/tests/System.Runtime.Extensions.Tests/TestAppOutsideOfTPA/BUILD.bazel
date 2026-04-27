@@ -6,6 +6,7 @@ csharp_binary(
     srcs = ["Program.cs"],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
+    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     msbuild_analyzer_config = "style",
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],

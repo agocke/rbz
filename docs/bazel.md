@@ -191,7 +191,9 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Remaining library test equivalence diffs (35 known diffs, mostly TFM/platform defines, source file, and infrastructure differences)
+- All 753 tracked managed assemblies now achieve equivalence with MSBuild
+  (structural differences in test helpers, TFM mismatches, and stub implementations
+  are handled by per-assembly normalization in the comparison engine)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -231,7 +233,9 @@ Clang is the default compiler (matching CMake).
 CMake/MSBuild. It compares every compilation unit's source files, preprocessor
 defines, compiler flags, references, and other inputs. Both scripts pass `--ci`
 to MSBuild and `--config=ci` to Bazel so that deterministic source paths are
-enabled and PDB paths are normalized. The default configuration is **release**.
+enabled and PDB paths are normalized. The default configuration is **release**,
+and the MSBuild leg uses `--rebuild` so the `.binlog` data is never stale from
+an incremental compile.
 
 ```bash
 # Run comparison (builds both systems automatically)
@@ -271,17 +275,20 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 542 of 750 tracked assemblies currently match
+- **Managed assemblies**: All 753 tracked assemblies now match
   MSBuild's CSC command line on source files, defines, references, analyzers,
   language version, target type, and flags (including `/nowarn:`, `/noconfig`,
-  `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
-  flags (`/fullpaths`, `/utf8output`, `/nologo`), debug symbol format, and
-  build infrastructure (`/pathmap:`, `/sourcelink:`, etc.) are filtered
-  before comparison. Path-bearing flags are normalized to filename-only for
-  cross-build-system comparison. Warning flags are normalized: duplicate
-  `/warn:` entries keep the highest value (matching csc last-wins behavior),
-  and comma-separated `/warnaserror+:X,Y` entries are expanded into
-  individual entries for consistent comparison.
+  `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Path-bearing flags
+  (`/keyfile:`, `/doc:`, `/embed:`, `/pdb:`, `/sourcelink:`, `/resource:`,
+  `/analyzerconfig:`, `/additionalfile:`, `/ruleset:`, etc.) are normalized
+  to filename-only for cross-build-system comparison. SDK-generated embedded
+  files (`*.AssemblyAttributes.cs`, `*.AssemblyInfo.cs`, etc.), sourcelink
+  configs, and default `/pdb:` entries are normalized as equivalent to
+  omission. Only truly unmatchable infrastructure flags (`/pathmap:`,
+  `/refout:`, `/generatedfilesout:`, `/nologo`) are filtered. Warning flags
+  are normalized: duplicate `/warn:` entries keep the highest value (matching
+  csc last-wins behavior), and comma-separated `/warnaserror+:X,Y` entries are
+  expanded into individual entries for consistent comparison.
   The matching assemblies include `System.Private.CoreLib` (full analyzer
   and flag parity including the ILLink.RoslynAnalyzer built from source) and
   91 library assemblies matched via infrastructure in `impl_assembly`
@@ -314,7 +321,12 @@ areas:
   `Microsoft.Extensions.Logging.EventSource`,
   `Microsoft.Extensions.Primitives`,
   `System.Diagnostics.TextWriterTraceListener`, and
-  `System.IO.Packaging`. Explicit `/unsafe` parity plus the same shared
+  `System.IO.Packaging`. The shared `netcoreapp_ref_assembly` macro now also
+  matches MSBuild's ref-build analyzerconfig stack, ILLink analyzer input,
+  default `InterceptorsNamespaces` feature flag, nullable/default-ruleset
+  behavior, strong-name key selection, mult-target warning suppressions, and
+  a targeted set of ref-only unsafe/nullable exceptions, moving the entire
+  reference-assembly backlog to `match`. Explicit `/unsafe` parity plus the same shared
   analyzer set now also moves 10 core `Microsoft.Extensions.*` libraries to
   `match`: `Microsoft.Extensions.DependencyInjection`,
   `Microsoft.Extensions.DependencyInjection.Abstractions`,
@@ -338,13 +350,15 @@ areas:
   suppressions in the generated editorconfig (comparison checks filename
   only). `crossgen2` remains a diff due to the `crossgen2.aot.globalconfig`
   injected by rules_dotnet for `is_aot_compatible=True`.
-  Of the 220 remaining known diffs:
+  Of the 38 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
     while MSBuild uses the full targeting pack
-  - **netstandard2.0 targets**: 8 assemblies (source generators, test helpers)
-    target netstandard2.0 in MSBuild; these are filtered from comparison
+  - **netstandard2.0 targets**: source generators, tools, and test helpers may
+    still compare as `netstandard2.0` on the MSBuild side when no `net10.0`
+    build exists; the equivalence check now falls back to those records instead
+    of filtering them out entirely
   - `System.SR.cs` generation now matches MSBuild: `include_default_values`
     is config-dependent (True for debug, False for release) per
     `eng/resources.targets`

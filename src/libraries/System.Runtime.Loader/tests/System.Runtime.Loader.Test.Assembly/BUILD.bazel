@@ -25,5 +25,6 @@ csharp_library(
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
+    skip_analyzers = True,
     visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
 )
