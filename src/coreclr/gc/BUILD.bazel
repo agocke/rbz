@@ -69,7 +69,7 @@ _GC_STANDALONE_DEFINES = [
     "URTBLDENV_FRIENDLY=Retail",
     "_FILE_OFFSET_BITS=64",
 ] + select({
-    "@platforms//os:macos": [
+    "//:macos_arm64": [
         "HOST_64BIT",
         "HOST_ARM64",
         "HOST_UNIX",
@@ -77,6 +77,18 @@ _GC_STANDALONE_DEFINES = [
         "HOST_OSX",
         "TARGET_64BIT",
         "TARGET_ARM64",
+        "TARGET_UNIX",
+        "TARGET_APPLE",
+        "TARGET_OSX",
+    ],
+    "//:macos_x64": [
+        "HOST_64BIT",
+        "HOST_AMD64",
+        "HOST_UNIX",
+        "HOST_APPLE",
+        "HOST_OSX",
+        "TARGET_64BIT",
+        "TARGET_AMD64",
         "TARGET_UNIX",
         "TARGET_APPLE",
         "TARGET_OSX",
@@ -105,7 +117,8 @@ _GC_INCLUDES = [
     ".",
     "env",
 ] + select({
-    "@platforms//os:macos": ["unix/bazel/darwin-arm64"],
+    "//:macos_arm64": ["unix/bazel/osx-arm64"],
+    "//:macos_x64": ["unix/bazel/osx-x64"],
     "//conditions:default": ["unix/bazel/linux-glibc-x64"],
 })
 
@@ -131,7 +144,8 @@ cc_library(
         "unix/events.cpp",
         "unix/cgroup.cpp",
     ] + select({
-        "@platforms//os:macos": ["unix/bazel/darwin-arm64/config.gc.h"],
+        "//:macos_arm64": ["unix/bazel/osx-arm64/config.gc.h"],
+        "//:macos_x64": ["unix/bazel/osx-x64/config.gc.h"],
         "//conditions:default": ["unix/bazel/linux-glibc-x64/config.gc.h"],
     }),
     copts = _GC_COPTS + CLR_CONFIG_COPTS,
