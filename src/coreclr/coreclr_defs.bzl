@@ -71,7 +71,7 @@ _CORECLR_DAC_COMMON_DEFINES = _CORECLR_BASE_DEFINES + [
 ]
 
 CORECLR_DEFINES = _CORECLR_COMMON_DEFINES + select({
-    "@platforms//os:macos": [
+    "//:macos_arm64": [
         # Platform (configurecompiler.cmake)
         "HOST_64BIT",
         "HOST_ARM64",
@@ -86,6 +86,28 @@ CORECLR_DEFINES = _CORECLR_COMMON_DEFINES + select({
         # clrdefinitions.cmake — ARM64-specific
         "FEATURE_EMULATE_SINGLESTEP",
         "OSX_ARM64_ABI",
+        # configurecompiler.cmake — macOS platform defines
+        "_XOPEN_SOURCE",
+        "_DARWIN_C_SOURCE",
+        "__DARWIN_NON_CANCELABLE=1",
+        # clrfeatures.cmake — macOS-only features
+        "FEATURE_OBJCMARSHAL",
+    ],
+    "//:macos_x64": [
+        # Platform (configurecompiler.cmake)
+        "HOST_64BIT",
+        "HOST_AMD64",
+        "HOST_UNIX",
+        "HOST_APPLE",
+        "HOST_OSX",
+        "TARGET_64BIT",
+        "TARGET_AMD64",
+        "TARGET_UNIX",
+        "TARGET_APPLE",
+        "TARGET_OSX",
+        # clrdefinitions.cmake — AMD64-specific
+        "UNIX_AMD64_ABI",
+        "UNIX_AMD64_ABI_ITF",
         # configurecompiler.cmake — macOS platform defines
         "_XOPEN_SOURCE",
         "_DARWIN_C_SOURCE",
@@ -113,7 +135,7 @@ CORECLR_DEFINES = _CORECLR_COMMON_DEFINES + select({
 
 # DAC variant: same platform selects, different base defines.
 CORECLR_DAC_DEFINES = _CORECLR_DAC_COMMON_DEFINES + select({
-    "@platforms//os:macos": [
+    "//:macos_arm64": [
         "HOST_64BIT",
         "HOST_ARM64",
         "HOST_UNIX",
@@ -126,6 +148,24 @@ CORECLR_DAC_DEFINES = _CORECLR_DAC_COMMON_DEFINES + select({
         "TARGET_OSX",
         "FEATURE_EMULATE_SINGLESTEP",
         "OSX_ARM64_ABI",
+        "_XOPEN_SOURCE",
+        "_DARWIN_C_SOURCE",
+        "__DARWIN_NON_CANCELABLE=1",
+        "FEATURE_OBJCMARSHAL",
+    ],
+    "//:macos_x64": [
+        "HOST_64BIT",
+        "HOST_AMD64",
+        "HOST_UNIX",
+        "HOST_APPLE",
+        "HOST_OSX",
+        "TARGET_64BIT",
+        "TARGET_AMD64",
+        "TARGET_UNIX",
+        "TARGET_APPLE",
+        "TARGET_OSX",
+        "UNIX_AMD64_ABI",
+        "UNIX_AMD64_ABI_ITF",
         "_XOPEN_SOURCE",
         "_DARWIN_C_SOURCE",
         "__DARWIN_NON_CANCELABLE=1",

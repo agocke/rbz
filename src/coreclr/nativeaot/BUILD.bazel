@@ -21,8 +21,8 @@ cc_library(
         "../runtime",
         "../pal/inc/rt",
     ] + select({
-        "@platforms//os:macos": ["Runtime/arm64"],
-        "@platforms//os:linux": ["Runtime/amd64"],
+        "@platforms//cpu:arm64": ["Runtime/arm64"],
+        "@platforms//cpu:x86_64": ["Runtime/amd64"],
     }),
 )
 
