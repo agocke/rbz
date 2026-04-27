@@ -23,7 +23,6 @@ jobs:
             name: macOS release
             config: clr_release
             libs_config: libs_release
-            skip_tests: true  # Intel x64 runner can't execute arm64 binaries
           - os: windows-latest
             name: Windows host
             config: clr_release
