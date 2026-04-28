@@ -429,12 +429,19 @@ The ILLink + R2R pipeline now matches MSBuild's output, including embedded MIBC/
 profiles. There are no remaining known equivalence gaps for the framework assembly
 pipeline.
 
-## Syncing with release/10.0
+## Syncing with upstream
 
-The `bazel` branch is a long-lived branch off `release/10.0`. A GitHub Action
-(`.github/workflows/sync-release.yml`) runs daily to keep it current, merging
-**one upstream commit at a time** to maintain a 1:1 correspondence between
-release/10.0 commits and bazel merge commits.
+There are two long-lived Bazel branches, each tracking a different upstream:
+
+| Branch | Upstream | Workflow |
+|--------|----------|----------|
+| `bazel` | `release/10.0` | `.github/workflows/sync-release.yml` |
+| `bazel-main` | `main` | `.github/workflows/sync-main.yml` |
+
+Both workflows run daily and use the same underlying script
+(`src/tools/bazel/sync-upstream.sh`) with different `--upstream-ref` and
+`--base-branch` arguments. They merge **one upstream commit at a time** to
+maintain a 1:1 correspondence between upstream commits and bazel merge commits.
 
 ### How the sync works
 
