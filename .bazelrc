@@ -167,6 +167,11 @@ build:linux --linkopt=-fuse-ld=lld
 build:macos --config=unix
 # Deployment target — match CMake's eng/native/configureplatform.cmake
 build:macos --macos_minimum_os=12.0
+build:macos --host_macos_minimum_os=12.0
+# Allow x86_64 test execution via Rosetta on Apple Silicon.
+# Only activates when --platforms=//platforms:macos_x64 is set;
+# plain "bazel test" still defaults to the host (arm64) platform.
+build:macos --extra_execution_platforms=//platforms:macos_x64
 
 # =====================================================================
 # Windows-specific settings (MSVC)
