@@ -12,6 +12,7 @@ filegroup(
         "//conditions:default": ["//src/coreclr/dlls/mscoree/coreclr:libcoreclr.so"],
     }) + select({
         "@platforms//os:linux": [
+            "//src/coreclr/jit:libclrjit.so",
             "//src/coreclr/System.Private.CoreLib:crossgen_System.Private.CoreLib",
             "//src/native/libs/System.Security.Cryptography.Native:System.Security.Cryptography.Native.OpenSsl",
         ],

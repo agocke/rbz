@@ -30,6 +30,20 @@ _TEST_NOWARN = [
     "CS3016", "CS8981",
 ]
 
+_CORECLR_TEST_COMMON_DEPS = [
+    "//src/tests/Common:TestLibrary",
+    "@paket.main//microsoft.dotnet.xunitextensions",
+]
+
+def _dedupe_labels(labels):
+    seen = {}
+    deduped = []
+    for label in labels:
+        if label not in seen:
+            seen[label] = True
+            deduped.append(label)
+    return deduped
+
 # NoWarn for library tests under src/libraries/. These inherit from:
 # - Directory.Build.props global: CS8500, CS8969, IDE0060, IDE0100
 # - Arcade SDK: CS1701, CS1702, CS1705, NU5105
@@ -461,9 +475,16 @@ cp -aL "$SDK_ROOT/host/fxr/$VERSION/"* "$OUT/host/fxr/$VERSION/"
 # SDK shared framework as base (lowest priority)
 cp -aL "$SDK_ROOT/shared/Microsoft.NETCore.App/$VERSION/"* "$FW_DIR/"
 
-# Copy Bazel-built runtime files (managed + native) over SDK
+# Copy Bazel-built runtime files (managed + native) over SDK.
+# The crossgen'd CoreLib is named System.Private.CoreLib.r2r.dll but the
+# runtime expects System.Private.CoreLib.dll, so rename it during copy.
 for f in "$@"; do
-    cp -afL "$f" "$FW_DIR/"
+    base=$(basename "$f")
+    if [ "$base" = "System.Private.CoreLib.r2r.dll" ]; then
+        cp -afL "$f" "$FW_DIR/System.Private.CoreLib.dll"
+    else
+        cp -afL "$f" "$FW_DIR/"
+    fi
 done
 
 # Generate a version-free deps.json matching MSBuild's testhost pattern.
@@ -742,16 +763,18 @@ def coreclr_test(
 ):
     # Build complete deps list for JIT tests:
     # 1. User deps (filtered to remove any already in CORE_ROOT_REFPACK_DEPS)
-    # 2. Xunit deps
-    # 3. CORE_ROOT_REFPACK_DEPS (refs matching impls in Core_Root)
+    # 2. Common test infrastructure dependencies injected by the shared MSBuild
+    #    test setup (TestLibrary, xunit extensions)
+    # 3. Xunit deps
+    # 4. CORE_ROOT_REFPACK_DEPS (refs matching impls in Core_Root)
     core_root_set = {dep: True for dep in CORE_ROOT_REFPACK_DEPS}
     filtered_deps = [dep for dep in deps if dep not in core_root_set]
 
-    all_deps = filtered_deps + [
+    all_deps = _dedupe_labels(filtered_deps + _CORECLR_TEST_COMMON_DEPS + [
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
-    ] + CORE_ROOT_REFPACK_DEPS
+    ] + CORE_ROOT_REFPACK_DEPS)
 
     compiler_options = [
         "/debug:%s" % debug_type,
@@ -984,10 +1007,10 @@ def coreclr_merged_test(
     # PlatformDetection in TestLibrary via [ActiveIssue] attributes). With strict
     # deps these transitive references are not visible to the merged compilation,
     # so include them explicitly.
-    merged_deps = deps + [
+    merged_deps = _dedupe_labels(deps + [
         "//src/tests/Common:TestLibrary",
         "@paket.main//microsoft.dotnet.xunitextensions",
-    ]
+    ])
 
     live_csharp_test(
         name = name,

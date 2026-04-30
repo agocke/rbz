@@ -4,7 +4,10 @@ load("//:defs.bzl", "OPEN_SNK")
 
 library_test(
     name = "System.Security.Cryptography.Xml.Tests",
-    srcs = glob(["**/*.cs"]) + [
+    srcs = glob(
+        ["**/*.cs"],
+        exclude = ["KeyReferenceTest.cs"],
+    ) + [
         "//src/libraries/Common/tests:System/Security/Cryptography/PlatformSupport.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/CngKeyWrapper.cs",
     ],

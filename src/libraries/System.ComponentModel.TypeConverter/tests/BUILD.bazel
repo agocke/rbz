@@ -1,10 +1,20 @@
 load("//src/tests:live_test.bzl", "library_test")
 load("//:defs.bzl", "OPEN_SNK", "resgen")
+load("//src/libraries:defs.bzl", "live_csharp_library")
 
 resgen(
     name = "TestResx",
     out = "Resources.TestResx.resources",
     resx_file = "Resources/TestResx.resx",
+)
+
+live_csharp_library(
+    name = "UnloadableTestTypes",
+    srcs = ["UnloadableTestTypes/UnloadableTestTypes.cs"],
+    deps = [
+        "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",
+    ],
+    keyfile = OPEN_SNK,
 )
 
 library_test(
@@ -13,11 +23,13 @@ library_test(
         ["**/*.cs"],
         exclude = [
             "TrimmingTests/**",
+            "UnloadableTestTypes/**",
         ],
     ) + [
         "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
     ],
     deps = [
+        ":UnloadableTestTypes",
         "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",

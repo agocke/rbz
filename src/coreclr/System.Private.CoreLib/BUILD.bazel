@@ -500,6 +500,7 @@ csharp_library(
         "NETCOREAPP",
         "FEATURE_COMWRAPPERS",
         "FEATURE_EH_FUNCLETS",
+        "FEATURE_MULTITHREADING",
         "FEATURE_PERFTRACING",
         "PROFILING_SUPPORTED",
     ] + select({

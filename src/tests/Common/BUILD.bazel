@@ -32,6 +32,8 @@ live_csharp_library(
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
+        "//src/libraries/System.Text.Json:ref_System.Text.Json",
+        "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
     ],
     allow_unsafe_blocks = True,
     visibility = ["//visibility:public"],

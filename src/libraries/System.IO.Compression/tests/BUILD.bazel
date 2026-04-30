@@ -4,7 +4,12 @@ load("//:defs.bzl", "OPEN_SNK")
 library_test(
     name = "System.IO.Compression.Tests",
     defines = select({"@platforms//os:linux": ["UNIX", "UNIX1_0"], "@platforms//os:macos": ["UNIX", "UNIX1_0"], "//conditions:default": []}),
-    srcs = glob(["**/*.cs"]) + [
+    # The branch-local System.IO.Compression.TestData package predates the
+    # upstream Zstandard assets, so Bazel cannot run those tests yet.
+    srcs = glob(
+        ["**/*.cs"],
+        exclude = ["Zstandard/**"],
+    ) + [
         "//src/libraries/Common/tests:System/IO/CallTrackingStream.cs",
         "//src/libraries/Common/tests:System/IO/Compression/CRC.cs",
         "//src/libraries/Common/tests:System/IO/Compression/CompressionStreamTestBase.cs",

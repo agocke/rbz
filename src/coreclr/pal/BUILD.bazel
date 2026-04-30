@@ -238,6 +238,8 @@ cc_library(
         "UNICODE",
         "_UNICODE",
         "FEATURE_PAL_ANSI",
+        # pal/src/CMakeLists.txt: defined when not targeting WASM
+        "FEATURE_MULTITHREADING",
     ] + select({
         "@platforms//os:macos": [
             # configurecompiler.cmake — macOS platform defines

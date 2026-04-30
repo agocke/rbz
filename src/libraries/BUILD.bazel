@@ -456,6 +456,8 @@ netcoreapp_impl_assembly(
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessInfo.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/Process.Multiplexing.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessOutputLine.cs",
+        "System.Diagnostics.Process/src/System/Diagnostics/Process.Scenarios.cs",
+        "System.Diagnostics.Process/src/System/Diagnostics/ProcessTextOutput.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessUtils.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessModule.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessModuleCollection.cs",

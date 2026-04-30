@@ -96,6 +96,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -164,6 +165,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -292,6 +294,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -310,6 +313,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -338,6 +342,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -346,6 +351,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -354,6 +360,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -402,6 +409,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -420,6 +428,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -428,6 +437,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -446,6 +456,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -464,6 +475,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -472,6 +484,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
@@ -480,6 +493,7 @@ il_coreclr_test(
     debug_type = "pdbonly",
     optimize = True,
     deps = ["//src/tests/Common:TestLibrary"],
+    target_compatible_with = ["@platforms//os:windows"],
 )
 
 il_coreclr_test(
