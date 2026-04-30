@@ -46,41 +46,6 @@ ECMA_SNK = "//eng:snk/ECMA.snk"
 SHAREDLIB1024_SNK = "//eng:snk/35MSSharedLib1024.snk"
 SILVERLIGHT_SNK = "//eng:snk/SilverlightPlatformPublicKey.snk"
 DEFAULT_RULESET = "//eng:Default.ruleset"
-ROSLYN_TOOLSET_COMPILER = "//:roslyn_toolset_csc"
-ROSLYN_TOOLSET_DOTNET_TOOLCHAIN = "//:roslyn_toolset_dotnet_toolchain"
-
-def _csharp_compiler_override_toolchain_impl(ctx):
-    base = ctx.attr.base[platform_common.ToolchainInfo]
-
-    return [
-        base.default,
-        base.template_variables,
-        platform_common.ToolchainInfo(
-            default = base.default,
-            dotnetinfo = base.dotnetinfo,
-            template_variables = base.template_variables,
-            runtime = base.runtime,
-            csharp_compiler = ctx.attr.csharp_compiler,
-            fsharp_compiler = base.fsharp_compiler,
-            host_model = base.host_model,
-            strict_deps = base.strict_deps,
-        ),
-    ]
-
-csharp_compiler_override_toolchain = rule(
-    implementation = _csharp_compiler_override_toolchain_impl,
-    attrs = {
-        "base": attr.label(
-            default = "@rules_dotnet//dotnet:resolved_toolchain",
-        ),
-        "csharp_compiler": attr.label(
-            mandatory = True,
-            executable = True,
-            cfg = "exec",
-        ),
-    },
-)
-
 # MIBC PGO optimization data files from NuGet (matched to target architecture).
 # MSBuild equivalent: eng/restore/optimizationData.targets selects the right
 # optimization.<OS>-<ARCH>.mibc.runtime package, then crossgen-corelib.proj
@@ -650,7 +615,6 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
             "//:ci_build": {_pathmap_key: _pathmap_value},
             "//conditions:default": {},
         }),
-        dotnet_toolchain = kwargs.pop("dotnet_toolchain", ROSLYN_TOOLSET_DOTNET_TOOLCHAIN),
         **kwargs
     )
 
@@ -791,6 +755,5 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         additionalfiles = additionalfiles,
         analyzer_configs = analyzer_configs,
         analyzers = analyzers,
-        dotnet_toolchain = kwargs.pop("dotnet_toolchain", ROSLYN_TOOLSET_DOTNET_TOOLCHAIN),
         **kwargs
     )

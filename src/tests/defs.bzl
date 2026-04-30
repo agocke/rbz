@@ -22,7 +22,7 @@ load(
 )
 load("@rules_dotnet//dotnet/private/macros:register_tfms.bzl", "get_tfm_value")
 load("@rules_dotnet//dotnet/private/sdk/targeting_packs:targeting_pack_transition.bzl", "targeting_pack_transition")
-load("//:defs.bzl", "ILLINK_TASKS_NET10_REPO", "ILLINK_TASKS_NET8_REPO", "ILLINK_TASKS_NET9_REPO", "ROSLYN_TOOLSET_DOTNET_TOOLCHAIN", "csharp_library")
+load("//:defs.bzl", "ILLINK_TASKS_NET10_REPO", "ILLINK_TASKS_NET8_REPO", "ILLINK_TASKS_NET9_REPO", "csharp_library")
 load("//src/libraries:defs.bzl", "LIVE_REFPACK_DEPS")
 
 # Label for the Roslyn compiler server persistent worker binary.
@@ -212,10 +212,6 @@ COMMON_ATTRS = {
         default = None,
         executable = True,
         cfg = default_transition,
-    ),
-    "dotnet_toolchain": attr.label(
-        doc = "The .NET toolchain to use for this target.",
-        default = ROSLYN_TOOLSET_DOTNET_TOOLCHAIN,
     ),
     "roll_forward_behavior": attr.string(
         doc = "The roll forward behavior that should be used: https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior",
