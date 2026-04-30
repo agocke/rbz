@@ -17,6 +17,11 @@ library_test(
             "BasicEventSourceTest/TestsManifestGeneration.Etw.cs",
             # Not compiled by MSBuild test project
             "BasicEventSourceTest/TestCallbacks.cs",
+            # Requires Microsoft.Diagnostics.NETCore.Client and Microsoft.Diagnostics.Tracing.TraceEvent packages
+            "BasicEventSourceTest/Harness/EventPipeListener.cs",
+            # References EventPipeListener which requires unavailable NuGet packages
+            "BasicEventSourceTest/TestsWriteEvent.cs",
+            "BasicEventSourceTest/TestsWrite.cs",
             # Trimming tests (require ILLink)
             "TrimmingTests/**",
         ],

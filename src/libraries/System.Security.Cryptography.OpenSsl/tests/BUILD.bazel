@@ -78,6 +78,7 @@ library_test(
         "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
         "//src/libraries/System.Text.Encoding.Extensions:ref_System.Text.Encoding.Extensions",
         "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
         "//src/libraries/System.Xml.XDocument:ref_System.Xml.XDocument",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",

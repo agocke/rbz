@@ -22,7 +22,9 @@ library_test(
     srcs = glob(
         ["*.cs"],
         exclude = ["ExceptionTestAssembly/**"],
-    ),
+    ) + [
+        "//src/libraries/Common/tests:System/Runtime/CompilerServices/RuntimeAsyncMethodGenerationAttribute.cs",
+    ],
     deps = [
         ":ExceptionTestAssembly",
         "//src/libraries/System.Diagnostics.StackTrace:ref_System.Diagnostics.StackTrace",

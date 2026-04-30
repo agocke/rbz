@@ -20,7 +20,12 @@ library_test(
     resource_logical_names = {"FxResources.System.Net.HttpListener.Tests.SR.resources": "FxResources.System.Net.HttpListener.Tests.SR.resources"},
     additionalfiles = ["//src/libraries/System.Net.HttpListener:src/Resources/Strings.resx"],
     defines = select({"@platforms//os:linux": ["UNIX", "UNIX1_0"], "@platforms//os:macos": ["UNIX", "UNIX1_0"], "//conditions:default": []}),
-    srcs = glob(["*.cs"]) + [
+    srcs = glob(
+        ["*.cs"],
+        exclude = [
+            "**/*.Windows.cs",
+        ],
+    ) + [
         "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
         "//src/libraries/Common:src/System/SR.cs",
         ":SR",

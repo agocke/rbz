@@ -38,6 +38,7 @@ library_test(
             "ActivityDateTimeTests.cs",
         ],
     ) + [
+        "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
         "//src/libraries/System.Diagnostics.DiagnosticSource:src/System/Diagnostics/DsesSamplerBuilder.cs",
         "//src/libraries/System.Diagnostics.DiagnosticSource:src/System/Diagnostics/RateLimiter.cs",
         "//src/libraries/System.Diagnostics.DiagnosticSource:src/System/Diagnostics/Helpers.cs",
