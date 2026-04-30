@@ -31,7 +31,6 @@ netcoreapp_impl_assembly(
         ["src/System/**/*.cs"],
         exclude = [
             # Not for NETCoreApp
-            "src/System/Reflection/Internal/Utilities/EncodingHelper.cs",
             "src/System/Reflection/Internal/Utilities/StreamExtensions.netstandard2.0.cs",
         ],
     ) + [

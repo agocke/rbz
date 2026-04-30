@@ -30,6 +30,7 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Net.NameResolution:ref_System.Net.NameResolution",
         "//src/libraries/System.Net.NetworkInformation:ref_System.Net.NetworkInformation",
         "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",
+        "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
         "//src/libraries/System.Text.RegularExpressions:ref_System.Text.RegularExpressions",
         "//src/libraries/System.Threading:ref_System.Threading",
     ],

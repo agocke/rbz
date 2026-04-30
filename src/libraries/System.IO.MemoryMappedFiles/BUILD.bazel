@@ -25,6 +25,7 @@ netcoreapp_impl_assembly(
         "src/System/IO/MemoryMappedFiles/MemoryMappedViewStream.cs",
         "src/System/IO/MemoryMappedFiles/MemoryMappedFileRights.cs",
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
+        "//src/libraries/Common:src/System/NullableBool.cs",
     ] + select({
         "@platforms//os:linux": [
             "src/Microsoft/Win32/SafeMemoryMappedFileHandle.Unix.cs",

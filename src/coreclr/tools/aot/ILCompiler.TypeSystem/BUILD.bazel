@@ -229,6 +229,8 @@ csharp_library(
         "//src/coreclr/tools/Common:TypeSystem/RuntimeDetermined/TypeDesc.RuntimeDetermined.cs",
         "//src/coreclr/tools/Common:TypeSystem/RuntimeDetermined/TypeSystemContext.RuntimeDetermined.cs",
         "//src/coreclr/tools/Common:System/FormattingHelpers.cs",
+        "//src/coreclr/tools/Common:TypeSystem/Common/VersionResilientHashCode.TypeSystem.cs",
+        "//src/libraries/Common:src/Internal/VersionResilientHashCode.cs",
         "//src/coreclr/tools/Common:TypeSystem/Sorting/ArrayType.Sorting.cs",
         "//src/coreclr/tools/Common:TypeSystem/Sorting/ByRefType.Sorting.cs",
         "//src/coreclr/tools/Common:TypeSystem/Sorting/FunctionPointerType.Sorting.cs",

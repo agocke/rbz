@@ -17,12 +17,13 @@ netcoreapp_impl_assembly(
     srcs = glob(["src/**/*.cs"]) + [
         # Shared sources from Common
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
+        "//src/libraries/Common:src/System/Text/ValueStringBuilder_1.cs",
         "//src/libraries/Common:src/System/Number.Formatting.Common.cs",
         "//src/libraries/Common:src/System/Number.NumberBuffer.cs",
         "//src/libraries/Common:src/System/Number.Parsing.Common.cs",
         # Shared sources from CoreLib
         "//src/libraries/System.Private.CoreLib:src/System/Buffers/Text/FormattingHelpers.CountDigits.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
     ],
     resx_file = "src/Resources/Strings.resx",
     allow_unsafe_blocks = True,

@@ -1,6 +1,10 @@
 load("//:defs.bzl", "ECMA_SNK")
 load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
 
+exports_files([
+    "src/System/IO/Compression/DeflateZLib/ZLibException.cs",
+])
+
 netcoreapp_ref_assembly(
     name = "ref_System.IO.Compression",
     srcs = [
@@ -41,6 +45,7 @@ netcoreapp_impl_assembly(
         "src/System/IO/Compression/ZipCustomStreams.cs",
         "src/System/IO/Compression/ZipHelper.cs",
         "src/System/IO/Compression/ZipHelper.Async.cs",
+        "src/System/IO/Compression/ZipCompressionMethod.cs",
         "src/System/IO/Compression/ZipVersion.cs",
 
         # DeflateManaged
@@ -60,6 +65,7 @@ netcoreapp_impl_assembly(
         "src/System/IO/Compression/DeflateZLib/ZLibException.cs",
 
         # Compression types
+        "src/System/IO/Compression/CompressionFormat.cs",
         "src/System/IO/Compression/CompressionLevel.cs",
         "src/System/IO/Compression/CompressionMode.cs",
         "src/System/IO/Compression/Crc32Helper.ZLib.cs",

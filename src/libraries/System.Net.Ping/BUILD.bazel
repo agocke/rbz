@@ -31,6 +31,8 @@ netcoreapp_impl_assembly(
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
         "//src/libraries/Common:src/System/Obsoletions.cs",
         "//src/libraries/Common:src/System/Net/SocketProtocolSupportPal.cs",
+        "//src/libraries/Common:src/System/LocalAppContextSwitches.Common.cs",
+        "//src/libraries/Common:src/System/Net/LocalAppContextSwitches.Net.cs",
     ] + select({
         "@platforms//os:linux": [
             # Linux-specific Ping impl
@@ -44,7 +46,6 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/System/Net/SocketAddressPal.Unix.cs",
             "//src/libraries/Common:src/System/Net/IPAddressParserStatics.cs",
             "//src/libraries/Common:src/System/Net/Sockets/SocketErrorPal.Unix.cs",
-            "//src/libraries/Common:src/System/Text/ValueUtf8Converter.cs",
             # Interop Unix
             "//src/libraries/Common:src/Interop/Unix/Interop.DefaultPathBufferSize.cs",
             "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",
@@ -67,7 +68,6 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/System/Net/SocketAddressPal.Unix.cs",
             "//src/libraries/Common:src/System/Net/IPAddressParserStatics.cs",
             "//src/libraries/Common:src/System/Net/Sockets/SocketErrorPal.Unix.cs",
-            "//src/libraries/Common:src/System/Text/ValueUtf8Converter.cs",
             # Interop Unix
             "//src/libraries/Common:src/Interop/Unix/Interop.DefaultPathBufferSize.cs",
             "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",
