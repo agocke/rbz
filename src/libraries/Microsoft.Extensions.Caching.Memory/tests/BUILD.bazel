@@ -13,6 +13,7 @@ library_test(
         "//src/libraries/Microsoft.Extensions.Caching.Memory:impl_Microsoft.Extensions.Caching.Memory",
         "//src/libraries/Microsoft.Extensions.DependencyInjection:ref_Microsoft.Extensions.DependencyInjection",
         "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
+        "//src/libraries/Microsoft.Extensions.Logging.Abstractions:ref_Microsoft.Extensions.Logging.Abstractions",
         "//src/libraries/Microsoft.Extensions.Primitives:ref_Microsoft.Extensions.Primitives",
         "//src/libraries/Microsoft.Extensions.Options:ref_Microsoft.Extensions.Options",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",

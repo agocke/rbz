@@ -172,6 +172,7 @@ library_test(
 library_test(
     name = "System.Threading.Tasks.Tests",
     srcs = glob(["System.Threading.Tasks.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
         "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
         "//src/libraries/Common/tests:System/Runtime/CompilerServices/RuntimeAsyncMethodGenerationAttribute.cs",
         "//src/libraries/Common/tests:System/Threading/ThreadPoolHelpers.cs",
@@ -449,6 +450,9 @@ library_test(
     deps = [
         "//src/libraries/System.Drawing.Primitives:ref_System.Drawing.Primitives",
         "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
+        "//src/libraries/System.Reflection.Emit.ILGeneration:ref_System.Reflection.Emit.ILGeneration",
+        "//src/libraries/System.Reflection.Emit.Lightweight:ref_System.Reflection.Emit.Lightweight",
+        "//src/libraries/System.Reflection.Primitives:ref_System.Reflection.Primitives",
         "//src/libraries/System.Reflection.TypeExtensions:ref_System.Reflection.TypeExtensions",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
