@@ -41,7 +41,6 @@ csharp_library(
 
         # Common source generator utilities
         "//src/libraries/Common:src/SourceGenerators/CSharpSyntaxUtilities.cs",
-        "//src/libraries/Common:src/SourceGenerators/DiagnosticInfo.cs",
         "//src/libraries/Common:src/SourceGenerators/ImmutableEquatableArray.cs",
         "//src/libraries/Common:src/SourceGenerators/SourceWriter.cs",
         "//src/libraries/Common:src/SourceGenerators/TypeModelHelper.cs",
@@ -56,8 +55,8 @@ csharp_library(
         "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/CompilerFeatureRequiredAttribute.cs",
         "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/IsExternalInit.cs",
         "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/RequiredMemberAttribute.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
 
         # Polyfills for netstandard2.0
         "//src/libraries/Common:src/System/ExceptionPolyfills.cs",
@@ -411,7 +410,6 @@ netcoreapp_impl_assembly(
         "src/System/Text/Json/Serialization/StreamReadBufferState.cs",
         "src/System/Text/Json/Serialization/WriteStack.cs",
         "src/System/Text/Json/Serialization/WriteStackFrame.cs",
-        "src/System/Text/Json/StackHelper.cs",
         "src/System/Text/Json/ThrowHelper.Node.cs",
         "src/System/Text/Json/ThrowHelper.Serialization.cs",
         "src/System/Text/Json/ThrowHelper.cs",

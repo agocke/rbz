@@ -96,6 +96,7 @@ gen_resx_source(
 
 common_imports = [
     "//src/libraries/Common:src/System/Collections/Generic/ArrayBuilder.cs",
+    "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
     "//src/libraries/Common:src/System/Experimentals.cs",
     "//src/libraries/Common:src/Internal/VersionResilientHashCode.cs",
     "//src/libraries/Common:src/Interop/Interop.Calendar.cs",
@@ -173,7 +174,6 @@ common_imports = [
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.CopyFile.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.DynamicLoad.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.ErrNo.cs",
-    "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.UnixFileSystemTypes.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.FLock.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.FSync.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.FTruncate.cs",
@@ -226,7 +226,6 @@ common_imports = [
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Unlink.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.UTimensat.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Write.cs",
-    "//src/libraries/Common:src/System/Text/ValueUtf8Converter.cs",
     "//src/libraries/Common:src/System/IO/PathInternal.Unix.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.GetEUid.cs",
     "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.IsMemberOfGroup.cs",
@@ -389,7 +388,6 @@ csharp_library(
         "src/System/Runtime/InteropServices/Marshal.CoreCLR.cs",
         "src/System/Runtime/InteropServices/MemoryMarshal.CoreCLR.cs",
         "src/System/Runtime/InteropServices/NativeLibrary.CoreCLR.cs",
-        "src/System/Runtime/Intrinsics/X86/X86Base.CoreCLR.cs",
         "src/System/Runtime/Loader/AssemblyLoadContext.CoreCLR.cs",
         "src/System/RuntimeArgumentHandle.cs",
         "src/System/RuntimeHandles.cs",
@@ -403,7 +401,6 @@ csharp_library(
         "src/System/Threading/Monitor.CoreCLR.cs",
         "src/System/Threading/SynchronizationContext.CoreCLR.cs",
         "src/System/Threading/Thread.CoreCLR.cs",
-        "src/System/Threading/WaitHandle.CoreCLR.cs",
         "src/System/Type.CoreCLR.cs",
         "src/System/TypedReference.CoreCLR.cs",
         "src/System/TypeLoadException.CoreCLR.cs",
@@ -416,8 +413,6 @@ csharp_library(
         "src/Internal/Runtime/InteropServices/ComActivator.PlatformNotSupported.cs",
         "src/Internal/Runtime/InteropServices/InMemoryAssemblyLoader.PlatformNotSupported.cs",
         "src/Interop/Unix/Interop.Libraries.cs",
-        "src/System/Threading/LowLevelLifoSemaphore.Unix.cs",
-        "src/System/Threading/Mutex.CoreCLR.Unix.cs",
 
         # SRM
         "//src/libraries/System.Reflection.Metadata:src/System/Reflection/Metadata/AssemblyNameInfo.cs",

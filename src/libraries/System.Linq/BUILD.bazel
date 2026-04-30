@@ -77,7 +77,6 @@ netcoreapp_impl_assembly(
         "src/System/Linq/RightJoin.cs",
         "src/System/Linq/SegmentedArrayBuilder.cs",
         "src/System/Linq/Select.cs",
-        "src/System/Linq/Skip.SizeOpt.cs",
         "src/System/Linq/SelectMany.cs",
         "src/System/Linq/Sequence.cs",
         "src/System/Linq/SequenceEqual.cs",
@@ -93,7 +92,6 @@ netcoreapp_impl_assembly(
         "src/System/Linq/Union.cs",
         "src/System/Linq/Utilities.cs",
         "src/System/Linq/Where.cs",
-        "src/System/Linq/Take.SizeOpt.cs",
         "src/System/Linq/Zip.cs",
     ],
     deps = [
