@@ -1,6 +1,6 @@
 load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "live_csharp_library")
 load("//src/tests:live_test.bzl", "library_test")
-load("//:defs.bzl", "ASPNETCORE_SNK", "OPEN_SNK", "csharp_binary")
+load("//:defs.bzl", "ASPNETCORE_SNK", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_binary")
 
 _hosting_deps = [
     "//src/libraries/Microsoft.Extensions.Configuration:impl_Microsoft.Extensions.Configuration",
@@ -56,6 +56,7 @@ live_csharp_library(
     msbuild_analyzer_config = "style",
     nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     nullable = "annotations",
+    target_frameworks = [NETCOREAPP_CURRENT],
     treat_warnings_as_errors = True,
     warnings_not_as_errors = ["NU1901", "NU1902", "NU1903", "NU1904"],
 )
@@ -71,7 +72,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -85,7 +86,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -99,7 +100,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -113,7 +114,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -127,7 +128,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -141,7 +142,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -155,7 +156,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -169,7 +170,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -183,7 +184,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -197,7 +198,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -211,7 +212,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -225,7 +226,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -239,7 +240,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -253,7 +254,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 csharp_binary(
@@ -267,7 +268,7 @@ csharp_binary(
     msbuild_analyzer_config = "style",
     nullable = "annotations",
     nowarn = MULTITARGET_NOWARN + ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_CURRENT],
 )
 
 _app_targets = [

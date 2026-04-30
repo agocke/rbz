@@ -12,9 +12,11 @@ load(
     "CODEANALYSIS_NETANALYZERS_REPO",
     "DOTNET_CODEANALYSIS_REPO",
     "MIBC_FILES",
+    "ROSLYN_TOOLSET_COMPILER",
     "STATICCS_REPO",
     "STYLECOP_ANALYZERS_UNSTABLE_REPO",
     "XUNIT_ANALYZERS_REPO",
+    "csharp_compiler_override_toolchain",
 )
 load(
     "//:framework_r2r.bzl",
@@ -69,6 +71,23 @@ test_analyzer_config_files = [
 filegroup(
     name = "test_analyzer_configs",
     srcs = test_analyzer_config_files,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "roslyn_toolset_csc",
+    srcs = [
+        ".packages/microsoft.net.compilers.toolset/5.7.0-1.26211.102/tasks/netcore/bincore/csc.dll",
+    ],
+    data = glob([
+        ".packages/microsoft.net.compilers.toolset/5.7.0-1.26211.102/tasks/netcore/bincore/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+csharp_compiler_override_toolchain(
+    name = "roslyn_toolset_dotnet_toolchain",
+    csharp_compiler = ROSLYN_TOOLSET_COMPILER,
     visibility = ["//visibility:public"],
 )
 

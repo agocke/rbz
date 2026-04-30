@@ -29,6 +29,8 @@ load(
 
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 
+_NETCOREAPP_CURRENT_ASSEMBLY_VERSION = NETCOREAPP_CURRENT[len("net"):].split(".")[0] + "." + NETCOREAPP_CURRENT[len("net"):].split(".")[1] + ".0.0"
+
 LIVE_NETCOREAPP_DEPS = [
 #    "//src/libraries:live_System.Runtime",
 #    "//src/libraries:live_System.Console",
@@ -180,7 +182,7 @@ def netcoreapp_ref_assembly(
     compiler_options = [],
     keyfile = None,
     cls_compliant = True,
-    assembly_version = "10.0.0.0",
+    assembly_version = _NETCOREAPP_CURRENT_ASSEMBLY_VERSION,
     **kwargs
 ):
     compiler_options = compiler_options + [
@@ -211,6 +213,8 @@ def netcoreapp_ref_assembly(
         disable_implicit_framework_refs = True,
         nowarn = nowarn,
         compiler_options = compiler_options,
+        # Match MSBuild's LangVersion=preview from Directory.Build.props.
+        langversion = "preview",
         ref_assembly = True,
         debug_type = "none",
         **kwargs
@@ -344,6 +348,8 @@ def impl_assembly(
     **kwargs
 ):
     base_name = name[len("impl_"):]
+    if assembly_version == None:
+        assembly_version = _NETCOREAPP_CURRENT_ASSEMBLY_VERSION
 
     # Assemblies whose MSBuild TFM includes an OS suffix receive OS-specific
     # implicit defines.  Match that in Bazel via select().
@@ -681,6 +687,7 @@ def live_csharp_library(
     **kwargs
 ):
     deps = deps + LIVE_REFPACK_DEPS
+    target_frameworks = kwargs.pop("target_frameworks", [NETCOREAPP_CURRENT])
 
     # Match MSBuild compiler options for features (nullable/strict)
     compiler_options = compiler_options + [
@@ -695,7 +702,7 @@ def live_csharp_library(
         langversion = "preview",
         compiler_options = compiler_options,
         disable_implicit_framework_refs = True,
-        target_frameworks = [ NETCOREAPP_CURRENT ],
+        target_frameworks = target_frameworks,
         treat_warnings_as_errors = treat_warnings_as_errors,
         **kwargs
     )

@@ -319,7 +319,7 @@ netcoreapp_ref_assembly(
         "/runtimemetadataversion:v4.0.30319",
     ],
     allow_unsafe_blocks = True,
-    nowarn = [ "CS0169", "CS0809", "CS0618", "CS3015" ]
+    nowarn = [ "CS0169", "CS0809", "CS0618", "CS3015", "CS9368" ]
 )
 
 netcoreapp_ref_assembly(

@@ -4,11 +4,11 @@ bazel_dep(name = "rules_dotnet")
 git_override(
     module_name = "rules_dotnet",
     remote = "https://github.com/agocke/rules_dotnet.git",
-    commit = "e02dc11e69a60652b6ab6a1ca9cceeba0c615e29",
+    commit = "3f7dbfe6578602cbb9ec0a2464da0a0a3af1d8b3",
 )
 
 dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
-dotnet.toolchain(dotnet_version = "10.0.100")
+dotnet.toolchain(dotnet_version = "11.0.100-preview.3.26207.106")
 use_repo(dotnet, "dotnet_toolchains")
 
 register_toolchains("@dotnet_toolchains//:all")

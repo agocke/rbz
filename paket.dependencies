@@ -31,7 +31,7 @@ nuget Microsoft.Build.Utilities.Core 17.8.3
 nuget System.Resources.Extensions 8.0.0
 nuget Microsoft.DotNet.XUnitAssert 2.9.3-beta.26170.102
 nuget Microsoft.DotNet.XUnitConsoleRunner 2.9.3-beta.26170.102
-nuget Microsoft.DotNet.RemoteExecutor 10.0.0-beta.26170.102
+nuget Microsoft.DotNet.RemoteExecutor 11.0.0-beta.26211.102
 nuget XUnit.Abstractions 2.0.3
 nuget XUnit.Extensibility.Core 2.9.3
 nuget xunit.analyzers 1.22.0

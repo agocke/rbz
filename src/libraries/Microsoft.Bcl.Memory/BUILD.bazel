@@ -6,7 +6,7 @@ load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWA
 impl_assembly(
     name = "impl_Microsoft.Bcl.Memory",
     allow_unsafe_blocks = True,
-    nowarn = MULTITARGET_NOWARN + ["CP0003"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS9368"],
     srcs = [
         "src/Microsoft.Bcl.Memory.Forwards.cs",
     ],
