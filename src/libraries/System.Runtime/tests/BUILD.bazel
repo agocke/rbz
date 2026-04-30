@@ -173,6 +173,7 @@ library_test(
     name = "System.Threading.Tasks.Tests",
     srcs = glob(["System.Threading.Tasks.Tests/**/*.cs"]) + [
         "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
+        "//src/libraries/Common/tests:System/Runtime/CompilerServices/RuntimeAsyncMethodGenerationAttribute.cs",
         "//src/libraries/Common/tests:System/Threading/ThreadPoolHelpers.cs",
         "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
     ],
@@ -366,7 +367,6 @@ library_test(
         "//src/libraries/Common:src/System/IO/PathInternal.CaseSensitivity.cs",
         "//src/libraries/Common/tests:System/Buffers/NativeMemoryManager.cs",
         "//src/libraries/Common/tests:System/IO/TempFile.cs",
-        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
         "//src/libraries/Common/tests:System/IO/ReparsePointUtilities.cs",
         "//src/libraries/Common/tests:Tests/TheoryDataExtensions.cs",
         "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
@@ -447,6 +447,7 @@ library_test(
     ],
     nowarn = ["SYSLIB0013", "SYSLIB0037"],
     deps = [
+        "//src/libraries/System.Drawing.Primitives:ref_System.Drawing.Primitives",
         "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
         "//src/libraries/System.Reflection.TypeExtensions:ref_System.Reflection.TypeExtensions",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
@@ -574,7 +575,6 @@ library_test(
         "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
         "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
         "//src/libraries/Common/tests:System/GenericMathTestMemberData.cs",
-        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
         "//src/libraries/Common/tests:System/ShouldNotBeInvokedException.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/ByteUtils.cs",
     ],
@@ -727,6 +727,7 @@ library_test(
         "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
         "//src/libraries:ref_System.Threading.Tasks",
         "//src/libraries/System.Runtime.Serialization.Formatters:ref_System.Runtime.Serialization.Formatters",
+        "//src/libraries/System.Runtime.CompilerServices.VisualC:ref_System.Runtime.CompilerServices.VisualC",
         "//src/libraries/System.Security.Permissions:ref_System.Security.Permissions",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//moq",
@@ -994,7 +995,6 @@ library_test(
         ],
     ) + [
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
-        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
         "//src/libraries/Common/tests:Tests/TheoryDataExtensions.cs",
         "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
         "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",

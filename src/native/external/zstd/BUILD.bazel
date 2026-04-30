@@ -36,10 +36,16 @@ cc_library(
         "lib/decompress/zstd_ddict.c",
         "lib/decompress/zstd_decompress.c",
         "lib/decompress/zstd_decompress_block.c",
+        # dictBuilder
+        "lib/dictBuilder/cover.c",
+        "lib/dictBuilder/divsufsort.c",
+        "lib/dictBuilder/fastcover.c",
+        "lib/dictBuilder/zdict.c",
     ] + glob([
         "lib/common/*.h",
         "lib/compress/*.h",
         "lib/decompress/*.h",
+        "lib/dictBuilder/*.h",
     ]),
     hdrs = [
         "lib/zdict.h",

@@ -40,6 +40,7 @@ impl_assembly(
         "//src/libraries/Microsoft.Extensions.Primitives:ref_Microsoft.Extensions.Primitives",
         "//src/libraries/System.Collections:ref_System.Collections",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
+        "//src/libraries/System.Diagnostics.DiagnosticSource:ref_System.Diagnostics.DiagnosticSource",
         "//src/libraries/System.Linq:ref_System.Linq",
         "//src/libraries/System.Memory:ref_System.Memory",
         "//src/libraries/System.Threading:ref_System.Threading",

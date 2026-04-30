@@ -9,7 +9,6 @@ load("//src/native:native_defs.bzl", "NATIVE_CONFIG_DEFINES")
 cc_library(
     name = "System.Security.Cryptography.Native.OpenSsl_lib",
     srcs = [
-        "apibridge.c",
         "apibridge_30.c",
         "entrypoints.c",
         "memory_debug.c",

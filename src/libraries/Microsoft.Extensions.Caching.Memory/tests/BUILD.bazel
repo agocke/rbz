@@ -17,6 +17,7 @@ library_test(
         "//src/libraries/Microsoft.Extensions.Options:ref_Microsoft.Extensions.Options",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Diagnostics.DiagnosticSource:ref_System.Diagnostics.DiagnosticSource",
         "//src/libraries/System.Threading:ref_System.Threading",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.xunitassert",

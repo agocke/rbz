@@ -28,7 +28,6 @@ impl_assembly(
     analyzers = COMMON_GENERATOR_ANALYZERS,
     srcs = [
         # Asn1Reader shared projitems
-        "//src/libraries/Common:src/System/Security/Cryptography/Asn1Reader/AsnValueReader.cs",
         # Common: DisableRuntimeMarshalling (NETCoreApp only)
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
         # Common: API types (platform independent)
@@ -60,6 +59,7 @@ impl_assembly(
         "//src/libraries/Common:src/System/Obsoletions.cs",
         "//src/libraries/Common:src/System/Memory/PointerMemoryManager.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/CryptoPool.cs",
+        "//src/libraries/Common:src/System/Security/Cryptography/AsnWriter/AsnWriterExtensions.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/Oids.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/Oids.Shared.cs",
         # Common: Asn1 types

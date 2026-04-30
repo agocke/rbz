@@ -29,6 +29,8 @@ impl_assembly(
 
         "src/System/Threading/RateLimiting/ChainedPartitionedRateLimiter.cs",
         "src/System/Threading/RateLimiting/ChainedRateLimiter.cs",
+        "src/System/Threading/RateLimiting/ChainedRateLimiterShared.cs",
+        "src/System/Threading/RateLimiting/ChainedReplenishingRateLimiter.cs",
         "src/System/Threading/RateLimiting/CombinedRateLimitLease.cs",
         "src/System/Threading/RateLimiting/ConcurrencyLimiter.cs",
         "src/System/Threading/RateLimiting/ConcurrencyLimiterOptions.cs",

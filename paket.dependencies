@@ -10,18 +10,18 @@ source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10-transport/nu
 storage: none
 framework: net10.0
 
-nuget Microsoft.CodeAnalysis.Common 4.11.0
-nuget Microsoft.CodeAnalysis.CSharp 4.11.0
-nuget Microsoft.CodeAnalysis.CSharp.Workspaces 4.11.0
+nuget Microsoft.CodeAnalysis.Common 5.0.0-2.26070.104
+nuget Microsoft.CodeAnalysis.CSharp 5.0.0-2.26070.104
+nuget Microsoft.CodeAnalysis.CSharp.Workspaces 5.0.0-2.26070.104
 nuget Microsoft.CodeAnalysis.Analyzers 5.0.0-2.26170.102
-nuget Microsoft.CodeAnalysis.CSharp.CodeStyle 4.14.0
+nuget Microsoft.CodeAnalysis.CSharp.CodeStyle 5.0.0-2.26070.104
 nuget Microsoft.CodeAnalysis.NetAnalyzers 10.0.106
-nuget Microsoft.CodeAnalysis.Workspaces.Common 4.11.0
+nuget Microsoft.CodeAnalysis.Workspaces.Common 5.0.0-2.26070.104
 nuget Microsoft.DotNet.CodeAnalysis 10.0.0-beta.26170.102
 nuget StaticCs 0.2.0
 nuget Microsoft.CodeAnalysis.BannedApiAnalyzers 3.3.5-beta1.23270.2
 nuget StyleCop.Analyzers 1.2.0-beta.556
-nuget System.Memory 4.5.5
+nuget System.Memory 4.6.0
 nuget microsoft.dotnet.arcade.sdk 10.0.0-beta.26170.102
 nuget System.Buffers 4.5.1
 nuget microsoft.dotnet.genfacades 10.0.0-beta.26170.102
@@ -56,12 +56,12 @@ nuget Microsoft.NET.StringTools 17.11.4
 nuget Microsoft.VisualStudio.Setup.Configuration.Interop 3.11.2177
 nuget System.Collections.Immutable 9.0.0
 nuget System.CommandLine 2.0.6
-nuget System.Composition 8.0.0
-nuget System.Composition.AttributedModel 8.0.0
-nuget System.Composition.Convention 8.0.0
-nuget System.Composition.Hosting 8.0.0
-nuget System.Composition.Runtime 8.0.0
-nuget System.Composition.TypedParts 8.0.0
+nuget System.Composition 9.0.0
+nuget System.Composition.AttributedModel 9.0.0
+nuget System.Composition.Convention 9.0.0
+nuget System.Composition.Hosting 9.0.0
+nuget System.Composition.Runtime 9.0.0
+nuget System.Composition.TypedParts 9.0.0
 nuget System.Configuration.ConfigurationManager 8.0.1
 nuget System.Diagnostics.EventLog 8.0.1
 nuget System.IO.Pipelines 8.0.0
@@ -81,11 +81,14 @@ nuget System.Runtime.Numerics.TestData 10.0.0-beta.25418.1
 
 group illink
 source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json
+source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json
+source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json
 
 storage: none
 framework: netstandard2.0
 
-nuget Microsoft.CodeAnalysis.Common 4.14.0
-nuget Microsoft.CodeAnalysis.CSharp 4.14.0
+nuget Microsoft.CodeAnalysis.Common 5.0.0-2.26070.104
+nuget Microsoft.CodeAnalysis.CSharp 5.0.0-2.26070.104
 nuget System.Collections.Immutable 9.0.0
-nuget System.Memory 4.5.5
+nuget System.Memory 4.6.0

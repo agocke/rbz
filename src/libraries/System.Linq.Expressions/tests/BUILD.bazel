@@ -9,7 +9,6 @@ library_test(
             "TrimmingTests/**",
         ],
     ) + [
-        "//src/libraries/Common/tests:System/Collections/DictionaryExtensions.cs",
     ],
     deps = [
         "//src/libraries/System.Linq.Expressions:impl_System.Linq.Expressions",

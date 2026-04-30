@@ -32,6 +32,7 @@ csharp_library(
         "//src/coreclr/tools/Common:JitInterface/JitTypeNameFormatter.cs",
         "//src/coreclr/tools/Common:JitInterface/SwiftPhysicalLowering.cs",
         "//src/coreclr/tools/Common:JitInterface/SystemVStructClassificator.cs",
+        "//src/coreclr/tools/Common:JitInterface/WasmLowering.cs",
         "//src/coreclr/tools/Common:JitInterface/UnboxingMethodDesc.cs",
         "//src/coreclr/tools/Common:JitInterface/UnboxingMethodDescFactory.cs",
         "//src/coreclr/tools/Common:Pgo/TypeSystemEntityOrUnknown.cs",

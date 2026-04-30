@@ -13,6 +13,7 @@ cc_library(
 exports_files(
     [
         "CachedInterfaceDispatch.cpp",
-        # asyncsafethreadmap.cpp was added in release/10.0 after the ancestor branch point.
+        "MiscNativeHelpers.cpp",
+        "SignalSafeThreadMap.cpp",
     ] + glob(["**/*.S"]),
 )

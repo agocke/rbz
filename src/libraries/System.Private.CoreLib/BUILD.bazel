@@ -15,8 +15,8 @@ csharp_library(
     name = "System.Private.CoreLib.Generators",
     srcs = glob(["gen/*.cs"]) + [
         "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/IsExternalInit.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
     ],
     target_frameworks = ["netstandard2.0"],
     langversion = "preview",

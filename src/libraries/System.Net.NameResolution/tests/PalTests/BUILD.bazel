@@ -35,6 +35,8 @@ library_test(
         "//src/libraries/Common:src/System/Net/Sockets/ProtocolFamily.cs",
         "//src/libraries/Common:src/System/Net/IPEndPointStatics.cs",
         "//src/libraries/Common:src/System/Net/IPAddressParserStatics.cs",
+        "//src/libraries/Common:src/System/LocalAppContextSwitches.Common.cs",
+        "//src/libraries/Common:src/System/Net/LocalAppContextSwitches.Net.cs",
         "//src/libraries/Common:src/System/Net/SocketProtocolSupportPal.cs",
         "//src/libraries/Common/tests:System/Net/Configuration.cs",
         "//src/libraries/Common/tests:System/Net/Configuration.Http.cs",

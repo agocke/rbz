@@ -11,4 +11,10 @@ cc_library(
     strip_include_prefix = "inc",
 )
 
+# Target for relative includes (../../native/managed/cdac/inc/cdac_reader.h)
+cc_library(
+    name = "cdac_inc",
+    hdrs = ["inc/cdac_reader.h"],
+)
+
 exports_files(["inc/cdac_reader.h"])

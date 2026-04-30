@@ -34,6 +34,7 @@ library_test(
         "//src/libraries/Common/tests:System/IO/ReparsePointUtilities.cs",
         "//src/libraries/Common/tests:System/IO/WrappedStream.cs",
         # ConnectedStreams.cs depends on StreamBuffer.cs which depends on MultiArrayBuffer.cs
+        "//src/libraries/Common:src/System/Net/ArrayBuffer.cs",
         "//src/libraries/Common:src/System/Net/StreamBuffer.cs",
         "//src/libraries/Common:src/System/Net/MultiArrayBuffer.cs",
         # Common source files

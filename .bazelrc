@@ -42,7 +42,7 @@ build:unix --config=clang
 
 # Match CMake configurecompiler.cmake settings (config-independent)
 build:unix --conlyopt=-std=gnu11
-build:unix --cxxopt=-std=gnu++11
+build:unix --cxxopt=-std=gnu++17
 build:unix --copt=-fPIC
 build:unix --copt=-fno-omit-frame-pointer
 build:unix --copt=-fno-strict-overflow
@@ -62,7 +62,7 @@ build:unix --copt=-D_TIME_BITS=64
 
 # Exec/tool platform defines (for tools like ilasm built with cfg = "exec")
 build:unix --host_conlyopt=-std=gnu11
-build:unix --host_cxxopt=-std=gnu++11
+build:unix --host_cxxopt=-std=gnu++17
 build:unix --host_copt=-D_FILE_OFFSET_BITS=64
 build:unix --host_copt=-D_TIME_BITS=64
 

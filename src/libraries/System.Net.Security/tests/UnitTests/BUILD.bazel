@@ -27,7 +27,6 @@ library_test(
         ],
     ) + [
         # Common source files (non-browser)
-        "//src/libraries/Common:src/System/AppContextSwitchHelper.cs",
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
         "//src/libraries/Common:src/System/HexConverter.cs",
         "//src/libraries/Common:src/System/Net/Security/MD4.cs",

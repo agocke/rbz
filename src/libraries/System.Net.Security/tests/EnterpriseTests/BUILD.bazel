@@ -13,6 +13,7 @@ library_test(
         "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
     ],
     deps = [
+        "//src/libraries/System.Net.Http:ref_System.Net.Http",
         "//src/libraries/System.Net.Security:ref_System.Net.Security",
         "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",

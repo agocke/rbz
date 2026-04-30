@@ -19,6 +19,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_Microsoft.Extensions.Diagnostics.Abstractions",
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
+    exclude_sr = True,
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/TypeNameHelper/TypeNameHelper.cs",
     ],
@@ -31,7 +32,6 @@ impl_assembly(
         "//src/libraries/System.ComponentModel:ref_System.ComponentModel",
         "//src/libraries/System.Diagnostics.DiagnosticSource:ref_System.Diagnostics.DiagnosticSource",
     ],
-    resx_file = "src/Resources/Strings.resx",
 )
 
 ref_impl_pair(

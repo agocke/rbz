@@ -157,6 +157,25 @@ _GC_SRCS = [
 _GC_TEXTUAL_HDRS = [
     "//src/coreclr/gc:gc.cpp",
     "//src/coreclr/gc:gcee.cpp",
+    "//src/coreclr/gc:region_allocator.cpp",
+    "//src/coreclr/gc:region_free_list.cpp",
+    "//src/coreclr/gc:finalization.cpp",
+    "//src/coreclr/gc:interface.cpp",
+    "//src/coreclr/gc:allocation.cpp",
+    "//src/coreclr/gc:mark_phase.cpp",
+    "//src/coreclr/gc:plan_phase.cpp",
+    "//src/coreclr/gc:relocate_compact.cpp",
+    "//src/coreclr/gc:sweep.cpp",
+    "//src/coreclr/gc:background.cpp",
+    "//src/coreclr/gc:regions_segments.cpp",
+    "//src/coreclr/gc:card_table.cpp",
+    "//src/coreclr/gc:memory.cpp",
+    "//src/coreclr/gc:diagnostics.cpp",
+    "//src/coreclr/gc:dynamic_tuning.cpp",
+    "//src/coreclr/gc:no_gc.cpp",
+    "//src/coreclr/gc:dynamic_heap_count.cpp",
+    "//src/coreclr/gc:init.cpp",
+    "//src/coreclr/gc:collect.cpp",
 ]
 
 # .cpp files that are #included by NativeAOT runtime sources
