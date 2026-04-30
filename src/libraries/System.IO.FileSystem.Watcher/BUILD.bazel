@@ -73,9 +73,10 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.RealPath.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Stat.Span.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Stat.cs",
-            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Sync.cs",
+
             "//src/libraries/Common:src/Microsoft/Win32/SafeHandles/SafeCreateHandle.OSX.cs",
             "//src/libraries/Common:src/Microsoft/Win32/SafeHandles/SafeEventStreamHandle.OSX.cs",
+            "//src/libraries/Common:src/System/Runtime/InteropServices/SpanOfCharAsUtf8StringMarshaller.cs",
         ],
     }),
     deps = [
@@ -95,7 +96,7 @@ netcoreapp_impl_assembly(
     resx_file = "src/Resources/Strings.resx",
     allow_unsafe_blocks = True,
     os_targeted = True,
-    supported_os_platforms = ["linux"],
+    supported_os_platforms = ["linux", "osx"],
 )
 
 ref_impl_pair(
