@@ -4,6 +4,7 @@ exports_files(["PEReaderExtensions.cs"])
 
 csharp_library(
     name = "ILCompiler.Reflection.ReadyToRun",
+    include_runtime_async = False,
     msbuild_analyzer_config = "style",
     include_default_ruleset = False,
     compiler_options = ["/warnaserror+:NU1605"],

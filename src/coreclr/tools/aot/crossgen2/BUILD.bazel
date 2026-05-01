@@ -24,6 +24,7 @@ resgen(
 
 csharp_binary(
     name = "crossgen2",
+    include_runtime_async = False,
     interceptors_namespaces = ";Microsoft.AspNetCore.Http.Generated;Microsoft.Extensions.Configuration.Binder.SourceGeneration;Microsoft.Extensions.Validation.Generated",
     srcs = glob(["*.cs"]) + [
         "//src/coreclr/tools/Common:CommandLineHelpers.cs",

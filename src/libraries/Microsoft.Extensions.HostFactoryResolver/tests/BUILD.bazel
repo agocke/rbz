@@ -40,6 +40,7 @@ _mock_host_type_deps = _hosting_deps + [":MockHostTypes"]
 
 live_csharp_library(
     name = "MockHostTypes",
+    include_runtime_async = False,
     srcs = glob(["MockHostTypes/*.cs"]),
     analyzers = [
         "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
@@ -63,6 +64,7 @@ live_csharp_library(
 
 csharp_binary(
     name = "ApplicationNameSetFromArgument",
+    include_runtime_async = False,
     srcs = ["ApplicationNameSetFromArgument/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -77,6 +79,7 @@ csharp_binary(
 
 csharp_binary(
     name = "BuildWebHostInvalidSignature",
+    include_runtime_async = False,
     srcs = ["BuildWebHostInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -91,6 +94,7 @@ csharp_binary(
 
 csharp_binary(
     name = "BuildWebHostPatternTestSite",
+    include_runtime_async = False,
     srcs = ["BuildWebHostPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -105,6 +109,7 @@ csharp_binary(
 
 csharp_binary(
     name = "CreateHostBuilderInvalidSignature",
+    include_runtime_async = False,
     srcs = ["CreateHostBuilderInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -119,6 +124,7 @@ csharp_binary(
 
 csharp_binary(
     name = "CreateHostBuilderPatternTestSite",
+    include_runtime_async = False,
     srcs = ["CreateHostBuilderPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -133,6 +139,7 @@ csharp_binary(
 
 csharp_binary(
     name = "CreateWebHostBuilderInvalidSignature",
+    include_runtime_async = False,
     srcs = ["CreateWebHostBuilderInvalidSignature/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -147,6 +154,7 @@ csharp_binary(
 
 csharp_binary(
     name = "CreateWebHostBuilderPatternTestSite",
+    include_runtime_async = False,
     srcs = ["CreateWebHostBuilderPatternTestSite/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -161,6 +169,7 @@ csharp_binary(
 
 csharp_binary(
     name = "NoSpecialEntryPointPattern",
+    include_runtime_async = False,
     srcs = ["NoSpecialEntryPointPattern/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -175,6 +184,7 @@ csharp_binary(
 
 csharp_binary(
     name = "NoSpecialEntryPointPatternBuildsThenThrows",
+    include_runtime_async = False,
     srcs = ["NoSpecialEntryPointPatternBuildsThenThrows/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -189,6 +199,7 @@ csharp_binary(
 
 csharp_binary(
     name = "NoSpecialEntryPointPatternExits",
+    include_runtime_async = False,
     srcs = ["NoSpecialEntryPointPatternExits/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -203,6 +214,7 @@ csharp_binary(
 
 csharp_binary(
     name = "NoSpecialEntryPointPatternHangs",
+    include_runtime_async = False,
     srcs = ["NoSpecialEntryPointPatternHangs/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -217,6 +229,7 @@ csharp_binary(
 
 csharp_binary(
     name = "NoSpecialEntryPointPatternMainNoArgs",
+    include_runtime_async = False,
     srcs = ["NoSpecialEntryPointPatternMainNoArgs/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -231,6 +244,7 @@ csharp_binary(
 
 csharp_binary(
     name = "NoSpecialEntryPointPatternThrows",
+    include_runtime_async = False,
     srcs = ["NoSpecialEntryPointPatternThrows/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -245,6 +259,7 @@ csharp_binary(
 
 csharp_binary(
     name = "TopLevelStatements",
+    include_runtime_async = False,
     srcs = ["TopLevelStatements/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,
@@ -259,6 +274,7 @@ csharp_binary(
 
 csharp_binary(
     name = "TopLevelStatementsTestsTimeout",
+    include_runtime_async = False,
     srcs = ["TopLevelStatementsTestsTimeout/Program.cs"],
     deps = _mock_host_type_deps,
     include_default_ruleset = False,

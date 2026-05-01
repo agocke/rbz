@@ -77,4 +77,5 @@ _APPLY_UPDATE_ANALYZERS = [
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
+    include_runtime_async = False,
 ) for name, src in _APPLY_UPDATE_HELPERS]

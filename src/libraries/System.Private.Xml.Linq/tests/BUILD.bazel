@@ -12,6 +12,7 @@ csharp_library(
 
 csharp_library(
     name = "XDocument.Common",
+    include_runtime_async = False,
     srcs = glob(["XDocument.Common/*.cs"]),
     target_frameworks = [NETCOREAPP_CURRENT],
     include_default_ruleset = False,

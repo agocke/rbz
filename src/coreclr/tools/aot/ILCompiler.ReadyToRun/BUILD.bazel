@@ -19,6 +19,7 @@ genrule(
 
 csharp_library(
     name = "ILCompiler.ReadyToRun",
+    include_runtime_async = False,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     nowarn = ["1591"],
     srcs = [

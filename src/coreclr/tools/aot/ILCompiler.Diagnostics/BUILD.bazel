@@ -2,6 +2,7 @@ load("//:defs.bzl", "csharp_library")
 
 csharp_library(
     name = "ILCompiler.Diagnostics",
+    include_runtime_async = False,
     nowarn = ["1591"],
     msbuild_analyzer_config = "style",
     include_default_ruleset = False,

@@ -8,6 +8,7 @@ genrule(
 
 csharp_library(
     name = "ILCompiler.RyuJit",
+    include_runtime_async = False,
     nowarn = ["1591"],
     msbuild_analyzer_config = "style",
     include_default_ruleset = False,

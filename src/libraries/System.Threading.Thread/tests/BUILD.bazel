@@ -3,6 +3,7 @@ load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_binary")
 
 csharp_binary(
     name = "STAMain",
+    include_runtime_async = False,
     srcs = ["STAMain/STAMain.cs"],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
@@ -16,6 +17,7 @@ csharp_binary(
 
 csharp_binary(
     name = "MTAMain",
+    include_runtime_async = False,
     srcs = ["MTAMain/MTAMain.cs"],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
@@ -29,6 +31,7 @@ csharp_binary(
 
 csharp_binary(
     name = "DefaultApartmentStateMain",
+    include_runtime_async = False,
     srcs = ["DefaultApartmentStateMain/DefaultApartmentStateMain.cs"],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,

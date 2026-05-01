@@ -5,6 +5,7 @@ load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library")
 
 csharp_library(
     name = "SerializableAssembly",
+    include_runtime_async = False,
     keyfile = OPEN_SNK,
     include_default_ruleset = False,
     include_syslib_warnaserror = False,

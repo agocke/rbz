@@ -35,6 +35,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Configuration.ConfigurationManager",
+    include_runtime_async = False,
     keyfile = OPEN_SNK,
     nowarn = MULTITARGET_NOWARN + ["CA2249", "CP0003", "nullable", "CS1591"],
     analyzers = COMMON_GENERATOR_ANALYZERS,

@@ -21,6 +21,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Configuration.Xml",
+    include_runtime_async = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]),
     analyzers = [

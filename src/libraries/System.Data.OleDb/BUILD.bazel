@@ -25,6 +25,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Data.OleDb",
+    include_runtime_async = False,
     keyfile = OPEN_SNK,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_OleDb",

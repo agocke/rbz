@@ -61,6 +61,7 @@ _SKIPANALYZERS_EDITORCONFIG_CONTENT = "\n".join([
 
 csharp_binary(
     name = "illink",
+    include_runtime_async = False,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     srcs = _COMMON_SRCS,
     out = "illink",

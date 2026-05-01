@@ -3,6 +3,7 @@ load("//:defs.bzl", "ASPNETCORE_SNK")
 
 live_csharp_library(
     name = "Microsoft.Extensions.DependencyInjection.Specification.Tests",
+    include_runtime_async = False,
     srcs = glob(["**/*.cs"]),
     analyzers = [
         "//:source_build_analyzers",

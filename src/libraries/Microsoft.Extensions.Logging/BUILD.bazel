@@ -22,6 +22,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Logging",
+    include_runtime_async = False,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]) + [

@@ -4,6 +4,7 @@ load("//:defs.bzl", "OPEN_SNK")
 
 live_csharp_library(
     name = "System.Reflection.DispatchProxy.TestDependency",
+    include_runtime_async = False,
     analyzers = [
         "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
         "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",

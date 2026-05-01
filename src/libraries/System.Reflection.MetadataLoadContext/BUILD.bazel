@@ -14,6 +14,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Reflection.MetadataLoadContext",
+    include_runtime_async = False,
     keyfile = OPEN_SNK,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     nowarn = MULTITARGET_NOWARN + ["CA1865", "CP0003", "CS1591"],

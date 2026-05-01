@@ -17,6 +17,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Speech",
+    include_runtime_async = False,
     keyfile = SHAREDLIB1024_SNK,
     include_editorconfig = False,
     pnse = True,

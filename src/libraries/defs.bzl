@@ -217,6 +217,7 @@ def netcoreapp_ref_assembly(
         langversion = "preview",
         ref_assembly = True,
         debug_type = "none",
+        include_runtime_async = False,
         **kwargs
     )
 
@@ -345,6 +346,8 @@ def impl_assembly(
     jsimport_generator = True,
     include_editorconfig = True,
     interceptors_namespaces = None,
+    include_runtime_async = True,
+    event_source_generator = None,
     **kwargs
 ):
     base_name = name[len("impl_"):]
@@ -554,33 +557,57 @@ EOF""".format(version = PRODUCT_VERSION),
         ":" + _editorconfig_target,
     ]
 
-    # Merge caller-provided analyzers with the standard source build analyzers
-    # and ILLink Roslyn analyzer. Interop source generators are conditional on
-    # the assembly's dependency on System.Runtime.InteropServices / CoreLib
-    # (matching eng/generators.targets). JSImportGenerator is separate because
-    # MSBuild flows it through the targeting-pack analyzer set for OOB builds.
+    # Analyzer scoping mirrors MSBuild's two delivery mechanisms:
+    #
+    # 1. Libraries with EventSourceGenerator (event_source_generator=True):
+    #    eng/generators.targets adds EventSourceGenerator +
+    #    Microsoft.Interop.SourceGeneration for IsSourceProject +
+    #    DisableImplicitFrameworkReferences.  This covers both NCA inner
+    #    source libs AND packable "abstractions" libraries that still live
+    #    in the shared framework source tree.
+    #
+    # 2. Libraries without EventSourceGenerator (event_source_generator=False):
+    #    Extensions generators (Logging, Options) and Interop.SourceGeneration
+    #    flow via the local targeting pack (FrameworkReferenceResolution.targets).
+    #
+    # event_source_generator defaults to True (matching the majority of
+    # impl_assembly users).  OOB libraries that don't get EventSourceGenerator
+    # from MSBuild should set event_source_generator = False.
+    #
+    # ILLink.RoslynAnalyzer is always included — both delivery paths provide it.
     #
     # interop_source_generation defaults to library_import_generator when not
     # set explicitly (None).  Callers that need SourceGeneration without
     # LibraryImportGenerator (e.g. shim/facade assemblies) can pass
     # interop_source_generation = True, library_import_generator = False.
     _interop_source_generation = interop_source_generation if interop_source_generation != None else library_import_generator
+    _event_source_generator = event_source_generator if event_source_generator != None else include_runtime_async
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
-        # Extensions generators delivered via the local targeting pack in
-        # MSBuild.  They flow into all source library projects that reference
-        # the shared framework (FrameworkReferenceResolution.targets).
-        "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
-        "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
     ]
+
+    if _event_source_generator:
+        # eng/generators.targets: EventSourceGenerator + Interop.SourceGeneration
+        # for IsSourceProject + DisableImplicitFrameworkReferences.
+        _analyzers = _analyzers + [
+            "//src/libraries/System.Private.CoreLib:EventSourceGenerator",
+            "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+        ]
+    else:
+        # Targeting-pack analyzers for OOB / non-EventSourceGenerator libs.
+        _analyzers = _analyzers + [
+            "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+            "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
+        ]
+        if _interop_source_generation:
+            _analyzers = _analyzers + [
+                "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+            ]
+
     if library_import_generator:
         _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        ]
-    if _interop_source_generation:
-        _analyzers = _analyzers + [
-            "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
         ]
     if com_interface_generator:
         _analyzers = _analyzers + [
@@ -638,6 +665,7 @@ EOF""".format(version = PRODUCT_VERSION),
         additionalfiles = _additionalfiles,
         analyzer_configs = _analyzer_configs,
         analyzers = _analyzers,
+        include_runtime_async = include_runtime_async,
         **kwargs
     )
 

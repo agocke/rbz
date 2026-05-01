@@ -22,6 +22,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Logging.Console",
+    include_runtime_async = False,
     analyzers = COMMON_GENERATOR_ANALYZERS + [
         "//src/libraries/Microsoft.Extensions.Configuration.Binder:ConfigurationBinderSourceGeneration",
     ],

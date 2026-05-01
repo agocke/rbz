@@ -4,6 +4,7 @@ exports_files(["TestClass.cs"])
 
 csharp_library(
     name = "System.Runtime.Loader.Test.Assembly",
+    include_runtime_async = False,
     srcs = ["TestClass.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
     keyfile = OPEN_SNK,

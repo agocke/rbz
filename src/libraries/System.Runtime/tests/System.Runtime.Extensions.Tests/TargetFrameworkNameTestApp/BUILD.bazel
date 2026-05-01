@@ -2,6 +2,7 @@ load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_binary")
 
 csharp_binary(
     name = "TargetFrameworkNameTestApp",
+    include_runtime_async = False,
     keyfile = OPEN_SNK,
     srcs = [
         "Program.cs",

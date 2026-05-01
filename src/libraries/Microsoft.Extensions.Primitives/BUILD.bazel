@@ -17,6 +17,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Primitives",
+    include_runtime_async = False,
+    event_source_generator = True,
     allow_unsafe_blocks = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = [

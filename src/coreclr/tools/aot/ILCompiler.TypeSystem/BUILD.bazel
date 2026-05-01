@@ -10,6 +10,7 @@ exports_files(["BannedSymbols.txt"])
 
 csharp_library(
     name = "ILCompiler.TypeSystem",
+    include_runtime_async = False,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     nowarn = ["1591", "CA1859", "CA1866"],
     srcs = [

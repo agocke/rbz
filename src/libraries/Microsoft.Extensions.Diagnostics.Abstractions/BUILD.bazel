@@ -18,6 +18,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Diagnostics.Abstractions",
+    include_runtime_async = False,
+    event_source_generator = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     exclude_sr = True,
     srcs = glob(["src/**/*.cs"]) + [

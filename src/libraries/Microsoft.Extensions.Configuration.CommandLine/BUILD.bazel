@@ -18,6 +18,7 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Configuration.CommandLine",
+    include_runtime_async = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CA1866"],
     srcs = glob(["src/**/*.cs"]),
     analyzers = [

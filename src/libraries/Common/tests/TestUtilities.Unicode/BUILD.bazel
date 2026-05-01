@@ -2,6 +2,7 @@ load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "UNICODE_DATA_REPO", "csha
 
 csharp_library(
     name = "TestUtilities.Unicode",
+    include_runtime_async = False,
     srcs = [
         "System/Text/Unicode/BidiClass.cs",
         "System/Text/Unicode/CodePoint.cs",

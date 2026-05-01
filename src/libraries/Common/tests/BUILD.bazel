@@ -8,6 +8,7 @@ exports_files(glob(["**/*.cs"]) + glob(["Data/**"]) + glob(["System/Xml/XPath/Te
 
 csharp_library(
     name = "TestUtilities",
+    include_runtime_async = False,
     nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     srcs = glob(
         ["TestUtilities/**/*.cs"],
@@ -95,6 +96,7 @@ csharp_library(
 
 csharp_library(
     name = "XmlCoreTest",
+    include_runtime_async = False,
     srcs = glob(["System/Xml/XmlCoreTest/*.cs"]),
     target_frameworks = [NETCOREAPP_CURRENT],
     include_default_ruleset = False,
@@ -119,6 +121,7 @@ csharp_library(
 
 live_csharp_library(
     name = "StreamConformanceTests",
+    include_runtime_async = False,
     nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     srcs = glob(["StreamConformanceTests/**/*.cs"]) + [
         "//src/libraries/Common/tests:System/IO/ConnectedStreams.cs",
