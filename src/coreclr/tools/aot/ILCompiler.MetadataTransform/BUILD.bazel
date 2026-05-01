@@ -1,4 +1,4 @@
-load("//:defs.bzl", "FILE_VERSION", "csharp_library")
+load("//:defs.bzl", "FILE_VERSION", "NETCOREAPP_MINIMUM", "NETCOREAPP_TOOL_CURRENT", "csharp_library")
 
 genrule(
     name = "AssemblyInfo",
@@ -62,6 +62,6 @@ csharp_library(
         "//src/coreclr/tools/aot/ILCompiler.TypeSystem",
         "@paket.main//microsoft.diasymreader",
     ],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_MINIMUM, NETCOREAPP_TOOL_CURRENT],
     visibility = ["//visibility:public"],
 )

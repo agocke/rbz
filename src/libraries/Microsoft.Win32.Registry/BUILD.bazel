@@ -20,7 +20,7 @@ netcoreapp_impl_assembly(
     pnse_ref_srcs = ["ref/Microsoft.Win32.Registry.cs"],
     srcs = [],
     defines = ["REGISTRY_ASSEMBLY"],
-    nowarn = ["CA2249", "IDE0280", "CS1591"],
+    nowarn = ["IDE0280", "CS1591"],
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.Collections:ref_System.Collections",

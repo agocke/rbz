@@ -1,4 +1,4 @@
-load("//:defs.bzl", "NETCOREAPP_CURRENT", "OPEN_SNK", "csharp_library", "gen_resx_source", "resgen")
+load("//:defs.bzl", "NETCOREAPP_CURRENT", "NETCOREAPP_MINIMUM", "OPEN_SNK", "csharp_library", "gen_resx_source", "resgen")
 load("//src/libraries:defs.bzl", "live_csharp_library")
 load("//src/tests:live_test.bzl", "library_test")
 
@@ -9,7 +9,7 @@ exports_files(glob(["**/*.cs"]) + glob(["Data/**"]) + glob(["System/Xml/XPath/Te
 csharp_library(
     name = "TestUtilities",
     include_runtime_async = False,
-    nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
+    nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "ESGEN001", "ESGEN002", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     srcs = glob(
         ["TestUtilities/**/*.cs"],
         exclude = [
@@ -50,7 +50,7 @@ csharp_library(
         "/features:strict",
         "/features:nullablePublicOnly",
     ],
-    target_frameworks = ["net8.0"],
+    target_frameworks = [NETCOREAPP_MINIMUM],
     deps = [
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//microsoft.dotnet.xunitextensions",
@@ -200,8 +200,10 @@ library_test(
         "Tests/System/Net/aspnetcore/Http2/HuffmanDecodingTests.cs",
         "Tests/System/Net/aspnetcore/Http3/VariableLengthIntegerHelperTests.cs",
         "Tests/System/PasteArgumentsTests.cs",
+        "Tests/System/Buffers/SearchValuesPolyfillTests.cs",
         "Tests/System/Security/IdentityHelperTests.cs",
         "Tests/System/Text/SimpleRegexTests.cs",
+        "Tests/System/Collections/Generic/ValueListBuilderTests.cs",
         "Tests/System/Text/ValueStringBuilderTests.cs",
         # Local source files
         "System/IO/ConnectedStreams.cs",
@@ -211,6 +213,8 @@ library_test(
         # Common production source files
         "//src/libraries/Common:src/SourceGenerators/SourceWriter.cs",
         "//src/libraries/Common:src/System/CharArrayHelpers.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/Polyfills/DictionaryPolyfills.cs",
         "//src/libraries/Common:src/System/Collections/Generic/ArrayBuilder.cs",
         "//src/libraries/Common:src/System/IO/PathInternal.CaseSensitivity.cs",
         "//src/libraries/Common:src/System/IO/PathInternal.cs",

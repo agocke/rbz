@@ -1,4 +1,4 @@
-load("//:defs.bzl", "csharp_library")
+load("//:defs.bzl", "NETCOREAPP_MINIMUM", "NETCOREAPP_TOOL_CURRENT", "csharp_library")
 
 csharp_library(
     name = "ILCompiler.DependencyAnalysisFramework",
@@ -19,6 +19,6 @@ csharp_library(
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
     ],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_MINIMUM, NETCOREAPP_TOOL_CURRENT],
     visibility = ["//visibility:public"],
 )

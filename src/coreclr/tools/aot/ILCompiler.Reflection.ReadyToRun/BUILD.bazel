@@ -1,4 +1,4 @@
-load("//:defs.bzl", "csharp_library")
+load("//:defs.bzl", "NETCOREAPP_MINIMUM", "csharp_library")
 
 exports_files(["PEReaderExtensions.cs"])
 
@@ -31,7 +31,7 @@ csharp_library(
     analyzers = [
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
     ],
-    target_frameworks = ["net8.0"],
+    target_frameworks = [NETCOREAPP_MINIMUM],
     deps = [
         "@paket.main//system.collections.immutable",
         "@paket.main//system.reflection.metadata",

@@ -36,9 +36,11 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.Configuration.ConfigurationManager",
     include_runtime_async = False,
+    event_source_generator = False,
     keyfile = OPEN_SNK,
-    nowarn = MULTITARGET_NOWARN + ["CA2249", "CP0003", "nullable", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "nullable", "CS1591"],
     analyzers = COMMON_GENERATOR_ANALYZERS,
+    allow_unsafe_blocks = True,
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/System/IO/TempFileCollection.cs",
         "//src/libraries/Common:src/System/Obsoletions.cs",

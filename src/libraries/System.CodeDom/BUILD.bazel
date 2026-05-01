@@ -22,6 +22,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.CodeDom",
     include_runtime_async = False,
+    event_source_generator = False,
     srcs = [
         "src/Microsoft/CSharp/CSharpCodeGenerator.cs",
         "src/Microsoft/CSharp/CSharpCodeGenerator.PlatformNotSupported.cs",

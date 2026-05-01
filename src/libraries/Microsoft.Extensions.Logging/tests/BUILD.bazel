@@ -18,7 +18,7 @@ exports_files([
 
 library_test(
     name = "Microsoft.Extensions.Logging.Tests",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["NU1511"],
     srcs = glob(["Common/**/*.cs"]) + [
         "DI.Common/Common/src/TestSink.cs",
         "DI.Common/Common/src/WriteContext.cs",

@@ -1,4 +1,4 @@
-load("//:defs.bzl", "FILE_VERSION", "csharp_library")
+load("//:defs.bzl", "FILE_VERSION", "NETCOREAPP_MINIMUM", "NETCOREAPP_TOOL_CURRENT", "csharp_library")
 
 exports_files([
     "Compiler/FileLayoutOptimizer.cs",
@@ -209,7 +209,6 @@ csharp_library(
         "//src/coreclr/tools/Common:Compiler/DependencyAnalysis/Relocation.cs",
         "//src/coreclr/tools/Common:Compiler/DependencyAnalysis/ShadowConcreteMethodNode.cs",
         "//src/coreclr/tools/Common:Compiler/DependencyAnalysis/ShadowMethodNode.cs",
-        "//src/coreclr/tools/Common:Compiler/DependencyAnalysis/ShadowNonConcreteMethodNode.cs",
         "//src/coreclr/tools/Common:Compiler/DependencyAnalysis/SortableDependencyNode.cs",
         "//src/coreclr/tools/Common:Compiler/DependencyAnalysis/Target_ARM/ARMEmitter.cs",
         "//src/coreclr/tools/Common:Compiler/DependencyAnalysis/Target_ARM/Register.cs",
@@ -366,7 +365,10 @@ csharp_library(
         "//src/coreclr/tools/Common:Compiler/GenericCycleDetection/GraphBuilder.MethodCall.cs",
         "//src/coreclr/tools/Common:Compiler/GenericCycleDetection/ModuleCycleInfo.cs",
     ],
-    defines = ["READYTORUN"],
+    defines = [
+        "FEATURE_DYNAMIC_CODE_COMPILED",
+        "READYTORUN",
+    ],
     compiler_options = ["/unsafe", "/warnaserror+:NU1605"],
     deps = [
         "//src/coreclr/tools/aot/ILCompiler.DependencyAnalysisFramework",
@@ -374,7 +376,7 @@ csharp_library(
         "//src/coreclr/tools/aot/ILCompiler.TypeSystem",
         "@paket.main//microsoft.diasymreader",
     ],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_MINIMUM, NETCOREAPP_TOOL_CURRENT],
     visibility = ["//visibility:public"],
     analyzers = [
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",

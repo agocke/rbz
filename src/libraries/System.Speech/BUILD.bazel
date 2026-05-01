@@ -18,6 +18,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.Speech",
     include_runtime_async = False,
+    event_source_generator = False,
     keyfile = SHAREDLIB1024_SNK,
     include_editorconfig = False,
     pnse = True,
@@ -56,7 +57,7 @@ impl_assembly(
     ],
     com_interface_generator = True,
     supported_os_platforms_short = ["windows"],
-    nullable = "disable",
+    nullable = "enable",
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS0649", "CA1822", "CA1852", "IDE0059", "NU5128", "SA1129", "CS1591"],
     allow_unsafe_blocks = True,
 )

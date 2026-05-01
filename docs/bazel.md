@@ -191,7 +191,8 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- Remaining library test equivalence diffs (35 known diffs, mostly TFM/platform defines, source file, and infrastructure differences)
+- Managed equivalence manifest cleanup (128 unlisted assemblies still need to be classified as `match`, `diff`, or `ignore`)
+- Remaining known managed equivalence diffs (208 manifest-listed assemblies)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -234,7 +235,7 @@ to MSBuild and `--config=ci` to Bazel so that deterministic source paths are
 enabled and PDB paths are normalized. The default configuration is **release**.
 
 ```bash
-# Run comparison (builds both systems automatically)
+# Run comparison (rebuilds MSBuild, builds Bazel automatically)
 ./compare-bazel.sh                                      # default (release)
 ./compare-bazel.sh --config debug                       # debug mode
 ./compare-bazel.sh --config both                        # both configs
@@ -253,9 +254,26 @@ references, flags (including `/nowarn`, `/warn`, `/features`, `/warnaserror`,
 `/unsafe`, `/checked`, `/nullable`, etc.), analyzers, language version, and
 target type.
 
+When `compare-bazel.sh` performs the MSBuild side itself, it uses
+`./build.sh ... --rebuild -bl` rather than an incremental build. That ensures
+the binlogs contain the full set of managed `Csc` invocations; incremental
+builds only emit tasks that reran and can make the managed comparison
+artificially small. `--skip-build` should therefore only be used after a
+baseline rebuild that produced fresh binlogs for the configuration being
+compared.
+
+The Bazel side intentionally scopes its build and aquery to
+`//src/coreclr/...`, `//src/libraries/...`, `//src/native/...`, and
+`//src/tools/illink/...` instead of `//...`. That keeps the comparison aligned
+with MSBuild's `clr+libs+libs.tests` subset while still including the ILLink
+tooling that `clr+libs+libs.tests` builds. It also avoids unrelated Bazel-only
+targets such as JIT regression tests or other helper graphs that would
+otherwise swamp the managed results.
+
 Managed assemblies are tracked via a **manifest file**
 (`managed-assembly-manifest.txt`) that lists every expected assembly as either
-`match` (must be identical) or `diff` (known difference). The check fails on
+`match` (must be identical), `diff` (known difference), or `ignore`
+(intentionally not comparable in this pipeline). The check fails on
 regressions (match→diff), unlisted assemblies, or missing entries. Reference
 assemblies (`ref_` targets) and implementation assemblies (`impl_`/`live_`
 targets) are compared independently — ref entries use a `.ref` suffix in the
@@ -271,17 +289,21 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: 524 of 732 tracked assemblies currently match
-  MSBuild's CSC command line on source files, defines, references, analyzers,
-  language version, target type, and flags (including `/nowarn:`, `/noconfig`,
-  `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Output-formatting
-  flags (`/fullpaths`, `/utf8output`, `/nologo`), debug symbol format, and
-  build infrastructure (`/pathmap:`, `/sourcelink:`, etc.) are filtered
-  before comparison. Path-bearing flags are normalized to filename-only for
-  cross-build-system comparison. Warning flags are normalized: duplicate
-  `/warn:` entries keep the highest value (matching csc last-wins behavior),
-  and comma-separated `/warnaserror+:X,Y` entries are expanded into
-  individual entries for consistent comparison.
+- **Managed assemblies**: the current narrowed release compare reports **730**
+  managed assemblies compared, **522** matched, **208** known diffs, **0**
+  unexpected managed diffs, and **128** unlisted managed assemblies still to
+  classify in the manifest. The manifest currently contains **733** entries:
+  **522** `match`, **208** `diff`, and **3** `ignore`. Comparison covers source
+  files, defines, references, analyzers, language version, target type, and
+  flags (including `/nowarn:`, `/noconfig`, `/nostdlib+`, `/warnaserror`,
+  `/warn:`, `/ruleset:`). Output-formatting flags (`/fullpaths`,
+  `/utf8output`, `/nologo`), debug symbol format, and build infrastructure
+  (`/pathmap:`, `/sourcelink:`, etc.) are filtered before comparison.
+  Path-bearing flags are normalized to filename-only for cross-build-system
+  comparison. Warning flags are normalized: duplicate `/warn:` entries keep the
+  highest value (matching csc last-wins behavior), and comma-separated
+  `/warnaserror+:X,Y` entries are expanded into individual entries for
+  consistent comparison.
   The matching assemblies include `System.Private.CoreLib` (full analyzer
   and flag parity including the ILLink.RoslynAnalyzer built from source) and
   91 library assemblies matched via infrastructure in `impl_assembly`

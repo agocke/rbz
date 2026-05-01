@@ -21,8 +21,9 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_Microsoft.Extensions.FileProviders.Physical",
     include_runtime_async = False,
+    event_source_generator = False,
     allow_unsafe_blocks = True,
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "CA1865", "CA1866"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/EmptyDisposable.cs",
         "//src/libraries/Common:src/Extensions/NonCapturingTimer/NonCapturingTimer.cs",

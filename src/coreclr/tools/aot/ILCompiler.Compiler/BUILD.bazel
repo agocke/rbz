@@ -1,4 +1,4 @@
-load("//:defs.bzl", "FILE_VERSION", "INFORMATIONAL_VERSION", "csharp_library", "gen_resx_source", "resgen")
+load("//:defs.bzl", "FILE_VERSION", "INFORMATIONAL_VERSION", "NETCOREAPP_TOOL_CURRENT", "csharp_library", "gen_resx_source", "resgen")
 
 genrule(
     name = "AssemblyInfo",
@@ -593,7 +593,6 @@ csharp_library(
         "//src/coreclr/tools/Common:TypeSystem/Interop/UnmanagedCallingConventions.cs",
         "//src/coreclr/tools/Common:TypeSystem/MetadataEmitter/TypeSystemMetadataEmitter.cs",
         "//src/coreclr/tools/Common:TypeSystem/TypesDebugInfoWriter/TypesDebugInfoWriter.cs",
-        "//src/coreclr/tools/Common:TypeSystem/Common/VersionResilientHashCode.TypeSystem.cs",
     ] + [
         "//src/libraries/Common:src/Internal/VersionResilientHashCode.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
@@ -677,8 +676,8 @@ csharp_library(
         "//src/coreclr/tools/aot/ILCompiler.TypeSystem",
         "@paket.main//microsoft.diasymreader",
     ],
-    target_frameworks = ["net10.0"],
-    nowarn = ["1591", "CA1859", "CA1866", "CA1867"],
+    target_frameworks = [NETCOREAPP_TOOL_CURRENT],
+    nowarn = ["1591", "CA1859", "CA1866"],
     extra_editorconfig_content = "\n".join([
         "dotnet_diagnostic.IDE0073.severity = none",
         "dotnet_diagnostic.SA1400.severity = none",

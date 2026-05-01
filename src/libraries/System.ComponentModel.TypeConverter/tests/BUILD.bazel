@@ -1,6 +1,6 @@
-load("//src/tests:live_test.bzl", "library_test")
 load("//:defs.bzl", "OPEN_SNK", "resgen")
-load("//src/libraries:defs.bzl", "live_csharp_library")
+load("//:defs.bzl", "csharp_library")
+load("//src/tests:live_test.bzl", "library_test")
 
 resgen(
     name = "TestResx",
@@ -8,13 +8,25 @@ resgen(
     resx_file = "Resources/TestResx.resx",
 )
 
-live_csharp_library(
+csharp_library(
     name = "UnloadableTestTypes",
     srcs = ["UnloadableTestTypes/UnloadableTestTypes.cs"],
-    deps = [
-        "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",
+    target_frameworks = ["netstandard2.1"],
+    nullable = "disable",
+    analyzers = [
+        "//src/libraries/System.Runtime.InteropServices:DownlevelLibraryImportGenerator",
+        "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
     ],
     keyfile = OPEN_SNK,
+    nowarn = [
+        "ESGEN001",
+        "ESGEN002",
+        "IL2121",
+    ],
+    msbuild_analyzer_config = "style",
+    include_default_ruleset = False,
+    include_syslib_warnaserror = False,
+    include_runtime_async = False,
 )
 
 library_test(

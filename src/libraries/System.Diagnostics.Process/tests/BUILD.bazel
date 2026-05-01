@@ -27,6 +27,7 @@ library_test(
         ["*.cs"],
         exclude = [
             "**/*.Windows.cs",
+            "ProcessTests.Mobile.cs",
             "ProcessModuleTests.Windows.cs",
             "ProcessStartInfoTests.Windows.cs",
             "ProcessTests.Windows.cs",

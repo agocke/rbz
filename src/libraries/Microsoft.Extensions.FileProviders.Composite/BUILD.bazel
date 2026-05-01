@@ -19,6 +19,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_Microsoft.Extensions.FileProviders.Composite",
     include_runtime_async = False,
+    event_source_generator = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     exclude_sr = True,
     srcs = glob(["src/**/*.cs"]),

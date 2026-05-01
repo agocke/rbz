@@ -26,6 +26,7 @@ library_test(
         ["*.cs"],
         exclude = [
             "AndroidKeyStoreHelper.cs",
+            "HttpClientHandlerTest.ProactiveProxyAuth.cs",
             "ImpersonatedAuthTests.cs",
             "MultiInterfaceNonRewindableReadOnlyStream.cs",
             "MultiInterfaceReadOnlyStream.cs",

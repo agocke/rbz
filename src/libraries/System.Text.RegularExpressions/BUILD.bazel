@@ -96,7 +96,7 @@ netcoreapp_ref_assembly(
 netcoreapp_impl_assembly(
     name = "impl_System.Text.RegularExpressions",
     com_interface_generator = True,
-    nowarn = ["CS1591"],
+    nowarn = [],
     srcs = [
         # Core types
         "src/System/Collections/HashtableExtensions.cs",

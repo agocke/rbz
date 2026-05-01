@@ -40,7 +40,9 @@ nuget Microsoft.DotNet.XUnitExtensions 10.0.0-beta.26170.102
 nuget Microsoft.DotNet.Cecil 0.11.5-alpha.26170.102
 nuget Microsoft.DiaSymReader 2.0.0
 nuget Microsoft.Diagnostics.Runtime 1.0.5
-nuget System.Runtime.CompilerServices.Unsafe 6.0.0
+nuget Microsoft.Diagnostics.Tracing.TraceEvent 3.1.28
+nuget Microsoft.Diagnostics.NetCore.Client 0.2.621003
+nuget System.Runtime.CompilerServices.Unsafe 6.1.2
 nuget System.Security.Cryptography.X509Certificates.TestData 10.0.0-beta.25418.1
 nuget System.Private.Runtime.UnicodeData 10.0.0-beta.25418.1
 nuget System.IO.Compression.TestData 10.0.0-beta.25418.1
@@ -54,7 +56,7 @@ nuget Microsoft.IdentityModel.Logging 6.15.0
 nuget Humanizer.Core 2.14.1
 nuget Microsoft.NET.StringTools 17.11.4
 nuget Microsoft.VisualStudio.Setup.Configuration.Interop 3.11.2177
-nuget System.Collections.Immutable 9.0.0
+nuget System.Collections.Immutable 9.0.8
 nuget System.CommandLine 2.0.6
 nuget System.Composition 9.0.0
 nuget System.Composition.AttributedModel 9.0.0
@@ -65,7 +67,7 @@ nuget System.Composition.TypedParts 9.0.0
 nuget System.Configuration.ConfigurationManager 8.0.1
 nuget System.Diagnostics.EventLog 8.0.1
 nuget System.IO.Pipelines 8.0.0
-nuget System.Reflection.Metadata 9.0.0
+nuget System.Reflection.Metadata 9.0.8
 nuget System.Security.Cryptography.ProtectedData 8.0.0
 nuget System.Threading.Channels 8.0.0
 nuget optimization.linux-x64.mibc.runtime 1.0.0-prerelease.26080.1

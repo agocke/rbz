@@ -8,6 +8,8 @@ live_csharp_library(
     analyzers = [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+        "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+        "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
         "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
         "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
         "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",

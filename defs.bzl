@@ -6,6 +6,8 @@ load("//eng/bazel:version.bzl", "PRODUCT_VERSION")
 NETCOREAPP_CURRENT = "net11.0"
 # The TFM used by our LKG SDK
 NETCOREAPP_TOOL_CURRENT = "net11.0"
+# The minimum netcoreapp TFM still used by selected tool/test-support projects
+NETCOREAPP_MINIMUM = "net10.0"
 
 # ─── Centralized versioned NuGet repo names ──────────────────────────────────
 # These are the Bazel repo names for version-pinned NuGet packages.
@@ -67,6 +69,114 @@ MIBC_FILES = select({
 
 # Label for the Roslyn compiler server persistent worker binary.
 _SHARED_COMPILATION_WORKER = "@rules_dotnet//dotnet/private/tools/compiler_worker"
+
+def _append_unique(items, extras):
+    result = list(items)
+    for item in extras:
+        if item not in result:
+            result.append(item)
+    return result
+
+# Test-support helper assets built via raw csharp_library/csharp_binary do not
+# flow through library_test, but their MSBuild projects still receive the local
+# targeting-pack Extensions generators and ESGEN suppressions. Keep Bazel aligned
+# for the helper assemblies that compare-bazel matches against those projects.
+_TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS = [
+    "ApplicationNameSetFromArgument",
+    "BuildWebHostInvalidSignature",
+    "BuildWebHostPatternTestSite",
+    "CollectibleAssembly",
+    "CreateHostBuilderInvalidSignature",
+    "CreateHostBuilderPatternTestSite",
+    "CreateWebHostBuilderInvalidSignature",
+    "CreateWebHostBuilderPatternTestSite",
+    "DefaultApartmentStateMain",
+    "LoaderLinkTest.Dynamic",
+    "LoaderLinkTest.Shared",
+    "MockHostTypes",
+    "MTAMain",
+    "NoSpecialEntryPointPattern",
+    "NoSpecialEntryPointPatternBuildsThenThrows",
+    "NoSpecialEntryPointPatternExits",
+    "NoSpecialEntryPointPatternHangs",
+    "NoSpecialEntryPointPatternMainNoArgs",
+    "NoSpecialEntryPointPatternThrows",
+    "ReferencedClassLib",
+    "ReferencedClassLibNeutralIsSatellite",
+    "SerializableAssembly",
+    "STAMain",
+    "StreamConformanceTests",
+    "System.Diagnostics.FileVersionInfo.TestAssembly",
+    "System.Reflection.DispatchProxy.TestDependency",
+    "System.Reflection.TestExe",
+    "System.Runtime.Loader.Noop.Assembly",
+    "System.Runtime.Loader.Test.Assembly",
+    "System.Runtime.Loader.Test.Assembly2",
+    "System.Runtime.Loader.Test.ContextualReflectionDependency",
+    "TargetFrameworkNameTestApp",
+    "TestApp",
+    "TestAppOutsideOfTPA",
+    "TestUtilities.Unicode",
+    "TopLevelStatements",
+    "TopLevelStatementsTestsTimeout",
+    "XDocument.Common",
+    "XmlCoreTest",
+]
+
+_TEST_SUPPORT_EXTENSIONS_REF_TARGETS = [
+    "ApplicationNameSetFromArgument",
+    "BuildWebHostInvalidSignature",
+    "BuildWebHostPatternTestSite",
+    "CreateHostBuilderInvalidSignature",
+    "CreateHostBuilderPatternTestSite",
+    "CreateWebHostBuilderInvalidSignature",
+    "CreateWebHostBuilderPatternTestSite",
+    "DefaultApartmentStateMain",
+    "LoaderLinkTest.Dynamic",
+    "LoaderLinkTest.Shared",
+    "MTAMain",
+    "NoSpecialEntryPointPattern",
+    "NoSpecialEntryPointPatternBuildsThenThrows",
+    "NoSpecialEntryPointPatternExits",
+    "NoSpecialEntryPointPatternHangs",
+    "NoSpecialEntryPointPatternMainNoArgs",
+    "NoSpecialEntryPointPatternThrows",
+    "ReferencedClassLib",
+    "ReferencedClassLibNeutralIsSatellite",
+    "SerializableAssembly",
+    "STAMain",
+    "System.Diagnostics.FileVersionInfo.TestAssembly",
+    "System.Reflection.TestExe",
+    "System.Runtime.Loader.Noop.Assembly",
+    "System.Runtime.Loader.Test.Assembly",
+    "System.Runtime.Loader.Test.Assembly2",
+    "System.Runtime.Loader.Test.ContextualReflectionDependency",
+    "TargetFrameworkNameTestApp",
+    "TestApp",
+    "TestAppOutsideOfTPA",
+    "TestUtilities.Unicode",
+    "TopLevelStatements",
+    "TopLevelStatementsTestsTimeout",
+    "XDocument.Common",
+    "XmlCoreTest",
+]
+
+_TEST_SUPPORT_EXTENSIONS_ANALYZERS = [
+    "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+    "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
+]
+
+_TEST_SUPPORT_EXTENSIONS_REFS = [
+    "//src/libraries/Microsoft.Extensions.Caching.Abstractions:ref_Microsoft.Extensions.Caching.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Configuration.Abstractions:ref_Microsoft.Extensions.Configuration.Abstractions",
+    "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Diagnostics.Abstractions:ref_Microsoft.Extensions.Diagnostics.Abstractions",
+    "//src/libraries/Microsoft.Extensions.FileProviders.Abstractions:ref_Microsoft.Extensions.FileProviders.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Hosting.Abstractions:ref_Microsoft.Extensions.Hosting.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Logging.Abstractions:ref_Microsoft.Extensions.Logging.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Options:ref_Microsoft.Extensions.Options",
+    "//src/libraries/Microsoft.Extensions.Primitives:ref_Microsoft.Extensions.Primitives",
+]
 
 # Version constants matching eng/Versions.props
 _MAJOR_VERSION = PRODUCT_VERSION.split(".")[0]
@@ -435,6 +545,13 @@ def csharp_library(
     if editorconfig_name == None:
         editorconfig_name = out
 
+    deps = kwargs.pop("deps", [])
+    if name in _TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS:
+        nowarn = _append_unique(nowarn, ["ESGEN001", "ESGEN002"])
+        analyzers = _append_unique(analyzers, _TEST_SUPPORT_EXTENSIONS_ANALYZERS)
+    if name in _TEST_SUPPORT_EXTENSIONS_REF_TARGETS:
+        deps = _append_unique(deps, _TEST_SUPPORT_EXTENSIONS_REFS)
+
     if resx_file != None:
         _resource_name = resource_name if resource_name else "FxResources.%s.SR" % out
         resgen_target = "resgen_" + name
@@ -619,6 +736,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         additionalfiles = additionalfiles,
         analyzer_configs = analyzer_configs,
         analyzers = analyzers,
+        deps = deps,
         # In CI mode, normalize PDB paths to match MSBuild's CI layout
         # (ContinuousIntegrationBuild=true → DeterministicSourcePaths → PathMap).
         pathmap = select({
@@ -654,6 +772,13 @@ def csharp_binary(
 ):
     if editorconfig_name == None:
         editorconfig_name = name
+
+    deps = kwargs.pop("deps", [])
+    if name in _TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS:
+        nowarn = _append_unique(nowarn, ["ESGEN001", "ESGEN002"])
+        analyzers = _append_unique(analyzers, _TEST_SUPPORT_EXTENSIONS_ANALYZERS)
+    if name in _TEST_SUPPORT_EXTENSIONS_REF_TARGETS:
+        deps = _append_unique(deps, _TEST_SUPPORT_EXTENSIONS_REFS)
 
     if msbuild_analyzer_config not in ["none", "style", "source"]:
         fail("msbuild_analyzer_config must be one of: none, style, source")
@@ -775,5 +900,6 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         additionalfiles = additionalfiles,
         analyzer_configs = analyzer_configs,
         analyzers = analyzers,
+        deps = deps,
         **kwargs
     )

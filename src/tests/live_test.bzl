@@ -72,6 +72,87 @@ _LIBRARY_TEST_NOWARN = [
     "xUnit1051",
 ]
 
+# These test projects explicitly disable trim/AOT analyzers in their csproj
+# (<EnableTrimAnalyzer>false</EnableTrimAnalyzer> and
+# <EnableAotAnalyzer>false</EnableAotAnalyzer>). Keep Bazel aligned by
+# suppressing ILLink.RoslynAnalyzer for the matching library_test targets.
+_LIBRARY_TESTS_WITHOUT_ILLINK_ANALYZER = [
+    "Microsoft.Extensions.Configuration.Binder.Tests",
+    "Microsoft.Extensions.Configuration.CommandLine.Tests",
+    "Microsoft.Extensions.Configuration.EnvironmentVariables.Tests",
+    "Microsoft.Extensions.Configuration.Functional.Tests",
+    "Microsoft.Extensions.Configuration.Ini.Tests",
+    "Microsoft.Extensions.Configuration.Json.Tests",
+    "Microsoft.Extensions.Configuration.Tests",
+    "Microsoft.Extensions.Configuration.Xml.Tests",
+    "Microsoft.Extensions.DependencyInjection.Tests",
+    "Microsoft.Extensions.Hosting.Unit.Tests",
+    "Microsoft.Extensions.Logging.Console.Tests",
+    "Microsoft.Extensions.Options.Tests",
+    "System.CodeDom.Tests",
+    "System.Collections.Concurrent.Tests",
+    "System.Collections.Immutable.Tests",
+    "System.Collections.NonGeneric.Tests",
+    "System.Collections.Specialized.Tests",
+    "System.Collections.Tests",
+    "System.ComponentModel.Annotations.Tests",
+    "System.ComponentModel.Composition.Tests",
+    "System.ComponentModel.Primitives.Tests",
+    "System.ComponentModel.TypeConverter.Tests",
+    "System.Composition.TypedParts.Tests",
+    "System.Data.Common.Tests",
+    "System.Data.DataSetExtensions.Tests",
+    "System.Diagnostics.DiagnosticSource.Tests",
+    "System.Diagnostics.StackTrace.Tests",
+    "System.Drawing.Primitives.Tests",
+    "System.Dynamic.Runtime.Tests",
+    "System.Formats.Nrbf.Tests",
+    "System.Linq.Expressions.Tests",
+    "System.Linq.Queryable.Tests",
+    "System.Linq.Tests",
+    "System.Memory.Data.Tests",
+    "System.Memory.Tests",
+    "System.Net.Http.Functional.Tests",
+    "System.Net.Http.Json.Functional.Tests",
+    "System.Net.Http.Json.Unit.Tests",
+    "System.Net.HttpListener.Tests",
+    "System.Net.Mail.Functional.Tests",
+    "System.Net.NetworkInformation.Functional.Tests",
+    "System.Net.Primitives.Functional.Tests",
+    "System.Net.Requests.Tests",
+    "System.Net.Sockets.Tests",
+    "System.Numerics.Tensors.Tests",
+    "System.ObjectModel.Tests",
+    "System.Reflection.Context.Tests",
+    "System.Reflection.DispatchProxy.Tests",
+    "System.Reflection.Emit.ILGeneration.Tests",
+    "System.Reflection.Emit.Lightweight.Tests",
+    "System.Reflection.Emit.Tests",
+    "System.Reflection.InvokeEmit.Tests",
+    "System.Reflection.InvokeInterpreted.Tests",
+    "System.Reflection.TypeExtensions.Tests",
+    "System.Runtime.InteropServices.Tests",
+    "System.Runtime.Numerics.Tests",
+    "System.Runtime.Serialization.Formatters.Disabled.Tests",
+    "System.Runtime.Serialization.Json.ReflectionOnly.Tests",
+    "System.Runtime.Serialization.Json.Tests",
+    "System.Runtime.Serialization.Primitives.Tests",
+    "System.Runtime.Serialization.Schema.Tests",
+    "System.Runtime.Serialization.Xml.Canonicalization.Tests",
+    "System.Runtime.Serialization.Xml.ReflectionOnly.Tests",
+    "System.Runtime.Serialization.Xml.Tests",
+    "System.Security.Cryptography.Csp.Tests",
+    "System.Security.Cryptography.OpenSsl.Tests",
+    "System.Security.Cryptography.Tests",
+    "System.Security.Cryptography.Xml.Tests",
+    "System.ServiceModel.Syndication.Tests",
+    "System.Text.Json.Tests",
+    "System.Threading.Channels.Tests",
+    "System.Threading.Tasks.Dataflow.Tests",
+    "System.Threading.Tasks.Tests",
+    "System.Xml.XmlSerializer.ReflectionOnly.Tests",
+]
+
 # Directory.Build.targets NoWarn for projects that multi-target net4x/netstandard:
 # Label for the Roslyn compiler server persistent worker binary.
 _SHARED_COMPILATION_WORKER = "@rules_dotnet//dotnet/private/tools/compiler_worker"
@@ -671,6 +752,7 @@ def library_test(
         all_nowarn = nowarn + replace_library_nowarns + ["CS8002"]
     else:
         all_nowarn = nowarn + _LIBRARY_TEST_NOWARN + ["CS8002"]
+    include_illink_analyzer = name not in _LIBRARY_TESTS_WITHOUT_ILLINK_ANALYZER
 
     # ── Analyzer infrastructure (matching MSBuild's Analyzers.targets for tests) ──
     # Generate an empty disabledAnalyzers.config
@@ -714,12 +796,11 @@ EOF""".format(version = PRODUCT_VERSION),
         "//src/libraries/System.Text.Json:JsonSourceGenerator",
         "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
         "//:xunit_test_analyzers",
-        # Extensions generators + ILLink analyzer delivered via the targeting
-        # pack in MSBuild (FrameworkReferenceResolution.targets).
+        # Extensions generators are delivered via the targeting pack in MSBuild
+        # (FrameworkReferenceResolution.targets).
         "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
         "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
-        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
-    ]
+    ] + (["//src/tools/illink/src/ILLink.RoslynAnalyzer"] if include_illink_analyzer else [])
     _analyzers = _dedupe_labels(_analyzers)
 
     # Match MSBuild test compiler options

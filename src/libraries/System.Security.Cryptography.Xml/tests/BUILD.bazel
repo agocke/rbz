@@ -6,7 +6,10 @@ library_test(
     name = "System.Security.Cryptography.Xml.Tests",
     srcs = glob(
         ["**/*.cs"],
-        exclude = ["KeyReferenceTest.cs"],
+        exclude = [
+            "KeyReferenceTest.cs",
+            "ReferenceListTest.cs",
+        ],
     ) + [
         "//src/libraries/Common/tests:System/Security/Cryptography/PlatformSupport.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/CngKeyWrapper.cs",

@@ -1,4 +1,4 @@
-load("//:defs.bzl", "csharp_library", "resgen")
+load("//:defs.bzl", "NETCOREAPP_MINIMUM", "NETCOREAPP_TOOL_CURRENT", "csharp_library", "resgen")
 
 resgen(
     name = "TypeSystemResources",
@@ -12,7 +12,7 @@ csharp_library(
     name = "ILCompiler.TypeSystem",
     include_runtime_async = False,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
-    nowarn = ["1591", "CA1859", "CA1866"],
+    nowarn = ["1591", "CA1859"],
     srcs = [
         "//src/coreclr/tools/Common:TypeSystem/Common/ArrayMethod.Diagnostic.cs",
         "//src/coreclr/tools/Common:TypeSystem/Canon/ArrayType.Canon.cs",
@@ -254,7 +254,7 @@ csharp_library(
     deps = [
         "@paket.main//microsoft.diasymreader",
     ],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_MINIMUM, NETCOREAPP_TOOL_CURRENT],
     visibility = ["//visibility:public"],
     analyzers = [
         "//:source_build_analyzers",

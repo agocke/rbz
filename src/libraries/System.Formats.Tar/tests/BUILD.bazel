@@ -50,7 +50,6 @@ library_test(
         "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Link.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MkFifo.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Stat.cs",
-        "//src/libraries/Common:src/System/Runtime/InteropServices/SpanOfCharAsUtf8StringMarshaller.cs",
         # SR resource generation
         "//src/libraries/Common:src/System/SR.cs",
         ":gen_resx",

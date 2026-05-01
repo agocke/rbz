@@ -8,6 +8,7 @@ exports_files([
 # PlatformNotSupportedException. Matches MSBuild's behavior.
 netcoreapp_impl_assembly(
     name = "impl_System.Runtime.InteropServices.JavaScript",
+    defines = ["CORECLR"],
     nowarn = ["CS1591"],
     pnse = True,
     pnse_message = "SR.SystemRuntimeInteropServicesJavaScript_PlatformNotSupported",

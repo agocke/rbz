@@ -581,7 +581,7 @@ EOF""".format(version = PRODUCT_VERSION),
     # LibraryImportGenerator (e.g. shim/facade assemblies) can pass
     # interop_source_generation = True, library_import_generator = False.
     _interop_source_generation = interop_source_generation if interop_source_generation != None else library_import_generator
-    _event_source_generator = event_source_generator if event_source_generator != None else include_runtime_async
+    _event_source_generator = event_source_generator if event_source_generator != None else True
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",

@@ -25,6 +25,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.Management",
     include_runtime_async = False,
+    event_source_generator = False,
     include_editorconfig = False,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_SystemManagement",
@@ -50,7 +51,7 @@ impl_assembly(
     com_interface_generator = True,
     supported_os_platforms_short = ["windows"],
     nullable = "disable",
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS0618", "CA1822", "CA1865", "IDE0059", "NU5128", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS0618", "CA1822", "IDE0059", "NU5128", "CS1591"],
     allow_unsafe_blocks = True,
 )
 

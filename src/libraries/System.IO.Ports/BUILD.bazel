@@ -15,6 +15,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.IO.Ports",
     include_runtime_async = False,
+    event_source_generator = False,
     keyfile = OPEN_SNK,
     os_targeted = "unix",
     nullable = "disable",

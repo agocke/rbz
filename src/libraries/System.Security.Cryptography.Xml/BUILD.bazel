@@ -21,6 +21,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.Security.Cryptography.Xml",
     include_runtime_async = False,
+    event_source_generator = False,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     com_interface_generator = True,
     keyfile = OPEN_SNK,
@@ -28,7 +29,6 @@ impl_assembly(
         # Common linked files
         "//src/libraries/Common:src/System/HexConverter.cs",
         "//src/libraries/Common:src/System/Obsoletions.cs",
-        "//src/libraries/Common:src/System/LocalAppContextSwitches.Common.cs",
         # Local src files
         "src/System/Security/Cryptography/Xml/AncestralNamespaceContextManager.cs",
         "src/System/Security/Cryptography/Xml/AttributeSortOrder.cs",

@@ -36,6 +36,7 @@ public enum ManifestStatus
 {
     Match,
     Diff,
+    Ignore,
 }
 
 /// <summary>
@@ -78,6 +79,9 @@ public sealed class EquivalenceReport
 
     public bool IsManagedKnownDiff(string name) =>
         ManagedManifest.TryGetValue(name, out var entry) && entry.ExpectedStatus == ManifestStatus.Diff;
+
+    public bool IsManagedIgnored(string name) =>
+        ManagedManifest.TryGetValue(name, out var entry) && entry.ExpectedStatus == ManifestStatus.Ignore;
 
     public bool IsNativeKnownDiff(string name) =>
         NativeManifest.TryGetValue(name, out var entry) && entry.ExpectedStatus == ManifestStatus.Diff;
@@ -141,6 +145,12 @@ public sealed class EquivalenceReport
         : NativeResults.Count(r => !r.IsMatch && !NativeManifest.ContainsKey(r.Name));
 
     public bool HasNativeManifest => NativeManifest.Count > 0;
+    public bool HasManagedManifest => ManagedManifest.Count > 0;
+
+    private IEnumerable<string> TrackedManagedManifestKeys =>
+        ManagedManifest
+            .Where(kv => kv.Value.ExpectedStatus != ManifestStatus.Ignore)
+            .Select(kv => kv.Key);
 
     // ── Managed manifest properties ─────────────────────────────────
 
@@ -148,7 +158,8 @@ public sealed class EquivalenceReport
     /// Managed assemblies present in the manifest but missing from both builds.
     /// </summary>
     public List<string> MissingFromBothBuilds =>
-        ManagedManifest.Keys
+        ManagedManifest.Count == 0 ? [] :
+        TrackedManagedManifestKeys
             .Where(name => !ManagedResults.Any(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 && !OnlyInMSBuild.Contains(name, StringComparer.OrdinalIgnoreCase)
                 && !OnlyInBazelManaged.Contains(name, StringComparer.OrdinalIgnoreCase))
@@ -156,8 +167,30 @@ public sealed class EquivalenceReport
             .ToList();
 
     /// <summary>
-    /// Managed assemblies that appear in the comparison (both builds) but are not in the manifest.
-    /// Only-in-one-build assemblies are not flagged — they are already tracked separately.
+    /// Managed assemblies listed in the manifest that are missing from MSBuild.
+    /// These appear only in the Bazel-side managed graph.
+    /// </summary>
+    public List<string> MissingFromMSBuild =>
+        ManagedManifest.Count == 0 ? [] :
+        OnlyInBazelManaged
+            .Where(name => ManagedManifest.TryGetValue(name, out var entry) && entry.ExpectedStatus != ManifestStatus.Ignore)
+            .Order()
+            .ToList();
+
+    /// <summary>
+    /// Managed assemblies listed in the manifest that are missing from Bazel.
+    /// These appear only in the MSBuild-side managed graph.
+    /// </summary>
+    public List<string> MissingFromBazel =>
+        ManagedManifest.Count == 0 ? [] :
+        OnlyInMSBuild
+            .Where(name => ManagedManifest.TryGetValue(name, out var entry) && entry.ExpectedStatus != ManifestStatus.Ignore)
+            .Order()
+            .ToList();
+
+    /// <summary>
+    /// Managed assemblies that appear anywhere in the comparison but are not in the manifest.
+    /// This includes matched pairs as well as assemblies that appear in only one build.
     /// </summary>
     public List<string> UnlistedAssemblies
     {
@@ -168,6 +201,9 @@ public sealed class EquivalenceReport
 
             return ManagedResults
                 .Select(r => r.Name)
+                .Concat(OnlyInMSBuild)
+                .Concat(OnlyInBazelManaged)
+                .Where(name => !ManagedManifest.TryGetValue(name, out var entry) || entry.ExpectedStatus != ManifestStatus.Ignore)
                 .Where(name => !ManagedManifest.ContainsKey(name))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Order()
@@ -198,6 +234,8 @@ public sealed class EquivalenceReport
 
     public bool ManagedIsEquivalent =>
         Regressions.Count == 0
+        && MissingFromMSBuild.Count == 0
+        && MissingFromBazel.Count == 0
         && MissingFromBothBuilds.Count == 0
         && UnlistedAssemblies.Count == 0
         && ManagedResults.All(r => r.IsMatch || IsManagedKnownDiff(r.Name)
@@ -302,17 +340,14 @@ public static class ComparisonEngine
         List<ManagedCompilationRecord> bazelRecords)
     {
         // ── Impl assemblies ────────────────────────────────────────────
-        // For MSBuild, prefer platform-specific TFM since that's what goes
-        // in the runtime archive and what Bazel builds. Priority:
-        //   1. net10.0-linux (highest — exact Linux match)
-        //   2. net10.0-unix  (covers Linux)
-        //   3. plain net10.0 (fallback — often a PNSE stub)
+        // For MSBuild, prefer the highest-TFM platform-specific build since
+        // that's what goes in the runtime archive and what Bazel builds.
         var msbuildImpl = msbuildRecords
             .Where(r => !r.IsReferenceAssembly)
-            // Exclude netstandard2.0 builds — Bazel always targets net10.0.
+            // Exclude netstandard2.0 builds — Bazel targets netcoreapp.
             // When MSBuild multi-targets, the netstandard build is for NuGet
             // packaging, not the runtime archive.  Comparing it against the
-            // net10.0 Bazel build produces meaningless diffs.
+            // Bazel build produces meaningless diffs.
             .Where(r => !r.OutputPath.Contains("netstandard2.0", StringComparison.OrdinalIgnoreCase))
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
@@ -320,12 +355,15 @@ public static class ComparisonEngine
                 .First());
 
         // For Bazel impl: prefer impl_ targets, then live_ targets, then
-        // anything that is not a ref_ target.
+        // anything that is not a ref_ target. Within the same target kind,
+        // prefer the highest-TFM platform-specific build.
         var bazelImpl = bazelRecords
             .Where(r => !IsRefTarget(r.TargetLabel))
             .GroupBy(r => r.AssemblyName)
             .ToDictionary(g => g.Key, g =>
-                g.OrderByDescending(r => IsImplTarget(r.TargetLabel)).First());
+                g.OrderByDescending(r => IsImplTarget(r.TargetLabel))
+                    .ThenByDescending(r => TfmPriority(r.OutputPath))
+                    .First());
 
         // ── Ref assemblies ─────────────────────────────────────────────
         var msbuildRef = msbuildRecords
@@ -339,7 +377,8 @@ public static class ComparisonEngine
         var bazelRef = bazelRecords
             .Where(r => IsRefTarget(r.TargetLabel))
             .GroupBy(r => r.AssemblyName)
-            .ToDictionary(g => g.Key, g => g.First());
+            .ToDictionary(g => g.Key, g =>
+                g.OrderByDescending(r => TfmPriority(r.OutputPath)).First());
 
         // ── Compare impl assemblies ────────────────────────────────────
         CompareVariant(report, msbuildImpl, bazelImpl, variant: null);
@@ -376,6 +415,10 @@ public static class ComparisonEngine
         foreach (var name in allNames)
         {
             var reportName = variant is null ? name : $"{name}.{variant}";
+
+            if (report.IsManagedIgnored(reportName))
+                continue;
+
             var inMSBuild = msbuildByName.TryGetValue(name, out var msbuild);
             var inBazel = bazelByName.TryGetValue(name, out var bazel);
 
@@ -1068,9 +1111,9 @@ public static class ComparisonEngine
 
     /// <summary>
     /// Assign a priority score for TFM selection from multi-targeted MSBuild builds.
-    /// Higher is better. Platform-specific TFMs (linux, unix) are preferred
-    /// over the plain net10.0 TFM which is often a PNSE stub.
-    /// Stub assemblies (shims/stubs) are deprioritized below all other builds.
+    /// Higher is better. Platform-specific TFMs are preferred over the plain
+    /// netX.Y TFM which is often a PNSE stub. Within the same platform shape,
+    /// newer TFMs win over older ones.
     /// </summary>
     private static int TfmPriority(string outputPath)
     {
@@ -1078,13 +1121,24 @@ public static class ComparisonEngine
         if (outputPath.Contains("/stub/", StringComparison.OrdinalIgnoreCase))
             return -1;
 
-        if (outputPath.Contains("net10.0-linux", StringComparison.OrdinalIgnoreCase))
-            return 3;
-        if (outputPath.Contains("net10.0-unix", StringComparison.OrdinalIgnoreCase))
-            return 2;
-        if (outputPath.Contains("net10.0-osx", StringComparison.OrdinalIgnoreCase))
-            return 1;
+        int platformBonus = 0;
+        if (outputPath.Contains("-linux", StringComparison.OrdinalIgnoreCase))
+            platformBonus = 3000;
+        else if (outputPath.Contains("-unix", StringComparison.OrdinalIgnoreCase))
+            platformBonus = 2000;
+        else if (outputPath.Contains("-osx", StringComparison.OrdinalIgnoreCase)
+            || outputPath.Contains("-macos", StringComparison.OrdinalIgnoreCase))
+            platformBonus = 1000;
 
-        return 0;
+        var match = System.Text.RegularExpressions.Regex.Match(
+            outputPath,
+            @"net(?<major>\d+)\.(?<minor>\d+)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (!match.Success)
+            return platformBonus;
+
+        int major = int.Parse(match.Groups["major"].Value);
+        int minor = int.Parse(match.Groups["minor"].Value);
+        return platformBonus + (major * 10) + minor;
     }
 }

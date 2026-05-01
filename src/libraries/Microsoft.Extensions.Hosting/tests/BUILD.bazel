@@ -19,6 +19,7 @@ genrule(
 library_test(
     name = "Microsoft.Extensions.Hosting.Unit.Tests",
     srcs = glob(["UnitTests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
         "//src/libraries/Common/tests:System/IO/TempDirectory.cs",
     ],
     deps = [

@@ -15,8 +15,6 @@ netcoreapp_impl_assembly(
     library_import_generator = False,
     nowarn = ["CS1591"],
     srcs = glob(["src/**/*.cs"]) + [
-        # Shared sources from Common
-        "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder_1.cs",
         "//src/libraries/Common:src/System/Number.Formatting.Common.cs",
         "//src/libraries/Common:src/System/Number.NumberBuffer.cs",

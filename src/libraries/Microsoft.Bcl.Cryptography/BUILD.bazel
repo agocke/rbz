@@ -11,6 +11,7 @@ exports_files([
 impl_assembly(
     name = "impl_Microsoft.Bcl.Cryptography",
     include_runtime_async = False,
+    event_source_generator = False,
     allow_unsafe_blocks = True,
     srcs = [
         "src/Microsoft.Bcl.Cryptography.Forwards.cs",

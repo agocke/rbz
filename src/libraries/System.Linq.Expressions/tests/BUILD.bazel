@@ -9,6 +9,7 @@ library_test(
             "TrimmingTests/**",
         ],
     ) + [
+        "//src/libraries/Common:src/Polyfills/DictionaryPolyfills.cs",
     ],
     deps = [
         "//src/libraries/System.Linq.Expressions:impl_System.Linq.Expressions",

@@ -1,5 +1,5 @@
 load("//:defs.bzl", "csharp_library")
-load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Extensions.Logging.Abstractions.cs",
@@ -63,6 +63,9 @@ impl_assembly(
     include_runtime_async = False,
     event_source_generator = True,
     allow_unsafe_blocks = True,
+    skip_locals_init = True,
+    com_interface_generator = True,
+    jsimport_generator = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/TypeNameHelper/TypeNameHelper.cs",
@@ -71,7 +74,6 @@ impl_assembly(
         "//src/libraries/Common:src/Extensions/Logging/DebuggerDisplayFormatting.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
     ],
-    analyzers = COMMON_GENERATOR_ANALYZERS,
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
@@ -79,6 +81,7 @@ impl_assembly(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Diagnostics.DiagnosticSource:ref_System.Diagnostics.DiagnosticSource",
         "//src/libraries/System.Memory:ref_System.Memory",
+        "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
         "//src/libraries/System.Threading:ref_System.Threading",
     ],
     resx_file = "src/Resources/Strings.resx",

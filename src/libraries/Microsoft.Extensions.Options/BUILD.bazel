@@ -1,5 +1,5 @@
 load("//:defs.bzl", "csharp_library")
-load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Extensions.Options.cs",
@@ -61,7 +61,10 @@ impl_assembly(
     name = "impl_Microsoft.Extensions.Options",
     include_runtime_async = False,
     event_source_generator = True,
-    analyzers = COMMON_GENERATOR_ANALYZERS,
+    allow_unsafe_blocks = True,
+    skip_locals_init = True,
+    library_import_generator = False,
+    jsimport_generator = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]),
     deps = [
@@ -72,9 +75,6 @@ impl_assembly(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.ComponentModel:ref_System.ComponentModel",
         "//src/libraries/System.ComponentModel.Annotations:ref_System.ComponentModel.Annotations",
-        "//src/libraries/System.Linq:ref_System.Linq",
-        "//src/libraries/System.Linq.Expressions:ref_System.Linq.Expressions",
-        "//src/libraries/System.Memory:ref_System.Memory",
         "//src/libraries/System.Threading:ref_System.Threading",
     ],
     resx_file = "src/Resources/Strings.resx",

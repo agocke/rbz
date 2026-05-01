@@ -1,15 +1,19 @@
 # Managed assembly equivalence manifest.
 #
 # Lists every managed assembly expected in the equivalence check and whether
-# it should match ("match") or is a known difference ("diff").
+# it should match ("match"), is a known difference ("diff"), or should be
+# excluded from comparison ("ignore").
 # Lines starting with # are comments. Blank lines are ignored.
 #
 # The equivalence check FAILS if:
 #   - A "match" assembly has differences (regression)
-#   - A listed assembly is missing from either build
+#   - A listed non-"ignore" assembly is missing from either build
 #   - An unlisted assembly appears in the comparison
 #
 # When a diff is resolved, change its status from "diff" to "match".
+# Use "ignore" only for assemblies that are intentionally not comparable in this
+# pipeline (for example a Bazel-only split test variant or an MSBuild helper
+# project filtered out by the managed TFM selection rules).
 
 # ── Archive assemblies ─────────────────────────────────────────────
 # These assemblies are shipped in the runtime archive tarball.
@@ -738,7 +742,8 @@ match  ReferencedClassLibNeutralIsSatellite
 match  TestUtilities.Unicode
 match  TargetFrameworkNameTestApp
 match  TestApp
-match  AssemblyResolveTestApp
+ignore AssemblyResolveTestApp
+ignore UnloadableTestTypes
 match  TestAppOutsideOfTPA
 
 # ── ApplyUpdate test helper assemblies ──
@@ -770,4 +775,4 @@ match  System.IO.FileSystem.DisabledFileLocking.Tests
 match  System.Runtime.InteropServices.ComDisabled.Tests
 match  System.Runtime.InvariantTimezone.Tests
 match  System.Runtime.Serialization.Formatters.Disabled.Tests
-match  System.Numerics.Tensors.Net8.Tests
+ignore System.Numerics.Tensors.Net8.Tests

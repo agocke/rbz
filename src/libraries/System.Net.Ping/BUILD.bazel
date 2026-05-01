@@ -56,6 +56,7 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MessageHeader.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Socket.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.SocketAddress.cs",
+            "//src/libraries/Common:src/System/Runtime/InteropServices/SpanOfCharAsUtf8StringMarshaller.cs",
         ],
         "@platforms//os:macos": [
             # macOS-specific Ping impl
@@ -78,6 +79,7 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MessageHeader.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Socket.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.SocketAddress.cs",
+            "//src/libraries/Common:src/System/Runtime/InteropServices/SpanOfCharAsUtf8StringMarshaller.cs",
         ],
     }),
     resx_file = "src/Resources/Strings.resx",

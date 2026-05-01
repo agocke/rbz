@@ -73,9 +73,10 @@ public static class BazelAqueryParser
             var args = ParseArguments(action);
             var record = ParseManagedArguments(args, targetLabel, repoRoot);
 
-            // Dedup by assembly name + target label so both ref and impl
-            // targets for the same assembly survive into the comparison engine.
-            if (record is not null && seen.Add(record.AssemblyName + "|" + targetLabel))
+            // Dedup by assembly name + target label + output path so multiple
+            // target-framework variants of the same Bazel target survive into
+            // the comparison engine.
+            if (record is not null && seen.Add(record.AssemblyName + "|" + targetLabel + "|" + record.OutputPath))
                 records.Add(record);
         }
 
@@ -251,6 +252,7 @@ public static class BazelAqueryParser
         string targetType = "library";
         string langVersion = "";
         string? assemblyName = null;
+        string outputPath = "";
 
         foreach (var arg in args)
         {
@@ -292,7 +294,8 @@ public static class BazelAqueryParser
             }
             else if (arg.StartsWith("/out:"))
             {
-                assemblyName = ExtractAssemblyName(arg[5..]);
+                outputPath = arg[5..];
+                assemblyName = ExtractAssemblyName(outputPath);
             }
             else if (arg is "/unsafe+" or "/unsafe-")
             {
@@ -339,6 +342,7 @@ public static class BazelAqueryParser
             TargetType = targetType,
             LangVersion = langVersion,
             BuildSystem = "bazel",
+            OutputPath = outputPath,
             TargetLabel = targetLabel,
         };
     }

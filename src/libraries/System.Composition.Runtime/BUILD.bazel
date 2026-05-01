@@ -3,6 +3,7 @@ load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWA
 impl_assembly(
     name = "impl_System.Composition.Runtime",
     include_runtime_async = False,
+    event_source_generator = False,
     srcs = [
         "src/System/Composition/CompositionContext.cs",
         "src/System/Composition/ExportFactoryOfT.cs",

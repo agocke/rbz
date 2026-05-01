@@ -26,6 +26,7 @@ netcoreapp_ref_assembly(
 impl_assembly(
     name = "impl_System.Security.Cryptography.Pkcs",
     include_runtime_async = False,
+    event_source_generator = False,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     srcs = [
         # Asn1Reader shared projitems
