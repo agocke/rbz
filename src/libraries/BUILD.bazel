@@ -589,7 +589,7 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Console:ref_System.Console",
     ],
     allow_unsafe_blocks = True,
-    supported_os_platforms = ["linux"],
+    supported_os_platforms = ["linux", "osx"],
 )
 
 netcoreapp_impl_assembly(

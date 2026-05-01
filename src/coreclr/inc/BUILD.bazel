@@ -57,6 +57,7 @@ cc_library(
         "//src/coreclr/pal:prebuilt/idl/cordebug_i.cpp",
         "//src/coreclr/pal:prebuilt/idl/corprof_i.cpp",
         "//src/coreclr/pal:prebuilt/idl/corsym_i.cpp",
+        "//src/coreclr/pal:prebuilt/idl/dacdbi_i.cpp",
         "//src/coreclr/pal:prebuilt/idl/sospriv_i.cpp",
         "//src/coreclr/pal:prebuilt/idl/xclrdata_i.cpp",
         "//src/coreclr/pal:prebuilt/idl/xcordebug_i.cpp",
