@@ -42,7 +42,7 @@ genrule(
     outs = ["AsmOffsets.inc"],
     cmd = select({
         "@platforms//cpu:arm64": " ".join([
-            "/usr/bin/xcrun clang",
+            "clang",
             "-x c++",
             "-E -P",
             "-DHOST_64BIT",
@@ -54,7 +54,7 @@ genrule(
             "> $@",
         ]),
         "//conditions:default": " ".join([
-            "/usr/bin/xcrun clang",
+            "clang",
             "-x c++",
             "-E -P",
             "-DHOST_64BIT",
