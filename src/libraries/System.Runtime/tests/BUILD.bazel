@@ -798,7 +798,7 @@ library_test(
 csharp_library(
     name = "System.Reflection.TestExe",
     srcs = ["System.Reflection.Tests/TestExe/Program.cs"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = ["net11.0"],
     keyfile = OPEN_SNK,
     nullable = "annotations",
     nowarn = [

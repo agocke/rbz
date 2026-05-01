@@ -12,7 +12,7 @@ csharp_library(
         "@paket.main//microsoft.codeanalysis.csharp",
         "@paket.main//system.collections.immutable",
     ],
-    target_frameworks = ["net10.0"],
+    target_frameworks = ["net11.0"],
     visibility = ["//visibility:public"],
     nullable = "enable",
     nowarn = [

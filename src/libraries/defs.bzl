@@ -568,6 +568,11 @@ EOF""".format(version = PRODUCT_VERSION),
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
+        # Extensions generators delivered via the local targeting pack in
+        # MSBuild.  They flow into all source library projects that reference
+        # the shared framework (FrameworkReferenceResolution.targets).
+        "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+        "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
     ]
     if library_import_generator:
         _analyzers = _analyzers + [

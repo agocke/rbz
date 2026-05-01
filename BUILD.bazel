@@ -35,7 +35,7 @@ exports_files([
 source_analyzer_config_files = [
     ".editorconfig",
     "//eng:CodeAnalysis.src.globalconfig",
-    "//src/tools/bazel:analysislevel_10_default.globalconfig",
+    "//src/tools/bazel:analysislevel_11_default.globalconfig",
     "//src/tools/bazel:analysislevelstyle_default.globalconfig",
 ]
 
@@ -43,7 +43,7 @@ source_analyzer_config_files = [
 # project doesn't emit a root .editorconfig analyzerconfig entry.
 source_analyzer_config_files_no_editorconfig = [
     "//eng:CodeAnalysis.src.globalconfig",
-    "//src/tools/bazel:analysislevel_10_default.globalconfig",
+    "//src/tools/bazel:analysislevel_11_default.globalconfig",
     "//src/tools/bazel:analysislevelstyle_default.globalconfig",
 ]
 
@@ -62,7 +62,7 @@ filegroup(
 test_analyzer_config_files = [
     ".editorconfig",
     "//eng:CodeAnalysis.test.globalconfig",
-    "//src/tools/bazel:analysislevel_10_default.globalconfig",
+    "//src/tools/bazel:analysislevel_11_default.globalconfig",
     "//src/tools/bazel:analysislevelstyle_default.globalconfig",
 ]
 

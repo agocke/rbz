@@ -423,6 +423,7 @@ def csharp_library(
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
     include_library_nowarn = True,
+    include_runtime_async = False,
     interceptors_namespaces = None,
     editorconfig_name = None,
     extra_editorconfig_content = "",
@@ -509,7 +510,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         if msbuild_analyzer_config == "source":
             _msbuild_analyzer_configs = _msbuild_analyzer_configs + [
                 "//eng:CodeAnalysis.src.globalconfig",
-                "//src/tools/bazel:analysislevel_10_default.globalconfig",
+                "//src/tools/bazel:analysislevel_11_default.globalconfig",
             ]
 
         analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
@@ -541,7 +542,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-    ]
+    ] + ([
+        # Enable runtime async for .NET 11+ CoreCLR targets.
+        # MSBuild: src/libraries/Directory.Build.targets + eng/testing/tests.targets
+        # Disable for net10.0 tool projects (e.g. ILCompiler/crossgen2).
+        "/features:runtime-async=on",
+    ] if include_runtime_async else [])
     if include_syslib_warnaserror:
         _compiler_options = _compiler_options + [
             # Arcade SDK promotes SYSLIB0011 to an error.  Test-support
@@ -574,6 +580,10 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
             "NU5105",
+            # CS8002: Referenced assembly does not have a strong name.
+            # Roslyn's Microsoft.CSharp.Core.targets suppresses this for all
+            # .NETCoreApp targets because .NET Core ignores strong naming.
+            "CS8002",
         ] + ([
             # src/libraries/Directory.Build.props global NoWarn — not present
             # in NativeAOT tool projects under src/coreclr/tools/.
@@ -635,6 +645,7 @@ def csharp_binary(
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
     include_library_nowarn = True,
+    include_runtime_async = False,
     interceptors_namespaces = None,
     editorconfig_name = None,
     extra_editorconfig_content = "",
@@ -678,7 +689,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         if msbuild_analyzer_config == "source":
             _msbuild_analyzer_configs = _msbuild_analyzer_configs + [
                 "//eng:CodeAnalysis.src.globalconfig",
-                "//src/tools/bazel:analysislevel_10_default.globalconfig",
+                "//src/tools/bazel:analysislevel_11_default.globalconfig",
             ]
 
         analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
@@ -699,7 +710,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-    ] + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
+    ] + ([
+        # Enable runtime async for .NET 11+ CoreCLR targets.
+        # MSBuild: src/libraries/Directory.Build.targets + eng/testing/tests.targets
+        # Disable for net10.0 tool projects (e.g. ILCompiler/crossgen2).
+        "/features:runtime-async=on",
+    ] if include_runtime_async else []) + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
     if interceptors_namespaces != None:
         _compiler_options = _compiler_options + [
             "/features:InterceptorsNamespaces=" + interceptors_namespaces,
@@ -722,6 +738,10 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
             "NU5105",
+            # CS8002: Referenced assembly does not have a strong name.
+            # Roslyn's Microsoft.CSharp.Core.targets suppresses this for all
+            # .NETCoreApp targets because .NET Core ignores strong naming.
+            "CS8002",
         ] + ([
             # src/libraries/Directory.Build.props global NoWarn — not present
             # in NativeAOT tool projects under src/coreclr/tools/.

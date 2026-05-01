@@ -64,6 +64,12 @@ _LIBRARY_TEST_NOWARN = [
     "SYSLIB0050",
     "SYSLIB0051",
     "IL2121",
+    # EventSource generator warnings (Directory.Build.props for tests)
+    "ESGEN001",
+    "ESGEN002",
+    # xUnit1051: recommends TestContext.Current.CancellationToken (v3 pattern)
+    # Suppressed in eng/testing/xunit/xunit.props and src/tests/Directory.Build.props
+    "xUnit1051",
 ]
 
 # Directory.Build.targets NoWarn for projects that multi-target net4x/netstandard:
@@ -662,9 +668,9 @@ def library_test(
     if replace_library_nowarns != None:
         # Allow overriding the standard _LIBRARY_TEST_NOWARN set (e.g. when MSBuild
         # csproj <NoWarn> replaces rather than appends to inherited warnings).
-        all_nowarn = nowarn + replace_library_nowarns
+        all_nowarn = nowarn + replace_library_nowarns + ["CS8002"]
     else:
-        all_nowarn = nowarn + _LIBRARY_TEST_NOWARN
+        all_nowarn = nowarn + _LIBRARY_TEST_NOWARN + ["CS8002"]
 
     # ── Analyzer infrastructure (matching MSBuild's Analyzers.targets for tests) ──
     # Generate an empty disabledAnalyzers.config
@@ -708,12 +714,21 @@ EOF""".format(version = PRODUCT_VERSION),
         "//src/libraries/System.Text.Json:JsonSourceGenerator",
         "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
         "//:xunit_test_analyzers",
+        # Extensions generators + ILLink analyzer delivered via the targeting
+        # pack in MSBuild (FrameworkReferenceResolution.targets).
+        "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+        "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
+        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
     ]
+    _analyzers = _dedupe_labels(_analyzers)
 
     # Match MSBuild test compiler options
     compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
         "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
+        # Enable runtime async for .NET 11+ CoreCLR targets.
+        # MSBuild: eng/testing/tests.targets
+        "/features:runtime-async=on",
         "/noconfig",
         "/warn:9999",
         "/ruleset:eng/Default.ruleset",

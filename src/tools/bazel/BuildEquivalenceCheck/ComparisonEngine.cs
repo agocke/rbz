@@ -568,6 +568,21 @@ public static class ComparisonEngine
             || flag.StartsWith("/generatedfilesout:", StringComparison.Ordinal))
             return true;
 
+        // Analysis-level globalconfig — MSBuild's SDK injects these implicitly
+        // via the AnalysisLevel property; Bazel must pass the equivalent file
+        // explicitly as /analyzerconfig:analysislevel_NN_default.globalconfig.
+        // Both deliver the same diagnostics configuration, just via different
+        // mechanisms, so this flag is build-infrastructure noise.
+        // The raw flag contains a full path, so we check the filename.
+        if (flag.StartsWith("/analyzerconfig:", StringComparison.Ordinal))
+        {
+            var configPath = flag["/analyzerconfig:".Length..];
+            var fileName = Path.GetFileName(configPath);
+            if (fileName.StartsWith("analysislevel", StringComparison.Ordinal)
+                && fileName.EndsWith("_default.globalconfig", StringComparison.Ordinal))
+                return true;
+        }
+
         // Unevaluated MSBuild property expressions that leaked into msbuild-records
         // (e.g. "/features:$(Features.Replace('nullablePublicOnly', ''))")
         if (flag.Contains("$(", StringComparison.Ordinal))

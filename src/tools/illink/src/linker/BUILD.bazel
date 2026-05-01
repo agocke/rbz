@@ -73,7 +73,7 @@ csharp_binary(
     allow_unsafe_blocks = True,
     cls_compliant = False,
     nullable = "enable",
-    target_frameworks = ["net10.0"],
+    target_frameworks = ["net11.0"],
     nowarn = _COMMON_NOWARN + ["CS1591", "NU5131"],
     compiler_options = ["/warnaserror+:NU1605", "/publicsign+"],
     additionalfiles = [
@@ -107,7 +107,7 @@ csharp_library(
     allow_unsafe_blocks = True,
     cls_compliant = False,
     nullable = "enable",
-    target_frameworks = ["net10.0"],
+    target_frameworks = ["net11.0"],
     nowarn = _COMMON_NOWARN + ["CS1591", "NU5131"],
     compiler_options = ["/publicsign+"],
     extra_editorconfig_content = _SKIPANALYZERS_EDITORCONFIG_CONTENT,
