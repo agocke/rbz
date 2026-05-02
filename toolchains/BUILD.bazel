@@ -7,9 +7,15 @@ load(":linux_arm64_cc_toolchain_config.bzl", "linux_arm64_cc_toolchain_config")
 
 package(default_visibility = ["//visibility:public"])
 
-# Toolchain config rule instance
+# Toolchain config rule instance.
+# Default attrs target the dotnet cross-build container
+# (mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64)
+# with rootfs at /crossrootfs/arm64 and clang at /usr/local/bin.
 linux_arm64_cc_toolchain_config(
     name = "linux_arm64_toolchain_config",
+    clang_resource_dirs = [
+        "/usr/local/lib/clang/22/include",
+    ],
 )
 
 # File groups for the cross-compiler (system-installed)

@@ -8,7 +8,9 @@
 #define HAVE_UNISTD_H 1
 
 #ifdef __linux__
-#define HAVE_LINUX_USER_EVENTS_H 1
+// linux/user_events.h requires kernel 6.4+ headers; the cross-build rootfs
+// may ship older headers so we conservatively disable this.
+#define HAVE_LINUX_USER_EVENTS_H 0
 #define HAVE_SYS_IOCTL_H 1
 /* This platform supports setting flags atomically when accepting connections. */
 #define HAVE_ACCEPT4 1

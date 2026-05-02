@@ -3,6 +3,10 @@
 Uses the system Clang compiler with --target=aarch64-linux-gnu for cross-compilation.
 Clang is inherently a cross-compiler and already supports -ferror-limit and other
 Clang-specific flags used in .bazelrc.
+
+The sysroot and tool paths are configured via attributes so the same rule works
+in different environments (bare host with multiarch packages, or the dotnet
+cross-build container with rootfs at /crossrootfs/arm64).
 """
 
 load("@rules_cc//cc:cc_toolchain_config_lib.bzl",
@@ -32,20 +36,21 @@ _ALL_LINK_ACTIONS = [
     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
 ]
 
-_SYSROOT = "/usr/aarch64-linux-gnu"
-
 def _impl(ctx):
+    sysroot = ctx.attr.sysroot
+    clang_prefix = ctx.attr.clang_prefix
+
     tool_paths = [
-        tool_path(name = "gcc", path = "/usr/bin/clang"),
-        tool_path(name = "g++", path = "/usr/bin/clang++"),
-        tool_path(name = "ld", path = "/usr/bin/aarch64-linux-gnu-ld"),
-        tool_path(name = "ar", path = "/usr/bin/aarch64-linux-gnu-ar"),
-        tool_path(name = "cpp", path = "/usr/bin/clang-cpp"),
-        tool_path(name = "gcov", path = "/usr/bin/llvm-cov"),
-        tool_path(name = "nm", path = "/usr/bin/aarch64-linux-gnu-nm"),
-        tool_path(name = "objdump", path = "/usr/bin/aarch64-linux-gnu-objdump"),
-        tool_path(name = "strip", path = "/usr/bin/aarch64-linux-gnu-strip"),
-        tool_path(name = "objcopy", path = "/usr/bin/aarch64-linux-gnu-objcopy"),
+        tool_path(name = "gcc", path = clang_prefix + "/clang"),
+        tool_path(name = "g++", path = clang_prefix + "/clang++"),
+        tool_path(name = "ld", path = clang_prefix + "/ld.lld"),
+        tool_path(name = "ar", path = clang_prefix + "/llvm-ar"),
+        tool_path(name = "cpp", path = clang_prefix + "/clang-cpp"),
+        tool_path(name = "gcov", path = clang_prefix + "/llvm-cov"),
+        tool_path(name = "nm", path = clang_prefix + "/llvm-nm"),
+        tool_path(name = "objdump", path = clang_prefix + "/llvm-objdump"),
+        tool_path(name = "strip", path = clang_prefix + "/llvm-strip"),
+        tool_path(name = "objcopy", path = clang_prefix + "/llvm-objcopy"),
     ]
 
     default_compile_flags = feature(
@@ -58,11 +63,7 @@ def _impl(ctx):
                     flag_group(
                         flags = [
                             "--target=aarch64-linux-gnu",
-                            "--sysroot=" + _SYSROOT,
-                            # Add system include paths for multiarch dev packages
-                            # (libssl-dev:arm64, libkrb5-dev:arm64 install to /usr/include)
-                            "-isystem", "/usr/include/aarch64-linux-gnu",
-                            "-isystem", "/usr/include",
+                            "--sysroot=" + sysroot,
                             "-no-canonical-prefixes",
                             "-Wno-builtin-macro-redefined",
                             "-D__DATE__=\"redacted\"",
@@ -86,11 +87,7 @@ def _impl(ctx):
                         flags = [
                             "--target=aarch64-linux-gnu",
                             "-fuse-ld=lld",
-                            # Don't pass --sysroot for linking: the GNU linker scripts
-                            # in the cross-sysroot contain absolute paths that lld would
-                            # try to resolve relative to the sysroot, causing double-prefix.
-                            # Instead, use -L to point at the cross-sysroot lib directly.
-                            "-L" + _SYSROOT + "/lib",
+                            "--sysroot=" + sysroot,
                             "-lstdc++",
                             "-lm",
                         ],
@@ -154,6 +151,9 @@ def _impl(ctx):
         opt_feature,
     ]
 
+    # Clang's own resource headers (stddef.h, stdarg.h, etc.)
+    clang_builtin_dirs = [d for d in ctx.attr.clang_resource_dirs if d]
+
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
         features = features,
@@ -167,16 +167,27 @@ def _impl(ctx):
         abi_libc_version = "glibc",
         tool_paths = tool_paths,
         cxx_builtin_include_directories = [
-            "/usr/aarch64-linux-gnu/include",
-            "/usr/include/aarch64-linux-gnu",
-            "/usr/include",
-            "/usr/lib/llvm-18/lib/clang/18/include",
-            "/usr/lib/clang/18/include",
-        ],
+            sysroot + "/usr/include/aarch64-linux-gnu",
+            sysroot + "/usr/include",
+            sysroot + "/include",
+        ] + clang_builtin_dirs,
     )
 
 linux_arm64_cc_toolchain_config = rule(
     implementation = _impl,
-    attrs = {},
+    attrs = {
+        "sysroot": attr.string(
+            default = "/crossrootfs/arm64",
+            doc = "Path to the arm64 sysroot (rootfs). Default is the dotnet cross-build container path.",
+        ),
+        "clang_prefix": attr.string(
+            default = "/usr/local/bin",
+            doc = "Directory containing clang, ld.lld, llvm-ar, etc.",
+        ),
+        "clang_resource_dirs": attr.string_list(
+            default = [],
+            doc = "Clang resource/builtin header directories (e.g. /usr/local/lib/clang/22/include).",
+        ),
+    },
     provides = [CcToolchainConfigInfo],
 )

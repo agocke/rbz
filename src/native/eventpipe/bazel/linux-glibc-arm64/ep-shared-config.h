@@ -2,7 +2,8 @@
 #define EP_SHARED_CONFIG_H_INCLUDED
 
 #define HAVE_ERRNO_H 1
-#define HAVE_LINUX_USER_EVENTS_H 1
+// linux/user_events.h requires kernel 6.4+; the cross-build rootfs has older headers
+#define HAVE_LINUX_USER_EVENTS_H 0
 #define HAVE_SYS_IOCTL_H 1
 #define HAVE_SYS_SOCKET_H 1
 #define HAVE_SYS_UIO_H 1
