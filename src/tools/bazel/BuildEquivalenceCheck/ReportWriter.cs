@@ -173,6 +173,20 @@ public static class ReportWriter
                     Console.WriteLine($"    - {name}");
             }
 
+            if (report.MissingFromMSBuild.Count > 0)
+            {
+                WriteColored($"  Listed in manifest but missing from MSBuild ({report.MissingFromMSBuild.Count}):", ConsoleColor.Red);
+                foreach (var name in report.MissingFromMSBuild)
+                    Console.WriteLine($"    - {name}");
+            }
+
+            if (report.MissingFromBazel.Count > 0)
+            {
+                WriteColored($"  Listed in manifest but missing from Bazel ({report.MissingFromBazel.Count}):", ConsoleColor.Red);
+                foreach (var name in report.MissingFromBazel)
+                    Console.WriteLine($"    - {name}");
+            }
+
             if (report.UnlistedAssemblies.Count > 0)
             {
                 WriteColored($"  Not in manifest ({report.UnlistedAssemblies.Count}):", ConsoleColor.Yellow);
@@ -230,6 +244,10 @@ public static class ReportWriter
             WriteColored($"  Native missing:    {report.NativeMissingFromBothBuilds.Count}", ConsoleColor.Red);
         if (report.MissingFromBothBuilds.Count > 0)
             WriteColored($"  Managed missing:   {report.MissingFromBothBuilds.Count}", ConsoleColor.Red);
+        if (report.MissingFromMSBuild.Count > 0)
+            WriteColored($"  Missing from MSBuild: {report.MissingFromMSBuild.Count}", ConsoleColor.Red);
+        if (report.MissingFromBazel.Count > 0)
+            WriteColored($"  Missing from Bazel:   {report.MissingFromBazel.Count}", ConsoleColor.Red);
         if (report.NativeUnlistedFiles.Count > 0)
             WriteColored($"  Native unlisted:   {report.NativeUnlistedFiles.Count}", ConsoleColor.Yellow);
         if (report.UnlistedAssemblies.Count > 0)
@@ -289,6 +307,8 @@ public static class ReportWriter
                 .ToList(),
             Regressions = report.Regressions.Select(r => r.Name).ToList(),
             MissingFromBothBuilds = report.MissingFromBothBuilds,
+            MissingFromMSBuild = report.MissingFromMSBuild,
+            MissingFromBazel = report.MissingFromBazel,
             UnlistedAssemblies = report.UnlistedAssemblies,
             OnlyInCMake = report.OnlyInCMake,
             OnlyInBazel = report.OnlyInBazel,
@@ -358,6 +378,8 @@ internal sealed class JsonReport
     public required List<JsonDiff> KnownManagedDifferences { get; init; }
     public required List<string> Regressions { get; init; }
     public required List<string> MissingFromBothBuilds { get; init; }
+    public required List<string> MissingFromMSBuild { get; init; }
+    public required List<string> MissingFromBazel { get; init; }
     public required List<string> UnlistedAssemblies { get; init; }
     public required List<string> OnlyInCMake { get; init; }
     public required List<string> OnlyInBazel { get; init; }

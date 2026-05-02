@@ -159,7 +159,8 @@ if (managedManifestPath is not null)
     report.ManagedManifest = manifest!;
     var matchCount = manifest!.Values.Count(e => e.ExpectedStatus == ManifestStatus.Match);
     var diffCount = manifest.Values.Count(e => e.ExpectedStatus == ManifestStatus.Diff);
-    Console.WriteLine($"  Loaded managed manifest: {manifest.Count} entries ({matchCount} match, {diffCount} diff) from {managedManifestPath}");
+    var ignoreCount = manifest.Values.Count(e => e.ExpectedStatus == ManifestStatus.Ignore);
+    Console.WriteLine($"  Loaded managed manifest: {manifest.Count} entries ({matchCount} match, {diffCount} diff, {ignoreCount} ignore) from {managedManifestPath}");
 }
 
 if (nativeManifestPath is not null)
@@ -218,11 +219,12 @@ static (Dictionary<string, ManifestEntry>? manifest, string? error) LoadManifest
         {
             "match" => ManifestStatus.Match,
             "diff" => ManifestStatus.Diff,
+            "ignore" => ManifestStatus.Ignore,
             _ => (ManifestStatus?)null,
         };
 
         if (status is null)
-            return (null, $"Invalid manifest status '{parts[0]}' (expected 'match' or 'diff'): {line}");
+            return (null, $"Invalid manifest status '{parts[0]}' (expected 'match', 'diff', or 'ignore'): {line}");
 
         manifest[parts[1]] = new ManifestEntry { Name = parts[1], ExpectedStatus = status.Value };
     }
