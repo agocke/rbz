@@ -168,10 +168,6 @@ build:macos --config=unix
 # Deployment target — match CMake's eng/native/configureplatform.cmake
 build:macos --macos_minimum_os=12.0
 build:macos --host_macos_minimum_os=12.0
-# Register both arm64 and x64 execution platforms so that on Apple
-# Silicon the native arm64 toolchain is preferred (avoiding Rosetta),
-# while x64 remains available for cross-compilation scenarios.
-build:macos --extra_execution_platforms=//platforms:macos_arm64,//platforms:macos_x64
 
 # =====================================================================
 # Windows-specific settings (MSVC)
