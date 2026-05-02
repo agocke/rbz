@@ -240,13 +240,43 @@ enabled and PDB paths are normalized. The default configuration is **release**.
 
 ```bash
 # Run comparison (rebuilds MSBuild, builds Bazel automatically)
-./compare-bazel.sh                                      # default (release)
+./compare-bazel.sh                                      # default (release, x64)
+./compare-bazel.sh --arch arm64                         # arm64 cross-build
 ./compare-bazel.sh --config debug                       # debug mode
 ./compare-bazel.sh --config both                        # both configs
 ./compare-bazel.sh --skip-build                         # reuse existing build artifacts
 ./compare-bazel.sh --verbose                            # show full diffs
 ./compare-bazel.sh --json-output results.json           # machine-readable output
 ```
+
+#### Cross-architecture comparison (arm64)
+
+For arm64, the Bazel aquery must be run inside the cross-build container where
+the arm64 toolchain is available. Pre-generate the aquery files, then run the
+comparison on the host with `--skip-build`:
+
+```bash
+# 1. Inside the cross-build container, generate aquery files:
+docker exec arm64-cross sh -c '
+  export HOME=/tmp/bazel-home && cd /repo &&
+  mkdir -p artifacts/obj/bazel-aquery &&
+  bazel --nohome_rc aquery --keep_going --config=release --config=ci \
+    --platforms=//platforms:linux_arm64 --output=jsonproto \
+    "mnemonic(\"CppCompile\", //src/coreclr/... union //src/native/...)" \
+    > artifacts/obj/bazel-aquery/release-arm64-native.json 2>/dev/null &&
+  bazel --nohome_rc aquery --keep_going --config=release --config=ci \
+    --platforms=//platforms:linux_arm64 --output=jsonproto \
+    "mnemonic(\"CSharpCompile\", //src/coreclr/... union //src/libraries/... union //src/native/... union //src/tools/illink/...)" \
+    > artifacts/obj/bazel-aquery/release-arm64-managed.json 2>/dev/null'
+
+# 2. On the host, run comparison with pre-generated aquery:
+./compare-bazel.sh --arch arm64 --skip-build \
+  --msbuild-json src/tools/bazel/BuildEquivalenceCheck/msbuild-records.json
+```
+
+If the pre-generated aquery files already exist at the expected paths
+(`artifacts/obj/bazel-aquery/{cfg}-{arch}-native.json`), the script reuses them
+instead of re-running `bazel aquery`.
 
 The tool lives in `src/tools/bazel/BuildEquivalenceCheck/`. The script builds
 and runs it via the repo's `dotnet.sh` wrapper so the SDK pinned in

@@ -7,7 +7,8 @@
 # bazel aquery).
 #
 # Usage:
-#   ./compare-bazel.sh                    # Release config (default)
+#   ./compare-bazel.sh                    # Release config, x64 arch (default)
+#   ./compare-bazel.sh --arch arm64       # Release config, arm64 arch
 #   ./compare-bazel.sh --config release   # Release config
 #   ./compare-bazel.sh --config both      # Both configs
 #   ./compare-bazel.sh --skip-build       # Use existing build artifacts
@@ -20,6 +21,7 @@ scriptroot="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ----- Defaults -----
 config="release"
+arch="x64"
 skip_build=false
 verbose=false
 json_output=""
@@ -30,6 +32,10 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --config)
             config="${2,,}"
+            shift 2
+            ;;
+        --arch)
+            arch="${2,,}"
             shift 2
             ;;
         --skip-build)
@@ -49,7 +55,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -h|--help)
-            head -16 "${BASH_SOURCE[0]}" | tail -15
+            head -17 "${BASH_SOURCE[0]}" | tail -16
             exit 0
             ;;
         *)
@@ -58,6 +64,15 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Validate arch
+case "$arch" in
+    x64|arm64) ;;
+    *)
+        echo "Invalid arch: $arch (must be x64 or arm64)"
+        exit 1
+        ;;
+esac
 
 # ----- Color helpers -----
 RED='\033[0;31m'
@@ -84,6 +99,12 @@ case "$config" in
         ;;
 esac
 
+# ----- Determine Bazel platform flags -----
+bazel_platform_args=()
+if [[ "$arch" == "arm64" ]]; then
+    bazel_platform_args=(--platforms=//platforms:linux_arm64)
+fi
+
 overall_exit=0
 bazel_scope_targets=(
     //src/coreclr/...
@@ -95,7 +116,7 @@ bazel_scope_query='//src/coreclr/... union //src/libraries/... union //src/nativ
 
 for cfg in "${configs[@]}"; do
     log "════════════════════════════════════════════════════"
-    log "  Configuration: $cfg"
+    log "  Configuration: $cfg / $arch"
     log "════════════════════════════════════════════════════"
 
     # ----- Map config to build system flags -----
@@ -103,16 +124,20 @@ for cfg in "${configs[@]}"; do
     # comparison reflects CI-mode deterministic source paths.
     if [[ "$cfg" == "debug" ]]; then
         msbuild_rc="Debug"
-        bazel_aquery_args=(--config=clr_debug --config=ci)
+        bazel_aquery_args=(--config=clr_debug --config=ci "${bazel_platform_args[@]}")
     else
         msbuild_rc="Release"
-        bazel_aquery_args=(--config=release --config=ci)
+        bazel_aquery_args=(--config=release --config=ci "${bazel_platform_args[@]}")
     fi
 
     # ----- CMake compile_commands.json paths -----
-    cmake_coreclr_cc="$scriptroot/artifacts/obj/coreclr/linux.x64.${msbuild_rc}/compile_commands.json"
-    cmake_corehost_cc="$scriptroot/artifacts/obj/linux-x64.${msbuild_rc}/compile_commands.json"
-    cmake_nativelibs_cc="$scriptroot/artifacts/obj/native/net10.0-linux-${msbuild_rc}-x64/compile_commands.json"
+    # Paths follow the CMake output directory convention:
+    #   coreclr:    artifacts/obj/coreclr/linux.{arch}.{Config}/
+    #   corehost:   artifacts/obj/linux-{arch}.{Config}/
+    #   native libs: artifacts/obj/native/net10.0-linux-{Config}-{arch}/
+    cmake_coreclr_cc="$scriptroot/artifacts/obj/coreclr/linux.${arch}.${msbuild_rc}/compile_commands.json"
+    cmake_corehost_cc="$scriptroot/artifacts/obj/linux-${arch}.${msbuild_rc}/compile_commands.json"
+    cmake_nativelibs_cc="$scriptroot/artifacts/obj/native/net10.0-linux-${msbuild_rc}-${arch}/compile_commands.json"
 
     # ----- MSBuild binlog path -----
     binlog_dir="$scriptroot/artifacts/log/${msbuild_rc}"
@@ -120,16 +145,20 @@ for cfg in "${configs[@]}"; do
     # ----- Bazel aquery output paths -----
     aquery_dir="$scriptroot/artifacts/obj/bazel-aquery"
     mkdir -p "$aquery_dir"
-    bazel_native_aquery="$aquery_dir/${cfg}-native.json"
-    bazel_managed_aquery="$aquery_dir/${cfg}-managed.json"
+    bazel_native_aquery="$aquery_dir/${cfg}-${arch}-native.json"
+    bazel_managed_aquery="$aquery_dir/${cfg}-${arch}-managed.json"
 
     # ----- Step 1: Build with CMake/MSBuild -----
     if [[ -z "$msbuild_json" && "$skip_build" != "true" ]]; then
         # Use a rebuild so the binlog contains the full managed compilation set.
         # An incremental build only records the Csc tasks that reran, which makes
         # the managed equivalence check compare a tiny overlap set.
-        log "Building with CMake/MSBuild (./build.sh clr+libs+libs.tests --rebuild --ci -c $cfg -rc $cfg -lc $cfg -bl)..."
-        "$scriptroot/build.sh" clr+libs+libs.tests --rebuild --ci -c "$cfg" -rc "$cfg" -lc "$cfg" -bl
+        msbuild_arch_args=()
+        if [[ "$arch" != "x64" ]]; then
+            msbuild_arch_args=(-arch "$arch" /p:CrossBuild=true)
+        fi
+        log "Building with CMake/MSBuild (./build.sh clr+libs+libs.tests --rebuild --ci -c $cfg -rc $cfg -lc $cfg ${msbuild_arch_args[*]} -bl)..."
+        "$scriptroot/build.sh" clr+libs+libs.tests --rebuild --ci -c "$cfg" -rc "$cfg" -lc "$cfg" "${msbuild_arch_args[@]}" -bl
     fi
 
     # ----- Step 2: Build with Bazel + extract aquery -----
@@ -146,19 +175,31 @@ for cfg in "${configs[@]}"; do
         bazel --nohome_rc build "${bazel_aquery_args[@]}" "${bazel_scope_targets[@]}"
     fi
 
-    log "Extracting Bazel aquery (native)..."
-    bazel --nohome_rc aquery \
-        "${bazel_aquery_args[@]}" \
-        --output=jsonproto \
-        "mnemonic(\"CppCompile\", ${bazel_scope_query})" \
-        > "$bazel_native_aquery" 2>/dev/null
+    # Extract aquery unless pre-generated files already exist.
+    # For cross-compilation targets (e.g. arm64), the aquery must be run inside
+    # the cross-build container where the toolchain is available.  Pre-generate
+    # the aquery files and pass --skip-build to use them.
+    if [[ ! -s "$bazel_native_aquery" ]]; then
+        log "Extracting Bazel aquery (native)..."
+        bazel --nohome_rc aquery \
+            "${bazel_aquery_args[@]}" \
+            --output=jsonproto \
+            "mnemonic(\"CppCompile\", ${bazel_scope_query})" \
+            > "$bazel_native_aquery" 2>/dev/null
+    else
+        log "Using existing Bazel aquery (native): $bazel_native_aquery"
+    fi
 
-    log "Extracting Bazel aquery (managed)..."
-    bazel --nohome_rc aquery \
-        "${bazel_aquery_args[@]}" \
-        --output=jsonproto \
-        "mnemonic(\"CSharpCompile\", ${bazel_scope_query})" \
-        > "$bazel_managed_aquery" 2>/dev/null
+    if [[ ! -s "$bazel_managed_aquery" ]]; then
+        log "Extracting Bazel aquery (managed)..."
+        bazel --nohome_rc aquery \
+            "${bazel_aquery_args[@]}" \
+            --output=jsonproto \
+            "mnemonic(\"CSharpCompile\", ${bazel_scope_query})" \
+            > "$bazel_managed_aquery" 2>/dev/null
+    else
+        log "Using existing Bazel aquery (managed): $bazel_managed_aquery"
+    fi
 
     # ----- Step 3: Find binlog files -----
     binlog_args=()
@@ -175,11 +216,23 @@ for cfg in "${configs[@]}"; do
 
     # ----- Step 5: Run comparison -----
     log "Running equivalence check..."
+
+    # Use arch-specific manifest if it exists, otherwise fall back to the
+    # shared manifest.  This allows platform-specific overrides (e.g. for
+    # assemblies that only exist on one architecture) while keeping the
+    # common case simple.
+    manifest_dir="$scriptroot/src/tools/bazel/BuildEquivalenceCheck"
+    if [[ -f "$manifest_dir/managed-assembly-manifest.linux-${arch}.txt" ]]; then
+        managed_manifest="$manifest_dir/managed-assembly-manifest.linux-${arch}.txt"
+    else
+        managed_manifest="$manifest_dir/managed-assembly-manifest.txt"
+    fi
+
     tool_args=(
         --repo-root "$scriptroot"
         --bazel-native-aquery "$bazel_native_aquery"
         --bazel-managed-aquery "$bazel_managed_aquery"
-        --managed-manifest "$scriptroot/src/tools/bazel/BuildEquivalenceCheck/managed-assembly-manifest.txt"
+        --managed-manifest "$managed_manifest"
     )
 
     # Add compile_commands.json files that exist
