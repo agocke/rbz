@@ -319,7 +319,7 @@ netcoreapp_ref_assembly(
         "/runtimemetadataversion:v4.0.30319",
     ],
     allow_unsafe_blocks = True,
-    nowarn = [ "CS0169", "CS0809", "CS0618", "CS3015" ]
+    nowarn = [ "CS0169", "CS0809", "CS0618", "CS3015", "CS9368" ]
 )
 
 netcoreapp_ref_assembly(
@@ -390,7 +390,7 @@ netcoreapp_impl_assembly(
         "//src/libraries/Common:src/System/Net/IPv4AddressHelper.Common.cs",
         "//src/libraries/Common:src/System/Net/IPv6AddressHelper.Common.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
 
         "System.Private.Uri/src/System/DomainNameHelper.cs",
         "System.Private.Uri/src/System/GenericUriParser.cs",
@@ -452,8 +452,13 @@ netcoreapp_impl_assembly(
         "System.Diagnostics.Process/src/System/Diagnostics/AsyncStreamReader.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/DataReceivedEventArgs.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/Process.cs",
+        "System.Diagnostics.Process/src/System/Diagnostics/ProcessExitStatus.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessInfo.cs",
-        "System.Diagnostics.Process/src/System/Diagnostics/ProcessManager.cs",
+        "System.Diagnostics.Process/src/System/Diagnostics/Process.Multiplexing.cs",
+        "System.Diagnostics.Process/src/System/Diagnostics/ProcessOutputLine.cs",
+        "System.Diagnostics.Process/src/System/Diagnostics/Process.Scenarios.cs",
+        "System.Diagnostics.Process/src/System/Diagnostics/ProcessTextOutput.cs",
+        "System.Diagnostics.Process/src/System/Diagnostics/ProcessUtils.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessModule.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessModuleCollection.cs",
         "System.Diagnostics.Process/src/System/Diagnostics/ProcessPriorityClass.cs",
@@ -471,6 +476,7 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Private.CoreLib:src/System/PasteArguments.cs",
 
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
+        "//src/libraries/Common:src/System/NullableBool.cs",
         "//src/libraries/Common:src/System/Runtime/Serialization/SerializationGuard.cs",
         "//src/libraries/Common:src/Interop/Windows/Interop.Errors.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
@@ -500,12 +506,19 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.GetSid.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.InitializeTerminalAndSignalHandling.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Kill.cs",
+            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.PosixSignal.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.ReadLink.cs",
+            "//src/libraries/Common:src/System/Runtime/InteropServices/SpanOfCharAsUtf8StringMarshaller.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.RegisterForSigChld.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.SetDelayedSigChildConsoleConfigurationHandler.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.ResourceLimits.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.PathConf.cs",
-            "//src/libraries/Common:src/System/Text/ValueUtf8Converter.cs",
+            "//src/libraries/Common:src/Interop/Unix/Interop.Poll.Structs.cs",
+            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Poll.cs",
+            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Fcntl.cs",
+            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Read.cs",
+            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.IsAtomicNonInheritablePipeCreationSupported.cs",
+            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.IsATty.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.WaitId.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.WaitPid.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Access.cs",
@@ -514,7 +527,9 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.IsMemberOfGroup.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.ConfigureTerminalForChildProcess.cs",
 
-            "System.Diagnostics.Process/src/System/Diagnostics/Process.ConfigureTerminalForChildProcesses.Unix.cs",
+            "System.Diagnostics.Process/src/System/Diagnostics/Process.Multiplexing.Unix.cs",
+            "System.Diagnostics.Process/src/System/Diagnostics/ProcessUtils.Unix.cs",
+            "System.Diagnostics.Process/src/System/Diagnostics/ProcessUtils.ConfigureTerminalForChildProcesses.Unix.cs",
             "System.Diagnostics.Process/src/System/Diagnostics/Process.NonUap.cs",
         ],
     }) + select({
@@ -527,7 +542,6 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Linux/cgroups/Interop.cgroups.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MountPoints.FormatInfo.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.RealPath.cs",
-            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.UnixFileSystemTypes.cs",
             "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcFsStat.cs",
             "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcFsStat.ParseMapModules.cs",
             "//src/libraries/Common:src/Interop/Linux/procfs/Interop.ProcFsStat.TryReadStatusFile.cs",
@@ -568,11 +582,14 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
         "//src/libraries/System.Text.Encoding.Extensions:ref_System.Text.Encoding.Extensions",
         "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Channels:ref_System.Threading.Channels",
+        "//src/libraries/System.Threading.Overlapped:ref_System.Threading.Overlapped",
         "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
         "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
+        "//src/libraries/System.Console:ref_System.Console",
     ],
     allow_unsafe_blocks = True,
-    supported_os_platforms = ["linux"],
+    supported_os_platforms = ["linux", "osx"],
 )
 
 netcoreapp_impl_assembly(

@@ -63,6 +63,8 @@ write_file(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Diagnostics.DiagnosticSource",
+    include_runtime_async = False,
+    event_source_generator = True,
     keyfile = OPEN_SNK,
     com_interface_generator = True,
     srcs = [

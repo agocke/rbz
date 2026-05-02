@@ -24,6 +24,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Formats.Nrbf",
+    include_runtime_async = False,
+    event_source_generator = False,
     keyfile = OPEN_SNK,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],

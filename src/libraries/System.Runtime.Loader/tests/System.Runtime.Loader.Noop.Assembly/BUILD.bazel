@@ -2,6 +2,7 @@ load("//:defs.bzl", "NETCOREAPP_CURRENT", "csharp_library")
 
 csharp_library(
     name = "System.Runtime.Loader.Noop.Assembly",
+    include_runtime_async = False,
     srcs = ["TestClass.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
     nullable = "annotations",

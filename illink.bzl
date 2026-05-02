@@ -25,15 +25,11 @@ def _illink_trim_impl(ctx):
     assembly_name = output.basename.removesuffix(".dll")
 
     # Collect reference assembly files and unique directories for -d args.
-    # Exclude the directory containing the root assembly itself — ILLink
-    # will fail with "Cannot overwrite an existing assembly" if it finds
-    # the same assembly name in both the -a input and a -d search dir.
     #
     # For ref assemblies (ref_assembly=True csharp_library targets),
     # DefaultInfo.files is empty — the DLL is only in
-    # DotnetAssemblyCompileInfo.irefs.  Fall back to that provider when
+    # DotnetAssemblyCompileInfo.irefs. Fall back to that provider when
     # dep.files yields no DLLs.
-    root_dir = il_assembly.dirname
     ref_files = []
     ref_dirs = {}
     for dep in ctx.attr.refs:
@@ -42,8 +38,7 @@ def _illink_trim_impl(ctx):
             dlls = list(dep[DotnetAssemblyCompileInfo].irefs)
         for f in dlls:
             ref_files.append(f)
-            if f.dirname != root_dir:
-                ref_dirs[f.dirname] = True
+            ref_dirs[f.dirname] = True
 
     # Build ILLink argument list matching eng/illink.targets ILLinkTrimAssembly.
     # The MSBuild ILLink task (LinkTask.cs) also emits --warnaserror- in its
@@ -95,32 +90,31 @@ def _illink_trim_impl(ctx):
 
     illink_exe = ctx.executable._illink
 
-    # ILLink writes to an output directory and requires the PDB next to the
-    # input assembly.  Stage DLL+PDB into a temp dir, run ILLink, copy result.
+    # ILLink writes to an output directory and expects the rooted assembly to be
+    # resolved by name from an assembly search path, matching eng/illink.targets.
+    # Stage the root DLL (and optional PDB) into a temp dir, add that dir as a
+    # search path, root by simple assembly name, then copy the trimmed result.
+    maybe_copy_pdb = ""
     if il_pdb:
-        # Root the assembly via the staging dir so ILLink finds the co-located PDB.
-        # The -a path uses $STAGE which must NOT be single-quoted.
-        cmd = (
-            'RUNFILES_DIR="{exe}.runfiles" && '.format(exe = illink_exe.path) +
-            "export RUNFILES_DIR && " +
-            "STAGE=$(mktemp -d) && OUTDIR=$(mktemp -d) && " +
-            'trap "rm -rf $STAGE $OUTDIR" EXIT && ' +
-            'cp "{dll}" "$STAGE/{basename}" && '.format(dll = il_assembly.path, basename = il_assembly.basename) +
-            'cp "{pdb}" "$STAGE/{pdb_basename}" && '.format(pdb = il_pdb.path, pdb_basename = il_pdb.basename) +
-            '{exe} {args} -a "$STAGE/{basename}" library -out "$OUTDIR" && '.format(
-                exe = illink_exe.path, args = args_str, basename = il_assembly.basename) +
-            'cp "$OUTDIR/{basename}" "{out}"'.format(basename = output.basename, out = output.path)
+        maybe_copy_pdb = 'cp "{pdb}" "$STAGE/{pdb_basename}" && '.format(
+            pdb = il_pdb.path,
+            pdb_basename = il_pdb.basename,
         )
-    else:
-        cmd = (
-            'RUNFILES_DIR="{exe}.runfiles" && '.format(exe = illink_exe.path) +
-            "export RUNFILES_DIR && " +
-            "OUTDIR=$(mktemp -d) && " +
-            'trap "rm -rf $OUTDIR" EXIT && ' +
-            "{exe} {args} -a '{input}' library -out \"$OUTDIR\" && ".format(
-                exe = illink_exe.path, args = args_str, input = il_assembly.path) +
-            'cp "$OUTDIR/{basename}" "{out}"'.format(basename = output.basename, out = output.path)
-        )
+
+    cmd = (
+        'RUNFILES_DIR="{exe}.runfiles" && '.format(exe = illink_exe.path) +
+        "export RUNFILES_DIR && " +
+        "STAGE=$(mktemp -d) && OUTDIR=$(mktemp -d) && " +
+        'trap "rm -rf $STAGE $OUTDIR" EXIT && ' +
+        'cp "{dll}" "$STAGE/{basename}" && '.format(dll = il_assembly.path, basename = il_assembly.basename) +
+        maybe_copy_pdb +
+        '{exe} {args} -d "$STAGE" -a \'{assembly_name}\' library -out "$OUTDIR" && '.format(
+            exe = illink_exe.path,
+            args = args_str,
+            assembly_name = assembly_name,
+        ) +
+        'cp "$OUTDIR/{basename}" "{out}"'.format(basename = output.basename, out = output.path)
+    )
 
     ctx.actions.run_shell(
         command = cmd,

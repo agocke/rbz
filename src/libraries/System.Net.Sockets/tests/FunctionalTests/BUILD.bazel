@@ -29,6 +29,8 @@ library_test(
         "//src/libraries/Common/tests:System/IO/TempFile.cs",
         "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
         "//src/libraries/Common:src/System/Net/Logging/NetEventSource.Common.cs",
+        "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Fcntl.cs",
     ],
     deps = [
         "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",

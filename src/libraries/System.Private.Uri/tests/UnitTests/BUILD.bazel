@@ -19,7 +19,7 @@ library_test(
     resources = [":strings_resx"],
     resource_logical_names = {"FxResources.System.Private.Uri.Unit.Tests.SR.resources": "FxResources.System.Private.Uri.Unit.Tests.SR.resources"},
     srcs = glob(["**/*.cs"]) + [
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
         "//src/libraries/Common:src/System/HexConverter.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
         "//src/libraries:System.Private.Uri/src/System/IriHelper.cs",

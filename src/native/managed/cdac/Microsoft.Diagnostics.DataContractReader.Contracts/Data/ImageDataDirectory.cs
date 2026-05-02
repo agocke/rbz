@@ -12,9 +12,9 @@ internal sealed class ImageDataDirectory : IData<ImageDataDirectory>
     {
         Target.TypeInfo type = target.GetTypeInfo(DataType.ImageDataDirectory);
 
-        VirtualAddress = target.Read<uint>(address + (ulong)type.Fields[nameof(VirtualAddress)].Offset);
-        Size = target.Read<uint>(address + (ulong)type.Fields[nameof(Size)].Offset);
-     }
+        VirtualAddress = target.ReadField<uint>(address, type, nameof(VirtualAddress));
+        Size = target.ReadField<uint>(address, type, nameof(Size));
+    }
 
     public uint VirtualAddress { get; }
     public uint Size { get; }

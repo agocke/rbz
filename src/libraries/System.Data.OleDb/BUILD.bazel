@@ -25,6 +25,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Data.OleDb",
+    include_runtime_async = False,
+    event_source_generator = False,
     keyfile = OPEN_SNK,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_OleDb",
@@ -33,7 +35,7 @@ impl_assembly(
         "ref/System.Data.OleDb.Manual.cs",
     ],
     srcs = [],
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS0618", "CS3016", "CA2249", "SYSLIB0004", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS0618", "CS3016", "SYSLIB0004", "CS1591"],
     analyzers = COMMON_GENERATOR_ANALYZERS,
     allow_unsafe_blocks = True,
     include_editorconfig = False,

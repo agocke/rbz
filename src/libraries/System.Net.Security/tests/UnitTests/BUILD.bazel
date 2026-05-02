@@ -27,7 +27,6 @@ library_test(
         ],
     ) + [
         # Common source files (non-browser)
-        "//src/libraries/Common:src/System/AppContextSwitchHelper.cs",
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
         "//src/libraries/Common:src/System/HexConverter.cs",
         "//src/libraries/Common:src/System/Net/Security/MD4.cs",
@@ -112,6 +111,9 @@ library_test(
         "//src/libraries/Common:src/Microsoft/Win32/SafeHandles/SafeHandleCache.cs",
         "//src/libraries/Common:src/System/Net/Security/Unix/SafeDeleteSslContext.cs",
         "//src/libraries/Common:src/System/Net/Security/SslKeyLogger.cs",
+        "//src/libraries/Common:src/System/LocalAppContextSwitches.Common.cs",
+        "//src/libraries/Common:src/System/Net/LocalAppContextSwitches.Net.cs",
+        "//src/libraries/System.Net.Security:src/System/Net/Security/LocalAppContextSwitches.cs",
         # SR support
         "//src/libraries/Common:src/System/SR.cs",
         ":gen_resx",

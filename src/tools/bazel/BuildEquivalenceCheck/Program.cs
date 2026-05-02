@@ -144,33 +144,39 @@ if (bazelAqueryManagedPath is not null && File.Exists(bazelAqueryManagedPath))
     Console.WriteLine($"  Bazel managed records: {bazelManagedRecords.Count}");
 }
 
+// ── Load manifests ──────────────────────────────────────────────────
+var managedManifest = default(Dictionary<string, ManifestEntry>);
+if (managedManifestPath is not null)
+{
+    var (manifest, error) = LoadManifest(managedManifestPath, "Managed");
+    if (error is not null) { Console.Error.WriteLine(error); return 1; }
+    var matchCount = manifest!.Values.Count(e => e.ExpectedStatus == ManifestStatus.Match);
+    var diffCount = manifest.Values.Count(e => e.ExpectedStatus == ManifestStatus.Diff);
+    var ignoreCount = manifest.Values.Count(e => e.ExpectedStatus == ManifestStatus.Ignore);
+    managedManifest = manifest;
+    Console.WriteLine($"  Loaded managed manifest: {manifest.Count} entries ({matchCount} match, {diffCount} diff, {ignoreCount} ignore) from {managedManifestPath}");
+}
+
+var nativeManifest = default(Dictionary<string, ManifestEntry>);
+if (nativeManifestPath is not null)
+{
+    var (manifest, error) = LoadManifest(nativeManifestPath, "Native");
+    if (error is not null) { Console.Error.WriteLine(error); return 1; }
+    var matchCount = manifest!.Values.Count(e => e.ExpectedStatus == ManifestStatus.Match);
+    var diffCount = manifest.Values.Count(e => e.ExpectedStatus == ManifestStatus.Diff);
+    var ignoreCount = manifest.Values.Count(e => e.ExpectedStatus == ManifestStatus.Ignore);
+    nativeManifest = manifest;
+    Console.WriteLine($"  Loaded native manifest: {manifest.Count} entries ({matchCount} match, {diffCount} diff, {ignoreCount} ignore) from {nativeManifestPath}");
+}
+
 // ── Compare ─────────────────────────────────────────────────────────
 Console.WriteLine();
 Console.WriteLine("Comparing build inputs...");
 
 var report = ComparisonEngine.CompareNative(cmakeNativeRecords, bazelNativeRecords);
+report.ManagedManifest = managedManifest ?? [];
+report.NativeManifest = nativeManifest ?? [];
 ComparisonEngine.CompareManaged(report, msbuildManagedRecords, bazelManagedRecords);
-
-// ── Load manifests ──────────────────────────────────────────────────
-if (managedManifestPath is not null)
-{
-    var (manifest, error) = LoadManifest(managedManifestPath, "Managed");
-    if (error is not null) { Console.Error.WriteLine(error); return 1; }
-    report.ManagedManifest = manifest!;
-    var matchCount = manifest!.Values.Count(e => e.ExpectedStatus == ManifestStatus.Match);
-    var diffCount = manifest.Values.Count(e => e.ExpectedStatus == ManifestStatus.Diff);
-    Console.WriteLine($"  Loaded managed manifest: {manifest.Count} entries ({matchCount} match, {diffCount} diff) from {managedManifestPath}");
-}
-
-if (nativeManifestPath is not null)
-{
-    var (manifest, error) = LoadManifest(nativeManifestPath, "Native");
-    if (error is not null) { Console.Error.WriteLine(error); return 1; }
-    report.NativeManifest = manifest!;
-    var matchCount = manifest!.Values.Count(e => e.ExpectedStatus == ManifestStatus.Match);
-    var diffCount = manifest.Values.Count(e => e.ExpectedStatus == ManifestStatus.Diff);
-    Console.WriteLine($"  Loaded native manifest: {manifest.Count} entries ({matchCount} match, {diffCount} diff) from {nativeManifestPath}");
-}
 
 // ── Report ──────────────────────────────────────────────────────────
 ReportWriter.WriteConsoleReport(report, verbose);
@@ -212,17 +218,18 @@ static (Dictionary<string, ManifestEntry>? manifest, string? error) LoadManifest
 
         var parts = line.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts.Length != 2)
-            return (null, $"Invalid manifest line (expected 'match|diff <name>'): {line}");
+            return (null, $"Invalid manifest line (expected 'match|diff|ignore <name>'): {line}");
 
         var status = parts[0].ToLowerInvariant() switch
         {
             "match" => ManifestStatus.Match,
             "diff" => ManifestStatus.Diff,
+            "ignore" => ManifestStatus.Ignore,
             _ => (ManifestStatus?)null,
         };
 
         if (status is null)
-            return (null, $"Invalid manifest status '{parts[0]}' (expected 'match' or 'diff'): {line}");
+            return (null, $"Invalid manifest status '{parts[0]}' (expected 'match', 'diff', or 'ignore'): {line}");
 
         manifest[parts[1]] = new ManifestEntry { Name = parts[1], ExpectedStatus = status.Value };
     }

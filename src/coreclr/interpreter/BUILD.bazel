@@ -14,5 +14,5 @@ cc_library(
         ],
         allow_empty = True,
     ),
-    includes = ["."],
+    includes = [".", "inc"],
 )

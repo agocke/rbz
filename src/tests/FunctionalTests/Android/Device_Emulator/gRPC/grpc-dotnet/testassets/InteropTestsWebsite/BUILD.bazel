@@ -2,6 +2,6 @@ load("//src/tests:live_test.bzl", "coreclr_test")
 
 coreclr_test(
     name = "InteropTestsWebsite",
-    srcs = glob(["*.cs"]),
+    srcs = glob(["*.cs"], allow_empty = True),
     target_compatible_with = ["@platforms//os:android"],
 )

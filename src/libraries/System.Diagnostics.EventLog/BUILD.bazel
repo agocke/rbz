@@ -19,6 +19,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Diagnostics.EventLog",
+    include_runtime_async = False,
+    event_source_generator = False,
     keyfile = OPEN_SNK,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_EventLog",
@@ -39,8 +41,8 @@ impl_assembly(
     ],
     resx_file = "src/Resources/Strings.resx",
     supported_os_platforms_short = ["windows"],
-    nullable = "disable",
-    nowarn = MULTITARGET_NOWARN + ["nullable", "CP0003", "CS1591"],
+    nullable = "enable",
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
 )
 
 ref_impl_pair(

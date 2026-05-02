@@ -19,8 +19,6 @@ cc_library(
         "md/inc",
         "hosts/inc",
         "interpreter",
-        "classlibnative/bcltype",
-        "classlibnative/inc",
         "minipal",
     ] + select({
         "@platforms//cpu:arm64": ["debug/inc/arm64"],

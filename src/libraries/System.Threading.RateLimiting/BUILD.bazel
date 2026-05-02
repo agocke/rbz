@@ -21,6 +21,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Threading.RateLimiting",
+    include_runtime_async = False,
+    event_source_generator = False,
     keyfile = OPEN_SNK,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
@@ -29,6 +31,8 @@ impl_assembly(
 
         "src/System/Threading/RateLimiting/ChainedPartitionedRateLimiter.cs",
         "src/System/Threading/RateLimiting/ChainedRateLimiter.cs",
+        "src/System/Threading/RateLimiting/ChainedRateLimiterShared.cs",
+        "src/System/Threading/RateLimiting/ChainedReplenishingRateLimiter.cs",
         "src/System/Threading/RateLimiting/CombinedRateLimitLease.cs",
         "src/System/Threading/RateLimiting/ConcurrencyLimiter.cs",
         "src/System/Threading/RateLimiting/ConcurrencyLimiterOptions.cs",

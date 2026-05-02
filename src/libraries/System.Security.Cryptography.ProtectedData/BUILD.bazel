@@ -16,6 +16,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Security.Cryptography.ProtectedData",
+    include_runtime_async = False,
+    event_source_generator = False,
     allow_unsafe_blocks = True,
     analyzers = [
         "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",

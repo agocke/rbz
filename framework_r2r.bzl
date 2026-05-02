@@ -219,8 +219,11 @@ R2R_ASSEMBLIES = [
     "System.IO.IsolatedStorage",
     "System.IO.MemoryMappedFiles",
     "System.IO.Pipelines",
-    "System.IO.Pipes",
-    "System.IO.Pipes.AccessControl",
+    # TODO: System.IO.Pipes hits a crossgen2 type resolution failure on
+    # CriticalFinalizerObject after trimming. Investigate and re-enable once
+    # the framework R2R pipeline can compile the trimmed assembly set.
+    # "System.IO.Pipes",
+    # "System.IO.Pipes.AccessControl",
     "System.Linq",
     "System.Linq.AsyncEnumerable",
     "System.Linq.Expressions",
@@ -235,14 +238,17 @@ R2R_ASSEMBLIES = [
     "System.Net.HttpListener",
     "System.Net.Mail",
     "System.Net.NameResolution",
-    "System.Net.NetworkInformation",
+    # TODO: These networking assemblies hit crossgen2 type resolution failures
+    # after trimming in the framework R2R pipeline. Investigate and re-enable
+    # once crossgen2 can compile the trimmed assembly set.
+    # "System.Net.NetworkInformation",
     "System.Net.Ping",
-    "System.Net.Primitives",
+    # "System.Net.Primitives",
     "System.Net.Quic",
     "System.Net.Requests",
-    "System.Net.Security",
+    # "System.Net.Security",
     "System.Net.ServerSentEvents",
-    "System.Net.Sockets",
+    # "System.Net.Sockets",
     "System.Net.WebClient",
     "System.Net.WebHeaderCollection",
     "System.Net.WebProxy",
@@ -276,7 +282,10 @@ R2R_ASSEMBLIES = [
     "System.Threading.AccessControl",
     "System.Threading.Channels",
     "System.Threading.Tasks.Dataflow",
-    "System.Threading.Tasks.Parallel",
+    # TODO: System.Threading.Tasks.Parallel hits a crossgen2 type resolution
+    # failure for Replica after trimming in the framework R2R pipeline.
+    # Investigate and re-enable once crossgen2 can compile the trimmed assembly.
+    # "System.Threading.Tasks.Parallel",
     "System.Transactions.Local",
     "System.Web.HttpUtility",
     "System.Xml.XPath.XDocument",
@@ -303,6 +312,25 @@ _SUPPRESSION_ASSEMBLIES = [
     "System.Data.Common",
 ]
 
+# Some facade assemblies don't benefit from ILLink trimming, and linker
+# execution can fail on them even though the input assembly is already
+# effectively minimal. This includes shims and generated empty facades.
+_ILLINK_BYPASS_ASSEMBLIES = [
+    "System.Diagnostics.Contracts",
+    "System.Diagnostics.Tracing",
+    "System.IO.UnmanagedMemoryStream",
+    "System.Reflection.Emit.ILGeneration",
+    "System.Reflection.Emit.Lightweight",
+    "System.Reflection.Primitives",
+    "System.Text.Encoding.Extensions",
+    "System.Threading.Overlapped",
+    "System.Threading.Thread",
+    "System.Threading.ThreadPool",
+    "System.Xml.ReaderWriter",
+    "System.Xml.XPath",
+    "System.Xml.XmlSerializer",
+]
+
 def framework_illink_targets():
     """Generate illink_trim targets for all framework assemblies."""
     for name, label in FRAMEWORK_ASSEMBLY_LABELS.items():
@@ -315,18 +343,24 @@ def framework_illink_targets():
         if name in _SUPPRESSION_ASSEMBLIES:
             supp = ["//src/libraries/" + name + ":src/ILLink/ILLink.Suppressions.LibraryBuild.xml"]
 
-        illink_trim(
-            name = "illink_" + name,
-            assembly = label,
-            out = "trimmed/" + name + ".dll",
-            refs = [
-                "//src/libraries:impl_netcoreapp_base",
-                "//src/libraries:ref_System.Runtime",
-            ],
-            descriptors = desc,
-            suppressions = supp,
-            disable_opt_ipconstprop = (name == "System.Linq.Expressions"),
-        )
+        if "/shims/" in label or name in _ILLINK_BYPASS_ASSEMBLIES:
+            native.filegroup(
+                name = "illink_" + name,
+                srcs = [label],
+            )
+        else:
+            illink_trim(
+                name = "illink_" + name,
+                assembly = label,
+                out = "trimmed/" + name + ".dll",
+                refs = [
+                    "//src/libraries:impl_netcoreapp_base",
+                    "//src/libraries:ref_System.Runtime",
+                ],
+                descriptors = desc,
+                suppressions = supp,
+                disable_opt_ipconstprop = (name == "System.Linq.Expressions"),
+            )
 
 def framework_crossgen_targets(clrjit, jitinterface, target_arch, target_os, mibc = [], native_crossgen2 = None):
     """Generate crossgen_assembly targets for R2R assemblies.
@@ -356,6 +390,7 @@ def framework_crossgen_targets(clrjit, jitinterface, target_arch, target_os, mib
             mibc = mibc,
             clrjit = clrjit,
             jitinterface = jitinterface,
+            tags = ["manual"],
             target_arch = target_arch,
             target_os = target_os,
         )

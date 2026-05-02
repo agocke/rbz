@@ -188,11 +188,12 @@ netcoreapp_ref_assembly(
         "//src/libraries/System.Collections:ref_System.Collections",
     ],
     allow_unsafe_blocks = True,
+    nowarn = ["CS9368"],
 )
 
 netcoreapp_impl_assembly(
     name = "impl_System.Runtime.InteropServices",
-    nowarn = ["CS1591"],
+    nowarn = ["CS1591", "CS9368"],
     partial_facade = True,
     srcs = [
         "src/System/Runtime/CompilerServices/IDispatchConstantAttribute.cs",

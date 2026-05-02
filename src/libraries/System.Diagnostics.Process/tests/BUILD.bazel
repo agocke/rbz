@@ -26,6 +26,8 @@ library_test(
     srcs = glob(
         ["*.cs"],
         exclude = [
+            "**/*.Windows.cs",
+            "ProcessTests.Mobile.cs",
             "ProcessModuleTests.Windows.cs",
             "ProcessStartInfoTests.Windows.cs",
             "ProcessTests.Windows.cs",
@@ -36,12 +38,13 @@ library_test(
         "//src/libraries/Common:src/Interop/OSX/Interop.libproc.cs",
         "//src/libraries/Common:src/Interop/OSX/Interop.libSystem.cs",
         "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Kill.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.PosixSignal.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Stat.cs",
         "//src/libraries/Common:src/System/IO/StringParser.cs",
         "//src/libraries/Common:src/System/SR.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
         "//src/libraries/Common/tests:Microsoft/Win32/TempRegistryKey.cs",
-        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
         "//src/libraries/Common/tests:System/ShouldNotBeInvokedException.cs",
         ":gen_resx",
     ],

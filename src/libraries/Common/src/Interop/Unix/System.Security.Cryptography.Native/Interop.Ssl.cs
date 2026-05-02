@@ -57,7 +57,7 @@ internal static partial class Interop
         internal static partial bool SslSetTlsExtHostName(SafeSslHandle ssl, string host);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetServerName")]
-        internal static unsafe partial IntPtr SslGetServerName(IntPtr ssl);
+        internal static unsafe partial byte* SslGetServerName(IntPtr ssl);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslSetSession")]
         internal static unsafe partial int SslSetSession(SafeSslHandle ssl, IntPtr session);
@@ -134,6 +134,9 @@ internal static partial class Interop
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetPeerCertificate")]
         internal static partial IntPtr SslGetPeerCertificate(SafeSslHandle ssl);
 
+        [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslUpdateOcspStaple")]
+        internal static partial void SslUpdateOcspStaple(SafeSslHandle ssl, IntPtr cert);
+
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetCertificate")]
         internal static partial IntPtr SslGetCertificate(SafeSslHandle ssl);
 
@@ -160,8 +163,15 @@ internal static partial class Interop
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static partial bool SslSessionReused(SafeSslHandle ssl);
 
+        [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslSessionReused")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool SslSessionReused(IntPtr ssl);
+
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetSession")]
         internal static partial IntPtr SslGetSession(SafeSslHandle ssl);
+
+        [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetSession")]
+        internal static partial IntPtr SslGetSession(IntPtr ssl);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetClientCAList")]
         private static partial SafeSharedX509NameStackHandle SslGetClientCAList_private(SafeSslHandle ssl);
@@ -171,14 +181,14 @@ internal static partial class Interop
         internal static partial bool SslGetCurrentCipherId(SafeSslHandle ssl, out int cipherId);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_GetOpenSslCipherSuiteName")]
-        private static partial IntPtr GetOpenSslCipherSuiteName(SafeSslHandle ssl, int cipherSuite, out int isTls12OrLower);
+        private static unsafe partial byte* GetOpenSslCipherSuiteName(SafeSslHandle ssl, int cipherSuite, out int isTls12OrLower);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SetCiphers")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static unsafe partial bool SslSetCiphers(SafeSslHandle ssl, byte* cipherList, byte* cipherSuites);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslSetVerifyPeer")]
-        internal static partial void SslSetVerifyPeer(SafeSslHandle ssl);
+        internal static partial void SslSetVerifyPeer(SafeSslHandle ssl, [MarshalAs(UnmanagedType.Bool)] bool failIfNoPeerCert);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetData")]
         internal static partial IntPtr SslGetData(IntPtr ssl);
@@ -214,19 +224,22 @@ internal static partial class Interop
         private static partial int Tls13SupportedImpl();
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslSessionGetHostname")]
-        internal static partial IntPtr SessionGetHostname(IntPtr session);
+        internal static unsafe partial byte* SessionGetHostname(IntPtr session);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslSessionFree")]
         internal static partial void SessionFree(IntPtr session);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslSessionSetHostname")]
-        internal static partial int SessionSetHostname(IntPtr session, IntPtr name);
+        internal static unsafe partial int SessionSetHostname(IntPtr session, byte* name);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslSessionGetData")]
         internal static partial IntPtr SslSessionGetData(IntPtr session);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslSessionSetData")]
         internal static partial void SslSessionSetData(IntPtr session, IntPtr val);
+
+        [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetSslCtx")]
+        internal static partial IntPtr SslGetSslCtx(IntPtr ssl);
 
         internal static class Capabilities
         {
@@ -245,6 +258,11 @@ internal static partial class Interop
                 }
 
                 protocolSize += protocol.Protocol.Length + 1;
+
+                if (protocolSize > ushort.MaxValue)
+                {
+                    throw new ArgumentException(SR.net_ssl_app_protocols_invalid, nameof(applicationProtocols));
+                }
             }
 
             return protocolSize;
@@ -328,9 +346,9 @@ internal static partial class Interop
             return true;
         }
 
-        internal static string? GetOpenSslCipherSuiteName(SafeSslHandle ssl, TlsCipherSuite cipherSuite, out bool isTls12OrLower)
+        internal static unsafe string? GetOpenSslCipherSuiteName(SafeSslHandle ssl, TlsCipherSuite cipherSuite, out bool isTls12OrLower)
         {
-            string? ret = Marshal.PtrToStringUTF8(GetOpenSslCipherSuiteName(ssl, (int)cipherSuite, out int isTls12OrLowerInt));
+            string? ret = Utf8StringMarshaller.ConvertToManaged(GetOpenSslCipherSuiteName(ssl, (int)cipherSuite, out int isTls12OrLowerInt));
             isTls12OrLower = isTls12OrLowerInt != 0;
             return ret;
         }
@@ -382,10 +400,14 @@ namespace Microsoft.Win32.SafeHandles
         private bool _isServer;
         private bool _handshakeCompleted;
 
-        public GCHandle AlpnHandle;
+        private WeakGCHandle<SslAuthenticationOptions> _authOptionsHandle;
         // Reference to the parent SSL_CTX handle in the SSL_CTX is being cached. Only used for
         // refcount management.
         public SafeSslContextHandle? SslContextHandle;
+
+        // Storage for the exception that occurred during certificate validation callback so that
+        // we may rethrow it after returning to managed code.
+        public Exception? CertificateValidationException;
 
         public bool IsServer
         {
@@ -413,7 +435,7 @@ namespace Microsoft.Win32.SafeHandles
             _handshakeCompleted = true;
         }
 
-        public static SafeSslHandle Create(SafeSslContextHandle context, bool isServer)
+        public static SafeSslHandle Create(SafeSslContextHandle context, SslAuthenticationOptions options)
         {
             SafeBioHandle readBio = Interop.Crypto.CreateMemoryBio();
             SafeBioHandle writeBio = Interop.Crypto.CreateMemoryBio();
@@ -425,7 +447,9 @@ namespace Microsoft.Win32.SafeHandles
                 handle.Dispose(); // will make IsInvalid==true if it's not already
                 return handle;
             }
-            handle._isServer = isServer;
+            handle._isServer = options.IsServer;
+            handle._authOptionsHandle = new WeakGCHandle<SslAuthenticationOptions>(options);
+            Interop.Ssl.SslSetData(handle, WeakGCHandle<SslAuthenticationOptions>.ToIntPtr(handle._authOptionsHandle));
 
             // SslSetBio will transfer ownership of the BIO handles to the SSL context
             try
@@ -444,7 +468,7 @@ namespace Microsoft.Win32.SafeHandles
                 throw;
             }
 
-            if (isServer)
+            if (options.IsServer)
             {
                 Interop.Ssl.SslSetAcceptState(handle);
             }
@@ -480,10 +504,11 @@ namespace Microsoft.Win32.SafeHandles
 
             SslContextHandle?.Dispose();
 
-            if (AlpnHandle.IsAllocated)
+            if (_authOptionsHandle.IsAllocated)
             {
                 Interop.Ssl.SslSetData(handle, IntPtr.Zero);
-                AlpnHandle.Free();
+                _authOptionsHandle.Dispose();
+                _authOptionsHandle = default;
             }
 
             IntPtr h = handle;

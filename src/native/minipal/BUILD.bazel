@@ -13,8 +13,10 @@ cc_library(
     srcs = [
         "cpufeatures.c",
         "debugger.c",
+        "descriptorlimit.c",
         "guid.c",
         "log.c",
+        "memorybarrierprocesswide.c",
         "mutex.c",
         "random.c",
         "strings.c",

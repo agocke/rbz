@@ -33,6 +33,7 @@ csharp_library(
         "//src/libraries/System.Reflection.Metadata:src/System/Reflection/Metadata/TypeNameParseOptions.cs",
         "//src/libraries/System.Reflection.Metadata:src/System/Reflection/Metadata/TypeNameParser.cs",
         "//src/libraries/System.Reflection.Metadata:src/System/Reflection/Metadata/TypeNameParserHelpers.cs",
+        "//src/libraries/Common:src/System/Buffers/SearchValuesPolyfills.cs",
         # Generated resx code
         ":resx_srm_strings",
     ],

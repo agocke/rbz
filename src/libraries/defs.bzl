@@ -29,6 +29,8 @@ load(
 
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 
+_NETCOREAPP_CURRENT_ASSEMBLY_VERSION = NETCOREAPP_CURRENT[len("net"):].split(".")[0] + "." + NETCOREAPP_CURRENT[len("net"):].split(".")[1] + ".0.0"
+
 LIVE_NETCOREAPP_DEPS = [
 #    "//src/libraries:live_System.Runtime",
 #    "//src/libraries:live_System.Console",
@@ -180,7 +182,7 @@ def netcoreapp_ref_assembly(
     compiler_options = [],
     keyfile = None,
     cls_compliant = True,
-    assembly_version = "10.0.0.0",
+    assembly_version = _NETCOREAPP_CURRENT_ASSEMBLY_VERSION,
     **kwargs
 ):
     compiler_options = compiler_options + [
@@ -211,8 +213,11 @@ def netcoreapp_ref_assembly(
         disable_implicit_framework_refs = True,
         nowarn = nowarn,
         compiler_options = compiler_options,
+        # Match MSBuild's LangVersion=preview from Directory.Build.props.
+        langversion = "preview",
         ref_assembly = True,
         debug_type = "none",
+        include_runtime_async = False,
         **kwargs
     )
 
@@ -341,9 +346,13 @@ def impl_assembly(
     jsimport_generator = True,
     include_editorconfig = True,
     interceptors_namespaces = None,
+    include_runtime_async = True,
+    event_source_generator = None,
     **kwargs
 ):
     base_name = name[len("impl_"):]
+    if assembly_version == None:
+        assembly_version = _NETCOREAPP_CURRENT_ASSEMBLY_VERSION
 
     # Assemblies whose MSBuild TFM includes an OS suffix receive OS-specific
     # implicit defines.  Match that in Bazel via select().
@@ -548,28 +557,57 @@ EOF""".format(version = PRODUCT_VERSION),
         ":" + _editorconfig_target,
     ]
 
-    # Merge caller-provided analyzers with the standard source build analyzers
-    # and ILLink Roslyn analyzer. Interop source generators are conditional on
-    # the assembly's dependency on System.Runtime.InteropServices / CoreLib
-    # (matching eng/generators.targets). JSImportGenerator is separate because
-    # MSBuild flows it through the targeting-pack analyzer set for OOB builds.
+    # Analyzer scoping mirrors MSBuild's two delivery mechanisms:
+    #
+    # 1. Libraries with EventSourceGenerator (event_source_generator=True):
+    #    eng/generators.targets adds EventSourceGenerator +
+    #    Microsoft.Interop.SourceGeneration for IsSourceProject +
+    #    DisableImplicitFrameworkReferences.  This covers both NCA inner
+    #    source libs AND packable "abstractions" libraries that still live
+    #    in the shared framework source tree.
+    #
+    # 2. Libraries without EventSourceGenerator (event_source_generator=False):
+    #    Extensions generators (Logging, Options) and Interop.SourceGeneration
+    #    flow via the local targeting pack (FrameworkReferenceResolution.targets).
+    #
+    # event_source_generator defaults to True (matching the majority of
+    # impl_assembly users).  OOB libraries that don't get EventSourceGenerator
+    # from MSBuild should set event_source_generator = False.
+    #
+    # ILLink.RoslynAnalyzer is always included — both delivery paths provide it.
     #
     # interop_source_generation defaults to library_import_generator when not
     # set explicitly (None).  Callers that need SourceGeneration without
     # LibraryImportGenerator (e.g. shim/facade assemblies) can pass
     # interop_source_generation = True, library_import_generator = False.
     _interop_source_generation = interop_source_generation if interop_source_generation != None else library_import_generator
+    _event_source_generator = event_source_generator if event_source_generator != None else True
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
     ]
+
+    if _event_source_generator:
+        # eng/generators.targets: EventSourceGenerator + Interop.SourceGeneration
+        # for IsSourceProject + DisableImplicitFrameworkReferences.
+        _analyzers = _analyzers + [
+            "//src/libraries/System.Private.CoreLib:EventSourceGenerator",
+            "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+        ]
+    else:
+        # Targeting-pack analyzers for OOB / non-EventSourceGenerator libs.
+        _analyzers = _analyzers + [
+            "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+            "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
+        ]
+        if _interop_source_generation:
+            _analyzers = _analyzers + [
+                "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+            ]
+
     if library_import_generator:
         _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        ]
-    if _interop_source_generation:
-        _analyzers = _analyzers + [
-            "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
         ]
     if com_interface_generator:
         _analyzers = _analyzers + [
@@ -627,6 +665,7 @@ EOF""".format(version = PRODUCT_VERSION),
         additionalfiles = _additionalfiles,
         analyzer_configs = _analyzer_configs,
         analyzers = _analyzers,
+        include_runtime_async = include_runtime_async,
         **kwargs
     )
 
@@ -681,6 +720,7 @@ def live_csharp_library(
     **kwargs
 ):
     deps = deps + LIVE_REFPACK_DEPS
+    target_frameworks = kwargs.pop("target_frameworks", [NETCOREAPP_CURRENT])
 
     # Match MSBuild compiler options for features (nullable/strict)
     compiler_options = compiler_options + [
@@ -695,7 +735,7 @@ def live_csharp_library(
         langversion = "preview",
         compiler_options = compiler_options,
         disable_implicit_framework_refs = True,
-        target_frameworks = [ NETCOREAPP_CURRENT ],
+        target_frameworks = target_frameworks,
         treat_warnings_as_errors = treat_warnings_as_errors,
         **kwargs
     )

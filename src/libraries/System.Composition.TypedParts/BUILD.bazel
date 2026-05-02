@@ -2,6 +2,8 @@ load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWA
 
 impl_assembly(
     name = "impl_System.Composition.TypedParts",
+    include_runtime_async = False,
+    event_source_generator = False,
     srcs = glob(["src/**/*.cs"]) + [
         # Linked from CoreLib shared sources
         "//src/libraries/System.Private.CoreLib:src/System/Numerics/Hashing/HashHelpers.cs",

@@ -65,8 +65,6 @@ cc_binary(
         "//src/coreclr/md:mdruntime_wks",
         "//src/coreclr/md:mdruntimerw_wks",
         "//src/coreclr/md/ceefilegen:ceefgen",
-        "//src/coreclr/classlibnative:bcltype",
-        "//src/coreclr/classlibnative:comfloat_wks",
         "//src/coreclr/inc:corguids",
         "//src/native/libs/System.Globalization.Native:System.Globalization.Native_lib",
         "//src/coreclr/interop",
@@ -83,6 +81,7 @@ cc_binary(
         "//src/coreclr/pal:coreclrpal",
         # CLRJIT_STATIC (FEATURE_STATICALLY_LINKED + FEATURE_JIT)
         "//src/coreclr/jit:clrjit_static",
+        "//src/coreclr/jitshared:jitshared",
         "//src/coreclr/gcinfo",
         # VM
         "//src/coreclr/vm:cee_wks_core",

@@ -30,6 +30,20 @@ _TEST_NOWARN = [
     "CS3016", "CS8981",
 ]
 
+_CORECLR_TEST_COMMON_DEPS = [
+    "//src/tests/Common:TestLibrary",
+    "@paket.main//microsoft.dotnet.xunitextensions",
+]
+
+def _dedupe_labels(labels):
+    seen = {}
+    deduped = []
+    for label in labels:
+        if label not in seen:
+            seen[label] = True
+            deduped.append(label)
+    return deduped
+
 # NoWarn for library tests under src/libraries/. These inherit from:
 # - Directory.Build.props global: CS8500, CS8969, IDE0060, IDE0100
 # - Arcade SDK: CS1701, CS1702, CS1705, NU5105
@@ -50,6 +64,93 @@ _LIBRARY_TEST_NOWARN = [
     "SYSLIB0050",
     "SYSLIB0051",
     "IL2121",
+    # EventSource generator warnings (Directory.Build.props for tests)
+    "ESGEN001",
+    "ESGEN002",
+    # xUnit1051: recommends TestContext.Current.CancellationToken (v3 pattern)
+    # Suppressed in eng/testing/xunit/xunit.props and src/tests/Directory.Build.props
+    "xUnit1051",
+]
+
+# These test projects explicitly disable trim/AOT analyzers in their csproj
+# (<EnableTrimAnalyzer>false</EnableTrimAnalyzer> and
+# <EnableAotAnalyzer>false</EnableAotAnalyzer>). Keep Bazel aligned by
+# suppressing ILLink.RoslynAnalyzer for the matching library_test targets.
+_LIBRARY_TESTS_WITHOUT_ILLINK_ANALYZER = [
+    "Microsoft.Extensions.Configuration.Binder.Tests",
+    "Microsoft.Extensions.Configuration.CommandLine.Tests",
+    "Microsoft.Extensions.Configuration.EnvironmentVariables.Tests",
+    "Microsoft.Extensions.Configuration.Functional.Tests",
+    "Microsoft.Extensions.Configuration.Ini.Tests",
+    "Microsoft.Extensions.Configuration.Json.Tests",
+    "Microsoft.Extensions.Configuration.Tests",
+    "Microsoft.Extensions.Configuration.Xml.Tests",
+    "Microsoft.Extensions.DependencyInjection.Tests",
+    "Microsoft.Extensions.Hosting.Unit.Tests",
+    "Microsoft.Extensions.Logging.Console.Tests",
+    "Microsoft.Extensions.Options.Tests",
+    "System.CodeDom.Tests",
+    "System.Collections.Concurrent.Tests",
+    "System.Collections.Immutable.Tests",
+    "System.Collections.NonGeneric.Tests",
+    "System.Collections.Specialized.Tests",
+    "System.Collections.Tests",
+    "System.ComponentModel.Annotations.Tests",
+    "System.ComponentModel.Composition.Tests",
+    "System.ComponentModel.Primitives.Tests",
+    "System.ComponentModel.TypeConverter.Tests",
+    "System.Composition.TypedParts.Tests",
+    "System.Data.Common.Tests",
+    "System.Data.DataSetExtensions.Tests",
+    "System.Diagnostics.DiagnosticSource.Tests",
+    "System.Diagnostics.StackTrace.Tests",
+    "System.Drawing.Primitives.Tests",
+    "System.Dynamic.Runtime.Tests",
+    "System.Formats.Nrbf.Tests",
+    "System.Linq.Expressions.Tests",
+    "System.Linq.Queryable.Tests",
+    "System.Linq.Tests",
+    "System.Memory.Data.Tests",
+    "System.Memory.Tests",
+    "System.Net.Http.Functional.Tests",
+    "System.Net.Http.Json.Functional.Tests",
+    "System.Net.Http.Json.Unit.Tests",
+    "System.Net.HttpListener.Tests",
+    "System.Net.Mail.Functional.Tests",
+    "System.Net.NetworkInformation.Functional.Tests",
+    "System.Net.Primitives.Functional.Tests",
+    "System.Net.Requests.Tests",
+    "System.Net.Sockets.Tests",
+    "System.Numerics.Tensors.Tests",
+    "System.ObjectModel.Tests",
+    "System.Reflection.Context.Tests",
+    "System.Reflection.DispatchProxy.Tests",
+    "System.Reflection.Emit.ILGeneration.Tests",
+    "System.Reflection.Emit.Lightweight.Tests",
+    "System.Reflection.Emit.Tests",
+    "System.Reflection.InvokeEmit.Tests",
+    "System.Reflection.InvokeInterpreted.Tests",
+    "System.Reflection.TypeExtensions.Tests",
+    "System.Runtime.InteropServices.Tests",
+    "System.Runtime.Numerics.Tests",
+    "System.Runtime.Serialization.Formatters.Disabled.Tests",
+    "System.Runtime.Serialization.Json.ReflectionOnly.Tests",
+    "System.Runtime.Serialization.Json.Tests",
+    "System.Runtime.Serialization.Primitives.Tests",
+    "System.Runtime.Serialization.Schema.Tests",
+    "System.Runtime.Serialization.Xml.Canonicalization.Tests",
+    "System.Runtime.Serialization.Xml.ReflectionOnly.Tests",
+    "System.Runtime.Serialization.Xml.Tests",
+    "System.Security.Cryptography.Csp.Tests",
+    "System.Security.Cryptography.OpenSsl.Tests",
+    "System.Security.Cryptography.Tests",
+    "System.Security.Cryptography.Xml.Tests",
+    "System.ServiceModel.Syndication.Tests",
+    "System.Text.Json.Tests",
+    "System.Threading.Channels.Tests",
+    "System.Threading.Tasks.Dataflow.Tests",
+    "System.Threading.Tasks.Tests",
+    "System.Xml.XmlSerializer.ReflectionOnly.Tests",
 ]
 
 # Directory.Build.targets NoWarn for projects that multi-target net4x/netstandard:
@@ -461,9 +562,16 @@ cp -aL "$SDK_ROOT/host/fxr/$VERSION/"* "$OUT/host/fxr/$VERSION/"
 # SDK shared framework as base (lowest priority)
 cp -aL "$SDK_ROOT/shared/Microsoft.NETCore.App/$VERSION/"* "$FW_DIR/"
 
-# Copy Bazel-built runtime files (managed + native) over SDK
+# Copy Bazel-built runtime files (managed + native) over SDK.
+# The crossgen'd CoreLib is named System.Private.CoreLib.r2r.dll but the
+# runtime expects System.Private.CoreLib.dll, so rename it during copy.
 for f in "$@"; do
-    cp -afL "$f" "$FW_DIR/"
+    base=$(basename "$f")
+    if [ "$base" = "System.Private.CoreLib.r2r.dll" ]; then
+        cp -afL "$f" "$FW_DIR/System.Private.CoreLib.dll"
+    else
+        cp -afL "$f" "$FW_DIR/"
+    fi
 done
 
 # Generate a version-free deps.json matching MSBuild's testhost pattern.
@@ -641,9 +749,10 @@ def library_test(
     if replace_library_nowarns != None:
         # Allow overriding the standard _LIBRARY_TEST_NOWARN set (e.g. when MSBuild
         # csproj <NoWarn> replaces rather than appends to inherited warnings).
-        all_nowarn = nowarn + replace_library_nowarns
+        all_nowarn = nowarn + replace_library_nowarns + ["CS8002"]
     else:
-        all_nowarn = nowarn + _LIBRARY_TEST_NOWARN
+        all_nowarn = nowarn + _LIBRARY_TEST_NOWARN + ["CS8002"]
+    include_illink_analyzer = name not in _LIBRARY_TESTS_WITHOUT_ILLINK_ANALYZER
 
     # ── Analyzer infrastructure (matching MSBuild's Analyzers.targets for tests) ──
     # Generate an empty disabledAnalyzers.config
@@ -687,12 +796,20 @@ EOF""".format(version = PRODUCT_VERSION),
         "//src/libraries/System.Text.Json:JsonSourceGenerator",
         "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
         "//:xunit_test_analyzers",
-    ]
+        # Extensions generators are delivered via the targeting pack in MSBuild
+        # (FrameworkReferenceResolution.targets).
+        "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+        "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
+    ] + (["//src/tools/illink/src/ILLink.RoslynAnalyzer"] if include_illink_analyzer else [])
+    _analyzers = _dedupe_labels(_analyzers)
 
     # Match MSBuild test compiler options
     compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
         "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
+        # Enable runtime async for .NET 11+ CoreCLR targets.
+        # MSBuild: eng/testing/tests.targets
+        "/features:runtime-async=on",
         "/noconfig",
         "/warn:9999",
         "/ruleset:eng/Default.ruleset",
@@ -742,16 +859,18 @@ def coreclr_test(
 ):
     # Build complete deps list for JIT tests:
     # 1. User deps (filtered to remove any already in CORE_ROOT_REFPACK_DEPS)
-    # 2. Xunit deps
-    # 3. CORE_ROOT_REFPACK_DEPS (refs matching impls in Core_Root)
+    # 2. Common test infrastructure dependencies injected by the shared MSBuild
+    #    test setup (TestLibrary, xunit extensions)
+    # 3. Xunit deps
+    # 4. CORE_ROOT_REFPACK_DEPS (refs matching impls in Core_Root)
     core_root_set = {dep: True for dep in CORE_ROOT_REFPACK_DEPS}
     filtered_deps = [dep for dep in deps if dep not in core_root_set]
 
-    all_deps = filtered_deps + [
+    all_deps = _dedupe_labels(filtered_deps + _CORECLR_TEST_COMMON_DEPS + [
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//xunit.abstractions",
         "@paket.main//xunit.extensibility.core",
-    ] + CORE_ROOT_REFPACK_DEPS
+    ] + CORE_ROOT_REFPACK_DEPS)
 
     compiler_options = [
         "/debug:%s" % debug_type,
@@ -984,10 +1103,10 @@ def coreclr_merged_test(
     # PlatformDetection in TestLibrary via [ActiveIssue] attributes). With strict
     # deps these transitive references are not visible to the merged compilation,
     # so include them explicitly.
-    merged_deps = deps + [
+    merged_deps = _dedupe_labels(deps + [
         "//src/tests/Common:TestLibrary",
         "@paket.main//microsoft.dotnet.xunitextensions",
-    ]
+    ])
 
     live_csharp_test(
         name = name,

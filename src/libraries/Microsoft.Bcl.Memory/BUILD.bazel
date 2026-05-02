@@ -1,12 +1,14 @@
 load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "impl_assembly")
 
-# For net10.0, this library is a pure set of type forwarders (Index,
+# For net11.0, this library is a pure set of type forwarders (Index,
 # Range, Utf8, Base64Url) since those types already exist in the
 # framework.
 impl_assembly(
     name = "impl_Microsoft.Bcl.Memory",
+    include_runtime_async = False,
+    event_source_generator = False,
     allow_unsafe_blocks = True,
-    nowarn = MULTITARGET_NOWARN + ["CP0003"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "CS9368"],
     srcs = [
         "src/Microsoft.Bcl.Memory.Forwards.cs",
     ],

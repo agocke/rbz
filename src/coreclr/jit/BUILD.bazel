@@ -30,6 +30,7 @@ _JIT_COMMON_SOURCES = [
     "alloc.cpp",
     "assertionprop.cpp",
     "async.cpp",
+    "asyncanalysis.cpp",
     "bitset.cpp",
     "block.cpp",
     "buildstring.cpp",
@@ -241,6 +242,7 @@ cc_library(
     defines = CORECLR_DEFINES + _JIT_DEFINES_BASE + _JIT_SIMD_DEFINES,
     deps = [
         "//src/coreclr/inc:coreclr_inc",
+        "//src/coreclr/jitshared:jitshared",
     ],
     alwayslink = True,
     linkstatic = True,
@@ -292,6 +294,7 @@ cc_binary(
         ":jit_textual_hdrs",
         "//src/coreclr/gcinfo",
         "//src/coreclr/inc:coreclr_inc",
+        "//src/coreclr/jitshared:jitshared",
         "//src/coreclr/utilcode:utilcodestaticnohost",
         "//src/coreclr/dlls/mscorrc",
         "//src/coreclr/pal:coreclrpal",
@@ -341,6 +344,7 @@ _CROSS_JIT_LINKER_INPUTS = select({
 _CROSS_JIT_DEPS = [
     ":jit_textual_hdrs",
     "//src/coreclr/inc:coreclr_inc_headers_only",
+    "//src/coreclr/jitshared:jitshared",
     "//src/coreclr/utilcode:utilcodestaticnohost",
     "//src/coreclr/dlls/mscorrc",
     "//src/coreclr/pal:coreclrpal",

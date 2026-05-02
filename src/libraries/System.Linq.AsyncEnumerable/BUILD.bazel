@@ -20,6 +20,8 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Linq.AsyncEnumerable",
+    include_runtime_async = False,
+    event_source_generator = True,
     com_interface_generator = True,
     srcs = [
         "src/System/Linq/AggregateAsync.cs",
@@ -28,6 +30,7 @@ netcoreapp_impl_assembly(
         "src/System/Linq/AnyAsync.cs",
         "src/System/Linq/Append.cs",
         "src/System/Linq/AsyncEnumerable.cs",
+        "src/System/Linq/AsyncIterator.cs",
         "src/System/Linq/AverageAsync.cs",
         "src/System/Linq/Cast.cs",
         "src/System/Linq/Chunk.cs",
@@ -69,6 +72,7 @@ netcoreapp_impl_assembly(
         "src/System/Linq/SequenceEqualAsync.cs",
         "src/System/Linq/Shuffle.cs",
         "src/System/Linq/SingleAsync.cs",
+        "src/System/Linq/SingleLinkedNode.cs",
         "src/System/Linq/Skip.cs",
         "src/System/Linq/SkipLast.cs",
         "src/System/Linq/SkipWhile.cs",

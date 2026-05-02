@@ -1,5 +1,5 @@
 load("//:defs.bzl", "csharp_library")
-load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
+load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_ref_assembly", "impl_assembly", "ref_impl_pair")
 
 exports_files([
     "ref/Microsoft.Extensions.Logging.Abstractions.cs",
@@ -11,11 +11,17 @@ csharp_library(
     name = "LoggingGenerators",
     out = "Microsoft.Extensions.Logging.Generators",
     srcs = glob(["gen/**/*.cs"], exclude = ["gen/LoggerMessageGenerator.Roslyn3.11.cs"]) + [
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
         "//src/libraries/Common:src/Roslyn/DiagnosticDescriptorHelper.cs",
         "//src/libraries/Common:src/Roslyn/GetBestTypeByMetadataName.cs",
+        "//src/libraries/Common:src/SourceGenerators/ImmutableEquatableArray.cs",
         "//src/libraries/Common:src/System/SR.cs",
+        "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/IsExternalInit.cs",
+        "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/CompilerFeatureRequiredAttribute.cs",
+        "//src/libraries/System.Private.CoreLib:src/System/Runtime/CompilerServices/RequiredMemberAttribute.cs",
+        "//src/libraries/System.Private.CoreLib:src/System/Diagnostics/CodeAnalysis/SetsRequiredMembersAttribute.cs",
+        "//src/libraries/System.Private.CoreLib:src/System/Numerics/Hashing/HashHelpers.cs",
     ],
     target_frameworks = ["netstandard2.0"],
     langversion = "preview",
@@ -46,6 +52,7 @@ netcoreapp_ref_assembly(
     ],
     deps = [
         "//src/libraries:ref_System.Runtime",
+        "//src/libraries/System.Collections:ref_System.Collections",
         "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
         "//src/libraries/System.Diagnostics.DiagnosticSource:ref_System.Diagnostics.DiagnosticSource",
     ],
@@ -53,7 +60,12 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Logging.Abstractions",
+    include_runtime_async = False,
+    event_source_generator = True,
     allow_unsafe_blocks = True,
+    skip_locals_init = True,
+    com_interface_generator = True,
+    jsimport_generator = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/TypeNameHelper/TypeNameHelper.cs",
@@ -62,7 +74,6 @@ impl_assembly(
         "//src/libraries/Common:src/Extensions/Logging/DebuggerDisplayFormatting.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
     ],
-    analyzers = COMMON_GENERATOR_ANALYZERS,
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
@@ -70,6 +81,7 @@ impl_assembly(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Diagnostics.DiagnosticSource:ref_System.Diagnostics.DiagnosticSource",
         "//src/libraries/System.Memory:ref_System.Memory",
+        "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
         "//src/libraries/System.Threading:ref_System.Threading",
     ],
     resx_file = "src/Resources/Strings.resx",

@@ -8,6 +8,7 @@ resgen(
 
 csharp_library(
     name = "ReferencedClassLib",
+    include_runtime_async = False,
     srcs = ["ReferencedClassLib.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
     include_default_ruleset = False,

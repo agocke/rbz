@@ -1,15 +1,19 @@
 # Managed assembly equivalence manifest.
 #
 # Lists every managed assembly expected in the equivalence check and whether
-# it should match ("match") or is a known difference ("diff").
+# it should match ("match"), is a known difference ("diff"), or should be
+# excluded from comparison ("ignore").
 # Lines starting with # are comments. Blank lines are ignored.
 #
 # The equivalence check FAILS if:
 #   - A "match" assembly has differences (regression)
-#   - A listed assembly is missing from either build
+#   - A listed non-"ignore" assembly is missing from either build
 #   - An unlisted assembly appears in the comparison
 #
 # When a diff is resolved, change its status from "diff" to "match".
+# Use "ignore" only for assemblies that are intentionally not comparable in this
+# pipeline (for example a Bazel-only split test variant or an MSBuild helper
+# project filtered out by the managed TFM selection rules).
 
 # ── Archive assemblies ─────────────────────────────────────────────
 # These assemblies are shipped in the runtime archive tarball.
@@ -210,7 +214,6 @@ diff   System.Runtime.Numerics.ref
 match  System.Runtime.Serialization
 diff   System.Runtime.Serialization.Formatters
 diff   System.Runtime.Serialization.Formatters.ref
-match  System.Runtime.Serialization.Formatters.Tests
 match  System.Runtime.Serialization.Json
 diff   System.Runtime.Serialization.Json.ref
 match  System.Runtime.Serialization.Primitives
@@ -496,7 +499,6 @@ match    System.Configuration.ConfigurationManager.Tests
 match  System.Console.Tests
 match  System.Data.Common.Tests
 match  System.Data.DataSetExtensions.Tests
-match  System.Data.Odbc.Tests
 diff   System.Data.Odbc
 diff   System.Data.Odbc.ref
 match  System.Data.OleDb
@@ -524,7 +526,6 @@ match  System.DirectoryServices.AccountManagement
 diff   System.DirectoryServices.AccountManagement.ref
 diff   System.DirectoryServices.Protocols
 diff   System.DirectoryServices.Protocols.ref
-match  System.DirectoryServices.Protocols.Tests
 match  System.Dynamic.Runtime.Tests
 match  System.Drawing.Primitives.Tests
 match  System.Formats.Asn1.Tests
@@ -543,7 +544,6 @@ match  System.IO.Compression.Tests
 match  System.IO.Compression.ZipFile.Tests
 match  System.IO.FileSystem.DriveInfo.Tests
 match  System.IO.FileSystem.Primitives.Tests
-match  System.IO.FileSystem.Tests
 match  System.IO.FileSystem.Watcher.Tests
 match  System.IO.Hashing.Tests
 diff   System.IO.Hashing
@@ -588,7 +588,6 @@ match  System.Net.Ping.Functional.Tests
 match  System.Net.Primitives.Functional.Tests
 match  System.Net.Primitives.Pal.Tests
 match  System.Net.Primitives.UnitTests.Tests
-match  System.Net.Quic.Functional.Tests
 match  System.Net.Requests.Tests
 match  System.Net.Security.Enterprise.Tests
 diff   System.Net.Security.Tests
@@ -607,7 +606,6 @@ match  System.Numerics.Tensors.Tests
 match  System.Numerics.Vectors.Tests
 match  System.ObjectModel.Tests
 # System.Private.CoreLib.Generators  # netstandard2.0, filtered
-match  System.Private.Uri.ExtendedFunctional.Tests
 match  System.Private.Uri.Functional.Tests
 match  System.Private.Uri.Unit.Tests
 match  System.Reflection.Context
@@ -623,7 +621,6 @@ diff   System.Reflection.Metadata.Tests
 match  System.Reflection.MetadataLoadContext
 diff   System.Reflection.MetadataLoadContext.ref
 diff   System.Reflection.MetadataLoadContext.Tests
-match  System.Reflection.CoreCLR.Tests
 match  System.Reflection.TestExe
 diff   System.Reflection.Tests
 match  System.Reflection.InvokeEmit.Tests
@@ -631,8 +628,6 @@ match  System.Reflection.InvokeInterpreted.Tests
 match  System.Reflection.TypeExtensions.Tests
 match  System.Resources.Extensions
 diff   System.Resources.Extensions.ref
-match  System.Resources.Extensions.BinaryFormat.Tests
-match  System.Resources.Extensions.Tests
 match  System.Resources.Reader.Tests
 diff   System.Resources.ResourceManager.Tests
 match  System.Resources.Writer.Tests
@@ -642,12 +637,9 @@ match  System.Runtime.Caching.Tests
 match  System.Runtime.CompilerServices.Unsafe.Tests
 match  System.Runtime.Handles.Tests
 match  System.Runtime.CompilerServices.VisualC.Tests
-match  System.Runtime.Extensions.Tests
-match  System.Runtime.InteropServices.RuntimeInformation.Tests
 match  System.Runtime.InteropServices.Tests
 diff   System.Runtime.Intrinsics.Tests
 diff   System.Runtime.Loader.Tests
-match  System.Runtime.Loader.DefaultContext.Tests
 match  System.Runtime.Loader.Noop.Assembly
 match  System.Runtime.Loader.RefEmitLoadContext.Tests
 match  System.Runtime.Numerics.Tests
@@ -662,7 +654,6 @@ match  System.Runtime.Serialization.Xml.Canonicalization.Tests
 match  System.Runtime.Serialization.Xml.ReflectionOnly.Tests
 match  System.Runtime.ReflectionInvokeEmit.Tests
 match  System.Runtime.ReflectionInvokeInterpreted.Tests
-match  System.Runtime.Tests
 match  System.Security.Claims.Tests
 match  System.Security.Cryptography.Cose
 diff   System.Security.Cryptography.Cose.ref
@@ -735,7 +726,6 @@ match  illink
 match  ILCompiler.Reflection.ReadyToRun
 diff   System.Text.Json.SourceGeneration
 match  TestUtilities
-match  Microsoft.Extensions.DependencyModel.Tests
 diff   System.Private.Xml.Tests
 match  System.Text.Json.Tests
 
@@ -743,7 +733,6 @@ match  System.Text.Json.Tests
 match  System.Runtime.Loader.Test.Assembly
 match  System.Runtime.Loader.Test.Assembly2
 match  System.Runtime.Loader.Test.ContextualReflectionDependency
-match  System.Runtime.Loader.Test.VersionDowngrade
 match  LoaderLinkTest.Shared
 match  LoaderLinkTest.Dynamic
 match  ReferencedClassLib
@@ -753,7 +742,8 @@ match  ReferencedClassLibNeutralIsSatellite
 match  TestUtilities.Unicode
 match  TargetFrameworkNameTestApp
 match  TestApp
-match  AssemblyResolveTestApp
+ignore AssemblyResolveTestApp
+ignore UnloadableTestTypes
 match  TestAppOutsideOfTPA
 
 # ── ApplyUpdate test helper assemblies ──
@@ -780,11 +770,9 @@ match  System.Reflection.Metadata.ApplyUpdate.Test.ReflectionAddNewType
 match  System.Reflection.Metadata.ApplyUpdate.Test.StaticLambdaRegression
 match  Invariant.Tests
 match  System.Diagnostics.DiagnosticSource.Switches.Tests
-match  System.Diagnostics.TraceSource.Config.Tests
 match  System.Globalization.CalendarsWithConfigSwitch.Tests
 match  System.IO.FileSystem.DisabledFileLocking.Tests
 match  System.Runtime.InteropServices.ComDisabled.Tests
 match  System.Runtime.InvariantTimezone.Tests
 match  System.Runtime.Serialization.Formatters.Disabled.Tests
-match  System.Numerics.Tensors.Net8.Tests
-match  IcuAppLocal.Tests
+ignore System.Numerics.Tensors.Net8.Tests

@@ -16,8 +16,10 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.DirectoryServices.AccountManagement",
+    include_runtime_async = False,
+    event_source_generator = False,
     keyfile = ECMA_SNK,
-    nowarn = MULTITARGET_NOWARN + ["CA1822", "CA1859", "CA2249", "CP0003", "IDE0059", "NU5128", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CA1822", "CA1859", "CP0003", "IDE0059", "NU5128", "CS1591"],
     analyzers = COMMON_GENERATOR_ANALYZERS,
     allow_unsafe_blocks = True,
     pnse = True,

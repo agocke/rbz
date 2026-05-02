@@ -23,5 +23,6 @@ library_test(
         "@paket.main//xunit.extensibility.core",
     ],
     size = "large",
+    allow_unsafe_blocks = True,
     keyfile = OPEN_SNK,
 )

@@ -4,7 +4,7 @@ load("//:defs.bzl", "OPEN_SNK")
 library_test(
     name = "System.Xml.Linq.xNodeBuilder.Tests",
     srcs = glob(["*.cs"]) + [
-        "//src/libraries/Common/tests:System/Collections/DictionaryExtensions.cs",
+        "//src/libraries/Common:src/Polyfills/DictionaryPolyfills.cs",
     ],
     deps = [
         "//src/libraries/System.Xml.XDocument:ref_System.Xml.XDocument",

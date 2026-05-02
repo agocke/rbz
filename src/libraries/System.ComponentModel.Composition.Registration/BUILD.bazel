@@ -20,6 +20,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.ComponentModel.Composition.Registration",
+    include_runtime_async = False,
+    event_source_generator = False,
     keyfile = ECMA_SNK,
     srcs = [
         "src/System/ComponentModel/Composition/Registration/ExportBuilder.cs",

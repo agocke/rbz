@@ -3,9 +3,11 @@ load("@rules_dotnet//dotnet/private/rules/csharp:binary.bzl", _base_csharp_binar
 load("//eng/bazel:version.bzl", "PRODUCT_VERSION")
 
 # The TFM that we're building
-NETCOREAPP_CURRENT = "net10.0"
+NETCOREAPP_CURRENT = "net11.0"
 # The TFM used by our LKG SDK
-NETCOREAPP_TOOL_CURRENT = "net10.0"
+NETCOREAPP_TOOL_CURRENT = "net11.0"
+# The minimum netcoreapp TFM still used by selected tool/test-support projects
+NETCOREAPP_MINIMUM = "net10.0"
 
 # ─── Centralized versioned NuGet repo names ──────────────────────────────────
 # These are the Bazel repo names for version-pinned NuGet packages.
@@ -27,7 +29,7 @@ MIBC_LINUX_ARM64_REPO = "nuget.optimization.linux-arm64.mibc.runtime.v1.0.0-prer
 # Analyzer NuGet packages (from eng/Analyzers.targets)
 CODEANALYSIS_ANALYZERS_REPO = "nuget.microsoft.codeanalysis.analyzers.v5.0.0-2.26170.102"
 CODEANALYSIS_NETANALYZERS_REPO = "nuget.microsoft.codeanalysis.netanalyzers.v10.0.106"
-CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codestyle.v4.14.0"
+CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codestyle.v5.0.0-2.26070.104"
 DOTNET_CODEANALYSIS_REPO = "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26170.102"
 STYLECOP_ANALYZERS_UNSTABLE_REPO = "nuget.stylecop.analyzers.unstable.v1.2.0.556"
 XUNIT_ANALYZERS_REPO = "nuget.xunit.analyzers.v1.22.0"
@@ -46,7 +48,6 @@ ECMA_SNK = "//eng:snk/ECMA.snk"
 SHAREDLIB1024_SNK = "//eng:snk/35MSSharedLib1024.snk"
 SILVERLIGHT_SNK = "//eng:snk/SilverlightPlatformPublicKey.snk"
 DEFAULT_RULESET = "//eng:Default.ruleset"
-
 # MIBC PGO optimization data files from NuGet (matched to target architecture).
 # MSBuild equivalent: eng/restore/optimizationData.targets selects the right
 # optimization.<OS>-<ARCH>.mibc.runtime package, then crossgen-corelib.proj
@@ -68,6 +69,114 @@ MIBC_FILES = select({
 
 # Label for the Roslyn compiler server persistent worker binary.
 _SHARED_COMPILATION_WORKER = "@rules_dotnet//dotnet/private/tools/compiler_worker"
+
+def _append_unique(items, extras):
+    result = list(items)
+    for item in extras:
+        if item not in result:
+            result.append(item)
+    return result
+
+# Test-support helper assets built via raw csharp_library/csharp_binary do not
+# flow through library_test, but their MSBuild projects still receive the local
+# targeting-pack Extensions generators and ESGEN suppressions. Keep Bazel aligned
+# for the helper assemblies that compare-bazel matches against those projects.
+_TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS = [
+    "ApplicationNameSetFromArgument",
+    "BuildWebHostInvalidSignature",
+    "BuildWebHostPatternTestSite",
+    "CollectibleAssembly",
+    "CreateHostBuilderInvalidSignature",
+    "CreateHostBuilderPatternTestSite",
+    "CreateWebHostBuilderInvalidSignature",
+    "CreateWebHostBuilderPatternTestSite",
+    "DefaultApartmentStateMain",
+    "LoaderLinkTest.Dynamic",
+    "LoaderLinkTest.Shared",
+    "MockHostTypes",
+    "MTAMain",
+    "NoSpecialEntryPointPattern",
+    "NoSpecialEntryPointPatternBuildsThenThrows",
+    "NoSpecialEntryPointPatternExits",
+    "NoSpecialEntryPointPatternHangs",
+    "NoSpecialEntryPointPatternMainNoArgs",
+    "NoSpecialEntryPointPatternThrows",
+    "ReferencedClassLib",
+    "ReferencedClassLibNeutralIsSatellite",
+    "SerializableAssembly",
+    "STAMain",
+    "StreamConformanceTests",
+    "System.Diagnostics.FileVersionInfo.TestAssembly",
+    "System.Reflection.DispatchProxy.TestDependency",
+    "System.Reflection.TestExe",
+    "System.Runtime.Loader.Noop.Assembly",
+    "System.Runtime.Loader.Test.Assembly",
+    "System.Runtime.Loader.Test.Assembly2",
+    "System.Runtime.Loader.Test.ContextualReflectionDependency",
+    "TargetFrameworkNameTestApp",
+    "TestApp",
+    "TestAppOutsideOfTPA",
+    "TestUtilities.Unicode",
+    "TopLevelStatements",
+    "TopLevelStatementsTestsTimeout",
+    "XDocument.Common",
+    "XmlCoreTest",
+]
+
+_TEST_SUPPORT_EXTENSIONS_REF_TARGETS = [
+    "ApplicationNameSetFromArgument",
+    "BuildWebHostInvalidSignature",
+    "BuildWebHostPatternTestSite",
+    "CreateHostBuilderInvalidSignature",
+    "CreateHostBuilderPatternTestSite",
+    "CreateWebHostBuilderInvalidSignature",
+    "CreateWebHostBuilderPatternTestSite",
+    "DefaultApartmentStateMain",
+    "LoaderLinkTest.Dynamic",
+    "LoaderLinkTest.Shared",
+    "MTAMain",
+    "NoSpecialEntryPointPattern",
+    "NoSpecialEntryPointPatternBuildsThenThrows",
+    "NoSpecialEntryPointPatternExits",
+    "NoSpecialEntryPointPatternHangs",
+    "NoSpecialEntryPointPatternMainNoArgs",
+    "NoSpecialEntryPointPatternThrows",
+    "ReferencedClassLib",
+    "ReferencedClassLibNeutralIsSatellite",
+    "SerializableAssembly",
+    "STAMain",
+    "System.Diagnostics.FileVersionInfo.TestAssembly",
+    "System.Reflection.TestExe",
+    "System.Runtime.Loader.Noop.Assembly",
+    "System.Runtime.Loader.Test.Assembly",
+    "System.Runtime.Loader.Test.Assembly2",
+    "System.Runtime.Loader.Test.ContextualReflectionDependency",
+    "TargetFrameworkNameTestApp",
+    "TestApp",
+    "TestAppOutsideOfTPA",
+    "TestUtilities.Unicode",
+    "TopLevelStatements",
+    "TopLevelStatementsTestsTimeout",
+    "XDocument.Common",
+    "XmlCoreTest",
+]
+
+_TEST_SUPPORT_EXTENSIONS_ANALYZERS = [
+    "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+    "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
+]
+
+_TEST_SUPPORT_EXTENSIONS_REFS = [
+    "//src/libraries/Microsoft.Extensions.Caching.Abstractions:ref_Microsoft.Extensions.Caching.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Configuration.Abstractions:ref_Microsoft.Extensions.Configuration.Abstractions",
+    "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Diagnostics.Abstractions:ref_Microsoft.Extensions.Diagnostics.Abstractions",
+    "//src/libraries/Microsoft.Extensions.FileProviders.Abstractions:ref_Microsoft.Extensions.FileProviders.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Hosting.Abstractions:ref_Microsoft.Extensions.Hosting.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Logging.Abstractions:ref_Microsoft.Extensions.Logging.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Options:ref_Microsoft.Extensions.Options",
+    "//src/libraries/Microsoft.Extensions.Primitives:ref_Microsoft.Extensions.Primitives",
+]
 
 # Version constants matching eng/Versions.props
 _MAJOR_VERSION = PRODUCT_VERSION.split(".")[0]
@@ -424,15 +533,24 @@ def csharp_library(
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
     include_library_nowarn = True,
+    include_runtime_async = True,
     interceptors_namespaces = None,
     editorconfig_name = None,
     extra_editorconfig_content = "",
+    langversion = "preview",
     **kwargs
 ):
     if out == None:
         out = name
     if editorconfig_name == None:
         editorconfig_name = out
+
+    deps = kwargs.pop("deps", [])
+    if name in _TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS:
+        nowarn = _append_unique(nowarn, ["ESGEN001", "ESGEN002"])
+        analyzers = _append_unique(analyzers, _TEST_SUPPORT_EXTENSIONS_ANALYZERS)
+    if name in _TEST_SUPPORT_EXTENSIONS_REF_TARGETS:
+        deps = _append_unique(deps, _TEST_SUPPORT_EXTENSIONS_REFS)
 
     if resx_file != None:
         _resource_name = resource_name if resource_name else "FxResources.%s.SR" % out
@@ -509,7 +627,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         if msbuild_analyzer_config == "source":
             _msbuild_analyzer_configs = _msbuild_analyzer_configs + [
                 "//eng:CodeAnalysis.src.globalconfig",
-                "//src/tools/bazel:analysislevel_10_default.globalconfig",
+                "//src/tools/bazel:analysislevel_11_default.globalconfig",
             ]
 
         analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
@@ -541,7 +659,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-    ]
+    ] + ([
+        # Enable runtime async for .NET 11+ CoreCLR targets.
+        # MSBuild: src/libraries/Directory.Build.targets + eng/testing/tests.targets
+        # Disable for net10.0 tool projects (e.g. ILCompiler/crossgen2).
+        "/features:runtime-async=on",
+    ] if include_runtime_async else [])
     if include_syslib_warnaserror:
         _compiler_options = _compiler_options + [
             # Arcade SDK promotes SYSLIB0011 to an error.  Test-support
@@ -568,11 +691,16 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         resource_logical_names = resource_logical_names,
         use_shared_compilation = use_shared_compilation,
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
+        langversion = langversion,
         nowarn = nowarn + _nullable_nowarn + [
             "CS1701",
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
             "NU5105",
+            # CS8002: Referenced assembly does not have a strong name.
+            # Roslyn's Microsoft.CSharp.Core.targets suppresses this for all
+            # .NETCoreApp targets because .NET Core ignores strong naming.
+            "CS8002",
         ] + ([
             # src/libraries/Directory.Build.props global NoWarn — not present
             # in NativeAOT tool projects under src/coreclr/tools/.
@@ -608,6 +736,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         additionalfiles = additionalfiles,
         analyzer_configs = analyzer_configs,
         analyzers = analyzers,
+        deps = deps,
         # In CI mode, normalize PDB paths to match MSBuild's CI layout
         # (ContinuousIntegrationBuild=true → DeterministicSourcePaths → PathMap).
         pathmap = select({
@@ -634,13 +763,22 @@ def csharp_binary(
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
     include_library_nowarn = True,
+    include_runtime_async = True,
     interceptors_namespaces = None,
     editorconfig_name = None,
     extra_editorconfig_content = "",
+    langversion = "preview",
     **kwargs
 ):
     if editorconfig_name == None:
         editorconfig_name = name
+
+    deps = kwargs.pop("deps", [])
+    if name in _TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS:
+        nowarn = _append_unique(nowarn, ["ESGEN001", "ESGEN002"])
+        analyzers = _append_unique(analyzers, _TEST_SUPPORT_EXTENSIONS_ANALYZERS)
+    if name in _TEST_SUPPORT_EXTENSIONS_REF_TARGETS:
+        deps = _append_unique(deps, _TEST_SUPPORT_EXTENSIONS_REFS)
 
     if msbuild_analyzer_config not in ["none", "style", "source"]:
         fail("msbuild_analyzer_config must be one of: none, style, source")
@@ -676,7 +814,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         if msbuild_analyzer_config == "source":
             _msbuild_analyzer_configs = _msbuild_analyzer_configs + [
                 "//eng:CodeAnalysis.src.globalconfig",
-                "//src/tools/bazel:analysislevel_10_default.globalconfig",
+                "//src/tools/bazel:analysislevel_11_default.globalconfig",
             ]
 
         analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
@@ -697,7 +835,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-    ] + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
+    ] + ([
+        # Enable runtime async for .NET 11+ CoreCLR targets.
+        # MSBuild: src/libraries/Directory.Build.targets + eng/testing/tests.targets
+        # Disable for net10.0 tool projects (e.g. ILCompiler/crossgen2).
+        "/features:runtime-async=on",
+    ] if include_runtime_async else []) + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
     if interceptors_namespaces != None:
         _compiler_options = _compiler_options + [
             "/features:InterceptorsNamespaces=" + interceptors_namespaces,
@@ -714,11 +857,16 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         srcs = srcs,
         use_shared_compilation = use_shared_compilation,
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
+        langversion = langversion,
         nowarn = nowarn + _nullable_nowarn + [
             "CS1701",
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
             "NU5105",
+            # CS8002: Referenced assembly does not have a strong name.
+            # Roslyn's Microsoft.CSharp.Core.targets suppresses this for all
+            # .NETCoreApp targets because .NET Core ignores strong naming.
+            "CS8002",
         ] + ([
             # src/libraries/Directory.Build.props global NoWarn — not present
             # in NativeAOT tool projects under src/coreclr/tools/.
@@ -752,5 +900,6 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         additionalfiles = additionalfiles,
         analyzer_configs = analyzer_configs,
         analyzers = analyzers,
+        deps = deps,
         **kwargs
     )

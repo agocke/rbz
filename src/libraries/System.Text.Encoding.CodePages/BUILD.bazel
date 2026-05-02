@@ -18,6 +18,8 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Text.Encoding.CodePages",
+    include_runtime_async = False,
+    event_source_generator = True,
     com_interface_generator = True,
     srcs = [
         "src/Microsoft/Win32/SafeHandles/SafeAllocHHandle.cs",
@@ -47,6 +49,7 @@ netcoreapp_impl_assembly(
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.Collections:ref_System.Collections",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Memory:ref_System.Memory",
         "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
         "//src/libraries/System.Threading:ref_System.Threading",

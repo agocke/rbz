@@ -19,6 +19,15 @@ TargetPointer GetFrameAddress(IStackDataFrameHandle stackDataFrameHandle);
 
 // Gets the Frame name associated with the given Frame identifier. If no matching Frame name found returns an empty string.
 string GetFrameName(TargetPointer frameIdentifier);
+
+// Gets the method desc pointer associated with the given Frame.
+TargetPointer GetMethodDescPtr(TargetPointer framePtr);
+
+// Gets the method desc pointer associated with a given IStackDataFrameHandle
+TargetPointer GetMethodDescPtr(IStackDataFrameHandle stackDataFrameHandle);
+
+// Gets the instruction pointer from the current frame's context.
+TargetPointer GetInstructionPointer(IStackDataFrameHandle stackDataFrameHandle);
 ```
 
 ## Version 1
@@ -43,9 +52,14 @@ This contract depends on the following descriptors:
 | `InlinedCallFrame` | `CallerReturnAddress` | Return address saved in Frame |
 | `InlinedCallFrame` | `CalleeSavedFP` | FP saved in Frame |
 | `InlinedCallFrame` (arm) | `SPAfterProlog` | Value of the SP after prolog. Used on ARM to maintain additional JIT invariant |
+| `InlinedCallFrame` | `Datum` | MethodDesc ptr or on 64 bit host: CALLI target address (if lowest bit is set) or on windows x86 host: argument stack size (if value is <64k) |
 | `SoftwareExceptionFrame` | `TargetContext` | Context object saved in Frame |
 | `SoftwareExceptionFrame` | `ReturnAddress` | Return address saved in Frame |
 | `FramedMethodFrame` | `TransitionBlockPtr` | Pointer to Frame's TransitionBlock |
+| `FramedMethodFrame` | `MethodDescPtr` | Pointer to Frame's method desc |
+| `StubDispatchFrame` | `MethodDescPtr` | Pointer to Frame's method desc |
+| `StubDispatchFrame` | `RepresentativeMTPtr` | Pointer to Frame's method table pointer |
+| `StubDispatchFrame` | `RepresentativeSlot` | Frame's method table slot |
 | `TransitionBlock` | `ReturnAddress` | Return address associated with the TransitionBlock |
 | `TransitionBlock` | `CalleeSavedRegisters` | Platform specific CalleeSavedRegisters struct associated with the TransitionBlock |
 | `TransitionBlock` (arm) | `ArgumentRegisters` | ARM specific `ArgumentRegisters` struct |
@@ -63,17 +77,31 @@ This contract depends on the following descriptors:
 | `CalleeSavedRegisters` | For each callee saved register `r`, `r` | Register names associated with stored register values |
 | `TailCallFrame` (x86 Windows) | `CalleeSavedRegisters` | CalleeSavedRegisters data structure |
 | `TailCallFrame` (x86 Windows) | `ReturnAddress` | Frame's stored instruction pointer |
+| `ExceptionInfo` | `ExceptionFlags` | Bit flags from `ExceptionFlags` class (`exstatecommon.h`). Used for GC reference reporting during stack walks with funclet handling. |
+| `ExceptionInfo` | `StackLowBound` | Low bound of the stack range unwound by this exception |
+| `ExceptionInfo` | `StackHighBound` | High bound of the stack range unwound by this exception |
+| `ExceptionInfo` | `CSFEHClause` | Caller stack frame of the current EH clause |
+| `ExceptionInfo` | `CSFEnclosingClause` | Caller stack frame of the enclosing clause |
+| `ExceptionInfo` | `CallerOfActualHandlerFrame` | Stack frame of the caller of the catch handler |
+| `ExceptionInfo` | `PreviousNestedInfo` | Pointer to previous nested ExInfo |
+| `ExceptionInfo` | `PassNumber` | Exception handling pass (1 or 2) |
 
 Global variables used:
 | Global Name | Type | Purpose |
 | --- | --- | --- |
 | For each FrameType `<frameType>`, `<frameType>##Identifier` | `FrameIdentifier` enum value | Identifier used to determine concrete type of Frames |
 
+Constants used:
+| Source | Name | Value | Purpose |
+| --- | --- | --- | --- |
+| `ExceptionFlags` (`exstatecommon.h`) | `Ex_UnwindHasStarted` | `0x00000004` | Bit flag in `ExceptionInfo.ExceptionFlags` indicating exception unwinding (2nd pass) has started. Used by `IsInStackRegionUnwoundBySpecifiedException` to skip ExInfo trackers still in the 1st pass. |
+
 Contracts used:
 | Contract Name |
 | --- |
 | `ExecutionManager` |
 | `Thread` |
+| `RuntimeTypeSystem` |
 
 
 ### Stackwalk Algorithm
@@ -263,7 +291,6 @@ When updating the context from a TransitionFrame, the IP, SP, and all ABI specif
 
 The following Frame types also use this mechanism:
 * FramedMethodFrame
-* CLRToCOMMethodFrame
 * PInvokeCallIFrame
 * PrestubMethodFrame
 * StubDispatchFrame
@@ -337,6 +364,39 @@ TargetPointer GetFrameAddress(IStackDataFrameHandle stackDataFrameHandle);
 `GetFrameName` gets the name associated with a FrameIdentifier (pointer sized value) from the Globals stored in the contract descriptor. If no associated Frame name is found, it returns an empty string.
 ```csharp
 string GetFrameName(TargetPointer frameIdentifier);
+```
+
+`GetMethodDescPtr(TargetPointer framePtr)` returns the method desc pointer associated with a Frame. If not applicable, it returns TargetPointer.Null.
+* For FramedMethodFrame and most of its subclasses the methoddesc is accessible as a pointer field on the object (MethodDescPtr). The two exceptions are PInvokeCalliFrame (no valid method desc) and StubDispatchFrame.
+  * StubDispatchFrame's MD may be either found on MethodDescPtr, or if this field is null, we look it up using a method table (RepresentativeMTPtr) and MT slot (RepresentativeSlot).
+* InlinedCallFrame also has a field from which we draw the method desc; however, we must first do some validation that the data in this field is valid.
+* MD is not applicable for other types of frames.
+```csharp
+TargetPointer GetMethodDescPtr(TargetPointer framePtr)
+```
+
+`GetMethodDescPtr(IStackDataFrameHandle stackDataFrameHandle)` returns the method desc pointer associated with a `IStackDataFrameHandle`. Note there are two major differences between this API and the one above that operates on a TargetPointer.
+* This API can either be at a capital 'F' frame or a managed frame unlike the TargetPointer overload which only works at capital 'F' frames.
+* This API handles the special ReportInteropMD case which happens under the following conditions
+    1. The dataFrame is at an `InlinedCallFrame`
+    2. The dataFrame is in a `SW_SKIPPED_FRAME` state
+    3. The InlinedCallFrame's return address is managed code
+    4. The InlinedCallFrame's return address method has a MDContext arg
+
+  In this case, we report the actual interop MethodDesc. A pointer to the MethodDesc immediately follows the InlinedCallFrame in memory.
+This API is implemented as follows:
+1. Try to get the current frame address `framePtr` with `GetFrameAddress`.
+2. If the address is not null, compute `reportInteropMD` as listed above. Otherwise skip to step 5.
+3. If `reportInteropMD`, dereference the pointer immediately following the InlinedCallFrame and return that value.
+4. If `!reportInteropMD`, return `GetMethodDescPtr(framePtr)`.
+5. Check if the current context IP is a managed context using the ExecutionManager contract. If it is a managed context, use the ExecutionManager context to find the related MethodDesc and return the pointer to it.
+```csharp
+TargetPointer GetMethodDescPtr(IStackDataFrameHandle stackDataFrameHandle)
+```
+
+`GetInstructionPointer` returns the instruction pointer (IP) from the current frame's context. This is the address of the instruction being executed (or about to be executed) in the method associated with this frame.
+```csharp
+TargetPointer GetInstructionPointer(IStackDataFrameHandle stackDataFrameHandle)
 ```
 
 ### x86 Specifics
