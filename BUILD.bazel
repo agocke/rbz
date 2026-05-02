@@ -190,6 +190,12 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+config_setting(
+    name = "linux_arm64",
+    constraint_values = ["@platforms//os:linux", "@platforms//cpu:arm64"],
+    visibility = ["//visibility:public"],
+)
+
 # ── CoreCLR config_settings ──────────────────────────────────────────
 config_setting(
     name = "clr_debug",

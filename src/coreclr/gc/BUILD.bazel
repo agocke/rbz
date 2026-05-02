@@ -103,6 +103,16 @@ _GC_STANDALONE_DEFINES = [
         "TARGET_LINUX",
         "_TIME_BITS=64",
     ],
+    "//:linux_arm64": [
+        "HOST_64BIT",
+        "HOST_ARM64",
+        "HOST_UNIX",
+        "TARGET_64BIT",
+        "TARGET_ARM64",
+        "TARGET_UNIX",
+        "TARGET_LINUX",
+        "_TIME_BITS=64",
+    ],
 })
 
 _GC_COPTS = [
@@ -119,6 +129,7 @@ _GC_INCLUDES = [
 ] + select({
     "//:macos_arm64": ["unix/bazel/osx-arm64"],
     "//:macos_x64": ["unix/bazel/osx-x64"],
+    "//:linux_arm64": ["unix/bazel/linux-glibc-arm64"],
     "//conditions:default": ["unix/bazel/linux-glibc-x64"],
 })
 
@@ -146,6 +157,7 @@ cc_library(
     ] + select({
         "//:macos_arm64": ["unix/bazel/osx-arm64/config.gc.h"],
         "//:macos_x64": ["unix/bazel/osx-x64/config.gc.h"],
+        "//:linux_arm64": ["unix/bazel/linux-glibc-arm64/config.gc.h"],
         "//conditions:default": ["unix/bazel/linux-glibc-x64/config.gc.h"],
     }),
     copts = _GC_COPTS + CLR_CONFIG_COPTS,

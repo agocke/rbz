@@ -13,6 +13,9 @@ use_repo(dotnet, "dotnet_toolchains")
 
 register_toolchains("@dotnet_toolchains//:all")
 
+# Cross-compilation toolchain for linux-arm64
+register_toolchains("//toolchains:linux_arm64_toolchain")
+
 main_extension = use_extension("//paket:paket.main_extension.bzl", "main_extension")
 
 use_repo(

@@ -45,7 +45,10 @@ cc_library(
         "pal_x509_root.c",
         "pal_x509ext.c",
     ] + glob(["*.h"]),
-    hdrs = ["bazel/linux-glibc-x64/pal_crypto_config.h"],
+    hdrs = select({
+        "//:linux_arm64": ["bazel/linux-glibc-arm64/pal_crypto_config.h"],
+        "//conditions:default": ["bazel/linux-glibc-x64/pal_crypto_config.h"],
+    }),
     copts = [
         "-Wno-cast-align",
         "-Wno-reserved-id-macro",
@@ -59,8 +62,10 @@ cc_library(
         "../Common",
         "../bazel",
         ".",
-        "bazel/linux-glibc-x64",
-    ],
+    ] + select({
+        "//:linux_arm64": ["bazel/linux-glibc-arm64"],
+        "//conditions:default": ["bazel/linux-glibc-x64"],
+    }),
     defines = [
         "OPENSSL_API_COMPAT=0x10100000L",
         "FEATURE_DISTRO_AGNOSTIC_SSL",

@@ -26,6 +26,10 @@ cc_library(
             "bazel/windows-x64/_version.c",
             "bazel/windows-x64/configure.h",
         ],
+        "//:linux_arm64": [
+            "bazel/linux-glibc-arm64/_version.c",
+            "bazel/linux-glibc-arm64/configure.h",
+        ],
         "//conditions:default": [
             "bazel/linux-glibc-x64/_version.c",
             "bazel/linux-glibc-x64/configure.h",
@@ -35,6 +39,7 @@ cc_library(
         "//:macos_arm64": "bazel/osx-arm64",
         "//:macos_x64": "bazel/osx-x64",
         "@platforms//os:windows": "bazel/windows-x64",
+        "//:linux_arm64": "bazel/linux-glibc-arm64",
         "//conditions:default": "bazel/linux-glibc-x64",
     }),
 )
@@ -45,12 +50,14 @@ cc_library(
         "//:macos_arm64": ["bazel/osx-arm64/config.h"],
         "//:macos_x64": ["bazel/osx-x64/config.h"],
         "@platforms//os:windows": ["bazel/windows-x64/config.h"],
+        "//:linux_arm64": ["bazel/linux-glibc-arm64/config.h"],
         "//conditions:default": ["bazel/linux-glibc-x64/config.h"],
     }),
     strip_include_prefix = select({
         "//:macos_arm64": "bazel/osx-arm64",
         "//:macos_x64": "bazel/osx-x64",
         "@platforms//os:windows": "bazel/windows-x64",
+        "//:linux_arm64": "bazel/linux-glibc-arm64",
         "//conditions:default": "bazel/linux-glibc-x64",
     }),
 )

@@ -28,6 +28,7 @@ cc_library(
         "//:macos_arm64": ["bazel/osx-arm64/minipalconfig.h"],
         "//:macos_x64": ["bazel/osx-x64/minipalconfig.h"],
         "@platforms//os:windows": ["bazel/windows-x64/minipalconfig.h"],
+        "//:linux_arm64": ["bazel/linux-glibc-arm64/minipalconfig.h"],
         "//conditions:default": ["bazel/linux-glibc-x64/minipalconfig.h"],
     }) + glob(
         ["*.h", "**/*.h"],
@@ -39,6 +40,7 @@ cc_library(
         "//:macos_arm64": ["bazel/osx-arm64"],
         "//:macos_x64": ["bazel/osx-x64"],
         "@platforms//os:windows": ["bazel/windows-x64"],
+        "//:linux_arm64": ["bazel/linux-glibc-arm64"],
         "//conditions:default": ["bazel/linux-glibc-x64"],
     }),
     linkopts = select({

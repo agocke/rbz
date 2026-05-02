@@ -50,7 +50,7 @@ NATIVEAOT_DEFINES = NATIVEAOT_COMMON_DEFINES + select({
         "FEATURE_USE_SOFTWARE_WRITE_WATCH_FOR_GC_HEAP",
         "FEATURE_MANUALLY_MANAGED_CARD_BUNDLES",
     ],
-    "@platforms//os:linux": [
+    "//:linux_x64": [
         "_GNU_SOURCE",
         "HOST_64BIT",
         "HOST_AMD64",
@@ -63,6 +63,20 @@ NATIVEAOT_DEFINES = NATIVEAOT_COMMON_DEFINES + select({
         "FEATURE_MANUALLY_MANAGED_CARD_BUNDLES",
         "FEATURE_READONLY_GS_COOKIE",
         "UNIX_AMD64_ABI",
+        "FEATURE_RX_THUNKS",
+    ],
+    "//:linux_arm64": [
+        "_GNU_SOURCE",
+        "HOST_64BIT",
+        "HOST_ARM64",
+        "HOST_UNIX",
+        "TARGET_64BIT",
+        "TARGET_ARM64",
+        "TARGET_UNIX",
+        "TARGET_LINUX",
+        "FEATURE_USE_SOFTWARE_WRITE_WATCH_FOR_GC_HEAP",
+        "FEATURE_MANUALLY_MANAGED_CARD_BUNDLES",
+        "FEATURE_READONLY_GS_COOKIE",
         "FEATURE_RX_THUNKS",
     ],
 })
@@ -84,5 +98,6 @@ _NATIVEAOT_COMMON_COPTS = [
 
 NATIVEAOT_COPTS = _NATIVEAOT_COMMON_COPTS + select({
     "@platforms//os:macos": [],
-    "@platforms//os:linux": ["-mcx16"],
+    "//:linux_x64": ["-mcx16"],
+    "//:linux_arm64": [],
 })

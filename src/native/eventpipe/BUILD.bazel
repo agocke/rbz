@@ -71,11 +71,13 @@ cc_library(
     hdrs = glob(["*.h"]) + select({
         "//:macos_arm64": glob(["bazel/osx-arm64/*.h"]),
         "//:macos_x64": glob(["bazel/osx-x64/*.h"]),
+        "//:linux_arm64": glob(["bazel/linux-glibc-arm64/*.h"]),
         "//conditions:default": glob(["bazel/linux-glibc-x64/*.h"]),
     }),
     includes = ["."] + select({
         "//:macos_arm64": ["bazel/osx-arm64"],
         "//:macos_x64": ["bazel/osx-x64"],
+        "//:linux_arm64": ["bazel/linux-glibc-arm64"],
         "//conditions:default": ["bazel/linux-glibc-x64"],
     }),
     visibility = ["//src:__subpackages__"],

@@ -116,7 +116,7 @@ CORECLR_DEFINES = _CORECLR_COMMON_DEFINES + select({
         # clrfeatures.cmake — macOS-only features
         "FEATURE_OBJCMARSHAL",
     ],
-    "@platforms//os:linux": [
+    "//:linux_x64": [
         # Platform (configurecompiler.cmake)
         "_GNU_SOURCE",
         "HOST_64BIT",
@@ -132,8 +132,22 @@ CORECLR_DEFINES = _CORECLR_COMMON_DEFINES + select({
         # clrfeatures.cmake — Linux-only features
         "FEATURE_EVENTSOURCE_XPLAT=1",
     ],
+    "//:linux_arm64": [
+        # Platform (configurecompiler.cmake)
+        "_GNU_SOURCE",
+        "HOST_64BIT",
+        "HOST_ARM64",
+        "HOST_UNIX",
+        "TARGET_64BIT",
+        "TARGET_ARM64",
+        "TARGET_UNIX",
+        "TARGET_LINUX",
+        # clrdefinitions.cmake — ARM64-specific
+        "FEATURE_EMULATE_SINGLESTEP",
+        # clrfeatures.cmake — Linux-only features
+        "FEATURE_EVENTSOURCE_XPLAT=1",
+    ],
 })
-
 # DAC variant: same platform selects, different base defines.
 CORECLR_DAC_DEFINES = _CORECLR_DAC_COMMON_DEFINES + select({
     "//:macos_arm64": [
@@ -172,7 +186,7 @@ CORECLR_DAC_DEFINES = _CORECLR_DAC_COMMON_DEFINES + select({
         "__DARWIN_NON_CANCELABLE=1",
         "FEATURE_OBJCMARSHAL",
     ],
-    "@platforms//os:linux": [
+    "//:linux_x64": [
         "_GNU_SOURCE",
         "HOST_64BIT",
         "HOST_AMD64",
@@ -183,6 +197,18 @@ CORECLR_DAC_DEFINES = _CORECLR_DAC_COMMON_DEFINES + select({
         "TARGET_LINUX",
         "UNIX_AMD64_ABI",
         "UNIX_AMD64_ABI_ITF",
+        "FEATURE_EVENTSOURCE_XPLAT=1",
+    ],
+    "//:linux_arm64": [
+        "_GNU_SOURCE",
+        "HOST_64BIT",
+        "HOST_ARM64",
+        "HOST_UNIX",
+        "TARGET_64BIT",
+        "TARGET_ARM64",
+        "TARGET_UNIX",
+        "TARGET_LINUX",
+        "FEATURE_EMULATE_SINGLESTEP",
         "FEATURE_EVENTSOURCE_XPLAT=1",
     ],
 })

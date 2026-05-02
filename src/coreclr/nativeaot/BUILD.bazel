@@ -194,6 +194,7 @@ _GC_UNIX_SRCS = [
 ] + select({
     "//:macos_arm64": ["//src/coreclr/gc:unix/bazel/osx-arm64/config.gc.h"],
     "//:macos_x64": ["//src/coreclr/gc:unix/bazel/osx-x64/config.gc.h"],
+    "//:linux_arm64": ["//src/coreclr/gc:unix/bazel/linux-glibc-arm64/config.gc.h"],
     "//conditions:default": ["//src/coreclr/gc:unix/bazel/linux-glibc-x64/config.gc.h"],
 })
 
@@ -233,9 +234,9 @@ _LLVM_LIBUNWIND_ASM_SRCS = [
 ]
 
 # Assembly sources from nativeaot/Runtime/{arch}/
-# ThunkPoolThunks.S is Apple-only; on Linux FEATURE_RX_THUNKS is used.
+# ThunkPoolThunks.S is Apple-only; on Linux FEATURE_RX_THUNKS is used instead.
 _NATIVEAOT_ASM_SRCS = select({
-    "@platforms//cpu:arm64": [
+    "//:macos_arm64": [
         "Runtime/arm64/CachedInterfaceDispatchAot.S",
         "Runtime/arm64/ExceptionHandling.S",
         "Runtime/arm64/GcProbe.S",
@@ -243,6 +244,15 @@ _NATIVEAOT_ASM_SRCS = select({
         "Runtime/arm64/MiscStubs.S",
         "Runtime/arm64/PInvoke.S",
         "Runtime/arm64/ThunkPoolThunks.S",
+        "Runtime/arm64/UniversalTransition.S",
+    ],
+    "//:linux_arm64": [
+        "Runtime/arm64/CachedInterfaceDispatchAot.S",
+        "Runtime/arm64/ExceptionHandling.S",
+        "Runtime/arm64/GcProbe.S",
+        "Runtime/arm64/InteropThunksHelpers.S",
+        "Runtime/arm64/MiscStubs.S",
+        "Runtime/arm64/PInvoke.S",
         "Runtime/arm64/UniversalTransition.S",
     ],
     "//conditions:default": [
@@ -355,6 +365,7 @@ _GC_UNIX_INCLUDES = [
 ] + select({
     "//:macos_arm64": ["../gc/unix/bazel/osx-arm64"],
     "//:macos_x64": ["../gc/unix/bazel/osx-x64"],
+    "//:linux_arm64": ["../gc/unix/bazel/linux-glibc-arm64"],
     "//conditions:default": ["../gc/unix/bazel/linux-glibc-x64"],
 })
 

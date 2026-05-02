@@ -9,7 +9,8 @@ output binaries and support all platforms CMake/MSBuild currently targets.
 
 ## Current Status
 
-The Bazel build produces a fully functional .NET runtime on **linux-x64**.
+The Bazel build produces a fully functional .NET runtime on **linux-x64**,
+with cross-compilation support for **linux-arm64** (via `--platforms=//platforms:linux_arm64`).
 All native C/C++ components build with Bazel (CoreCLR, corehost, 6 native
 interop libs, NativeAOT runtime). Managed C# libraries (System.Private.CoreLib,
 173 framework assemblies) also build with Bazel via `rules_dotnet`.
@@ -198,7 +199,10 @@ layout.
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
 - Bootstrap mode: NativeAOT-compile crossgen2, use it for System.Private.CoreLib
 - Installer/packaging (NuGet packs, runtime packs, targeting packs)
-- Additional platforms (linux-arm64, macOS, Windows)
+- Additional platforms (macOS, Windows)
+  - **linux-arm64**: Cross-compilation support added via `--platforms=//platforms:linux_arm64`.
+    Uses Clang cross-toolchain targeting `aarch64-linux-gnu`. Requires `aarch64-linux-gnu` sysroot
+    and arm64 dev packages (`libssl-dev:arm64`, `libkrb5-dev:arm64`) for full native lib builds.
   - **Windows (win-x64)**: corehost native components (dotnet.exe, hostfxr.dll,
     hostpolicy.dll) build successfully with MSVC. Infrastructure includes
     MSVC compiler/linker flags in `cc_defs.bzl`, static debug CRT (`/MTd`)
@@ -523,7 +527,7 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 
 | OS | CMake | Bazel | Notes |
 |----|-------|-------|-------|
-| Linux (glibc) | ✅ | 🔨 In progress | First target; linux-x64 compiler flags verified |
+| Linux (glibc) | ✅ | 🔨 In progress | First target; linux-x64 compiler flags verified. linux-arm64 cross-compile via `--platforms=//platforms:linux_arm64`. |
 | Linux (musl/Alpine) | ✅ | ❌ Not started | |
 | macOS (Darwin) | ✅ | 🔄 In progress | Cross-compile for arm64 via `--platforms` and `--cpu=darwin_arm64` in `.bazelrc`. Tests skipped on Intel CI runners. |
 | Windows | ✅ | 🔨 Host only | corehost (dotnet.exe, hostfxr.dll, hostpolicy.dll, apphost.exe, nethost.dll) builds with MSVC; CI on `windows-latest` |
@@ -546,7 +550,7 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 |-------------|-------|-------|-------|
 | x64 (AMD64) | ✅ | 🔨 In progress | First target |
 | x86 (i386) | ✅ | ❌ Not started | |
-| ARM64 (AArch64) | ✅ | ❌ Not started | |
+| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host; native libs build (except crypto/gssapi needing arm64 dev packages) |
 | ARM (32-bit) | ✅ | ❌ Not started | |
 | ARMv6 | ✅ | ❌ Not started | |
 | RISC-V 64 | ✅ | ❌ Not started | |

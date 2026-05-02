@@ -1,4 +1,4 @@
-# Bundled GNU libunwind for linux-x64 and macOS DAC.
+# Bundled GNU libunwind for Linux (x64 and arm64) and macOS DAC.
 # Used by CoreCLR PAL for stack unwinding on Linux.
 # On macOS, the system libunwind is used for normal unwinding; this target
 # also provides a DAC-specific build for remote unwinding (libunwind_dac_macos).
@@ -9,7 +9,9 @@ load("//src/coreclr:coreclr_defs.bzl", "CLR_CONFIG_COPTS")
 
 package(default_visibility = ["//src/coreclr:__subpackages__"])
 
-# --- Generated config headers (linux-glibc-x64) ---
+# --- Generated config headers (linux) ---
+# These headers use preprocessor #if dispatching, so the same files work
+# for both x64 and arm64.
 
 cc_library(
     name = "libunwind_config",
@@ -141,11 +143,22 @@ cc_library(
         "src/mi/flush_cache.c",
         "src/mi/mempool.c",
         "src/mi/strerror.c",
-        # --- x86_64 common ---
-        "src/x86_64/is_fpreg.c",
-        "src/x86_64/regname.c",
-        # --- x86_64 os generic (Linux) ---
-        "src/x86_64/Gos-linux.c",
+    ] + select({
+        "@platforms//cpu:arm64": [
+            # --- aarch64 common ---
+            "src/aarch64/is_fpreg.c",
+            "src/aarch64/regname.c",
+            # --- aarch64 os generic (Linux) ---
+            "src/aarch64/Gos-linux.c",
+        ],
+        "//conditions:default": [
+            # --- x86_64 common ---
+            "src/x86_64/is_fpreg.c",
+            "src/x86_64/regname.c",
+            # --- x86_64 os generic (Linux) ---
+            "src/x86_64/Gos-linux.c",
+        ],
+    }) + [
         # --- libunwind_la_SOURCES_generic (mi/G*) ---
         "src/mi/Gdyn-extract.c",
         "src/mi/Gdyn-remote.c",
@@ -160,21 +173,43 @@ cc_library(
         "src/mi/Gset_fpreg.c",
         "src/mi/Gset_caching_policy.c",
         "src/mi/Gset_cache_size.c",
-        # --- x86_64 generic arch-specific (x86_64/G*) ---
-        "src/x86_64/Gapply_reg_state.c",
-        "src/x86_64/Greg_states_iterate.c",
-        "src/x86_64/Gcreate_addr_space.c",
-        "src/x86_64/Gget_save_loc.c",
-        "src/x86_64/Gglobal.c",
-        "src/x86_64/Ginit.c",
-        "src/x86_64/Ginit_local.c",
-        "src/x86_64/Ginit_remote.c",
-        "src/x86_64/Gget_proc_info.c",
-        "src/x86_64/Gregs.c",
-        "src/x86_64/Gresume.c",
-        "src/x86_64/Gstash_frame.c",
-        "src/x86_64/Gstep.c",
-        "src/x86_64/Gtrace.c",
+    ] + select({
+        "@platforms//cpu:arm64": [
+            # --- aarch64 generic arch-specific (aarch64/G*) ---
+            "src/aarch64/Gapply_reg_state.c",
+            "src/aarch64/Greg_states_iterate.c",
+            "src/aarch64/Gcreate_addr_space.c",
+            "src/aarch64/Gget_save_loc.c",
+            "src/aarch64/Gglobal.c",
+            "src/aarch64/Ginit.c",
+            "src/aarch64/Ginit_local.c",
+            "src/aarch64/Ginit_remote.c",
+            "src/aarch64/Gget_proc_info.c",
+            "src/aarch64/Gis_signal_frame.c",
+            "src/aarch64/Gregs.c",
+            "src/aarch64/Gresume.c",
+            "src/aarch64/Gstash_frame.c",
+            "src/aarch64/Gstep.c",
+            "src/aarch64/Gtrace.c",
+        ],
+        "//conditions:default": [
+            # --- x86_64 generic arch-specific (x86_64/G*) ---
+            "src/x86_64/Gapply_reg_state.c",
+            "src/x86_64/Greg_states_iterate.c",
+            "src/x86_64/Gcreate_addr_space.c",
+            "src/x86_64/Gget_save_loc.c",
+            "src/x86_64/Gglobal.c",
+            "src/x86_64/Ginit.c",
+            "src/x86_64/Ginit_local.c",
+            "src/x86_64/Ginit_remote.c",
+            "src/x86_64/Gget_proc_info.c",
+            "src/x86_64/Gregs.c",
+            "src/x86_64/Gresume.c",
+            "src/x86_64/Gstash_frame.c",
+            "src/x86_64/Gstep.c",
+            "src/x86_64/Gtrace.c",
+        ],
+    }) + [
         # --- dwarf generic (dwarf/G*) ---
         "src/dwarf/Gexpr.c",
         "src/dwarf/Gfde.c",
@@ -187,8 +222,16 @@ cc_library(
         "src/dwarf/global.c",
         # --- libunwind_elf64_la_SOURCES ---
         "src/elf64.c",
-        # --- x86_64 os local (Linux) ---
-        "src/x86_64/Los-linux.c",
+    ] + select({
+        "@platforms//cpu:arm64": [
+            # --- aarch64 os local (Linux) ---
+            "src/aarch64/Los-linux.c",
+        ],
+        "//conditions:default": [
+            # --- x86_64 os local (Linux) ---
+            "src/x86_64/Los-linux.c",
+        ],
+    }) + [
         # --- libunwind_la_SOURCES_local (mi/L*) ---
         "src/mi/backtrace.c",
         "src/mi/dyn-cancel.c",
@@ -208,23 +251,47 @@ cc_library(
         "src/mi/Lset_caching_policy.c",
         "src/mi/Lset_cache_size.c",
         "src/mi/Laddress_validator.c",
-        # --- x86_64 local arch-specific (x86_64/L*) ---
-        "src/x86_64/setcontext.S",
-        "src/x86_64/Lapply_reg_state.c",
-        "src/x86_64/Lreg_states_iterate.c",
-        "src/x86_64/Lcreate_addr_space.c",
-        "src/x86_64/Lget_save_loc.c",
-        "src/x86_64/Lglobal.c",
-        "src/x86_64/Linit.c",
-        "src/x86_64/Linit_local.c",
-        "src/x86_64/Linit_remote.c",
-        "src/x86_64/Lget_proc_info.c",
-        "src/x86_64/Lregs.c",
-        "src/x86_64/Lresume.c",
-        "src/x86_64/Lstash_frame.c",
-        "src/x86_64/Lstep.c",
-        "src/x86_64/Ltrace.c",
-        "src/x86_64/getcontext.S",
+    ] + select({
+        "@platforms//cpu:arm64": [
+            # --- aarch64 local arch-specific (aarch64/L*) ---
+            "src/aarch64/setcontext.S",
+            "src/aarch64/Lapply_reg_state.c",
+            "src/aarch64/Lreg_states_iterate.c",
+            "src/aarch64/Lcreate_addr_space.c",
+            "src/aarch64/Lget_save_loc.c",
+            "src/aarch64/Lglobal.c",
+            "src/aarch64/Linit.c",
+            "src/aarch64/Linit_local.c",
+            "src/aarch64/Linit_remote.c",
+            "src/aarch64/Lget_proc_info.c",
+            "src/aarch64/Lis_signal_frame.c",
+            "src/aarch64/Lregs.c",
+            "src/aarch64/Lresume.c",
+            "src/aarch64/Lstash_frame.c",
+            "src/aarch64/Lstep.c",
+            "src/aarch64/Ltrace.c",
+            "src/aarch64/getcontext.S",
+        ],
+        "//conditions:default": [
+            # --- x86_64 local arch-specific (x86_64/L*) ---
+            "src/x86_64/setcontext.S",
+            "src/x86_64/Lapply_reg_state.c",
+            "src/x86_64/Lreg_states_iterate.c",
+            "src/x86_64/Lcreate_addr_space.c",
+            "src/x86_64/Lget_save_loc.c",
+            "src/x86_64/Lglobal.c",
+            "src/x86_64/Linit.c",
+            "src/x86_64/Linit_local.c",
+            "src/x86_64/Linit_remote.c",
+            "src/x86_64/Lget_proc_info.c",
+            "src/x86_64/Lregs.c",
+            "src/x86_64/Lresume.c",
+            "src/x86_64/Lstash_frame.c",
+            "src/x86_64/Lstep.c",
+            "src/x86_64/Ltrace.c",
+            "src/x86_64/getcontext.S",
+        ],
+    }) + [
         # --- dwarf local (dwarf/L*) ---
         "src/dwarf/Lexpr.c",
         "src/dwarf/Lfde.c",
@@ -233,16 +300,21 @@ cc_library(
         "src/dwarf/Lfind_proc_info-lsb.c",
         "src/dwarf/Lfind_unwind_table.c",
         "src/dwarf/Lget_proc_info_in_range.c",
-    ] + LIBUNWIND_INTERNAL_HDRS,
+    ] + select({
+        "@platforms//cpu:arm64": LIBUNWIND_INTERNAL_HDRS_AARCH64,
+        "//conditions:default": LIBUNWIND_INTERNAL_HDRS,
+    }),
     # Expose G*.c files as textual headers so L*.c files can #include them
     textual_hdrs = glob(
         [
             "src/mi/G*.c",
             "src/dwarf/G*.c",
-            "src/x86_64/G*.c",
         ],
         allow_empty = True,
-    ) + [
+    ) + select({
+        "@platforms//cpu:arm64": glob(["src/aarch64/G*.c"], allow_empty = True),
+        "//conditions:default": glob(["src/x86_64/G*.c"], allow_empty = True),
+    }) + [
         # elf64.c includes elfxx.c
         "src/elfxx.c",
     ],
@@ -251,8 +323,10 @@ cc_library(
     hdrs = glob([
         "include/*.h",
         "include/tdep/*.h",
-        "include/tdep-x86_64/*.h",
-    ]),
+    ]) + select({
+        "@platforms//cpu:arm64": glob(["include/tdep-aarch64/*.h"]),
+        "//conditions:default": glob(["include/tdep-x86_64/*.h"]),
+    }),
     includes = [
         "include",
         "include/tdep",

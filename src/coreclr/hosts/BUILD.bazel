@@ -16,11 +16,13 @@ cc_library(
     hdrs = select({
         "//:macos_arm64": ["corerun/bazel/osx-arm64/config.h"],
         "//:macos_x64": ["corerun/bazel/osx-x64/config.h"],
+        "//:linux_arm64": ["corerun/bazel/linux-glibc-arm64/config.h"],
         "//conditions:default": ["corerun/bazel/linux-glibc-x64/config.h"],
     }),
     strip_include_prefix = select({
         "//:macos_arm64": "corerun/bazel/osx-arm64",
         "//:macos_x64": "corerun/bazel/osx-x64",
+        "//:linux_arm64": "corerun/bazel/linux-glibc-arm64",
         "//conditions:default": "corerun/bazel/linux-glibc-x64",
     }),
 )
