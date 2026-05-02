@@ -59,6 +59,10 @@ def _impl(ctx):
                         flags = [
                             "--target=aarch64-linux-gnu",
                             "--sysroot=" + _SYSROOT,
+                            # Add system include paths for multiarch dev packages
+                            # (libssl-dev:arm64, libkrb5-dev:arm64 install to /usr/include)
+                            "-isystem", "/usr/include/aarch64-linux-gnu",
+                            "-isystem", "/usr/include",
                             "-no-canonical-prefixes",
                             "-Wno-builtin-macro-redefined",
                             "-D__DATE__=\"redacted\"",
@@ -164,6 +168,8 @@ def _impl(ctx):
         tool_paths = tool_paths,
         cxx_builtin_include_directories = [
             "/usr/aarch64-linux-gnu/include",
+            "/usr/include/aarch64-linux-gnu",
+            "/usr/include",
             "/usr/lib/llvm-18/lib/clang/18/include",
             "/usr/lib/clang/18/include",
         ],

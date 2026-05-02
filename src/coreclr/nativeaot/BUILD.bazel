@@ -76,12 +76,14 @@ genrule(
     srcs = select({
         "//:macos_arm64": ["Runtime/unix/bazel/osx-arm64/config.h"],
         "//:macos_x64": ["Runtime/unix/bazel/osx-x64/config.h"],
+        "//:linux_arm64": ["Runtime/unix/bazel/linux-glibc-arm64/config.h"],
         "//conditions:default": ["Runtime/unix/bazel/config.h"],
     }),
     outs = ["config.h"],
     cmd = select({
         "//:macos_arm64": "cp $(location Runtime/unix/bazel/osx-arm64/config.h) $@",
         "//:macos_x64": "cp $(location Runtime/unix/bazel/osx-x64/config.h) $@",
+        "//:linux_arm64": "cp $(location Runtime/unix/bazel/linux-glibc-arm64/config.h) $@",
         "//conditions:default": "cp $(location Runtime/unix/bazel/config.h) $@",
     }),
 )

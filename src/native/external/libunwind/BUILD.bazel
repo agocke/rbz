@@ -254,7 +254,8 @@ cc_library(
     ] + select({
         "@platforms//cpu:arm64": [
             # --- aarch64 local arch-specific (aarch64/L*) ---
-            "src/aarch64/setcontext.S",
+            # NOTE: setcontext.S is FreeBSD-only for aarch64 (see libunwind.cmake).
+            # On Linux, the ucontext_i.h doesn't define SC_FPSIMD_OFF for __linux__.
             "src/aarch64/Lapply_reg_state.c",
             "src/aarch64/Lreg_states_iterate.c",
             "src/aarch64/Lcreate_addr_space.c",
