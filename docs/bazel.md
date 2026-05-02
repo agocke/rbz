@@ -550,7 +550,7 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 |-------------|-------|-------|-------|
 | x64 (AMD64) | ✅ | 🔨 In progress | First target |
 | x86 (i386) | ✅ | ❌ Not started | |
-| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host; native libs build (except crypto/gssapi needing arm64 dev packages) |
+| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host; 95/95 native and 187/192 coreclr targets build. Remaining: lttng (missing arm64 dev pkg), interpexec.cpp (upstream bug), crossgen2-publish (host/target link mismatch). |
 | ARM (32-bit) | ✅ | ❌ Not started | |
 | ARMv6 | ✅ | ❌ Not started | |
 | RISC-V 64 | ✅ | ❌ Not started | |
