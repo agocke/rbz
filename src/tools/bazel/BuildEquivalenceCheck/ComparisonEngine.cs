@@ -203,7 +203,6 @@ public sealed class EquivalenceReport
                 .Select(r => r.Name)
                 .Concat(OnlyInMSBuild)
                 .Concat(OnlyInBazelManaged)
-                .Where(name => !ManagedManifest.TryGetValue(name, out var entry) || entry.ExpectedStatus != ManifestStatus.Ignore)
                 .Where(name => !ManagedManifest.ContainsKey(name))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Order()
