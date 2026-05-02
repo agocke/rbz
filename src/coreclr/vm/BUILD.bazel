@@ -563,6 +563,7 @@ cc_library(
         "gctoclreventsink.cpp",
         "genericdict.cpp",
         "generics.cpp",
+        "genmeth.cpp",
         "hash.cpp",
         "ilinstrumentation.cpp",
         "ilstubcache.cpp",
