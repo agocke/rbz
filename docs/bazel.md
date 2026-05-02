@@ -1199,7 +1199,10 @@ with `PublishAot=true`).
 
 **How it works:**
 - `//src/coreclr/tools/aot/crossgen2:crossgen2-publish` — `publish_binary` with
-  `aot=True` that NativeAOT-compiles crossgen2 into a standalone native binary (~14 MB)
+  `aot=True` that NativeAOT-compiles crossgen2 into a standalone native binary (~14 MB).
+  The target uses `extra_ilc_args` to supply Crossgen2-specific feature switches
+  and runtime knobs from `crossgen2_publish.csproj` / `AotCompilerCommon.props`
+  that `rules_dotnet`'s generic NativeAOT defaults do not model yet.
 - `crossgen_corelib` and `crossgen_assembly` rules take a mandatory `native_crossgen2`
   attr pointing to this binary
 - The rules set `LD_LIBRARY_PATH` / `DYLD_LIBRARY_PATH` so the binary can find
