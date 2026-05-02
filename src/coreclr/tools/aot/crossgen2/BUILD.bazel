@@ -1,4 +1,4 @@
-load("//:defs.bzl", "FILE_VERSION", "NETCOREAPP_MINIMUM", "csharp_binary")
+load("//:defs.bzl", "FILE_VERSION", "NETCOREAPP_MINIMUM", "NETCOREAPP_TOOL_CURRENT", "csharp_binary")
 load("//:defs.bzl", "gen_resx_source", "resgen")
 load("@rules_dotnet//dotnet:defs.bzl", "publish_binary")
 
@@ -95,7 +95,7 @@ csharp_binary(
         "@paket.main//microsoft.diasymreader",
         "@paket.main//system.commandline",
     ],
-    target_frameworks = [NETCOREAPP_MINIMUM],
+    target_frameworks = [NETCOREAPP_TOOL_CURRENT],
     nowarn = ["1701", "1702", "8002", "CS8632", "IL2121", "NU1701", "NU5105"],
     include_library_nowarn = False,
     include_default_ruleset = False,
@@ -108,11 +108,14 @@ csharp_binary(
 publish_binary(
     name = "crossgen2-publish",
     binary = ":crossgen2",
-    target_framework = NETCOREAPP_MINIMUM,
+    target_framework = NETCOREAPP_TOOL_CURRENT,
     self_contained = True,
     aot = True,
     optimization_mode = "speed",
     invariant_globalization = True,
+    server_gc = True,
+    eventpipe = True,
+    debug_symbols = True,
     extra_ilc_args = _CROSSGEN2_PUBLISH_EXTRA_ILC_ARGS,
     visibility = ["//visibility:public"],
 )
