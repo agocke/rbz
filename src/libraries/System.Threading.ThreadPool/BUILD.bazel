@@ -14,6 +14,7 @@ netcoreapp_ref_assembly(
         "//src/libraries/System.Threading.Overlapped:ref_System.Threading.Overlapped",
     ],
     allow_unsafe_blocks = True,
+    nowarn = ["CS9368"],
 )
 
 netcoreapp_impl_assembly(

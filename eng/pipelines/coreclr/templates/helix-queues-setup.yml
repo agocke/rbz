@@ -33,7 +33,7 @@ jobs:
     helixQueues:
 
     # iOS Simulator/Mac Catalyst arm64
-    - ${{ if in(parameters.platform, 'maccatalyst_arm64', 'iossimulator_arm64') }}:
+    - ${{ if in(parameters.platform, 'iossimulator_arm64', 'tvossimulator_arm64', 'maccatalyst_arm64') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
         - OSX.15.Arm64.Open
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
@@ -63,58 +63,58 @@ jobs:
     # Browser wasm
     - ${{ if eq(parameters.platform, 'browser_wasm') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-        - (Ubuntu.2404.Amd64)AzureLinux.3.Amd64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-24.04-helix-webassembly-amd64
+        - (Ubuntu.2604.Amd64.Open)AzureLinux.3.Amd64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-26.04-helix-webassembly-amd64@sha256:051f8f1a037bbe85fca4d81e4cd56d496840fbe3edcfee776d4963331cb28029
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-        - (Ubuntu.2404.Amd64)AzureLinux.3.Amd64@mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-24.04-helix-webassembly-amd64
+        - (Ubuntu.2604.Amd64)AzureLinux.3.Amd64@mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-26.04-helix-webassembly-amd64@sha256:051f8f1a037bbe85fca4d81e4cd56d496840fbe3edcfee776d4963331cb28029
 
     # iOS devices
     - ${{ if in(parameters.platform, 'ios_arm64') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-        - OSX.15.Amd64.Iphone.Open
+        - osx.15.amd64.iphone.open
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
         - osx.15.amd64.iphone
 
     # tvOS devices
     - ${{ if in(parameters.platform, 'tvos_arm64') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          - OSX.15.Amd64.AppleTV.Open
+        - osx.15.amd64.appletv.open
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
         - osx.15.amd64.appletv
 
     # Linux arm
     - ${{ if eq(parameters.platform, 'linux_arm') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-        - (Debian.13.Arm32.Open)AzureLinux.3.Arm64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:debian-13-helix-arm32v7
+        - (Debian.13.Arm32.Open)AzureLinux.3.Arm64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:debian-13-helix-arm32v7@sha256:51d087934972200928d8deffdcbd164d7b6f12af7b46059be125bc00b357ad12
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-        - (Debian.13.Arm32)AzureLinux.3.Arm64@mcr.microsoft.com/dotnet-buildtools/prereqs:debian-13-helix-arm32v7
+        - (Debian.13.Arm32)AzureLinux.3.Arm64@mcr.microsoft.com/dotnet-buildtools/prereqs:debian-13-helix-arm32v7@sha256:51d087934972200928d8deffdcbd164d7b6f12af7b46059be125bc00b357ad12
 
     # Linux arm64
     - ${{ if eq(parameters.platform, 'linux_arm64') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-        - (AzureLinux.3.0.ArmArch.Open)AzureLinux.3.Arm64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-helix-arm64v8
+        - AzureLinux.3.Arm64.Open
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-        - (AzureLinux.3.0.ArmArch)AzureLinux.3.Arm64@mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-helix-arm64v8
+        - AzureLinux.3.Arm64
 
     # Linux musl x64
     - ${{ if eq(parameters.platform, 'linux_musl_x64') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-        - (Alpine.323.Amd64.Open)AzureLinux.3.Amd64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-amd64
+        - (Alpine.323.Amd64.Open)AzureLinux.3.Amd64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-amd64@sha256:0d1628f4008b733e3a8f91fa617153b54cc792a30443395624652b372cfb55b0
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-        - (Alpine.323.Amd64)AzureLinux.3.Amd64@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-amd64
+        - (Alpine.323.Amd64)AzureLinux.3.Amd64@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-amd64@sha256:0d1628f4008b733e3a8f91fa617153b54cc792a30443395624652b372cfb55b0
 
     # Linux musl arm32
     - ${{ if eq(parameters.platform, 'linux_musl_arm') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-        - (Alpine.323.Arm32.Open)AzureLinux.3.Arm64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-arm32v7
+        - (Alpine.323.Arm32.Open)AzureLinux.3.Arm64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-arm32v7@sha256:b6a2e7098c3949b98043f847d5fc17523ab711fab0b8769b17a8e2b9677843d0
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-        - (Alpine.323.Arm32)AzureLinux.3.Arm64@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-arm32v7
+        - (Alpine.323.Arm32)AzureLinux.3.Arm64@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-arm32v7@sha256:b6a2e7098c3949b98043f847d5fc17523ab711fab0b8769b17a8e2b9677843d0
 
     # Linux musl arm64
     - ${{ if eq(parameters.platform, 'linux_musl_arm64') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-        - (Alpine.323.Arm64.Open)AzureLinux.3.Arm64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-arm64v8
+        - (Alpine.323.Arm64.Open)AzureLinux.3.Arm64.Open@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-arm64v8@sha256:09e23d72bd6741b7a95ffeebc2899c97388e95fbce2bc8edff79afc4f15b15be
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-        - (Alpine.323.Arm64)AzureLinux.3.Arm64@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-arm64v8
+        - (Alpine.323.Arm64)AzureLinux.3.Arm64@mcr.microsoft.com/dotnet-buildtools/prereqs:alpine-3.23-helix-arm64v8@sha256:09e23d72bd6741b7a95ffeebc2899c97388e95fbce2bc8edff79afc4f15b15be
 
     # Linux x64
     - ${{ if eq(parameters.platform, 'linux_x64') }}:
@@ -126,19 +126,18 @@ jobs:
     # OSX arm64
     - ${{ if eq(parameters.platform, 'osx_arm64') }}:
       - ${{ if and(eq(variables['System.TeamProject'], 'public'), ne(parameters.jobParameters.helixQueueGroup, 'superpmi-diffs')) }}:
-        - OSX.26.Arm64.Open
+        - $(helix_macos_arm64)
       - ${{ if and(eq(variables['System.TeamProject'], 'public'), eq(parameters.jobParameters.helixQueueGroup, 'superpmi-diffs')) }}:
-        # superpmi is not about testing platform differences, so go with highest capacity queue
-        - OSX.26.Arm64.Open
+        - OSX.15.Arm64.Open
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-        - OSX.26.Arm64
+        - OSX.14.Arm64
 
     # OSX x64
     - ${{ if eq(parameters.platform, 'osx_x64') }}:
       - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-        - OSX.15.Amd64.Open
+        - $(helix_macos_x64)
       - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-        - OSX.15.Amd64
+        - OSX.13.Amd64
 
     # windows x64
     - ${{ if eq(parameters.platform, 'windows_x64') }}:

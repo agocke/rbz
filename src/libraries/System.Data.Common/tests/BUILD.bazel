@@ -16,6 +16,7 @@ library_test(
             "TrimmingTests/**",
             # Separate MSBuild test project (System.Data.DataSetExtensions.Tests)
             "System.Data.DataSetExtensions.Tests/**",
+            "System/Data/Common/DataRecordInternalTest.cs",
         ],
     ) + [
         "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",

@@ -15,7 +15,7 @@ library_test(
         "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.ReadLink.cs",
         "//src/libraries/Common:src/System/Net/NetworkInformation/UnixCommandLinePing.cs",
-        "//src/libraries/Common:src/System/Text/ValueUtf8Converter.cs",
+        "//src/libraries/Common:src/System/Runtime/InteropServices/SpanOfCharAsUtf8StringMarshaller.cs",
     ],
     deps = [
         "//src/libraries/System.Net.Ping:ref_System.Net.Ping",
@@ -30,6 +30,7 @@ library_test(
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/System.Diagnostics.Tracing:ref_System.Diagnostics.Tracing",
         "//src/libraries/System.Threading:ref_System.Threading",
+        "//src/libraries/System.Threading.Thread:ref_System.Threading.Thread",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",
         "@paket.main//microsoft.dotnet.xunitassert",

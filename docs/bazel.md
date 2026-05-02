@@ -191,9 +191,8 @@ layout.
 ### What's Next
 
 - Remaining managed libraries (21 NetFxReference shims + 5 non-shim assemblies not yet in Bazel)
-- All 753 tracked managed assemblies now achieve equivalence with MSBuild
-  (structural differences in test helpers, TFM mismatches, and stub implementations
-  are handled by per-assembly normalization in the comparison engine)
+- Managed equivalence manifest cleanup (128 unlisted assemblies still need to be classified as `match`, `diff`, or `ignore`)
+- Remaining known managed equivalence diffs (208 manifest-listed assemblies)
 - CoreCLR diagnostic tooling: SOS
 - CoreCLR tools: SuperPMI, ildasm (full binary)
 - ILC BUILD files and end-to-end NativeAOT pipeline (see [NativeAOT Compilation Pipeline](#nativeaot-compilation-pipeline))
@@ -233,12 +232,10 @@ Clang is the default compiler (matching CMake).
 CMake/MSBuild. It compares every compilation unit's source files, preprocessor
 defines, compiler flags, references, and other inputs. Both scripts pass `--ci`
 to MSBuild and `--config=ci` to Bazel so that deterministic source paths are
-enabled and PDB paths are normalized. The default configuration is **release**,
-and the MSBuild leg uses `--rebuild` so the `.binlog` data is never stale from
-an incremental compile.
+enabled and PDB paths are normalized. The default configuration is **release**.
 
 ```bash
-# Run comparison (builds both systems automatically)
+# Run comparison (rebuilds MSBuild, builds Bazel automatically)
 ./compare-bazel.sh                                      # default (release)
 ./compare-bazel.sh --config debug                       # debug mode
 ./compare-bazel.sh --config both                        # both configs
@@ -257,9 +254,26 @@ references, flags (including `/nowarn`, `/warn`, `/features`, `/warnaserror`,
 `/unsafe`, `/checked`, `/nullable`, etc.), analyzers, language version, and
 target type.
 
+When `compare-bazel.sh` performs the MSBuild side itself, it uses
+`./build.sh ... --rebuild -bl` rather than an incremental build. That ensures
+the binlogs contain the full set of managed `Csc` invocations; incremental
+builds only emit tasks that reran and can make the managed comparison
+artificially small. `--skip-build` should therefore only be used after a
+baseline rebuild that produced fresh binlogs for the configuration being
+compared.
+
+The Bazel side intentionally scopes its build and aquery to
+`//src/coreclr/...`, `//src/libraries/...`, `//src/native/...`, and
+`//src/tools/illink/...` instead of `//...`. That keeps the comparison aligned
+with MSBuild's `clr+libs+libs.tests` subset while still including the ILLink
+tooling that `clr+libs+libs.tests` builds. It also avoids unrelated Bazel-only
+targets such as JIT regression tests or other helper graphs that would
+otherwise swamp the managed results.
+
 Managed assemblies are tracked via a **manifest file**
 (`managed-assembly-manifest.txt`) that lists every expected assembly as either
-`match` (must be identical) or `diff` (known difference). The check fails on
+`match` (must be identical), `diff` (known difference), or `ignore`
+(intentionally not comparable in this pipeline). The check fails on
 regressions (match→diff), unlisted assemblies, or missing entries. Reference
 assemblies (`ref_` targets) and implementation assemblies (`impl_`/`live_`
 targets) are compared independently — ref entries use a `.ref` suffix in the
@@ -275,20 +289,21 @@ areas:
   between `.bazelrc`/`coreclr_defs.bzl` and `CMakeLists.txt`. Native define
   normalization (`-DFOO` vs `-DFOO=1`) and optimization normalization (empty vs
   `-O0`) are handled by the tool.
-- **Managed assemblies**: All 753 tracked assemblies now match
-  MSBuild's CSC command line on source files, defines, references, analyzers,
-  language version, target type, and flags (including `/nowarn:`, `/noconfig`,
-  `/nostdlib+`, `/warnaserror`, `/warn:`, `/ruleset:`). Path-bearing flags
-  (`/keyfile:`, `/doc:`, `/embed:`, `/pdb:`, `/sourcelink:`, `/resource:`,
-  `/analyzerconfig:`, `/additionalfile:`, `/ruleset:`, etc.) are normalized
-  to filename-only for cross-build-system comparison. SDK-generated embedded
-  files (`*.AssemblyAttributes.cs`, `*.AssemblyInfo.cs`, etc.), sourcelink
-  configs, and default `/pdb:` entries are normalized as equivalent to
-  omission. Only truly unmatchable infrastructure flags (`/pathmap:`,
-  `/refout:`, `/generatedfilesout:`, `/nologo`) are filtered. Warning flags
-  are normalized: duplicate `/warn:` entries keep the highest value (matching
-  csc last-wins behavior), and comma-separated `/warnaserror+:X,Y` entries are
-  expanded into individual entries for consistent comparison.
+- **Managed assemblies**: the current narrowed release compare reports **730**
+  managed assemblies compared, **522** matched, **208** known diffs, **0**
+  unexpected managed diffs, and **128** unlisted managed assemblies still to
+  classify in the manifest. The manifest currently contains **733** entries:
+  **522** `match`, **208** `diff`, and **3** `ignore`. Comparison covers source
+  files, defines, references, analyzers, language version, target type, and
+  flags (including `/nowarn:`, `/noconfig`, `/nostdlib+`, `/warnaserror`,
+  `/warn:`, `/ruleset:`). Output-formatting flags (`/fullpaths`,
+  `/utf8output`, `/nologo`), debug symbol format, and build infrastructure
+  (`/pathmap:`, `/sourcelink:`, etc.) are filtered before comparison.
+  Path-bearing flags are normalized to filename-only for cross-build-system
+  comparison. Warning flags are normalized: duplicate `/warn:` entries keep the
+  highest value (matching csc last-wins behavior), and comma-separated
+  `/warnaserror+:X,Y` entries are expanded into individual entries for
+  consistent comparison.
   The matching assemblies include `System.Private.CoreLib` (full analyzer
   and flag parity including the ILLink.RoslynAnalyzer built from source) and
   91 library assemblies matched via infrastructure in `impl_assembly`
@@ -321,12 +336,7 @@ areas:
   `Microsoft.Extensions.Logging.EventSource`,
   `Microsoft.Extensions.Primitives`,
   `System.Diagnostics.TextWriterTraceListener`, and
-  `System.IO.Packaging`. The shared `netcoreapp_ref_assembly` macro now also
-  matches MSBuild's ref-build analyzerconfig stack, ILLink analyzer input,
-  default `InterceptorsNamespaces` feature flag, nullable/default-ruleset
-  behavior, strong-name key selection, mult-target warning suppressions, and
-  a targeted set of ref-only unsafe/nullable exceptions, moving the entire
-  reference-assembly backlog to `match`. Explicit `/unsafe` parity plus the same shared
+  `System.IO.Packaging`. Explicit `/unsafe` parity plus the same shared
   analyzer set now also moves 10 core `Microsoft.Extensions.*` libraries to
   `match`: `Microsoft.Extensions.DependencyInjection`,
   `Microsoft.Extensions.DependencyInjection.Abstractions`,
@@ -350,15 +360,13 @@ areas:
   suppressions in the generated editorconfig (comparison checks filename
   only). `crossgen2` remains a diff due to the `crossgen2.aot.globalconfig`
   injected by rules_dotnet for `is_aot_compatible=True`.
-  Of the 38 remaining known diffs:
+  Of the 220 remaining known diffs:
   - **PNSE stub generation**: Bazel generates per-file `.notsupported.cs` via
     `GenNotSupportedSource`, matching MSBuild's per-ref-file output pattern
   - **Non-archive assemblies**: Differ by design — Bazel uses precise deps
     while MSBuild uses the full targeting pack
-  - **netstandard2.0 targets**: source generators, tools, and test helpers may
-    still compare as `netstandard2.0` on the MSBuild side when no `net10.0`
-    build exists; the equivalence check now falls back to those records instead
-    of filtering them out entirely
+  - **netstandard2.0 targets**: 8 assemblies (source generators, test helpers)
+    target netstandard2.0 in MSBuild; these are filtered from comparison
   - `System.SR.cs` generation now matches MSBuild: `include_default_values`
     is config-dependent (True for debug, False for release) per
     `eng/resources.targets`
@@ -429,19 +437,12 @@ The ILLink + R2R pipeline now matches MSBuild's output, including embedded MIBC/
 profiles. There are no remaining known equivalence gaps for the framework assembly
 pipeline.
 
-## Syncing with upstream
+## Syncing with release/10.0
 
-There are two long-lived Bazel branches, each tracking a different upstream:
-
-| Branch | Upstream | Workflow |
-|--------|----------|----------|
-| `bazel` | `release/10.0` | `.github/workflows/sync-release.yml` |
-| `bazel-main` | `main` | `.github/workflows/sync-main.yml` |
-
-Both workflows run daily and use the same underlying script
-(`src/tools/bazel/sync-upstream.sh`) with different `--upstream-ref` and
-`--base-branch` arguments. They merge **one upstream commit at a time** to
-maintain a 1:1 correspondence between upstream commits and bazel merge commits.
+The `bazel` branch is a long-lived branch off `release/10.0`. A GitHub Action
+(`.github/workflows/sync-release.yml`) runs daily to keep it current, merging
+**one upstream commit at a time** to maintain a 1:1 correspondence between
+release/10.0 commits and bazel merge commits.
 
 ### How the sync works
 
@@ -932,11 +933,13 @@ The runtime archive pipeline matches MSBuild: **compile → ILLink trim → cros
 | Stage | Rule | File | Count |
 |---|---|---|---|
 | ILLink trim | `illink_trim` | `illink.bzl` | 171 assemblies |
-| Crossgen2 R2R | `crossgen_assembly` | `src/coreclr/crossgen2.bzl` | 90 assemblies |
+| Crossgen2 R2R | `crossgen_assembly` | `src/coreclr/crossgen2.bzl` | disabled in root `BUILD.bazel` |
 
-Per-assembly targets are generated by macros in `framework_r2r.bzl`:
+Per-assembly targets are defined by macros in `framework_r2r.bzl`:
 - `framework_illink_targets()` — generates `illinked_<Name>` targets for all framework assemblies
-- `framework_crossgen_targets()` — generates `r2r_<Name>` targets for the R2R subset
+- `framework_crossgen_targets()` — generates `r2r_<Name>` targets for the R2R subset, but the
+  root `BUILD.bazel` does not currently invoke it by default because several trimmed assemblies
+  still hit crossgen2 type-resolution failures
 
 ILLink args match `eng/illink.targets`: `--trim-mode skip`, `--action link <Name>`,
 `-b true` (PDB preservation), `--preserve-symbol-paths`, per-library descriptor XMLs.
@@ -949,7 +952,9 @@ so the `dotnet-pgo merge` step that MSBuild uses to produce a single
 `StandardOptimizationData.mibc` is unnecessary. Both `crossgen_corelib` and
 `crossgen_assembly` pass all 6 `.mibc` files with `--embed-pgo-data`.
 
-System.Net.Http is excluded from R2R (crossgen2 type resolution issue).
+Framework R2R generation is currently disabled in the root `BUILD.bazel` until the remaining
+crossgen2 type-resolution failures are resolved. `System.Net.Http` is also excluded from the
+R2R subset in `framework_r2r.bzl`.
 
 ---
 
@@ -1199,7 +1204,10 @@ with `PublishAot=true`).
 
 **How it works:**
 - `//src/coreclr/tools/aot/crossgen2:crossgen2-publish` — `publish_binary` with
-  `aot=True` that NativeAOT-compiles crossgen2 into a standalone native binary (~14 MB)
+  `aot=True` that NativeAOT-compiles crossgen2 into a standalone native binary (~14 MB).
+  The target uses `extra_ilc_args` to supply Crossgen2-specific feature switches
+  and runtime knobs from `crossgen2_publish.csproj` / `AotCompilerCommon.props`
+  that `rules_dotnet`'s generic NativeAOT defaults do not model yet.
 - `crossgen_corelib` and `crossgen_assembly` rules take a mandatory `native_crossgen2`
   attr pointing to this binary
 - The rules set `LD_LIBRARY_PATH` / `DYLD_LIBRARY_PATH` so the binary can find

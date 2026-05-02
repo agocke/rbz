@@ -30,6 +30,7 @@ netcoreapp_impl_assembly(
         "src/System/IO/Pipes/PipeTransmissionMode.cs",
 
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
+        "//src/libraries/Common:src/System/Obsoletions.cs",
     ] + select({
         "@platforms//os:linux": [
             # Unix-specific implementation files

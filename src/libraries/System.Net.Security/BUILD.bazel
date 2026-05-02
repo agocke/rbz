@@ -68,7 +68,8 @@ netcoreapp_impl_assembly(
         # Unconditional Common sources
         "//src/libraries/Common:src/System/Obsoletions.cs",
         "//src/libraries/Common:src/System/Net/UriScheme.cs",
-        "//src/libraries/Common:src/System/AppContextSwitchHelper.cs",
+        "//src/libraries/Common:src/System/LocalAppContextSwitches.Common.cs",
+        "//src/libraries/Common:src/System/Net/LocalAppContextSwitches.Net.cs",
         # Common sources (TargetPlatformIdentifier != '')
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
         "//src/libraries/Common:src/System/Net/Logging/NetEventSource.Common.cs",
@@ -103,7 +104,6 @@ netcoreapp_impl_assembly(
             "src/System/Net/Security/SslStreamPal.Unix.cs",
             "src/System/Net/Security/StreamSizes.Unix.cs",
             # Asn1Reader (non-windows)
-            "//src/libraries/Common:src/System/Security/Cryptography/Asn1Reader/AsnValueReader.cs",
             # Unix Common (non-windows)
             "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
             "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",
@@ -169,7 +169,6 @@ netcoreapp_impl_assembly(
             "src/System/Net/Security/Pal.OSX/SafeDeleteNwContext.cs",
             "src/System/Net/Security/Pal.Managed/SslProtocolsValidation.cs",
             # Asn1Reader (non-windows)
-            "//src/libraries/Common:src/System/Security/Cryptography/Asn1Reader/AsnValueReader.cs",
             # Unix Common (non-windows) - still needed for GSS/Negotiate
             "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
             "//src/libraries/Common:src/Interop/Unix/Interop.Errors.cs",

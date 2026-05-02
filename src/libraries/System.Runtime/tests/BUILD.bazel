@@ -172,7 +172,9 @@ library_test(
 library_test(
     name = "System.Threading.Tasks.Tests",
     srcs = glob(["System.Threading.Tasks.Tests/**/*.cs"]) + [
+        "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
         "//src/libraries/Common/tests:System/Diagnostics/Tracing/TestEventListener.cs",
+        "//src/libraries/Common/tests:System/Runtime/CompilerServices/RuntimeAsyncMethodGenerationAttribute.cs",
         "//src/libraries/Common/tests:System/Threading/ThreadPoolHelpers.cs",
         "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
     ],
@@ -366,7 +368,6 @@ library_test(
         "//src/libraries/Common:src/System/IO/PathInternal.CaseSensitivity.cs",
         "//src/libraries/Common/tests:System/Buffers/NativeMemoryManager.cs",
         "//src/libraries/Common/tests:System/IO/TempFile.cs",
-        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
         "//src/libraries/Common/tests:System/IO/ReparsePointUtilities.cs",
         "//src/libraries/Common/tests:Tests/TheoryDataExtensions.cs",
         "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
@@ -447,7 +448,11 @@ library_test(
     ],
     nowarn = ["SYSLIB0013", "SYSLIB0037"],
     deps = [
+        "//src/libraries/System.Drawing.Primitives:ref_System.Drawing.Primitives",
         "//src/libraries/System.Reflection.Emit:ref_System.Reflection.Emit",
+        "//src/libraries/System.Reflection.Emit.ILGeneration:ref_System.Reflection.Emit.ILGeneration",
+        "//src/libraries/System.Reflection.Emit.Lightweight:ref_System.Reflection.Emit.Lightweight",
+        "//src/libraries/System.Reflection.Primitives:ref_System.Reflection.Primitives",
         "//src/libraries/System.Reflection.TypeExtensions:ref_System.Reflection.TypeExtensions",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
@@ -574,7 +579,6 @@ library_test(
         "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
         "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
         "//src/libraries/Common/tests:System/GenericMathTestMemberData.cs",
-        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
         "//src/libraries/Common/tests:System/ShouldNotBeInvokedException.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/ByteUtils.cs",
     ],
@@ -727,6 +731,7 @@ library_test(
         "//src/libraries/System.Threading.Tasks.Parallel:ref_System.Threading.Tasks.Parallel",
         "//src/libraries:ref_System.Threading.Tasks",
         "//src/libraries/System.Runtime.Serialization.Formatters:ref_System.Runtime.Serialization.Formatters",
+        "//src/libraries/System.Runtime.CompilerServices.VisualC:ref_System.Runtime.CompilerServices.VisualC",
         "//src/libraries/System.Security.Permissions:ref_System.Security.Permissions",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//moq",
@@ -792,8 +797,9 @@ library_test(
 # supported.
 csharp_library(
     name = "System.Reflection.TestExe",
+    include_runtime_async = False,
     srcs = ["System.Reflection.Tests/TestExe/Program.cs"],
-    target_frameworks = ["net10.0"],
+    target_frameworks = ["net11.0"],
     keyfile = OPEN_SNK,
     nullable = "annotations",
     nowarn = [
@@ -806,7 +812,6 @@ csharp_library(
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
-    skip_analyzers = True,
 )
 
 # NOTE: System.Reflection.CoreCLR.Tests depends on TestExe as a project
@@ -852,7 +857,6 @@ library_test(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/Common/tests:TestUtilities",
-        "//src/libraries/shims/netstandard:impl_netstandard",
         "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
@@ -884,7 +888,6 @@ library_test(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/Common/tests:TestUtilities",
-        "//src/libraries/shims/netstandard:impl_netstandard",
         "//src/libraries/System.Runtime/tests/System.Reflection.Tests/TestAssembly",
         "@paket.main//microsoft.dotnet.remoteexecutor",
     ] + XUNIT_DEPS,
@@ -997,7 +1000,6 @@ library_test(
         ],
     ) + [
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
-        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
         "//src/libraries/Common/tests:Tests/TheoryDataExtensions.cs",
         "//src/libraries/Common/tests:TestUtilities/System/DisableParallelization.cs",
         "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",

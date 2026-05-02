@@ -1,5 +1,5 @@
 load("//src/libraries:defs.bzl", "netcoreapp_ref_assembly", "netcoreapp_impl_assembly", "ref_impl_pair")
-load("//:defs.bzl", "MSFT_SNK", "csharp_library")
+load("//:defs.bzl", "OPEN_SNK", "csharp_library")
 
 exports_files([
     "ref/System.Text.RegularExpressions.cs",
@@ -7,8 +7,7 @@ exports_files([
 
 csharp_library(
     name = "RegexGenerator",
-    keyfile = MSFT_SNK,
-    compiler_options = ["/publicsign+"],
+    keyfile = OPEN_SNK,
     out = "System.Text.RegularExpressions.Generator",
     srcs = [
         "gen/RegexGenerator.cs",
@@ -30,13 +29,14 @@ csharp_library(
         "//src/libraries/Common:src/System/HexConverter.cs",
         "//src/libraries/Common:src/System/Obsoletions.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
         "src/System/Threading/StackHelper.cs",
         "src/System/Text/RegularExpressions/RegexCaseEquivalences.Data.cs",
         "src/System/Text/RegularExpressions/RegexCaseEquivalences.cs",
         "src/System/Text/RegularExpressions/RegexCaseBehavior.cs",
         "src/System/Text/RegularExpressions/RegexCharClass.cs",
+        "src/System/Text/RegularExpressions/RegexCharClass.Tables.cs",
         "src/System/Text/RegularExpressions/RegexFindOptimizations.cs",
         "src/System/Text/RegularExpressions/RegexNode.cs",
         "src/System/Text/RegularExpressions/RegexNodeKind.cs",
@@ -49,12 +49,19 @@ csharp_library(
         "src/System/Text/RegularExpressions/RegexTree.cs",
         "src/System/Text/RegularExpressions/RegexTreeAnalyzer.cs",
         "src/System/Collections/HashtableExtensions.cs",
+
+        # Span polyfills for netstandard2.0
+        "//src/libraries/Common:src/System/MemoryExtensionsPolyfills.cs",
+        "//src/libraries/Common:src/System/StringPolyfills.cs",
+        "//src/libraries/Common:src/System/Buffers/SearchValuesPolyfills.cs",
+        "//src/libraries/Common:src/System/Text/AsciiPolyfills.cs",
+        "//src/libraries/Common:src/Polyfills/EncodingPolyfills.cs",
     ],
     resx_file = "gen/Resources/Strings.resx",
     target_frameworks = ["netstandard2.0"],
     langversion = "preview",
     cls_compliant = False,
-    nullable = "enable",
+    nullable = "annotations",
     allow_unsafe_blocks = True,
     deps = [
         "@paket.main//microsoft.codeanalysis.common",
@@ -62,40 +69,15 @@ csharp_library(
         "@paket.main//microsoft.codeanalysis.workspaces.common",
         "@paket.main//microsoft.codeanalysis.csharp.workspaces",
         "@paket.main//system.composition.attributedmodel",
-        "@paket.main//system.composition.convention",
-        "@paket.main//system.composition.hosting",
-        "@paket.main//system.composition.runtime",
-        "@paket.main//system.composition.typedparts",
         "@paket.main//system.collections.immutable",
         "@paket.main//system.memory",
         "@paket.main//system.buffers",
-        "@paket.main//system.io.pipelines",
-        "@paket.illink//system.numerics.vectors",
-        "@paket.main//system.reflection.metadata",
         "@paket.main//system.runtime.compilerservices.unsafe",
-        "@paket.main//system.threading.channels",
-        "@paket.illink//system.text.encoding.codepages",
-        "@paket.illink//system.threading.tasks.extensions",
     ],
-    analyzers = [
-        "//:source_build_analyzers",
-    ],
-    additionalfiles = glob(["gen/Resources/*.resx"]),
-    msbuild_analyzer_config = "source",
-    include_syslib_warnaserror = False,
-    extra_editorconfig_content = "dotnet_diagnostic.RS1036.severity = none",
     nowarn = [
         "CS0436",
         "CS0649",
         "CA1872",
-        "CA1510",
-        "CA1511",
-        "CA1512",
-        "CA1513",
-        "CA1845",
-        "CA1846",
-        "CA1847",
-        "nullable",
     ],
     visibility = ["//visibility:public"],
 )
@@ -114,7 +96,7 @@ netcoreapp_ref_assembly(
 netcoreapp_impl_assembly(
     name = "impl_System.Text.RegularExpressions",
     com_interface_generator = True,
-    nowarn = ["CS1591"],
+    nowarn = [],
     srcs = [
         # Core types
         "src/System/Collections/HashtableExtensions.cs",
@@ -143,6 +125,7 @@ netcoreapp_impl_assembly(
         "src/System/Text/RegularExpressions/RegexCaseEquivalences.Data.cs",
         "src/System/Text/RegularExpressions/RegexCaseEquivalences.cs",
         "src/System/Text/RegularExpressions/RegexCharClass.cs",
+        "src/System/Text/RegularExpressions/RegexCharClass.Tables.cs",
         "src/System/Text/RegularExpressions/RegexCompilationInfo.cs",
         "src/System/Text/RegularExpressions/RegexFindOptimizations.cs",
         "src/System/Text/RegularExpressions/GeneratedRegexAttribute.cs",
@@ -213,8 +196,8 @@ netcoreapp_impl_assembly(
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
 
         # CoreLib shared source files
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
     ],
     deps = [
         "//src/libraries/System.Collections:ref_System.Collections",

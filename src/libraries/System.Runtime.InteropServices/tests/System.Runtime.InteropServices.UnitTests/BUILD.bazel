@@ -46,6 +46,7 @@ library_test(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
         "//src/libraries/System.Drawing.Primitives:ref_System.Drawing.Primitives",
+        "//src/libraries/System.Reflection.Metadata:ref_System.Reflection.Metadata",
         "//src/libraries/System.Runtime.Numerics:ref_System.Runtime.Numerics",
         "//src/libraries/Common/tests:TestUtilities",
         "@paket.main//microsoft.dotnet.remoteexecutor",

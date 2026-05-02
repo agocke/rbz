@@ -137,6 +137,10 @@ jobs:
       - name: _nativeSanitizersArg
         value: ''
 
+      # Capture MSBuild crash diagnostics so they are published with build logs
+      - name: MSBUILDDEBUGPATH
+        value: $(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)/MsbuildDebugLogs
+
       - ${{ each variableTemplate in parameters.extraVariablesTemplates }}:
         - template: ${{ variableTemplate.template }}
           parameters:
@@ -220,6 +224,15 @@ jobs:
         buildArgs: ${{ parameters.buildArgs }}
         useContinueOnErrorDuringBuild: ${{ parameters.useContinueOnErrorDuringBuild }}
         shouldContinueOnError: ${{ parameters.shouldContinueOnError }}
+
+    - task: CopyFiles@2
+      displayName: Gather CMakeConfigureLog for publish to artifacts
+      inputs:
+        SourceFolder: 'artifacts/obj'
+        Contents: '**/CMakeConfigureLog.yaml'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/artifacts/log/cmake'
+      continueOnError: true
+      condition: always()
 
     - ${{ if in(parameters.osGroup, 'osx', 'ios', 'tvos', 'android') }}:
       - script: |

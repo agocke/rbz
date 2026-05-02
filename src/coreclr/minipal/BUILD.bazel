@@ -9,17 +9,26 @@ package(default_visibility = ["//src/coreclr:__subpackages__"])
 cc_library(
     name = "coreclrminipal_headers",
     hdrs = [
+        "dn-stdio.h",
         "dn-u16.h",
         "minipal.h",
     ],
     includes = ["."],
 )
 
+# Alias for VM to depend on
+alias(
+    name = "minipal_headers",
+    actual = ":coreclrminipal_headers",
+)
+
 cc_library(
     name = "coreclrminipal",
     srcs = [
+        "Unix/dn-stdio.cpp",
         "Unix/dn-u16.cpp",
         "Unix/doublemapping.cpp",
+        "Unix/memory.cpp",
     ],
     copts = CLR_CONFIG_COPTS,
     deps = [

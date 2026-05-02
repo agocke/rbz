@@ -12,6 +12,8 @@ library_test(
     srcs = glob(["**/*.cs"]),
     deps = [
         "//src/libraries/System.Reflection.Context:impl_System.Reflection.Context",
+        "//src/libraries/System.Collections.Immutable:ref_System.Collections.Immutable",
+        "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Runtime.Serialization.Primitives:ref_System.Runtime.Serialization.Primitives",
         "//src/libraries/System.Xml.ReaderWriter:ref_System.Xml.ReaderWriter",
         "//src/libraries/System.Xml.XDocument:ref_System.Xml.XDocument",

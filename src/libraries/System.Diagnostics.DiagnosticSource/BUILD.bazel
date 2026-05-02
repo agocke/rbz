@@ -63,6 +63,8 @@ write_file(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Diagnostics.DiagnosticSource",
+    include_runtime_async = False,
+    event_source_generator = True,
     keyfile = OPEN_SNK,
     com_interface_generator = True,
     srcs = [
@@ -176,7 +178,6 @@ netcoreapp_impl_assembly(
 
 live_csharp_library(
     name = "live_System.Diagnostics.DiagnosticSource",
-    generate_assembly_info = True,
     srcs = [
         # Unconditional sources
         "src/System/Diagnostics/Activity.cs",

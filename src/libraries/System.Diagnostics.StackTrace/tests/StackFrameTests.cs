@@ -18,7 +18,7 @@ namespace System.Diagnostics.Tests
         }
 
         [Fact]
-        [ActiveIssue("https://github.com/dotnet/runtime/issues/50957", typeof(PlatformDetection), nameof(PlatformDetection.IsBrowser), nameof(PlatformDetection.IsMonoAOT))]
+        [ActiveIssue("https://github.com/dotnet/runtime/issues/50957", typeof(PlatformDetection), nameof(PlatformDetection.IsMonoAOT))]
         public void Ctor_Default()
         {
             var stackFrame = new StackFrame();
@@ -26,7 +26,7 @@ namespace System.Diagnostics.Tests
         }
 
         [Theory]
-        [ActiveIssue("https://github.com/dotnet/runtime/issues/50957", typeof(PlatformDetection), nameof(PlatformDetection.IsBrowser), nameof(PlatformDetection.IsMonoAOT))]
+        [ActiveIssue("https://github.com/dotnet/runtime/issues/50957", typeof(PlatformDetection), nameof(PlatformDetection.IsMonoAOT))]
         [InlineData(true)]
         [InlineData(false)]
         public void Ctor_FNeedFileInfo(bool fNeedFileInfo)
@@ -50,7 +50,7 @@ namespace System.Diagnostics.Tests
         }
 
         [Fact]
-        [ActiveIssue("https://github.com/dotnet/runtime/issues/50957", typeof(PlatformDetection), nameof(PlatformDetection.IsBrowser), nameof(PlatformDetection.IsMonoAOT))]
+        [ActiveIssue("https://github.com/dotnet/runtime/issues/50957", typeof(PlatformDetection), nameof(PlatformDetection.IsMonoAOT))]
         public void SkipFrames_CallMethod_ReturnsExpected()
         {
             StackFrame stackFrame = CallMethod(1);
@@ -72,7 +72,7 @@ namespace System.Diagnostics.Tests
         }
 
         [Theory]
-        [ActiveIssue("https://github.com/dotnet/runtime/issues/50957", typeof(PlatformDetection), nameof(PlatformDetection.IsBrowser), nameof(PlatformDetection.IsMonoAOT))]
+        [ActiveIssue("https://github.com/dotnet/runtime/issues/50957", typeof(PlatformDetection), nameof(PlatformDetection.IsMonoAOT))]
         [InlineData(null, StackFrame.OFFSET_UNKNOWN)]
         [InlineData("", 0)]
         [InlineData("FileName", 1)]
@@ -105,7 +105,11 @@ namespace System.Diagnostics.Tests
         {
             yield return new object[] { new StackFrame(), "MoveNext at offset {offset} in file:line:column {fileName}:{lineNumber}:{column}" + Environment.NewLine };
             yield return new object[] { new StackFrame("FileName", 1, 2), "MoveNext at offset {offset} in file:line:column FileName:1:2" + Environment.NewLine };
-            yield return new object[] { new StackFrame(int.MaxValue), "<null>" + Environment.NewLine };
+
+            // https://github.com/dotnet/runtime/issues/103218
+            if (!PlatformDetection.IsNativeAot)
+                yield return new object[] { new StackFrame(int.MaxValue), "<null>" + Environment.NewLine };
+
             yield return new object[] { GenericMethod<string>(), "GenericMethod<T> at offset {offset} in file:line:column {fileName}:{lineNumber}:{column}" + Environment.NewLine };
             yield return new object[] { GenericMethod<string, int>(), "GenericMethod<T,U> at offset {offset} in file:line:column {fileName}:{lineNumber}:{column}" + Environment.NewLine };
             yield return new object[] { new ClassWithConstructor().StackFrame, ".ctor at offset {offset} in file:line:column {fileName}:{lineNumber}:{column}" + Environment.NewLine };
@@ -113,7 +117,6 @@ namespace System.Diagnostics.Tests
 
         [Theory]
         [ActiveIssue("https://github.com/mono/mono/issues/15186", TestRuntimes.Mono)]
-        [ActiveIssue("https://github.com/dotnet/runtime/issues/103156", typeof(PlatformDetection), nameof(PlatformDetection.IsNativeAot))]
         [MemberData(nameof(ToString_TestData))]
         public void ToString_Invoke_ReturnsExpected(StackFrame stackFrame, string expectedToString)
         {
@@ -152,31 +155,66 @@ namespace System.Diagnostics.Tests
 
         private static void VerifyStackFrameSkipFrames(StackFrame stackFrame, bool isFileConstructor, int skipFrames, MethodInfo expectedMethod, bool isCurrentFrame = false)
         {
+            MethodBase? actualMethod = stackFrame.GetMethod();
+            string stackFrameText = stackFrame.ToString();
+            bool isInvokeStubFrame =
+                actualMethod?.Name.StartsWith("InvokeStub_", StringComparison.Ordinal) == true ||
+                stackFrameText.Contains("InvokeStub_", StringComparison.Ordinal);
+
             // GetILOffset returns StackFrame.OFFSET_UNKNOWN for unknown frames.
-            if (skipFrames == int.MinValue || skipFrames > 0)
+            // For a positive skipFrame, reflection invoke implementation details
+            // can surface either an unknown frame or a managed frame with a real
+            // IL offset.
+            if (skipFrames == int.MinValue)
             {
                 Assert.Equal(StackFrame.OFFSET_UNKNOWN, stackFrame.GetILOffset());
+            }
+            else if (skipFrames > 0)
+            {
+                if (PlatformDetection.IsILOffsetsSupported)
+                {
+                    Assert.InRange(stackFrame.GetILOffset(), StackFrame.OFFSET_UNKNOWN, int.MaxValue);
+                }
+                else
+                {
+                    Assert.Equal(StackFrame.OFFSET_UNKNOWN, stackFrame.GetILOffset());
+                }
             }
             else
             {
                 if (PlatformDetection.IsILOffsetsSupported)
                 {
-                    Assert.True(stackFrame.GetILOffset() >= 0, $"Expected GetILOffset() {stackFrame.GetILOffset()} for {stackFrame} to be greater or equal to zero.");
+                    if (isInvokeStubFrame)
+                    {
+                        Assert.InRange(stackFrame.GetILOffset(), StackFrame.OFFSET_UNKNOWN, int.MaxValue);
+                    }
+                    else
+                    {
+                        Assert.True(stackFrame.GetILOffset() >= 0, $"Expected GetILOffset() {stackFrame.GetILOffset()} for {stackFrame} to be greater or equal to zero.");
+                    }
                 }
             }
 
             // GetMethod returns null for unknown frames.
             if (expectedMethod == null)
             {
-                Assert.Null(stackFrame.GetMethod());
+                Assert.Null(actualMethod);
             }
             else if (skipFrames == 0)
             {
-                Assert.Equal(expectedMethod, stackFrame.GetMethod());
+                if (isInvokeStubFrame)
+                {
+                    Assert.NotNull(actualMethod);
+                    Assert.Contains(expectedMethod.Name, actualMethod.Name, StringComparison.Ordinal);
+                }
+                else
+                {
+                    Assert.Equal(expectedMethod, actualMethod);
+                }
             }
             else
             {
-                Assert.NotEqual(expectedMethod, stackFrame.GetMethod());
+                Assert.NotEqual(expectedMethod, actualMethod);
             }
 
             // GetNativeOffset returns StackFrame.OFFSET_UNKNOWN for unknown frames.

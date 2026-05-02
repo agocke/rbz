@@ -23,6 +23,7 @@ netcoreapp_impl_assembly(
         "src/System/Collections/ThrowHelper.cs",
         "src/System/Collections/Generic/LinkedList.cs",
         "src/System/Collections/Generic/OrderedDictionary.cs",
+        "src/System/Collections/Generic/OrderedDictionaryDebugView.cs",
         "src/System/Collections/Generic/PriorityQueue.cs",
         "src/System/Collections/Generic/PriorityQueueDebugView.cs",
         "src/System/Collections/Generic/SortedDictionary.cs",

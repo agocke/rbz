@@ -4,6 +4,7 @@ load("//:defs.bzl", "ASPNETCORE_SNK", "OPEN_SNK")
 
 live_csharp_library(
     name = "CollectibleAssembly",
+    include_runtime_async = False,
     nowarn = ["CA1510", "CA1511", "CA1512", "CA1513", "CA1845", "CA1846", "CA1847", "IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
     srcs = glob(["CollectibleAssembly/**/*.cs"]),
     deps = [
@@ -20,7 +21,6 @@ live_csharp_library(
     ],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
-    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",
@@ -31,7 +31,7 @@ live_csharp_library(
 
 library_test(
     name = "Microsoft.Extensions.DependencyInjection.Tests",
-    nowarn = MULTITARGET_NOWARN,
+    nowarn = MULTITARGET_NOWARN + ["NU1511"],
     srcs = glob(["DI.Tests/**/*.cs"]) + [
         "//src/libraries/Common/tests:Extensions/SingleThreadedSynchronizationContext.cs",
     ],

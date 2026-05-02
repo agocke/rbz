@@ -446,7 +446,6 @@ namespace System.Runtime
         {
             STATUS_NATIVEAOT_NULL_REFERENCE = 0x00000000u,
             STATUS_NATIVEAOT_UNMANAGED_HELPER_NULL_REFERENCE = 0x00000042u,
-            STATUS_NATIVEAOT_THREAD_ABORT = 0x00000043u,
 
             STATUS_DATATYPE_MISALIGNMENT = 0x80000002u,
             STATUS_ACCESS_VIOLATION = 0xC0000005u,
@@ -579,12 +578,18 @@ namespace System.Runtime
         //
         // Called by RhpThrowHwEx
         //
+        [StackTraceHidden]
 #if NATIVEAOT
         [RuntimeExport("RhThrowHwEx")]
-#endif
-        [StackTraceHidden]
         public static void RhThrowHwEx(uint exceptionCode, ref ExInfo exInfo)
+#else
+        [UnmanagedCallersOnly]
+        internal static void RhThrowHwEx(uint exceptionCode, ExInfo* pExInfo)
+#endif
         {
+#if !NATIVEAOT
+            ref ExInfo exInfo = ref *pExInfo;
+#endif
 #if NATIVEAOT
             // trigger a GC (only if gcstress) to ensure we can stackwalk at this point
             GCStress.TriggerGC();
@@ -609,12 +614,6 @@ namespace System.Runtime
                     instructionFault = false;
                     exceptionId = ExceptionIDs.NullReference;
                     break;
-
-#if NATIVEAOT
-                case (uint)HwExceptionCode.STATUS_NATIVEAOT_THREAD_ABORT:
-                    exceptionToThrow = InternalCalls.RhpGetThreadAbortException();
-                    break;
-#endif
 
                 case (uint)HwExceptionCode.STATUS_DATATYPE_MISALIGNMENT:
                     exceptionId = ExceptionIDs.DataMisaligned;
@@ -668,12 +667,19 @@ namespace System.Runtime
 
         private const uint MaxTryRegionIdx = 0xFFFFFFFFu;
 
+        [StackTraceHidden]
 #if NATIVEAOT
         [RuntimeExport("RhThrowEx")]
-#endif
-        [StackTraceHidden]
         public static void RhThrowEx(object exceptionObj, ref ExInfo exInfo)
+#else
+        [UnmanagedCallersOnly]
+        internal static void RhThrowEx(object* pExceptionObj, ExInfo* pExInfo)
+#endif
         {
+#if !NATIVEAOT
+            object exceptionObj = *pExceptionObj;
+            ref ExInfo exInfo = ref *pExInfo;
+#endif
 #if NATIVEAOT
 
 #if TARGET_WINDOWS
@@ -701,12 +707,19 @@ namespace System.Runtime
 #endif
         }
 
+        [StackTraceHidden]
 #if NATIVEAOT
         [RuntimeExport("RhRethrow")]
-#endif
-        [StackTraceHidden]
         public static void RhRethrow(ref ExInfo activeExInfo, ref ExInfo exInfo)
+#else
+        [UnmanagedCallersOnly]
+        internal static void RhRethrow(ExInfo* pActiveExInfo, ExInfo* pExInfo)
+#endif
         {
+#if !NATIVEAOT
+            ref ExInfo activeExInfo = ref *pActiveExInfo;
+            ref ExInfo exInfo = ref *pExInfo;
+#endif
 #if NATIVEAOT
 
 #if TARGET_WINDOWS
@@ -954,8 +967,10 @@ namespace System.Runtime
         private static void DebugVerifyHandlingFrame(UIntPtr handlingFrameSP)
         {
             Debug.Assert(handlingFrameSP != MaxSP, "Handling frame must have an SP value");
+#if !FEATURE_INTERPRETER
             Debug.Assert(((UIntPtr*)handlingFrameSP) > &handlingFrameSP,
                 "Handling frame must have a valid stack frame pointer");
+#endif
         }
 
         // Caclulate the code offset from the start of the method as if the hot and cold regions were

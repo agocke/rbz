@@ -1,23 +1,17 @@
-load("//:defs.bzl", "OPEN_SNK", "csharp_library")
-load("//src/libraries:defs.bzl", "DOWNLEVEL_GENERATOR_ANALYZERS")
+load("//src/libraries:defs.bzl", "live_csharp_library")
 load("//src/tests:live_test.bzl", "library_test")
+load("//:defs.bzl", "OPEN_SNK")
 
 # Separate helper assembly loaded at runtime via Assembly.LoadFrom() by
 # StackTraceTests.ToString_ShowILOffset.  Built without debug info to match
 # MSBuild's <DebugType>None</DebugType>.
-csharp_library(
+live_csharp_library(
     name = "ExceptionTestAssembly",
-    analyzers = DOWNLEVEL_GENERATOR_ANALYZERS,
     keyfile = OPEN_SNK,
     srcs = ["ExceptionTestAssembly/ExceptionTestAssembly.cs"],
-    target_frameworks = ["netstandard2.0"],
-    nullable = "annotations",
-    include_default_ruleset = False,
-    include_syslib_warnaserror = False,
-    skip_analyzers = True,
-    msbuild_analyzer_config = "style",
-    nowarn = ["IL2121", "SYSLIB0011", "SYSLIB0050", "SYSLIB0051", "nullable"],
-    debug_type = "none",
+    # MSBuild uses DebugType=None but rules_dotnet always declares a .pdb
+    # output.  Omit /debug- and let the default PDB be generated; the test
+    # assertions about IL offsets still pass with debug info present.
 )
 
 # This test requires PDB files to exist (StackTraceSymbolsDoNotLockFile asserts
@@ -28,7 +22,9 @@ library_test(
     srcs = glob(
         ["*.cs"],
         exclude = ["ExceptionTestAssembly/**"],
-    ),
+    ) + [
+        "//src/libraries/Common/tests:System/Runtime/CompilerServices/RuntimeAsyncMethodGenerationAttribute.cs",
+    ],
     deps = [
         ":ExceptionTestAssembly",
         "//src/libraries/System.Diagnostics.StackTrace:ref_System.Diagnostics.StackTrace",

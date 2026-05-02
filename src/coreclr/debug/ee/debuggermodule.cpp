@@ -141,7 +141,7 @@ void DebuggerModuleTable::RemoveModule(Module* pModule)
         if (pRuntimeModule == pModule)
         {
             LOG((LF_CORDB, LL_INFO1000, "DMT::RM Removing DebuggerMod:0x%x - Module:0x%x DF:0x%x\n",
-                pDM, pModule, pDM->GetDomainAssembly()));
+                pDM, pModule, pDM->GetAssembly()));
             TRACE_FREE(pDM);
             DeleteInteropSafe(pDM);
             Delete(HASH(pRuntimeModule), (HASHENTRY *) pDME);
@@ -166,7 +166,9 @@ DebuggerModule *DebuggerModuleTable::GetModule(Module* module)
     CONTRACTL_END;
 
     _ASSERTE(module != NULL);
+#ifndef DACCESS_COMPILE
     _ASSERTE(ThreadHoldsLock());
+#endif
 
     DebuggerModuleEntry *entry
       = (DebuggerModuleEntry *) Find(HASH(module), KEY(module));
@@ -185,7 +187,9 @@ DebuggerModule *DebuggerModuleTable::GetFirstModule(HASHFIND *info)
     }
     CONTRACTL_END;
 
+#ifndef DACCESS_COMPILE
     _ASSERTE(ThreadHoldsLock());
+#endif
 
     DebuggerModuleEntry *entry = (DebuggerModuleEntry *) FindFirstEntry(info);
     if (entry == NULL)
@@ -203,7 +207,9 @@ DebuggerModule *DebuggerModuleTable::GetNextModule(HASHFIND *info)
     }
     CONTRACTL_END;
 
+#ifndef DACCESS_COMPILE
     _ASSERTE(ThreadHoldsLock());
+#endif
 
     DebuggerModuleEntry *entry = (DebuggerModuleEntry *) FindNextEntry(info);
     if (entry == NULL)

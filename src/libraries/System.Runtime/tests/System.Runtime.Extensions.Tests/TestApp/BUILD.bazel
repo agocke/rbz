@@ -15,6 +15,7 @@ gen_resx_source(
 
 csharp_binary(
     name = "TestApp",
+    include_runtime_async = False,
     srcs = [
         "TestApp.cs",
         ":gen_sr_TestApp",
@@ -22,7 +23,6 @@ csharp_binary(
     ],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
-    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     keyfile = OPEN_SNK,
     msbuild_analyzer_config = "style",

@@ -10,7 +10,7 @@ csharp_binary(
         "@paket.main//microsoft.dotnet.cecil",
     ],
     nullable = "disable",
-    target_frameworks = ["net10.0"],
+    target_frameworks = ["net11.0"],
     nowarn = ["CS1701", "CS8500", "CS8969"],
     visibility = ["//visibility:public"],
 )

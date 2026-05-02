@@ -12,6 +12,7 @@ il_coreclr_test(
     name = "NegativeCases",
     srcs = ["NegativeCases.il"],
     debug_type = "pdbonly",
+    deps = ["//src/libraries/System.Diagnostics.StackTrace:impl_System.Diagnostics.StackTrace"],
 )
 
 coreclr_test(
@@ -35,6 +36,7 @@ il_coreclr_test(
     srcs = ["AttributeConflict.il"],
     pri = 1,
     debug_type = "pdbonly",
+    deps = ["//src/libraries/System.Diagnostics.StackTrace:impl_System.Diagnostics.StackTrace"],
     env = {"DOTNET_TieredCompilation": "0"},
     size = "medium",
 )
@@ -44,6 +46,7 @@ il_coreclr_test(
     srcs = ["PositiveCases.il"],
     pri = 1,
     debug_type = "pdbonly",
+    deps = ["//src/libraries/System.Diagnostics.StackTrace:impl_System.Diagnostics.StackTrace"],
     env = {"DOTNET_TieredCompilation": "0"},
     size = "medium",
 )

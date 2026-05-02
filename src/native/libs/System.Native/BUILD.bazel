@@ -33,12 +33,16 @@ cc_library(
         # On Apple platforms, the Objective-C variants in System.Native_objc
         # replace these C stubs. On other platforms, use the C fallbacks.
         "@platforms//os:macos": [
+            "pal_crossprocessmutex_unsupported.c",
             "pal_datetime.c",
+            "pal_getosinfo.c",
         ],
         "//conditions:default": [
             "pal_autoreleasepool.c",
+            "pal_crossprocessmutex.c",
             "pal_datetime.c",
             "pal_environment.c",
+            "pal_getosinfo.c",
             "pal_searchpath.c",
         ],
     }) + glob(["*.h"]),

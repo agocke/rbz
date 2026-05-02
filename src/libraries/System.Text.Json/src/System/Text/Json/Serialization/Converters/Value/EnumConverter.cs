@@ -5,7 +5,6 @@ using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Encodings.Web;
@@ -248,7 +247,7 @@ namespace System.Text.Json.Serialization.Converters
 
             int charsWritten = reader.CopyString(charBuffer);
             charBuffer = charBuffer.Slice(0, charsWritten);
-#if NET9_0_OR_GREATER
+#if NET
             ReadOnlySpan<char> source = charBuffer.Trim();
             ConcurrentDictionary<string, ulong>.AlternateLookup<ReadOnlySpan<char>> lookup = _nameCacheForReading.GetAlternateLookup<ReadOnlySpan<char>>();
 #else
@@ -296,14 +295,14 @@ namespace System.Text.Json.Serialization.Converters
         }
 
         private bool TryParseNamedEnum(
-#if NET9_0_OR_GREATER
+#if NET
             ReadOnlySpan<char> source,
 #else
             string source,
 #endif
             out T result)
         {
-#if NET9_0_OR_GREATER
+#if NET
             Dictionary<string, EnumFieldInfo>.AlternateLookup<ReadOnlySpan<char>> lookup = _enumFieldInfoIndex.GetAlternateLookup<ReadOnlySpan<char>>();
             ReadOnlySpan<char> rest = source;
 #else
@@ -328,7 +327,7 @@ namespace System.Text.Json.Serialization.Converters
                 }
 
                 if (lookup.TryGetValue(
-#if NET9_0_OR_GREATER
+#if NET
                         next,
 #else
                         next.ToString(),
@@ -524,7 +523,7 @@ namespace System.Text.Json.Serialization.Converters
             Debug.Assert(names.Length == values.Length);
 
             Dictionary<string, string>? enumMemberAttributes = null;
-            foreach (FieldInfo field in GetFields())
+            foreach (FieldInfo field in typeof(T).GetFields(BindingFlags.Public | BindingFlags.Static))
             {
                 if (field.GetCustomAttribute<JsonStringEnumMemberNameAttribute>() is { } attribute)
                 {
@@ -562,12 +561,6 @@ namespace System.Text.Json.Serialization.Converters
             }
 
             return enumFields;
-
-#if !NET9_0_OR_GREATER
-            [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2090:UnrecognizedReflectionPattern",
-                Justification = "Enum fields are always preserved by trimming.")]
-#endif
-            static IEnumerable<FieldInfo> GetFields() => typeof(T).GetFields(BindingFlags.Public | BindingFlags.Static);
         }
 
         private static string ResolveAndValidateJsonName(string name, JsonNamingPolicy? namingPolicy, EnumFieldNameKind kind)
@@ -580,7 +573,7 @@ namespace System.Text.Json.Serialization.Converters
             }
 
             if (string.IsNullOrEmpty(name) || char.IsWhiteSpace(name[0]) || char.IsWhiteSpace(name[name.Length - 1]) ||
-                (s_isFlagsEnum && name.AsSpan().IndexOf(',') >= 0))
+                (s_isFlagsEnum && name.Contains(',')))
             {
                 // Reject null or empty strings or strings with leading or trailing whitespace.
                 // In the case of flags additionally reject strings containing commas.

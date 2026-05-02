@@ -8,11 +8,11 @@ resgen(
 
 csharp_library(
     name = "ReferencedClassLib",
+    include_runtime_async = False,
     srcs = ["ReferencedClassLib.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
-    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     msbuild_analyzer_config = "style",
     nullable = "annotations",

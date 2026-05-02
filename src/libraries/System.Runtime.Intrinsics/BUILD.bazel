@@ -20,6 +20,7 @@ netcoreapp_ref_assembly(
         "//src/libraries/System.Numerics.Vectors:ref_System.Numerics.Vectors",
     ],
     allow_unsafe_blocks = True,
+    nowarn = ["CS9368"],
     keyfile = OPEN_SNK,
 )
 

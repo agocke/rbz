@@ -48,7 +48,6 @@ public static class MsbuildJsonStore
             LangVersion = !string.IsNullOrEmpty(r.LangVersion) ? r.LangVersion : null,
             OutputPath = !string.IsNullOrEmpty(r.OutputPath) ? r.OutputPath : null,
             IsReferenceAssembly = r.IsReferenceAssembly ? true : null,
-            TargetFramework = !string.IsNullOrEmpty(r.TargetFramework) ? r.TargetFramework : null,
         }).ToList();
 
         var json = JsonSerializer.Serialize(dtos, s_options);
@@ -90,7 +89,6 @@ public static class MsbuildJsonStore
                 BuildSystem = "msbuild",
                 OutputPath = d.OutputPath ?? "",
                 IsReferenceAssembly = d.IsReferenceAssembly ?? false,
-                TargetFramework = d.TargetFramework ?? "",
             };
         }).ToList();
     }
@@ -110,7 +108,6 @@ public static class MsbuildJsonStore
         public string? LangVersion { get; set; }
         public string? OutputPath { get; set; }
         public bool? IsReferenceAssembly { get; set; }
-        public string? TargetFramework { get; set; }
     }
 
     /// <summary>

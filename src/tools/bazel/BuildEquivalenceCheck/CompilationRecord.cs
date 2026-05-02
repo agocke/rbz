@@ -61,9 +61,4 @@ public sealed class ManagedCompilationRecord
     /// Empty for MSBuild records.
     /// </summary>
     public string TargetLabel { get; init; } = "";
-    /// <summary>
-    /// The target framework moniker extracted from the output path
-    /// (e.g. "net10.0", "net10.0-linux", "netstandard2.0").
-    /// </summary>
-    public string TargetFramework { get; set; } = "";
 }

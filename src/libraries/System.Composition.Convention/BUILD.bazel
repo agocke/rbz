@@ -2,6 +2,8 @@ load("//src/libraries:defs.bzl", "COMMON_GENERATOR_ANALYZERS", "MULTITARGET_NOWA
 
 impl_assembly(
     name = "impl_System.Composition.Convention",
+    include_runtime_async = False,
+    event_source_generator = False,
     srcs = [
         "src/System/Composition/Convention/ConventionBuilder.cs",
         "src/System/Composition/Convention/ExportConventionBuilder.cs",

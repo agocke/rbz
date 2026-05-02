@@ -4,6 +4,8 @@ load("//src/libraries:defs.bzl", "MULTITARGET_NOWARN", "netcoreapp_impl_assembly
 # Matches MSBuild's GeneratePlatformNotSupportedAssemblyMessage behavior.
 netcoreapp_impl_assembly(
     name = "impl_System.Threading.AccessControl",
+    event_source_generator = True,
+    include_runtime_async = False,
     com_interface_generator = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
     pnse = True,

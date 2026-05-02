@@ -105,8 +105,8 @@ namespace System.IO.Tests
             byte[] buffer = new byte[bufferSize];
             using (MemoryStream ms = new MemoryStream(buffer, origin, buffer.Length - origin, true))
             {
-                Seek(mode, ms, int.MaxValue - origin);
-                Assert.Throws<ArgumentOutOfRangeException>(() => Seek(mode, ms, (long)int.MaxValue - origin + 1));
+                Seek(mode, ms, Array.MaxLength - origin);
+                Assert.Throws<ArgumentOutOfRangeException>(() => Seek(mode, ms, (long)Array.MaxLength - origin + 1));
                 Assert.ThrowsAny<Exception>(() => Seek(mode, ms, long.MinValue + 1));
                 Assert.ThrowsAny<Exception>(() => Seek(mode, ms, long.MaxValue - 1));
             }
@@ -144,6 +144,42 @@ namespace System.IO.Tests
             await s.ReadAsync((Memory<byte>)new byte[1]);
             Assert.True(s.WriteArrayInvoked);
             Assert.True(s.ReadArrayInvoked);
+        }
+
+        [Fact]
+        [SkipOnCI("Skipping on CI due to large memory allocation")]
+        public void MemoryStream_CapacityBoundaryChecks()
+        {
+            int MaxSupportedLength = Array.MaxLength;
+            static Exception? CaptureException(Action action)
+            {
+                try
+                {
+                    action();
+                    return null;
+                }
+                catch (Exception exception)
+                {
+                    return exception;
+                }
+            }
+
+            using (var ms = new MemoryStream())
+            {
+                ms.Capacity = MaxSupportedLength - 1;
+                Assert.Equal(MaxSupportedLength - 1, ms.Capacity);
+
+                ms.Capacity = MaxSupportedLength;
+                Assert.Equal(MaxSupportedLength, ms.Capacity);
+
+                Exception? exception = CaptureException(() => ms.Capacity = MaxSupportedLength + 1);
+                Assert.NotNull(exception);
+                Assert.True(exception is ArgumentOutOfRangeException or OutOfMemoryException, $"Unexpected exception type: {exception.GetType()}");
+
+                exception = CaptureException(() => ms.Capacity = int.MaxValue);
+                Assert.NotNull(exception);
+                Assert.True(exception is ArgumentOutOfRangeException or OutOfMemoryException, $"Unexpected exception type: {exception.GetType()}");
+            }
         }
 
         private class ReadWriteOverridingMemoryStream : MemoryStream

@@ -43,17 +43,18 @@ library_test(
             # Android/Apple-only
             "MLKemOpenSslTests.NotSupported.cs",
             "SlhDsaOpenSslConstructionTests.NotSupported.cs",
+            "X25519DiffieHellmanOpenSslTests.NotSupported.cs",
             "X509Certificates/X509StoreMutableTests.cs",
         ],
     ) + [
         # ---- Shared projitems: AsnReader ----
-        "//src/libraries/Common:src/System/Security/Cryptography/Asn1Reader/AsnValueReader.cs",
         # ---- Unconditional CommonPath (ASN.1 and crypto infrastructure) ----
         "//src/libraries/Common:src/System/IO/MemoryMappedFiles/MemoryMappedFileMemoryManager.cs",
         "//src/libraries/Common:src/System/Memory/PointerMemoryManager.cs",
         "//src/libraries/Common:src/System/Net/ArrayBuffer.cs",
         "//src/libraries/Common:src/System/Net/MultiArrayBuffer.cs",
         "//src/libraries/Common:src/System/Net/StreamBuffer.cs",
+        "//src/libraries/Common:src/System/Security/Cryptography/AsnWriter/AsnWriterExtensions.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/Asn1/AlgorithmIdentifierAsn.manual.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/Asn1/AlgorithmIdentifierAsn.xml.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/Asn1/AttributeAsn.manual.cs",
@@ -95,6 +96,7 @@ library_test(
         "//src/libraries/Common:src/Interop/Unix/System.Security.Cryptography.Native/Interop.EvpPkey.FromData.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Security.Cryptography.Native/Interop.EvpPkey.MLDsa.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Security.Cryptography.Native/Interop.EvpPkey.SlhDsa.cs",
+        "//src/libraries/Common:src/Interop/Unix/System.Security.Cryptography.Native/Interop.EvpPkey.X25519.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Security.Cryptography.Native/Interop.Initialization.cs",
         # ---- CoreLib PersistedFiles (for X509 store path tests) ----
         "//src/libraries/System.Private.CoreLib:src/System/IO/PersistedFiles.Unix.cs",
@@ -235,6 +237,7 @@ library_test(
         "//src/libraries/Common/tests:System/Security/Cryptography/MLKemTests.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/OpenSslNamedKeys.Helpers.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/PbeParametersTests.cs",
+        "//src/libraries/Common/tests:System/Security/Cryptography/Pkcs8TestHelpers.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/PlatformSupport.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/SP800108HmacCounterKdfTests.ArgValidation.cs",
         "//src/libraries/Common/tests:System/Security/Cryptography/SP800108HmacCounterKdfTests.Functional.cs",
@@ -260,6 +263,7 @@ library_test(
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",
         "//src/libraries/System.Runtime.Numerics:ref_System.Runtime.Numerics",
         "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",
+        "//src/libraries/System.Net.Security:ref_System.Net.Security",
         "//src/libraries/System.Net.HttpListener:ref_System.Net.HttpListener",
         "//src/libraries/System.Xml.ReaderWriter:ref_System.Xml.ReaderWriter",
         "//src/libraries/System.Xml.XDocument:ref_System.Xml.XDocument",
@@ -269,6 +273,8 @@ library_test(
         "//src/libraries/System.IO.MemoryMappedFiles:ref_System.IO.MemoryMappedFiles",
         "//src/libraries/System.Text.Encoding.Extensions:ref_System.Text.Encoding.Extensions",
         "//src/libraries/System.Threading.ThreadPool:ref_System.Threading.ThreadPool",
+        "//src/libraries/System.Diagnostics.Tracing:ref_System.Diagnostics.Tracing",
+        "//src/libraries/System.Net.Http:ref_System.Net.Http",
         "//src/libraries/shims/System.Threading.Tasks:impl_System.Threading.Tasks",
         "//src/libraries/Common/tests:StreamConformanceTests",
         "//src/libraries/Common/tests:TestUtilities",

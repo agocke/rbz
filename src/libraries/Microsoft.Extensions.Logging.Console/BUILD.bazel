@@ -22,6 +22,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Logging.Console",
+    include_runtime_async = False,
+    event_source_generator = False,
     analyzers = COMMON_GENERATOR_ANALYZERS + [
         "//src/libraries/Microsoft.Extensions.Configuration.Binder:ConfigurationBinderSourceGeneration",
     ],
@@ -30,6 +32,7 @@ impl_assembly(
     srcs = glob(["src/**/*.cs"]) + [
         "//src/libraries/Common:src/Extensions/Logging/NullExternalScopeProvider.cs",
         "//src/libraries/Common:src/Extensions/Logging/NullScope.cs",
+        "//src/libraries/Common:src/System/NullableBool.cs",
         "//src/libraries/Common:src/System/Net/ArrayBuffer.cs",
         "//src/libraries/Common:src/System/Text/Json/PooledByteBufferWriter.cs",
         "//src/libraries/Common:src/Interop/Windows/Interop.Libraries.cs",

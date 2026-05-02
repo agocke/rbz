@@ -3,14 +3,7 @@ load("//:defs.bzl", "ECMA_SNK")
 
 netcoreapp_ref_assembly(
     name = "ref_mscorlib",
-    srcs = [
-        "ref/mscorlib.cs",
-        "//src/libraries/shims:System.Void.cs",
-    ],
-    defines = select({
-        "@platforms//os:linux": ["LINUX", "LINUX1_0"],
-        "//conditions:default": [],
-    }),
+    srcs = [ "ref/mscorlib.cs" ],
     deps = [
         "//src/libraries/Microsoft.Win32.Registry:ref_Microsoft.Win32.Registry",
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",

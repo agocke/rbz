@@ -8,6 +8,7 @@ netcoreapp_ref_assembly(
     deps = [
         "//src/libraries/System.Collections.NonGeneric:ref_System.Collections.NonGeneric",
         "//src/libraries:ref_System.Runtime",
+        "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
         "//src/libraries/System.Security.Principal.Windows:ref_System.Security.Principal.Windows",
     ],
 )

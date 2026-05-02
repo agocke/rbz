@@ -253,7 +253,7 @@ GenTree* LC_Condition::ToGenTree(Compiler* comp, BasicBlock* bb, bool invert)
 
     if (compareUnsigned)
     {
-        result->gtFlags |= GTF_UNSIGNED;
+        result->SetUnsigned();
     }
 
     return result;
@@ -1208,7 +1208,7 @@ bool Compiler::optDeriveLoopCloningConditions(FlowGraphNaturalLoop* loop, LoopCl
     // is beyond the limit.
     int stride = abs(iterInfo->IterConst());
 
-    static_assert_no_msg(INT32_MAX >= CORINFO_Array_MaxLength);
+    static_assert(INT32_MAX >= CORINFO_Array_MaxLength);
     if (stride >= (INT32_MAX - (CORINFO_Array_MaxLength - 1) + 1))
     {
         // Array.MaxLength can have maximum of 0x7fffffc7 elements, so make sure
@@ -1334,17 +1334,17 @@ bool Compiler::optDeriveLoopCloningConditions(FlowGraphNaturalLoop* loop, LoopCl
     // GT_LE loop test: (start <= end) ==> (end < arrLen)
     //
     // Decreasing loops
-    // GT_GT loop test: (end > start) ==> (end <= arrLen)
-    // GT_GE loop test: (end >= start) ==> (end < arrLen)
+    // Always check if iter var is less than array length.
     genTreeOps opLimitCondition;
     switch (iterInfo->TestOper())
     {
         case GT_LT:
-        case GT_GT:
+
             opLimitCondition = GT_LE;
             break;
         case GT_LE:
         case GT_GE:
+        case GT_GT:
             opLimitCondition = GT_LT;
             break;
         default:
@@ -2912,7 +2912,7 @@ bool Compiler::optCheckLoopCloningGDVTestProfitable(GenTreeOp* guard, LoopCloneV
 /* static */
 Compiler::fgWalkResult Compiler::optCanOptimizeByLoopCloningVisitor(GenTree** pTree, Compiler::fgWalkData* data)
 {
-    return data->compiler->optCanOptimizeByLoopCloning(*pTree, (LoopCloneVisitorInfo*)data->pCallbackData);
+    return data->m_compiler->optCanOptimizeByLoopCloning(*pTree, (LoopCloneVisitorInfo*)data->pCallbackData);
 }
 
 //------------------------------------------------------------------------

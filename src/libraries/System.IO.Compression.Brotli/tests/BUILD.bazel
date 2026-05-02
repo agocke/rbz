@@ -8,6 +8,7 @@ library_test(
         "//src/libraries/Common/tests:System/IO/Compression/CompressionStreamTestBase.cs",
         "//src/libraries/Common/tests:System/IO/Compression/CompressionStreamUnitTestBase.cs",
         "//src/libraries/Common/tests:System/IO/Compression/CRC.cs",
+        "//src/libraries/Common/tests:System/IO/Compression/EncoderDecoderTestBase.cs",
         "//src/libraries/Common/tests:System/IO/Compression/FileData.cs",
         "//src/libraries/Common/tests:System/IO/Compression/LocalMemoryStream.cs",
         "//src/libraries/Common/tests:System/IO/Compression/StreamHelpers.cs",

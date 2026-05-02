@@ -12,7 +12,6 @@ library_test(
         "//src/libraries/Common:src/Interop/Unix/Interop.Libraries.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MountPoints.FormatInfo.cs",
         "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.RealPath.cs",
-        "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.UnixFileSystemTypes.cs",
     ],
     deps = [
         "//src/libraries/System.Collections.Concurrent:ref_System.Collections.Concurrent",

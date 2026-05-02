@@ -7,7 +7,7 @@
 # bazel aquery).
 #
 # Usage:
-#   ./compare-bazel.sh                    # Debug config (default)
+#   ./compare-bazel.sh                    # Release config (default)
 #   ./compare-bazel.sh --config release   # Release config
 #   ./compare-bazel.sh --config both      # Both configs
 #   ./compare-bazel.sh --skip-build       # Use existing build artifacts
@@ -85,6 +85,13 @@ case "$config" in
 esac
 
 overall_exit=0
+bazel_scope_targets=(
+    //src/coreclr/...
+    //src/libraries/...
+    //src/native/...
+    //src/tools/illink/...
+)
+bazel_scope_query='//src/coreclr/... union //src/libraries/... union //src/native/... union //src/tools/illink/...'
 
 for cfg in "${configs[@]}"; do
     log "════════════════════════════════════════════════════"
@@ -118,31 +125,39 @@ for cfg in "${configs[@]}"; do
 
     # ----- Step 1: Build with CMake/MSBuild -----
     if [[ -z "$msbuild_json" && "$skip_build" != "true" ]]; then
-        log "Building with CMake/MSBuild (./build.sh clr+libs+libs.tests --ci -c $cfg -rc $cfg -lc $cfg -bl --rebuild)..."
-        "$scriptroot/build.sh" clr+libs+libs.tests --ci -c "$cfg" -rc "$cfg" -lc "$cfg" -bl --rebuild
+        # Use a rebuild so the binlog contains the full managed compilation set.
+        # An incremental build only records the Csc tasks that reran, which makes
+        # the managed equivalence check compare a tiny overlap set.
+        log "Building with CMake/MSBuild (./build.sh clr+libs+libs.tests --rebuild --ci -c $cfg -rc $cfg -lc $cfg -bl)..."
+        "$scriptroot/build.sh" clr+libs+libs.tests --rebuild --ci -c "$cfg" -rc "$cfg" -lc "$cfg" -bl
     fi
 
     # ----- Step 2: Build with Bazel + extract aquery -----
     # Build first so that generated source files (AssemblyInfo.cs, System.SR.cs)
     # are materialized on disk with the correct CI-mode content.  The aquery
     # alone only performs analysis and does not write generated files.
+    #
+    # Keep the Bazel scope aligned with MSBuild's clr+libs+libs.tests subset.
+    # Querying //... pulls in unrelated targets (for example src/tests/JIT and
+    # other helper graphs) that the MSBuild subset never builds, which floods
+    # the managed comparison with only-in-Bazel noise.
     if [[ "$skip_build" != "true" ]]; then
-        log "Building with Bazel (bazel build ${bazel_aquery_args[*]} //...)..."
-        bazel --nohome_rc build "${bazel_aquery_args[@]}" //...
+        log "Building with Bazel (bazel build ${bazel_aquery_args[*]} ${bazel_scope_targets[*]})..."
+        bazel --nohome_rc build "${bazel_aquery_args[@]}" "${bazel_scope_targets[@]}"
     fi
 
     log "Extracting Bazel aquery (native)..."
     bazel --nohome_rc aquery \
         "${bazel_aquery_args[@]}" \
         --output=jsonproto \
-        'mnemonic("CppCompile", //...)' \
+        "mnemonic(\"CppCompile\", ${bazel_scope_query})" \
         > "$bazel_native_aquery" 2>/dev/null
 
     log "Extracting Bazel aquery (managed)..."
     bazel --nohome_rc aquery \
         "${bazel_aquery_args[@]}" \
         --output=jsonproto \
-        'mnemonic("CSharpCompile", //...)' \
+        "mnemonic(\"CSharpCompile\", ${bazel_scope_query})" \
         > "$bazel_managed_aquery" 2>/dev/null
 
     # ----- Step 3: Find binlog files -----

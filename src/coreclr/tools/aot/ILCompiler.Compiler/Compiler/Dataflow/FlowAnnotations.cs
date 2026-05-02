@@ -36,6 +36,10 @@ namespace ILLink.Shared.TrimAnalysis
 
         public FlowAnnotations(Logger logger, ILProvider ilProvider, CompilerGeneratedState compilerGeneratedState)
         {
+#if !ILTRIM
+            ilProvider = new AsyncMaskingILProvider(ilProvider);
+#endif
+
             _hashtable = new TypeAnnotationsHashtable(logger, ilProvider, compilerGeneratedState);
             _logger = logger;
             ILProvider = ilProvider;
@@ -271,18 +275,18 @@ namespace ILLink.Shared.TrimAnalysis
 
             foreach (var intf in type.RuntimeInterfaces)
             {
-                if (intf.Name == "IReflect" && intf.Namespace == "System.Reflection")
+                if (intf.Name.SequenceEqual("IReflect"u8) && intf.Namespace.SequenceEqual("System.Reflection"u8))
                     return true;
             }
 
-            if (metadataType.Name == "IReflect" && metadataType.Namespace == "System.Reflection")
+            if (metadataType.Name.SequenceEqual("IReflect"u8) && metadataType.Namespace.SequenceEqual("System.Reflection"u8))
                 return true;
 
             do
             {
-                if (metadataType.Name == "Type" && metadataType.Namespace == "System")
+                if (metadataType.Name.SequenceEqual("Type"u8) && metadataType.Namespace.SequenceEqual("System"u8))
                     return true;
-            } while ((metadataType = metadataType.MetadataBaseType) != null);
+            } while ((metadataType = metadataType.BaseType) != null);
 
             return false;
         }
@@ -298,7 +302,8 @@ namespace ILLink.Shared.TrimAnalysis
             private readonly Logger _logger;
             private readonly CompilerGeneratedState _compilerGeneratedState;
 
-            public TypeAnnotationsHashtable(Logger logger, ILProvider ilProvider, CompilerGeneratedState compilerGeneratedState) => (_logger, _ilProvider, _compilerGeneratedState) = (logger, ilProvider, compilerGeneratedState);
+            public TypeAnnotationsHashtable(Logger logger, ILProvider ilProvider, CompilerGeneratedState compilerGeneratedState) =>
+                (_logger, _ilProvider, _compilerGeneratedState) = (logger, ilProvider, compilerGeneratedState);
 
             private static DynamicallyAccessedMemberTypes GetMemberTypesForDynamicallyAccessedMembersAttribute(MetadataReader reader, CustomAttributeHandleCollection customAttributeHandles)
             {
@@ -1006,7 +1011,7 @@ namespace ILLink.Shared.TrimAnalysis
         }
 
         internal SingleValue GetFieldValue(FieldDesc field)
-            => field.Name switch
+            => field.GetName() switch
             {
                 "EmptyTypes" when field.OwningType.IsTypeOf(ILLink.Shared.TypeSystemProxy.WellKnownType.System_Type) => ArrayValue.Create(0, field.OwningType),
                 "Empty" when field.OwningType.IsTypeOf(ILLink.Shared.TypeSystemProxy.WellKnownType.System_String) => new KnownStringValue(string.Empty),

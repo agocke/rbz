@@ -28,7 +28,9 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.DirectoryServices",
-    nowarn = MULTITARGET_NOWARN + ["CA1822", "CA1865", "CP0003", "IDE0059", "NU5128", "CS1591"],
+    include_runtime_async = False,
+    event_source_generator = False,
+    nowarn = MULTITARGET_NOWARN + ["CA1822", "CP0003", "IDE0059", "NU5128", "CS1591"],
     analyzers = COMMON_GENERATOR_ANALYZERS,
     allow_unsafe_blocks = True,
     include_editorconfig = False,

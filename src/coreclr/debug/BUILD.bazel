@@ -33,11 +33,17 @@ cc_library(
 # --- cDAC data descriptor shared infrastructure ---
 # Used by GC (and later VM) data descriptor stubs.
 
-# Header-only target for contract-descriptor.h
+# Header-only target for contract-descriptor.h (stripped prefix for clean includes)
 cc_library(
     name = "datadescriptor_shared_inc",
     hdrs = ["datadescriptor-shared/inc/contract-descriptor.h"],
     strip_include_prefix = "datadescriptor-shared/inc",
+)
+
+# Same header without stripping — for relative includes from vm/cdacstress.cpp
+cc_library(
+    name = "datadescriptor_shared_inc_relative",
+    hdrs = ["datadescriptor-shared/inc/contract-descriptor.h"],
 )
 
 # Stub contract descriptor source (exported as a filegroup so multiple
@@ -84,9 +90,11 @@ cc_library(
         "ee/debugger.cpp",
         "ee/debuggermessagebox.cpp",
         "ee/debuggermodule.cpp",
+        "ee/executioncontrol.cpp",
         "ee/frameinfo.cpp",
         "ee/funceval.cpp",
         "ee/functioninfo.cpp",
+        "ee/interpreterwalker.cpp",
         "ee/rcthread.cpp",
         "ee/shared.cpp",
         "ee/stdafx.h",
@@ -270,6 +278,7 @@ cc_library(
         "ee/debugger.cpp",
         "ee/debuggermessagebox.cpp",
         "ee/debuggermodule.cpp",
+        "ee/executioncontrol.cpp",
         "ee/functioninfo.cpp",
         "ee/stdafx.h",
     ],
@@ -317,7 +326,6 @@ cc_library(
         "daccess/daccess.cpp",
         "daccess/dacfn.cpp",
         "daccess/dacdbiimpl.cpp",
-        "daccess/dacdbiimpllocks.cpp",
         "daccess/dacdbiimplstackwalk.cpp",
         "daccess/datatargetadapter.cpp",
         "daccess/enummem.cpp",
@@ -363,6 +371,7 @@ cc_library(
         "ee",
         "../gcdump",
         "../interop/inc",
+        "datadescriptor-shared/inc",
     ] + select({
         "@platforms//cpu:arm64": [
             "../vm/arm64",
@@ -378,6 +387,7 @@ cc_library(
         "FEATURE_VIRTUAL_STUB_DISPATCH",
     ],
     deps = [
+        ":datadescriptor_shared_inc",
         "//src/native/managed/cdac:cdac_api",
         "//src/coreclr/inc:coreclr_inc_dac",
         "//src/coreclr/interop:interop_headers",
@@ -413,7 +423,6 @@ cc_library(
         "di/rsclass.cpp",
         "di/rsfunction.cpp",
         "di/rsmain.cpp",
-        "di/rsmda.cpp",
         "di/rsregsetcommon.cpp",
         "di/rsstackwalk.cpp",
         "di/rsthread.cpp",

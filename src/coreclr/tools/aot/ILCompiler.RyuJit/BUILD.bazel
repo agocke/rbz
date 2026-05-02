@@ -1,33 +1,21 @@
-load("//:defs.bzl", "csharp_library", "gen_assembly_info", "gen_target_framework_attrs")
+load("//:defs.bzl", "FILE_VERSION", "NETCOREAPP_TOOL_CURRENT", "csharp_library")
 
-gen_assembly_info(
-    name = "assemblyinfo_ILCompiler.RyuJit",
-    out = "ILCompiler.RyuJit.AssemblyInfo.cs",
-    assembly_name = "ILCompiler.RyuJit",
-    cls_compliant = False,
-    is_aot_compatible = False,
-    include_serviceable = False,
-    include_description = False,
-    assembly_configuration = "Release",
-    include_dll_safe_search_path = 0,
-)
-
-gen_target_framework_attrs(
-    name = "tfmattrs_ILCompiler.RyuJit",
-    out = ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+genrule(
+    name = "AssemblyInfo",
+    outs = ["AssemblyInfo.g.cs"],
+    cmd = "echo '[assembly: System.Reflection.AssemblyFileVersion(\"" + FILE_VERSION + "\")]' > $@",
 )
 
 csharp_library(
     name = "ILCompiler.RyuJit",
+    include_runtime_async = False,
     nowarn = ["1591"],
     msbuild_analyzer_config = "style",
     include_default_ruleset = False,
-    skip_analyzers = True,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     compiler_options = ["/warnaserror+:NU1605"],
     srcs = [
-        ":assemblyinfo_ILCompiler.RyuJit",
-        ":tfmattrs_ILCompiler.RyuJit",
+        ":AssemblyInfo",
         "Compiler/DependencyAnalysis/MethodCodeNode.cs",
         "Compiler/DependencyAnalysis/RyuJitNodeFactory.cs",
         "Compiler/ProfileDataManager.cs",
@@ -45,11 +33,14 @@ csharp_library(
         "//src/coreclr/tools/Common:JitInterface/JitTypeNameFormatter.cs",
         "//src/coreclr/tools/Common:JitInterface/SwiftPhysicalLowering.cs",
         "//src/coreclr/tools/Common:JitInterface/SystemVStructClassificator.cs",
+        "//src/coreclr/tools/Common:JitInterface/WasmLowering.cs",
         "//src/coreclr/tools/Common:JitInterface/UnboxingMethodDesc.cs",
         "//src/coreclr/tools/Common:JitInterface/UnboxingMethodDescFactory.cs",
         "//src/coreclr/tools/Common:Pgo/TypeSystemEntityOrUnknown.cs",
         "//src/coreclr/tools/Common:System/Collections/Generic/ArrayBuilder.cs",
         "//src/coreclr/tools/Common:System/FormattingHelpers.cs",
+        "//src/coreclr/tools/Common:Compiler/ObjectWriter/WasmInstructions.cs",
+        "//src/coreclr/tools/Common:Compiler/ObjectWriter/WasmNative.cs",
         "//src/coreclr/tools/Common:TypeSystem/IL/HelperExtensions.cs",
         "//src/coreclr/tools/Common:TypeSystem/IL/ILReader.cs",
         "//src/coreclr/tools/Common:TypeSystem/IL/Stubs/TypeSystemThrowingILEmitter.cs",
@@ -71,10 +62,11 @@ csharp_library(
     deps = [
         "//src/coreclr/tools/aot/ILCompiler.Compiler",
         "//src/coreclr/tools/aot/ILCompiler.DependencyAnalysisFramework",
+        "//src/coreclr/tools/aot/ILCompiler.Diagnostics",
         "//src/coreclr/tools/aot/ILCompiler.MetadataTransform",
         "//src/coreclr/tools/aot/ILCompiler.TypeSystem",
         "@paket.main//microsoft.diasymreader",
     ],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_TOOL_CURRENT],
     visibility = ["//visibility:public"],
 )

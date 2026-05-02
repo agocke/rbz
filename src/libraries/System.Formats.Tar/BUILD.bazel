@@ -25,6 +25,7 @@ netcoreapp_impl_assembly(
     srcs = [
         "src/System/Formats/Tar/FieldLengths.cs",
         "src/System/Formats/Tar/FieldLocations.cs",
+        "src/System/Formats/Tar/GnuSparseStream.cs",
         "src/System/Formats/Tar/GnuTarEntry.cs",
         "src/System/Formats/Tar/PaxGlobalExtendedAttributesTarEntry.cs",
         "src/System/Formats/Tar/PaxTarEntry.cs",
@@ -33,7 +34,9 @@ netcoreapp_impl_assembly(
         "src/System/Formats/Tar/SubReadStream.cs",
         "src/System/Formats/Tar/TarEntry.cs",
         "src/System/Formats/Tar/TarEntryFormat.cs",
+        "src/System/Formats/Tar/TarHardLinkMode.cs",
         "src/System/Formats/Tar/TarEntryType.cs",
+        "src/System/Formats/Tar/TarExtractOptions.cs",
         "src/System/Formats/Tar/TarFile.cs",
         "src/System/Formats/Tar/TarHeader.cs",
         "src/System/Formats/Tar/TarHeader.Read.cs",
@@ -41,6 +44,7 @@ netcoreapp_impl_assembly(
         "src/System/Formats/Tar/TarHelpers.cs",
         "src/System/Formats/Tar/TarReader.cs",
         "src/System/Formats/Tar/TarWriter.cs",
+        "src/System/Formats/Tar/TarWriterOptions.cs",
         "src/System/Formats/Tar/UstarTarEntry.cs",
         "src/System/Formats/Tar/V7TarEntry.cs",
 
@@ -90,6 +94,7 @@ netcoreapp_impl_assembly(
     deps = [
         "//src/libraries/System.Collections:ref_System.Collections",
         "//src/libraries/System.Memory:ref_System.Memory",
+        "//src/libraries/System.Numerics.Vectors:ref_System.Numerics.Vectors",
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
         "//src/libraries/System.Threading:ref_System.Threading",

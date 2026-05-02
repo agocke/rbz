@@ -719,16 +719,16 @@ void SystemDomain::Attach()
     CONTRACTL_END;
 
     // Initialize stub managers
+#ifndef FEATURE_PORTABLE_ENTRYPOINTS
     PrecodeStubManager::Init();
-    JumpStubStubManager::Init();
+#endif // !FEATURE_PORTABLE_ENTRYPOINTS
     RangeSectionStubManager::Init();
     ILStubManager::Init();
+    PInvokeStubManager::Init();
     InteropDispatchStubManager::Init();
     StubLinkStubManager::Init();
     TailCallStubManager::Init();
-#ifdef FEATURE_TIERED_COMPILATION
-    CallCountingStubManager::Init();
-#endif
+    AsyncThunkStubManager::Init();
 
     m_SystemDomainCrst.Init(CrstSystemDomain, (CrstFlags)(CRST_REENTRANCY | CRST_TAKEN_DURING_SHUTDOWN));
     m_DelayedUnloadCrst.Init(CrstSystemDomainDelayedUnloadList, CRST_UNSAFE_COOPGC);
@@ -899,13 +899,6 @@ void SystemDomain::Init()
 
         // Finish loading CoreLib now.
         m_pSystemAssembly->EnsureActive();
-
-        // Set AwareLock's offset of the holding OS thread ID field into ThreadBlockingInfo's static field. That can be used
-        // when doing managed debugging to get the OS ID of the thread holding the lock. The offset is currently not zero, and
-        // zero is used in managed code to determine if the static variable has been initialized.
-        _ASSERTE(AwareLock::GetOffsetOfHoldingOSThreadId() != 0);
-        CoreLibBinder::GetField(FIELD__THREAD_BLOCKING_INFO__OFFSET_OF_LOCK_OWNER_OS_THREAD_ID)
-            ->SetStaticValue32(AwareLock::GetOffsetOfHoldingOSThreadId());
     }
 }
 
@@ -1109,11 +1102,9 @@ void SystemDomain::LoadBaseSystemClasses()
         }
     #endif
 
-#ifdef FEATURE_EH_FUNCLETS
         g_pEHClass = CoreLibBinder::GetClass(CLASS__EH);
         g_pExceptionServicesInternalCallsClass = CoreLibBinder::GetClass(CLASS__EXCEPTIONSERVICES_INTERNALCALLS);
         g_pStackFrameIteratorClass = CoreLibBinder::GetClass(CLASS__STACKFRAMEITERATOR);
-#endif
 
         g_pGetGCStaticBase = CoreLibBinder::GetMethod(METHOD__STATICSHELPERS__GET_GC_STATIC)->GetMultiCallableAddrOfCode();
         g_pGetNonGCStaticBase = CoreLibBinder::GetMethod(METHOD__STATICSHELPERS__GET_NONGC_STATIC)->GetMultiCallableAddrOfCode();
@@ -1128,7 +1119,7 @@ void SystemDomain::LoadBaseSystemClasses()
         // all base system classes are loaded.  Profilers are not allowed to call any type-loading
         // APIs until g_profControlBlock.fBaseSystemClassesLoaded is TRUE.  It is important that
         // all base system classes need to be loaded before profilers can trigger the type loading.
-        g_profControlBlock.fBaseSystemClassesLoaded = TRUE;
+        g_profControlBlock.fBaseSystemClassesLoaded = true;
     #endif // PROFILING_SUPPORTED
 
     #if defined(_DEBUG)
@@ -1296,10 +1287,30 @@ bool SystemDomain::IsReflectionInvocationMethod(MethodDesc* pMeth)
 
 struct CallersDataWithStackMark
 {
-    StackCrawlMark* stackMark;
-    BOOL foundMe;
-    MethodDesc* pFoundMethod;
-    MethodDesc* pPrevMethod;
+    CallersDataWithStackMark(StackCrawlMark* mark, PTR_Thread thread) :
+        stackMark(mark)
+#ifdef FEATURE_INTERPRETER
+        // Since the interpreter has its own stack, we need to get a pointer which can be compared on the real
+        // stack so that IsInCalleesFrames can work correctly.
+        , stackMarkOnOSStack(ConvertStackMarkToPointerOnOSStack(thread, mark))
+#endif
+    {
+    }
+    StackCrawlMark* const stackMark;
+#ifdef FEATURE_INTERPRETER
+    PTR_VOID const stackMarkOnOSStack;
+#endif
+    PTR_VOID GetStackMarkPointerToCheckAgainstStack()
+    {
+#ifdef FEATURE_INTERPRETER
+        return stackMarkOnOSStack;
+#else
+        return (PTR_VOID)stackMark;
+#endif
+    }
+    BOOL foundMe = FALSE;
+    MethodDesc* pFoundMethod = NULL;
+    MethodDesc* pPrevMethod = NULL;
 };
 
 /*static*/
@@ -1320,11 +1331,10 @@ Module* SystemDomain::GetCallersModule(StackCrawlMark* stackMark)
 
     GCX_COOP();
 
-    CallersDataWithStackMark cdata;
-    ZeroMemory(&cdata, sizeof(CallersDataWithStackMark));
-    cdata.stackMark = stackMark;
+    PTR_Thread pThread = GetThread();
+    CallersDataWithStackMark cdata(stackMark, pThread);
 
-    GetThread()->StackWalkFrames(CallersMethodCallbackWithStackMark, &cdata, FUNCTIONSONLY | LIGHTUNWIND);
+    pThread->StackWalkFrames(CallersMethodCallbackWithStackMark, &cdata, FUNCTIONSONLY | LIGHTUNWIND);
 
     if(cdata.pFoundMethod) {
         return cdata.pFoundMethod->GetModule();
@@ -1369,7 +1379,7 @@ StackWalkAction SystemDomain::CallersMethodCallbackWithStackMark(CrawlFrame* pCf
     CallersDataWithStackMark* pCaller = (CallersDataWithStackMark*) data;
     if (pCaller->stackMark)
     {
-        if (!pCf->IsInCalleesFrames(pCaller->stackMark))
+        if (!pCf->IsInCalleesFrames(pCaller->GetStackMarkPointerToCheckAgainstStack()))
         {
             // save the current in case it is the one we want
             pCaller->pPrevMethod = pFunc;
@@ -1425,7 +1435,7 @@ StackWalkAction SystemDomain::CallersMethodCallbackWithStackMark(CrawlFrame* pCf
 
     // If we got here, we must already be in the frame containing the stack mark and we are not looking for "me".
     _ASSERTE(pCaller->stackMark &&
-             pCf->IsInCalleesFrames(pCaller->stackMark) &&
+             pCf->IsInCalleesFrames(pCaller->GetStackMarkPointerToCheckAgainstStack()) &&
              *(pCaller->stackMark) != LookForMe);
 
     // When looking for caller's caller, we delay returning results for another
@@ -1745,7 +1755,7 @@ void AppDomain::Stop()
 
 #ifndef DACCESS_COMPILE
 
-void AppDomain::AddAssembly(DomainAssembly * assem)
+void AppDomain::AddAssembly(Assembly * assem)
 {
     CONTRACTL
     {
@@ -1775,7 +1785,7 @@ void AppDomain::AddAssembly(DomainAssembly * assem)
     }
 }
 
-void AppDomain::RemoveAssembly(DomainAssembly * pAsm)
+void AppDomain::RemoveAssembly(Assembly * pAsm)
 {
     CONTRACTL
     {
@@ -2016,7 +2026,7 @@ BOOL FileLoadLock::CompleteLoadLevel(FileLoadLevel level, BOOL success)
 
                 // Dev11 bug 236344
                 // In AppDomain::IsLoading, if the lock is taken on m_pList and then FindFileLock returns NULL,
-                // we depend on the DomainAssembly's load level being up to date. Hence we must update the load
+                // we depend on the Assembly's load level being up to date. Hence we must update the load
                 // level while the m_pList lock is held.
                 if (success)
                     m_pAssembly->SetLoadLevel(level);
@@ -2119,12 +2129,6 @@ FileLoadLock::FileLoadLock(PEFileListLock* pLock, PEAssembly* pPEAssembly)
 {
     WRAPPER_NO_CONTRACT;
     pPEAssembly->AddRef();
-}
-
-void FileLoadLock::HolderLeave(FileLoadLock *pThis)
-{
-    LIMITED_METHOD_CONTRACT;
-    pThis->Leave();
 }
 
 
@@ -2603,7 +2607,7 @@ Assembly *AppDomain::LoadAssembly(FileLoadLock *pLock, FileLoadLevel targetLevel
     Assembly* pAssembly = pLock->GetAssembly();
     _ASSERTE(pAssembly != nullptr); // We should always be loading to at least FILE_LOAD_ALLOCATE, so the assembly should be created
 
-    // There may have been an error stored on the domain file by another thread, or from a previous load
+    // There may have been an error stored on the assembly by another thread, or from a previous load
     pAssembly->ThrowIfError(targetLevel);
 
     // There are two normal results from the above loop.
@@ -2633,7 +2637,7 @@ void AppDomain::TryIncrementalLoad(FileLoadLevel workLevel, FileLoadLockHolder& 
     // This is factored out so we don't call EX_TRY in a loop (EX_TRY can _alloca)
 
     BOOL released = FALSE;
-    FileLoadLock* pLoadLock = lockHolder.GetValue();
+    FileLoadLock* pLoadLock = lockHolder;
     Assembly* pAssembly = pLoadLock->GetAssembly();
 
     EX_TRY
@@ -2644,7 +2648,7 @@ void AppDomain::TryIncrementalLoad(FileLoadLevel workLevel, FileLoadLockHolder& 
             // FileLoadLock should not have an assembly yet
             _ASSERTE(pAssembly == NULL);
 
-            // Allocate DomainAssembly & Assembly
+            // Allocate Assembly
             PEAssembly *pPEAssembly = pLoadLock->GetPEAssembly();
             AssemblyBinder *pAssemblyBinder = pPEAssembly->GetAssemblyBinder();
             LoaderAllocator *pLoaderAllocator = pAssemblyBinder->GetLoaderAllocator();
@@ -2653,16 +2657,14 @@ void AppDomain::TryIncrementalLoad(FileLoadLevel workLevel, FileLoadLockHolder& 
 
             AllocMemTracker amTracker;
             AllocMemTracker *pamTracker = &amTracker;
-            NewHolder<DomainAssembly> pDomainAssembly = new DomainAssembly(pPEAssembly, pLoaderAllocator, pamTracker);
-            pLoadLock->SetAssembly(pDomainAssembly->GetAssembly());
-            pDomainAssembly->GetAssembly()->SetIsTenured();
-            if (pDomainAssembly->GetAssembly()->IsCollectible())
+            pAssembly = Assembly::Create(pPEAssembly, pamTracker, pLoaderAllocator);
+            pLoadLock->SetAssembly(pAssembly);
+            pAssembly->SetIsTenured();
+            if (pAssembly->IsCollectible())
             {
-                ((AssemblyLoaderAllocator *)pLoaderAllocator)->AddDomainAssembly(pDomainAssembly);
+                ((AssemblyLoaderAllocator *)pLoaderAllocator)->AddAssembly(pAssembly);
             }
-            pDomainAssembly.SuppressRelease();
             pamTracker->SuppressRelease();
-            pAssembly = pLoadLock->GetAssembly();
             success = TRUE;
         }
         else
@@ -2674,7 +2676,7 @@ void AppDomain::TryIncrementalLoad(FileLoadLevel workLevel, FileLoadLockHolder& 
         if (pLoadLock->CompleteLoadLevel(workLevel, success) &&
             pLoadLock->GetLoadLevel()==FILE_LOAD_DELIVER_EVENTS)
         {
-            lockHolder.Release();
+            lockHolder.Free();
             released = TRUE;
             pAssembly->DeliverAsyncEvents();
         };
@@ -2727,7 +2729,7 @@ CHECK AppDomain::CheckValidModule(Module * pModule)
     }
     CONTRACTL_END;
 
-    if (pModule->GetDomainAssembly() != NULL)
+    if (pModule->GetAssembly() != NULL)
         CHECK_OK;
 
     CHECK_OK;
@@ -2810,7 +2812,7 @@ void AppDomain::SetFriendlyName(LPCWSTR pwzFriendlyName)
     CONTRACTL
     {
         THROWS;
-        if (GetThreadNULLOk()) {GC_TRIGGERS;} else {DISABLED(GC_NOTRIGGER);}
+        GC_TRIGGERS; // for NameChangeEvent
         MODE_ANY;
         INJECT_FAULT(COMPlusThrowOM(););
     }
@@ -2859,48 +2861,6 @@ LPCWSTR AppDomain::GetFriendlyName()
 
     RETURN (LPCWSTR)m_friendlyName;
 }
-
-#ifndef DACCESS_COMPILE
-
-LPCWSTR AppDomain::GetFriendlyNameForDebugger()
-{
-    CONTRACT (LPCWSTR)
-    {
-        NOTHROW;
-        if (GetThreadNULLOk()) {GC_TRIGGERS;} else {DISABLED(GC_NOTRIGGER);}
-        MODE_ANY;
-        POSTCONDITION(CheckPointer(RETVAL));
-    }
-    CONTRACT_END;
-
-
-    if (m_friendlyName == NULL)
-    {
-        BOOL fSuccess = FALSE;
-
-        EX_TRY
-        {
-            SetFriendlyName(NULL);
-
-            fSuccess = TRUE;
-        }
-        EX_CATCH
-        {
-            // Gobble all exceptions.
-        }
-        EX_END_CATCH
-
-        if (!fSuccess)
-        {
-            RETURN W("");
-        }
-    }
-
-    RETURN m_friendlyName;
-}
-
-
-#endif // !DACCESS_COMPILE
 
 #ifndef DACCESS_COMPILE
 
@@ -3393,17 +3353,12 @@ void AppDomain::RaiseLoadingAssemblyEvent(Assembly *pAssembly)
             } gc;
             gc.orThis = NULL;
 
-            ARG_SLOT args[1];
             GCPROTECT_BEGIN(gc);
 
             gc.orThis = pAssembly->GetExposedObject();
 
-            MethodDescCallSite onAssemblyLoad(METHOD__ASSEMBLYLOADCONTEXT__ON_ASSEMBLY_LOAD);
-
-            // GetExposedAssemblyObject may cause a gc, so call this before filling args[0]
-            args[0] = ObjToArgSlot(gc.orThis);
-
-            onAssemblyLoad.Call(args);
+            UnmanagedCallersOnlyCaller onAssemblyLoad(METHOD__ASSEMBLYLOADCONTEXT__ON_ASSEMBLY_LOAD);
+            onAssemblyLoad.InvokeThrowing(&gc.orThis);
 
             GCPROTECT_END();
         }
@@ -3427,12 +3382,8 @@ void AppDomain::OnUnhandledException(OBJECTREF* pThrowable)
 
     EX_TRY
     {
-        MethodDescCallSite raiseEvent(METHOD__APPCONTEXT__ON_UNHANDLED_EXCEPTION);
-        ARG_SLOT args[] =
-        {
-            ObjToArgSlot(*pThrowable)
-        };
-        raiseEvent.Call(args);
+        UnmanagedCallersOnlyCaller raiseEvent(METHOD__APPCONTEXT__ON_UNHANDLED_EXCEPTION);
+        raiseEvent.InvokeThrowing(pThrowable);
     }
     EX_CATCH
     {
@@ -3454,8 +3405,8 @@ void AppDomain::RaiseExitProcessEvent()
 
     _ASSERTE (GetThread()->PreemptiveGCDisabled());
 
-    MethodDescCallSite onProcessExit(METHOD__APPCONTEXT__ON_PROCESS_EXIT);
-    onProcessExit.Call(NULL);
+    UnmanagedCallersOnlyCaller onProcessExit(METHOD__APPCONTEXT__ON_PROCESS_EXIT);
+    onProcessExit.InvokeThrowing();
 }
 
 DefaultAssemblyBinder *AppDomain::CreateDefaultBinder()
@@ -3641,23 +3592,6 @@ void AppDomain::DetachRCWs()
 
 #endif // FEATURE_COMINTEROP
 
-void AppDomain::ExceptionUnwind(Frame *pFrame)
-{
-    CONTRACTL
-    {
-        DISABLED(GC_TRIGGERS);  // EEResourceException
-        DISABLED(THROWS);   // EEResourceException
-        MODE_ANY;
-    }
-    CONTRACTL_END;
-
-    LOG((LF_APPDOMAIN, LL_INFO10, "AppDomain::ExceptionUnwind for %8.8x\n", pFrame));
-    Thread *pThread = GetThread();
-
-    LOG((LF_APPDOMAIN, LL_INFO10, "AppDomain::ExceptionUnwind: not first transition or abort\n"));
-}
-
-
 #endif // !DACCESS_COMPILE
 
 #ifndef DACCESS_COMPILE
@@ -3682,34 +3616,27 @@ Assembly* AppDomain::RaiseTypeResolveEventThrowing(Assembly* pAssembly, LPCSTR s
 
     struct {
         ASSEMBLYREF AssemblyRef;
-        STRINGREF str;
+        ASSEMBLYREF ResultRef;
     } gc;
     gc.AssemblyRef = NULL;
-    gc.str = NULL;
+    gc.ResultRef = NULL;
 
     GCPROTECT_BEGIN(gc);
 
     if (pAssembly != NULL)
         gc.AssemblyRef = (ASSEMBLYREF)pAssembly->GetExposedObject();
 
-    MethodDescCallSite onTypeResolve(METHOD__ASSEMBLYLOADCONTEXT__ON_TYPE_RESOLVE);
+    UnmanagedCallersOnlyCaller onTypeResolve(METHOD__ASSEMBLYLOADCONTEXT__ON_TYPE_RESOLVE);
+    onTypeResolve.InvokeThrowing(&gc.AssemblyRef, szName, &gc.ResultRef);
 
-    gc.str = StringObject::NewString(szName);
-    ARG_SLOT args[2] =
+    if (gc.ResultRef != NULL)
     {
-        ObjToArgSlot(gc.AssemblyRef),
-        ObjToArgSlot(gc.str)
-    };
-    gc.AssemblyRef = (ASSEMBLYREF) onTypeResolve.Call_RetOBJECTREF(args);
+        _ASSERTE(CoreLibBinder::IsClass(gc.ResultRef->GetMethodTable(), CLASS__ASSEMBLY));
 
-    if (gc.AssemblyRef != NULL)
-    {
-        _ASSERTE(CoreLibBinder::IsClass(gc.AssemblyRef->GetMethodTable(), CLASS__ASSEMBLY));
-
-        pResolvedAssembly = gc.AssemblyRef->GetAssembly();
+        pResolvedAssembly = gc.ResultRef->GetAssembly();
 
         if (pResultingAssemblyRef)
-            *pResultingAssemblyRef = gc.AssemblyRef;
+            *pResultingAssemblyRef = gc.ResultRef;
         else
         {
             if (pResolvedAssembly->IsCollectible())
@@ -3742,29 +3669,23 @@ Assembly* AppDomain::RaiseResourceResolveEvent(Assembly* pAssembly, LPCSTR szNam
 
     struct {
         ASSEMBLYREF AssemblyRef;
-        STRINGREF str;
+        ASSEMBLYREF ResultRef;
     } gc;
     gc.AssemblyRef = NULL;
-    gc.str = NULL;
+    gc.ResultRef = NULL;
 
     GCPROTECT_BEGIN(gc);
 
     if (pAssembly != NULL)
         gc.AssemblyRef=(ASSEMBLYREF)pAssembly->GetExposedObject();
 
-    MethodDescCallSite onResourceResolve(METHOD__ASSEMBLYLOADCONTEXT__ON_RESOURCE_RESOLVE);
-    gc.str = StringObject::NewString(szName);
-    ARG_SLOT args[2] =
+    UnmanagedCallersOnlyCaller onResourceResolve(METHOD__ASSEMBLYLOADCONTEXT__ON_RESOURCE_RESOLVE);
+    onResourceResolve.InvokeThrowing(&gc.AssemblyRef, szName, &gc.ResultRef);
+    if (gc.ResultRef != NULL)
     {
-        ObjToArgSlot(gc.AssemblyRef),
-        ObjToArgSlot(gc.str)
-    };
-    gc.AssemblyRef = (ASSEMBLYREF) onResourceResolve.Call_RetOBJECTREF(args);
-    if (gc.AssemblyRef != NULL)
-    {
-        _ASSERTE(CoreLibBinder::IsClass(gc.AssemblyRef->GetMethodTable(), CLASS__ASSEMBLY));
+        _ASSERTE(CoreLibBinder::IsClass(gc.ResultRef->GetMethodTable(), CLASS__ASSEMBLY));
 
-        pResolvedAssembly = gc.AssemblyRef->GetAssembly();
+        pResolvedAssembly = gc.ResultRef->GetAssembly();
         if (pResolvedAssembly->IsCollectible())
         {
             COMPlusThrow(kNotSupportedException, W("NotSupported_CollectibleAssemblyResolve"));
@@ -3806,10 +3727,10 @@ AppDomain::RaiseAssemblyResolveEvent(
 
     struct {
         ASSEMBLYREF AssemblyRef;
-        STRINGREF str;
+        ASSEMBLYREF ResultRef;
     } gc;
     gc.AssemblyRef = NULL;
-    gc.str = NULL;
+    gc.ResultRef = NULL;
 
     GCPROTECT_BEGIN(gc);
     {
@@ -3818,21 +3739,14 @@ AppDomain::RaiseAssemblyResolveEvent(
             gc.AssemblyRef=(ASSEMBLYREF)pSpec->GetParentAssembly()->GetExposedObject();
         }
 
-        MethodDescCallSite onAssemblyResolve(METHOD__ASSEMBLYLOADCONTEXT__ON_ASSEMBLY_RESOLVE);
+        UnmanagedCallersOnlyCaller onAssemblyResolve(METHOD__ASSEMBLYLOADCONTEXT__ON_ASSEMBLY_RESOLVE);
+        onAssemblyResolve.InvokeThrowing(&gc.AssemblyRef, ssName.GetUnicode(), &gc.ResultRef);
 
-        gc.str = StringObject::NewString(ssName);
-        ARG_SLOT args[2] = {
-            ObjToArgSlot(gc.AssemblyRef),
-            ObjToArgSlot(gc.str)
-        };
-
-        gc.AssemblyRef = (ASSEMBLYREF) onAssemblyResolve.Call_RetOBJECTREF(args);
-
-        if (gc.AssemblyRef != NULL)
+        if (gc.ResultRef != NULL)
         {
-            _ASSERTE(CoreLibBinder::IsClass(gc.AssemblyRef->GetMethodTable(), CLASS__ASSEMBLY));
+            _ASSERTE(CoreLibBinder::IsClass(gc.ResultRef->GetMethodTable(), CLASS__ASSEMBLY));
 
-            pAssembly = gc.AssemblyRef->GetAssembly();
+            pAssembly = gc.ResultRef->GetAssembly();
             if (pAssembly->IsCollectible())
             {
                 COMPlusThrow(kNotSupportedException, W("NotSupported_CollectibleAssemblyResolve"));
@@ -4009,13 +3923,12 @@ AppDomain::AssemblyIterator::Next_Unlocked(
     while (m_Iterator.Next())
     {
         // Get element from the list/iterator (without adding reference to the assembly)
-        DomainAssembly * pDomainAssembly = dac_cast<PTR_DomainAssembly>(m_Iterator.GetElement());
-        if (pDomainAssembly == NULL)
+        Assembly * pAssembly = dac_cast<PTR_Assembly>(m_Iterator.GetElement());
+        if (pAssembly == NULL)
         {
             continue;
         }
 
-        Assembly* pAssembly = pDomainAssembly->GetAssembly();
         if (pAssembly->IsError())
         {
             if (m_assemblyIterationFlags & kIncludeFailedToLoad)
@@ -4076,7 +3989,7 @@ AppDomain::AssemblyIterator::Next_Unlocked(
 
             // Un-tenured collectible assemblies should not be returned. (This can only happen in a brief
             // window during collectible assembly creation. No thread should need to have a pointer
-            // to the just allocated DomainAssembly at this stage.)
+            // to the just allocated Assembly at this stage.)
             if (!pAssembly->GetModule()->IsTenured())
             {
                 continue; // reject
@@ -4148,9 +4061,6 @@ HRESULT RuntimeInvokeHostAssemblyResolver(INT_PTR pAssemblyLoadContextToBindWith
     bool fResolvedAssembly = false;
     BinderTracing::ResolutionAttemptedOperation tracer{pAssemblyName, 0 /*binderID*/, pAssemblyLoadContextToBindWithin, hr};
 
-    // Allocate an AssemblyName managed object
-    _gcRefs.oRefAssemblyName = (ASSEMBLYNAMEREF) AllocateObject(CoreLibBinder::GetClass(CLASS__ASSEMBLY_NAME));
-
     // Initialize the AssemblyName object
     AssemblySpec::InitializeAssemblyNameRef(pAssemblyName, &_gcRefs.oRefAssemblyName);
 
@@ -4164,18 +4074,8 @@ HRESULT RuntimeInvokeHostAssemblyResolver(INT_PTR pAssemblyLoadContextToBindWith
             // This is not invoked for TPA Binder since it always returns NULL.
             tracer.GoToStage(BinderTracing::ResolutionAttemptedOperation::Stage::AssemblyLoadContextLoad);
 
-            // Finally, setup arguments for invocation
-            MethodDescCallSite methLoadAssembly(METHOD__ASSEMBLYLOADCONTEXT__RESOLVE);
-
-            // Setup the arguments for the call
-            ARG_SLOT args[2] =
-            {
-                PtrToArgSlot(pAssemblyLoadContextToBindWithin), // IntPtr for managed assembly load context instance
-                ObjToArgSlot(_gcRefs.oRefAssemblyName), // AssemblyName instance
-            };
-
-            // Make the call
-            _gcRefs.oRefLoadedAssembly = (ASSEMBLYREF) methLoadAssembly.Call_RetOBJECTREF(args);
+            UnmanagedCallersOnlyCaller methLoadAssembly(METHOD__ASSEMBLYLOADCONTEXT__RESOLVE);
+            methLoadAssembly.InvokeThrowing(pAssemblyLoadContextToBindWithin, &_gcRefs.oRefAssemblyName, &_gcRefs.oRefLoadedAssembly);
             if (_gcRefs.oRefLoadedAssembly != NULL)
             {
                 fResolvedAssembly = true;
@@ -4212,17 +4112,8 @@ HRESULT RuntimeInvokeHostAssemblyResolver(INT_PTR pAssemblyLoadContextToBindWith
             // Finally, setup arguments for invocation
             tracer.GoToStage(BinderTracing::ResolutionAttemptedOperation::Stage::ResolveSatelliteAssembly);
 
-            MethodDescCallSite methResolveSateliteAssembly(METHOD__ASSEMBLYLOADCONTEXT__RESOLVESATELLITEASSEMBLY);
-
-            // Setup the arguments for the call
-            ARG_SLOT args[2] =
-            {
-                PtrToArgSlot(pAssemblyLoadContextToBindWithin), // IntPtr for managed assembly load context instance
-                ObjToArgSlot(_gcRefs.oRefAssemblyName), // AssemblyName instance
-            };
-
-            // Make the call
-            _gcRefs.oRefLoadedAssembly = (ASSEMBLYREF) methResolveSateliteAssembly.Call_RetOBJECTREF(args);
+            UnmanagedCallersOnlyCaller methResolveSateliteAssembly(METHOD__ASSEMBLYLOADCONTEXT__RESOLVESATELLITEASSEMBLY);
+            methResolveSateliteAssembly.InvokeThrowing(pAssemblyLoadContextToBindWithin, &_gcRefs.oRefAssemblyName, &_gcRefs.oRefLoadedAssembly);
             if (_gcRefs.oRefLoadedAssembly != NULL)
             {
                 // Set the flag indicating we found the assembly
@@ -4241,17 +4132,8 @@ HRESULT RuntimeInvokeHostAssemblyResolver(INT_PTR pAssemblyLoadContextToBindWith
             // Finally, setup arguments for invocation
             tracer.GoToStage(BinderTracing::ResolutionAttemptedOperation::Stage::AssemblyLoadContextResolvingEvent);
 
-            MethodDescCallSite methResolveUsingEvent(METHOD__ASSEMBLYLOADCONTEXT__RESOLVEUSINGEVENT);
-
-            // Setup the arguments for the call
-            ARG_SLOT args[2] =
-            {
-                PtrToArgSlot(pAssemblyLoadContextToBindWithin), // IntPtr for managed assembly load context instance
-                ObjToArgSlot(_gcRefs.oRefAssemblyName), // AssemblyName instance
-            };
-
-            // Make the call
-            _gcRefs.oRefLoadedAssembly = (ASSEMBLYREF) methResolveUsingEvent.Call_RetOBJECTREF(args);
+            UnmanagedCallersOnlyCaller methResolveUsingEvent(METHOD__ASSEMBLYLOADCONTEXT__RESOLVEUSINGEVENT);
+            methResolveUsingEvent.InvokeThrowing(pAssemblyLoadContextToBindWithin, &_gcRefs.oRefAssemblyName, &_gcRefs.oRefLoadedAssembly);
             if (_gcRefs.oRefLoadedAssembly != NULL)
             {
                 // Set the flag indicating we found the assembly

@@ -50,9 +50,9 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: ~/.cache/bazel-disk
-          key: bazel-${{ runner.os }}-${{ runner.arch }}-${{ matrix.config }}-${{ github.sha }}
+          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
           restore-keys: |
-            bazel-${{ runner.os }}-${{ runner.arch }}-${{ matrix.config }}-
+            bazel-${{ runner.os }}-${{ matrix.config }}-
 
       - name: Build
         run: bazel build ${{ matrix.targets || '//...' }} --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk
@@ -66,4 +66,4 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: ~/.cache/bazel-disk
-          key: bazel-${{ runner.os }}-${{ runner.arch }}-${{ matrix.config }}-${{ github.sha }}
+          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}

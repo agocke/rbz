@@ -25,13 +25,14 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Reflection.Metadata",
+    include_runtime_async = False,
+    event_source_generator = True,
     com_interface_generator = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
     srcs = glob(
         ["src/System/**/*.cs"],
         exclude = [
             # Not for NETCoreApp
-            "src/System/Reflection/Internal/Utilities/EncodingHelper.cs",
             "src/System/Reflection/Internal/Utilities/StreamExtensions.netstandard2.0.cs",
         ],
     ) + [

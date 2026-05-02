@@ -267,8 +267,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             }
         }
 
-        [Fact]
-        [SkipOnPlatform(PlatformSupport.MobileAppleCrypto, "DSA is not available")]
+        [ConditionalFact(typeof(PlatformSupport), nameof(PlatformSupport.IsDSASupported))]
         public static void DsaPrivateKeyProperty()
         {
             using (var cert = new X509Certificate2(TestData.Dsa1024Pfx, TestData.Dsa1024PfxPassword, Cert.EphemeralIfPossible))
@@ -365,8 +364,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             }
         }
 
-        [Fact]
-        [SkipOnPlatform(PlatformSupport.MobileAppleCrypto, "DSA is not available")]
+        [ConditionalFact(typeof(PlatformSupport), nameof(PlatformSupport.IsDSASupported))]
         public static void ReadDSAPrivateKey()
         {
             byte[] data = { 1, 2, 3, 4, 5 };
@@ -559,7 +557,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             }
         }
 
-        [ConditionalTheory(nameof(MLKemIsNotSupported))]
+        [ConditionalTheory(typeof(PfxTests), nameof(MLKemIsNotSupported))]
         [MemberData(nameof(StorageFlags))]
         public static void ReadMLKem512PrivateKey_NotSupported(X509KeyStorageFlags keyStorageFlags)
         {

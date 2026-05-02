@@ -25,8 +25,8 @@ library_test(
         "//src/libraries/Common:src/System/Obsoletions.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
         # CoreLib shared files
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.cs",
-        "//src/libraries/System.Private.CoreLib:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.cs",
+        "//src/libraries/Common:src/System/Collections/Generic/ValueListBuilder.Pop.cs",
         # Generated string resources
         "//src/libraries/Common:src/System/SR.cs",
         ":gen_resx",
@@ -35,6 +35,7 @@ library_test(
         "//src/libraries/System.Text.RegularExpressions:src/System/Text/RegularExpressions/RegexCaseEquivalences.Data.cs",
         "//src/libraries/System.Text.RegularExpressions:src/System/Text/RegularExpressions/RegexCaseEquivalences.cs",
         "//src/libraries/System.Text.RegularExpressions:src/System/Text/RegularExpressions/RegexCaseBehavior.cs",
+        "//src/libraries/System.Text.RegularExpressions:src/System/Text/RegularExpressions/RegexCharClass.Tables.cs",
         "//src/libraries/System.Text.RegularExpressions:src/System/Text/RegularExpressions/RegexCharClass.cs",
         "//src/libraries/System.Text.RegularExpressions:src/System/Text/RegularExpressions/RegexInterpreterCode.cs",
         "//src/libraries/System.Text.RegularExpressions:src/System/Text/RegularExpressions/RegexFindOptimizations.cs",

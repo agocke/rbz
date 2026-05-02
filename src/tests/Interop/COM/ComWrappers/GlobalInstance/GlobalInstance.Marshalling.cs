@@ -20,7 +20,9 @@ namespace ComWrappersTests.GlobalInstance
             Assert.NotEqual(GlobalComWrappers.ReleaseObjectsCallAck, hr);
         }
 
+        [ActiveIssue("Not supported on Mono", TestRuntimes.Mono)]
         [Fact]
+        [Xunit.SkipOnCoreClrAttribute("Depends on windows-only COM->CLR transitions flowing hidden parameter", (RuntimeTestModes)0x400)]
         public static int TestEntryPoint()
         {
             try

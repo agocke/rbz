@@ -375,7 +375,7 @@ BOOL MethodTable::ValidateWithPossibleAV()
     }
 
     // generic instantiation check
-    return (HasInstantiation() || IsArray()) && (pEEClassFromMethodTable->GetClassWithPossibleAV() == pEEClass);
+    return (HasInstantiation() || IsArray() || IsContinuation()) && (pEEClassFromMethodTable->GetClassWithPossibleAV() == pEEClass);
 }
 
 
@@ -421,7 +421,7 @@ WORD MethodTable::GetNumMethods()
 PTR_MethodTable MethodTable::GetTypicalMethodTable()
 {
     LIMITED_METHOD_DAC_CONTRACT;
-    if (IsArray())
+    if (IsArray() || IsContinuation())
         return (PTR_MethodTable)this;
 
     PTR_MethodTable methodTableMaybe = GetModule()->LookupTypeDef(GetCl()).AsMethodTable();
@@ -505,7 +505,7 @@ PTR_MethodTable InterfaceInfo_t::GetApproxMethodTable(Module * pContainingModule
             FALSE,              // allowInstParam
             TRUE);              // forceRemotableMethod
 
-        RETURN(pServerMT->GetMethodDescForComInterfaceMethod(pItfMD, false));
+        RETURN(pServerMT->GetMethodDescForComInterfaceMethod(pItfMD));
     }
 #endif // !FEATURE_COMINTEROP
 
@@ -536,8 +536,7 @@ PTR_MethodTable InterfaceInfo_t::GetApproxMethodTable(Module * pContainingModule
 #ifdef FEATURE_COMINTEROP
 //==========================================================================================
 // get the method desc given the interface method desc on a COM implemented server
-// (if fNullOk is set then NULL is an allowable return value)
-MethodDesc *MethodTable::GetMethodDescForComInterfaceMethod(MethodDesc *pItfMD, bool fNullOk)
+MethodDesc *MethodTable::GetMethodDescForComInterfaceMethod(MethodDesc *pItfMD)
 {
     CONTRACT(MethodDesc*)
     {
@@ -547,7 +546,7 @@ MethodDesc *MethodTable::GetMethodDescForComInterfaceMethod(MethodDesc *pItfMD, 
         PRECONDITION(CheckPointer(pItfMD));
         PRECONDITION(pItfMD->IsInterface());
         PRECONDITION(IsComObjectType());
-        POSTCONDITION(fNullOk || CheckPointer(RETVAL));
+        POSTCONDITION(CheckPointer(RETVAL));
     }
     CONTRACT_END;
 
@@ -572,22 +571,17 @@ MethodDesc *MethodTable::GetMethodDescForComInterfaceMethod(MethodDesc *pItfMD, 
 
         if (tgt != NULL)
         {
-            RETURN(MethodTable::GetMethodDescForSlotAddress(tgt));
+            RETURN(NonVirtualEntry2MethodDesc(tgt));
         }
 
         // The interface is not in the static class definition so we need to look at the
         // dynamic interfaces.
-        else if (FindDynamicallyAddedInterface(pItfMT))
-        {
-            // This interface was added to the class dynamically so it is implemented
-            // by the COM object. We treat this dynamically added interfaces the same
-            // way we treat COM objects. That is by using the interface vtable.
-            RETURN(pItfMD);
-        }
-        else
-        {
-            RETURN(NULL);
-        }
+        _ASSERTE(FindDynamicallyAddedInterface(pItfMT));
+
+        // This interface was added to the class dynamically so it is implemented
+        // by the COM object. We treat this dynamically added interface the same
+        // way we treat COM objects. That is by using the interface vtable.
+        RETURN(pItfMD);
     }
 }
 #endif // FEATURE_COMINTEROP
@@ -713,44 +707,6 @@ MethodTable* CreateMinimalMethodTable(Module* pContainingModule,
 
     return pMT;
 }
-
-
-#ifdef FEATURE_COMINTEROP
-//==========================================================================================
-OBJECTREF MethodTable::GetObjCreateDelegate()
-{
-    CONTRACTL
-    {
-        MODE_COOPERATIVE;
-        GC_NOTRIGGER;
-        NOTHROW;
-    }
-    CONTRACTL_END;
-    _ASSERT(!IsInterface());
-    if (GetOHDelegate())
-        return ObjectFromHandle(GetOHDelegate());
-    else
-        return NULL;
-}
-
-//==========================================================================================
-void MethodTable::SetObjCreateDelegate(OBJECTREF orDelegate)
-{
-    CONTRACTL
-    {
-        MODE_COOPERATIVE;
-        GC_NOTRIGGER;
-        THROWS; // From CreateHandle
-    }
-    CONTRACTL_END;
-
-    if (GetOHDelegate())
-        StoreObjectInHandle(GetOHDelegate(), orDelegate);
-    else
-        SetOHDelegate (GetAppDomain()->CreateHandle(orDelegate));
-}
-#endif // FEATURE_COMINTEROP
-
 
 //==========================================================================================
 void MethodTable::SetInterfaceMap(WORD wNumInterfaces, InterfaceInfo_t* iMap)
@@ -1341,6 +1297,7 @@ BOOL MethodTable::CanCastToClass(MethodTable *pTargetMT, TypeHandlePairList *pVi
         PRECONDITION(CheckPointer(pTargetMT));
         PRECONDITION(!pTargetMT->IsArray());
         PRECONDITION(!pTargetMT->IsInterface());
+        PRECONDITION(!pTargetMT->IsContinuation());
     }
     CONTRACTL_END
 
@@ -1465,8 +1422,7 @@ BOOL MethodTable::ArrayIsInstanceOf(MethodTable* pTargetMT, TypeHandlePairList* 
         PRECONDITION(pTargetMT->IsArray());
     } CONTRACTL_END;
 
-    // GetRank touches EEClass. Try to avoid it for SZArrays.
-    if (pTargetMT->GetInternalCorElementType() == ELEMENT_TYPE_SZARRAY)
+    if (!pTargetMT->IsMultiDimArray())
     {
         if (this->IsMultiDimArray())
         {
@@ -1767,7 +1723,7 @@ bool MethodTable::InterfaceMapIterator::CurrentInterfaceEquivalentTo(MethodTable
 
     if (pCurrentMethodTable == pMT)
         return true;
-        
+
     if (pCurrentMethodTable->IsSpecialMarkerTypeForGenericCasting() && !pMTOwner->GetAuxiliaryData()->MayHaveOpenInterfacesInInterfaceMap() && pCurrentMethodTable->HasSameTypeDefAs(pMT))
     {
         // Any matches need to use the special marker type logic
@@ -1784,7 +1740,7 @@ bool MethodTable::InterfaceMapIterator::CurrentInterfaceEquivalentTo(MethodTable
 #ifndef DACCESS_COMPILE
                 if (pMT->IsFullyLoaded())
                     SetInterface(pMT);
-#endif 
+#endif
                 return true;
             }
             else
@@ -1886,7 +1842,7 @@ MethodDesc *MethodTable::GetMethodDescForInterfaceMethod(TypeHandle ownerType, M
         _ASSERTE(!throwOnConflict);
         return NULL;
     }
-    pMD = MethodTable::GetMethodDescForSlotAddress(pTgt);
+    pMD = NonVirtualEntry2MethodDesc(pTgt);
 
 #ifdef _DEBUG
     MethodDesc *pDispSlotMD = FindDispatchSlotForInterfaceMD(ownerType, pInterfaceMD, throwOnConflict).GetMethodDesc();
@@ -2044,16 +2000,16 @@ const char* GetSystemVClassificationTypeName(SystemVClassificationType t)
 #endif // _DEBUG && LOGGING
 
 // Returns 'true' if the struct is passed in registers, 'false' otherwise.
-bool MethodTable::ClassifyEightBytes(SystemVStructRegisterPassingHelperPtr helperPtr, unsigned int nestingLevel, unsigned int startOffsetOfStruct, bool useNativeLayout, MethodTable** pByValueClassCache)
+bool MethodTable::ClassifyEightBytes(SystemVStructRegisterPassingHelper *helperPtr, bool useNativeLayout, MethodTable** pByValueClassCache)
 {
     if (useNativeLayout)
     {
         _ASSERTE(pByValueClassCache == NULL);
-        return ClassifyEightBytesWithNativeLayout(helperPtr, nestingLevel, startOffsetOfStruct, GetNativeLayoutInfo());
+        return ClassifyEightBytesWithNativeLayout(helperPtr, 0, 0, GetNativeLayoutInfo());
     }
     else
     {
-        return ClassifyEightBytesWithManagedLayout(helperPtr, nestingLevel, startOffsetOfStruct, useNativeLayout, pByValueClassCache);
+        return ClassifyEightBytesWithManagedLayout(helperPtr, 0, 0, useNativeLayout, pByValueClassCache);
     }
 }
 
@@ -2116,7 +2072,7 @@ static MethodTable* ByValueClassCacheLookup(MethodTable** pByValueClassCache, un
 }
 
 // Returns 'true' if the struct is passed in registers, 'false' otherwise.
-bool MethodTable::ClassifyEightBytesWithManagedLayout(SystemVStructRegisterPassingHelperPtr helperPtr,
+bool MethodTable::ClassifyEightBytesWithManagedLayout(SystemVStructRegisterPassingHelper *helperPtr,
                                                      unsigned int nestingLevel,
                                                      unsigned int startOffsetOfStruct,
                                                      bool useNativeLayout,
@@ -2325,7 +2281,7 @@ bool MethodTable::ClassifyEightBytesWithManagedLayout(SystemVStructRegisterPassi
 }
 
 // Returns 'true' if the struct is passed in registers, 'false' otherwise.
-bool MethodTable::ClassifyEightBytesWithNativeLayout(SystemVStructRegisterPassingHelperPtr helperPtr,
+bool MethodTable::ClassifyEightBytesWithNativeLayout(SystemVStructRegisterPassingHelper *helperPtr,
                                                     unsigned int nestingLevel,
                                                     unsigned int startOffsetOfStruct,
                                                     EEClassNativeLayoutInfo const* pNativeLayoutInfo)
@@ -2574,10 +2530,10 @@ bool MethodTable::ClassifyEightBytesWithNativeLayout(SystemVStructRegisterPassin
 }
 
 // Assigns the classification types to the array with eightbyte types.
-void  MethodTable::AssignClassifiedEightByteTypes(SystemVStructRegisterPassingHelperPtr helperPtr, unsigned int nestingLevel) const
+void  MethodTable::AssignClassifiedEightByteTypes(SystemVStructRegisterPassingHelper *helperPtr, unsigned int nestingLevel) const
 {
     static const size_t CLR_SYSTEMV_MAX_BYTES_TO_PASS_IN_REGISTERS = CLR_SYSTEMV_MAX_EIGHTBYTES_COUNT_TO_PASS_IN_REGISTERS * SYSTEMV_EIGHT_BYTE_SIZE_IN_BYTES;
-    static_assert_no_msg(CLR_SYSTEMV_MAX_BYTES_TO_PASS_IN_REGISTERS == SYSTEMV_MAX_NUM_FIELDS_IN_REGISTER_PASSED_STRUCT);
+    static_assert(CLR_SYSTEMV_MAX_BYTES_TO_PASS_IN_REGISTERS == SYSTEMV_MAX_NUM_FIELDS_IN_REGISTER_PASSED_STRUCT);
 
     if (!helperPtr->inEmbeddedStruct)
     {
@@ -2716,7 +2672,7 @@ void  MethodTable::AssignClassifiedEightByteTypes(SystemVStructRegisterPassingHe
 
         for (unsigned int currentEightByte = 0; currentEightByte < usedEightBytes; currentEightByte++)
         {
-            unsigned int eightByteSize = accumulatedSizeForEightBytes < (SYSTEMV_EIGHT_BYTE_SIZE_IN_BYTES * (currentEightByte + 1))
+            uint8_t eightByteSize = accumulatedSizeForEightBytes < (SYSTEMV_EIGHT_BYTE_SIZE_IN_BYTES * (currentEightByte + 1))
                 ? accumulatedSizeForEightBytes % SYSTEMV_EIGHT_BYTE_SIZE_IN_BYTES
                 :   SYSTEMV_EIGHT_BYTE_SIZE_IN_BYTES;
 
@@ -2725,7 +2681,8 @@ void  MethodTable::AssignClassifiedEightByteTypes(SystemVStructRegisterPassingHe
             helperPtr->eightByteOffsets[currentEightByte] = currentEightByte * SYSTEMV_EIGHT_BYTE_SIZE_IN_BYTES;
         }
 
-        helperPtr->eightByteCount = usedEightBytes;
+        _ASSERTE(usedEightBytes <= 255);
+        helperPtr->eightByteCount = (uint8_t)usedEightBytes;
 
         _ASSERTE(helperPtr->eightByteCount <= CLR_SYSTEMV_MAX_EIGHTBYTES_COUNT_TO_PASS_IN_REGISTERS);
 
@@ -3581,23 +3538,9 @@ BOOL MethodTable::RunClassInitEx(OBJECTREF *pThrowable)
 
         // Call the code method without touching MethodDesc if possible
         PCODE pCctorCode = pCanonMT->GetRestoredSlot(pCanonMT->GetClassConstructorSlot());
-
-        if (pCanonMT->IsSharedByGenericInstantiations())
-        {
-            PREPARE_NONVIRTUAL_CALLSITE_USING_CODE(pCctorCode);
-            DECLARE_ARGHOLDER_ARRAY(args, 1);
-            args[ARGNUM_0] = PTR_TO_ARGHOLDER(this);
-            CATCH_HANDLER_FOUND_NOTIFICATION_CALLSITE;
-            CALL_MANAGED_METHOD_NORET(args);
-        }
-        else
-        {
-            PREPARE_NONVIRTUAL_CALLSITE_USING_CODE(pCctorCode);
-            DECLARE_ARGHOLDER_ARRAY(args, 0);
-            CATCH_HANDLER_FOUND_NOTIFICATION_CALLSITE;
-            CALL_MANAGED_METHOD_NORET(args);
-        }
-
+        MethodTable* instantiatingArg = pCanonMT->IsSharedByGenericInstantiations() ? this : nullptr;
+        UnmanagedCallersOnlyCaller caller(METHOD__INITHELPERS__CALLCLASSCONSTRUCTOR);
+        caller.InvokeThrowing(pCctorCode, instantiatingArg);
         STRESS_LOG1(LF_CLASSLOADER, LL_INFO100000, "RunClassInit: Returned Successfully from class constructor for type %pT\n", this);
 
         fRet = TRUE;
@@ -4358,7 +4301,7 @@ VOID DoAccessibilityCheckForConstraintSignature(Module *pModule, SigPointer *pSi
         case ELEMENT_TYPE_TYPEDBYREF:
             // Primitive types and such. Nothing to check
             break;
-        
+
         case ELEMENT_TYPE_VAR:
         case ELEMENT_TYPE_MVAR:
         {
@@ -4784,7 +4727,7 @@ void MethodTable::DoFullyLoad(Generics::RecursionGraph * const pVisited,  const 
 
             for (DWORD i = 0; i < formalParams.GetNumArgs(); i++)
             {
-                // This call to Bounded/DoAccessibilityCheckForConstraints will also cause constraint Variance rules to be checked 
+                // This call to Bounded/DoAccessibilityCheckForConstraints will also cause constraint Variance rules to be checked
                 // via the call to GetConstraints which will eventually call EEClass::CheckVarianceInSig
                 BOOL Bounded(TypeVarTypeDesc *tyvar, DWORD depth);
 
@@ -4905,22 +4848,6 @@ BOOL MethodTable::IsExtensibleRCW()
     WRAPPER_NO_CONTRACT;
     _ASSERTE(GetClass());
     return IsComObjectType() && !GetClass()->IsComImport();
-}
-
-//==========================================================================================
-OBJECTHANDLE MethodTable::GetOHDelegate()
-{
-    WRAPPER_NO_CONTRACT;
-    _ASSERTE(GetClass());
-    return GetClass()->GetOHDelegate();
-}
-
-//==========================================================================================
-void MethodTable::SetOHDelegate (OBJECTHANDLE _ohDelegate)
-{
-    LIMITED_METHOD_CONTRACT;
-    _ASSERTE(GetClass());
-    GetClass()->SetOHDelegate(_ohDelegate);
 }
 
 //==========================================================================================
@@ -5768,7 +5695,6 @@ namespace
                 FALSE,                  // allowInstParam
                 TRUE,                   // forceRemoteableMethod
                 TRUE,                   // allowCreate
-                AsyncVariantLookup::MatchingAsyncVariant,
                 level                   // level
             );
         }
@@ -6424,33 +6350,6 @@ void MethodTable::GetGuid(GUID *pGuid, BOOL bGenerateIfNotFound, BOOL bClassic /
 #endif // !DACCESS_COMPILE
 }
 
-
-//==========================================================================================
-MethodDesc* MethodTable::GetMethodDescForSlotAddress(PCODE addr, BOOL fSpeculative /*=FALSE*/)
-{
-    CONTRACT(MethodDesc *)
-    {
-        GC_NOTRIGGER;
-        NOTHROW;
-        POSTCONDITION(CheckPointer(RETVAL, NULL_NOT_OK));
-        POSTCONDITION(RETVAL->m_pDebugMethodTable == NULL || // We must be in BuildMethdTableThrowing()
-                      RETVAL->SanityCheck());
-    }
-    CONTRACT_END;
-
-    MethodDesc* pMethodDesc = ExecutionManager::GetCodeMethodDesc(addr);
-    if (NULL != pMethodDesc)
-    {
-        goto lExit;
-    }
-
-    pMethodDesc = MethodDesc::GetMethodDescFromStubAddr(addr, fSpeculative);
-
-lExit:
-
-    RETURN(pMethodDesc);
-}
-
 //==========================================================================================
 /* static*/
 BOOL MethodTable::ComputeContainsGenericVariables(Instantiation inst)
@@ -6497,7 +6396,7 @@ BOOL MethodTable::SanityCheck()
     if (GetNumGenericArgs() != 0)
         return (pCanonMT->GetClass() == pClass);
     else
-        return (pCanonMT == this) || IsArray();
+        return (pCanonMT == this) || IsArray() || IsContinuation();
 }
 
 
@@ -7743,7 +7642,7 @@ CHECK MethodTable::CheckInstanceActivated()
 {
     WRAPPER_NO_CONTRACT;
 
-    if (IsArray())
+    if (IsArray() || IsContinuation())
         CHECK_OK;
 
 
@@ -7821,15 +7720,6 @@ MethodTable::EnumMemoryRegions(CLRDataEnumMemoryFlags flags)
 
         if (pClass.IsValid())
         {
-            if (IsArray())
-            {
-                // This is kind of a workaround, in that ArrayClass is derived from EEClass, but
-                // it's not virtual, we only cast if the IsArray() predicate holds above.
-                // For minidumps, DAC will choke if we don't have the full size given
-                // by ArrayClass available. If ArrayClass becomes more complex, it
-                // should get it's own EnumMemoryRegions().
-                DacEnumMemoryRegion(dac_cast<TADDR>(pClass), sizeof(ArrayClass));
-            }
             pClass->EnumMemoryRegions(flags, this);
         }
         else
@@ -7898,14 +7788,6 @@ MethodTable::EnumMemoryRegions(CLRDataEnumMemoryFlags flags)
         }
     }
 
-    if (flags != CLRDATA_ENUM_MEM_MINI && flags != CLRDATA_ENUM_MEM_TRIAGE && flags != CLRDATA_ENUM_MEM_HEAP2)
-    {
-        DispatchMap * pMap = GetDispatchMap();
-        if (pMap != NULL)
-        {
-            pMap->EnumMemoryRegions(flags);
-        }
-    }
 } // MethodTable::EnumMemoryRegions
 
 #endif // DACCESS_COMPILE
@@ -8028,6 +7910,26 @@ namespace
     }
 }
 
+MethodDesc* MethodTable::GetParallelMethodDesc(MethodDesc* pDefMD)
+{
+    CONTRACTL
+    {
+        NOTHROW;
+        GC_NOTRIGGER;
+        MODE_ANY;
+    }
+    CONTRACTL_END;
+
+#ifdef FEATURE_METADATA_UPDATER
+    if (pDefMD->IsEnCAddedMethod())
+    {
+        return GetParallelMethodDescForEnC(this, pDefMD);
+    }
+#endif // FEATURE_METADATA_UPDATER
+
+    return GetMethodDescForSlot_NoThrow(pDefMD->GetSlot());
+}
+
 MethodDesc* MethodTable::GetParallelMethodDesc(MethodDesc* pDefMD, AsyncVariantLookup asyncVariantLookup)
 {
     CONTRACTL
@@ -8038,30 +7940,23 @@ MethodDesc* MethodTable::GetParallelMethodDesc(MethodDesc* pDefMD, AsyncVariantL
     }
     CONTRACTL_END;
 
-    if (asyncVariantLookup == AsyncVariantLookup::MatchingAsyncVariant)
+    if (pDefMD->MatchesAsyncVariantLookup(asyncVariantLookup))
     {
-#ifdef FEATURE_METADATA_UPDATER
-        if (pDefMD->IsEnCAddedMethod())
-            return GetParallelMethodDescForEnC(this, pDefMD);
-#endif // FEATURE_METADATA_UPDATER
-
-        return GetMethodDescForSlot_NoThrow(pDefMD->GetSlot()); // TODO! We should probably use the throwing variant where possible
+        return GetParallelMethodDesc(pDefMD);
     }
     else
     {
-        // Slow path for finding the Async variant (or not-Async variant, if we start from Async one)
+        // Slow path for finding the matching async variant.
         // This could be optimized with some trickery around slot numbers, but doing so is ... confusing, so I'm not implementing this yet
         mdMethodDef tkMethod = pDefMD->GetMemberDef();
         Module* mod = pDefMD->GetModule();
-        bool isAsyncVariantMethod = pDefMD->IsAsyncVariantMethod();
-
         MethodTable::IntroducedMethodIterator it(this);
         for (; it.IsValid(); it.Next())
         {
             MethodDesc* pMD = it.GetMethodDesc();
             if (pMD->GetMemberDef() == tkMethod
                 && pMD->GetModule() == mod
-                && pMD->IsAsyncVariantMethod() != isAsyncVariantMethod)
+                && (pMD->MatchesAsyncVariantLookup(asyncVariantLookup)))
             {
                 return pMD;
             }
@@ -8105,7 +8000,7 @@ void MethodTable::SetSlot(UINT32 slotNumber, PCODE slotCode)
 
         if (fSharedVtableChunk)
         {
-            MethodDesc* pMD = GetMethodDescForSlotAddress(slotCode);
+            MethodDesc* pMD = NonVirtualEntry2MethodDesc(slotCode);
             _ASSERTE(pMD->IsVersionableWithVtableSlotBackpatch() || pMD->GetStableEntryPoint() == slotCode);
         }
     }
@@ -8450,18 +8345,19 @@ MethodTable::TryResolveVirtualStaticMethodOnThisType(MethodTable* pInterfaceType
         }
 
         bool differsByAsyncVariant = false;
+        _ASSERTE(!pMethodDecl->IsAsyncVariantMethod());
         if (!pMethodDecl->HasSameMethodDefAs(pInterfaceMD))
         {
             if (pMethodDecl->GetMemberDef() == pInterfaceMD->GetMemberDef() &&
                 pMethodDecl->GetModule() == pInterfaceMD->GetModule() &&
-                pMethodDecl->IsAsyncVariantMethod() != pInterfaceMD->IsAsyncVariantMethod())
+                pInterfaceMD->IsAsyncVariantMethod())
             {
                 differsByAsyncVariant = true;
-                pMethodDecl = pMethodDecl->GetAsyncOtherVariant();
+                pMethodDecl = pMethodDecl->GetAsyncVariant();
                 if (verifyImplemented)
                 {
                     // if only asked to verify, return pMethodDecl as a success (not NULL)
-                    // otherwise GetAsyncOtherVariant down below will trigger verifying again and we will keep coming here
+                    // otherwise GetAsyncVariant down below will trigger verifying again and we will keep coming here
                     _ASSERTE(pMethodDecl != NULL);
                     return pMethodDecl;
                 }
@@ -8497,7 +8393,7 @@ MethodTable::TryResolveVirtualStaticMethodOnThisType(MethodTable* pInterfaceType
 
         if (differsByAsyncVariant)
         {
-            pMethodImpl = pMethodImpl->GetAsyncOtherVariant();
+            pMethodImpl = pMethodImpl->GetAsyncVariant();
         }
 
         if (!verifyImplemented && instantiateMethodParameters)
@@ -8510,7 +8406,6 @@ MethodTable::TryResolveVirtualStaticMethodOnThisType(MethodTable* pInterfaceType
                 /* allowInstParam */ FALSE,
                 /* forceRemotableMethod */ FALSE,
                 /* allowCreate */ TRUE,
-                AsyncVariantLookup::MatchingAsyncVariant,
                 /* level */ level);
         }
         if (pMethodImpl != nullptr)

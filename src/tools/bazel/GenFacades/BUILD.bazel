@@ -26,6 +26,6 @@ csharp_binary(
         "@paket.main//microsoft.build.utilities.core",
     ],
     nullable = "enable",
-    target_frameworks = [ "net10.0" ],
+    target_frameworks = [ "net11.0" ],
     visibility = ["//visibility:public"],
 )

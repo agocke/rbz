@@ -17,13 +17,14 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Configuration.Abstractions",
+    include_runtime_async = False,
+    event_source_generator = True,
+    allow_unsafe_blocks = True,
+    skip_locals_init = True,
+    library_import_generator = False,
+    jsimport_generator = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(["src/**/*.cs"]),
-    analyzers = [
-        "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
-        "//src/libraries/System.Text.Json:JsonSourceGenerator",
-        "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
-    ],
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/Microsoft.Extensions.Primitives:ref_Microsoft.Extensions.Primitives",

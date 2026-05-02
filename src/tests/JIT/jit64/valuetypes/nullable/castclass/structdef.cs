@@ -8,24 +8,28 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
+
 // primitives / CLR Types
 
-// interfaces 
+// interfaces
 public interface IEmpty { }
+
 public interface INotEmpty
 {
     void DoNothing();
 }
 
-// generic interfaces 
+// generic interfaces
 public interface IEmptyGen<T> { }
+
 public interface INotEmptyGen<T>
 {
     void DoNothing();
 }
 
-// struct 
+// struct
 public struct EmptyStruct { }
+
 public struct NotEmptyStruct
 {
     public int Field;
@@ -46,8 +50,9 @@ public struct NotEmptyStructQA
     public int?[] Field;
 }
 
-// generic structs 
+// generic structs
 public struct EmptyStructGen<T> { }
+
 public struct NotEmptyStructGen<T>
 {
     public T Field;
@@ -73,7 +78,7 @@ public struct NotEmptyStructConstrainedGenQA<T> where T : struct
     public T?[] Field;
 }
 
-// nested struct 
+// nested struct
 public struct NestedStruct
 {
     public struct Nested { }
@@ -84,13 +89,13 @@ public struct NestedStructGen<T>
     public struct Nested { }
 }
 
-
 // struct with Field Offset
 [StructLayout(LayoutKind.Explicit)]
 public struct ExplicitFieldOffsetStruct
 {
     [FieldOffset(0)]
     public int Field00;
+
     [FieldOffset(0x0f)]
     public int Field15;
 }
@@ -120,6 +125,7 @@ internal struct ImplementTwoInterfaceGen<T> : IEmptyGen<T>, INotEmptyGen<T>
 internal struct ImplementAllInterface<T> : IEmpty, INotEmpty, IEmptyGen<T>, INotEmptyGen<T>
 {
     public void DoNothing() { }
+
     void INotEmptyGen<T>.DoNothing() { }
 }
 
@@ -127,7 +133,6 @@ internal struct ImplementAllInterface<T> : IEmpty, INotEmpty, IEmptyGen<T>, INot
 public enum IntE { start = 1, }
 public enum ByteE : byte { start = 1, }
 public enum LongE : long { start = 1, }
-
 
 // other intersting structs
 public struct WithMultipleGCHandleStruct
@@ -145,7 +150,6 @@ public struct WithOnlyFXTypeStruct
     public decimal DECIMAL;
 }
 
-
 public struct MixedAllStruct
 {
     public int INT;
@@ -162,15 +166,16 @@ public struct MixedAllStruct
     public GCHandle GCHANDLE;
 }
 
-
 // other types
 public struct EmptyClass { }
+
 public struct NotEmptyClass
 {
     public int Field;
 }
 
 public struct EmptyClassGen<T> { }
+
 public struct NotEmptyClassGen<T>
 {
     public T Field;
@@ -180,6 +185,7 @@ public struct NotEmptyClassConstrainedGen<T> where T : class
 {
     public T Field;
 }
+
 public struct NestedClass
 {
     public struct Nested { }
@@ -207,6 +213,7 @@ internal class ImplementTwoInterfaceGenC<T> : IEmptyGen<T>, INotEmptyGen<T>
 internal class ImplementAllInterfaceC<T> : IEmpty, INotEmpty, IEmptyGen<T>, INotEmptyGen<T>
 {
     public void DoNothing() { }
+
     void INotEmptyGen<T>.DoNothing() { }
 }
 
@@ -214,7 +221,6 @@ public sealed class SealedClass { }
 
 public delegate void SimpleDelegate();
 public delegate void GenericDelegate<T>();
-
 
 // ExitCode
 public static class ExitCode
@@ -257,7 +263,6 @@ internal static class Helper
     public static float Create(float val) { return 1.15f; }
     public static double Create(double val) { return 0.05; }
     public static decimal Create(decimal val) { return 1.0M; }
-
     public static IntPtr Create(IntPtr val) { return (IntPtr)1000; }
     public static UIntPtr Create(UIntPtr val) { return (UIntPtr)2000; }
     public static Guid Create(Guid val) { return new Guid("00020810-0001-0000-C000-000000000046"); }
@@ -285,8 +290,7 @@ internal static class Helper
     public static ImplementOneInterfaceGen<int> Create(ImplementOneInterfaceGen<int> val) { ImplementOneInterfaceGen<int> imp = new ImplementOneInterfaceGen<int>(); return imp; }
     public static ImplementTwoInterfaceGen<int> Create(ImplementTwoInterfaceGen<int> val) { ImplementTwoInterfaceGen<int> imp = new ImplementTwoInterfaceGen<int>(); return imp; }
     public static ImplementAllInterface<int> Create(ImplementAllInterface<int> val) { ImplementAllInterface<int> imp = new ImplementAllInterface<int>(); return imp; }
-    public static WithMultipleGCHandleStruct Create(WithMultipleGCHandleStruct val)
-    { WithMultipleGCHandleStruct mgch = new WithMultipleGCHandleStruct(); mgch.H1 = GCHANDLE; mgch.H2 = GCHANDLE; mgch.H3 = GCHANDLE; mgch.H4 = GCHANDLE; mgch.H5 = GCHANDLE; return mgch; }
+    public static WithMultipleGCHandleStruct Create(WithMultipleGCHandleStruct val) { WithMultipleGCHandleStruct mgch = new WithMultipleGCHandleStruct(); mgch.H1 = GCHANDLE; mgch.H2 = GCHANDLE; mgch.H3 = GCHANDLE; mgch.H4 = GCHANDLE; mgch.H5 = GCHANDLE; return mgch; }
     public static WithOnlyFXTypeStruct Create(WithOnlyFXTypeStruct val) { WithOnlyFXTypeStruct wofx = new WithOnlyFXTypeStruct(); wofx.DECIMAL = 50.0m; wofx.GUID = Create(default(Guid)); return wofx; }
     public static MixedAllStruct Create(MixedAllStruct val)
     {
@@ -303,7 +307,6 @@ internal static class Helper
         mas.EMPTYSTRUCTGEN = Create(default(EmptyStructGen<int>));
         mas.WITHONLYFXTYPESTRUCT = Create(default(WithOnlyFXTypeStruct));
         mas.GCHANDLE = Create(default(GCHandle));
-
         return mas;
     }
 
@@ -320,7 +323,6 @@ internal static class Helper
     public static bool Compare(float val, float val1) { return val == val1; }
     public static bool Compare(double val, double val1) { return val == val1; }
     public static bool Compare(decimal val, decimal val1) { return val == val1; }
-
     public static bool Compare(IntPtr val, IntPtr val1) { return val == val1; }
     public static bool Compare(UIntPtr val, UIntPtr val1) { return val == val1; }
     public static bool Compare(Guid val, Guid val1) { return val == val1; }
@@ -348,23 +350,22 @@ internal static class Helper
     public static bool Compare(ImplementOneInterfaceGen<int> val, ImplementOneInterfaceGen<int> val1) { return val is IEmptyGen<int> && val.Equals(val1); }
     public static bool Compare(ImplementTwoInterfaceGen<int> val, ImplementTwoInterfaceGen<int> val1) { return val is IEmptyGen<int> && val is INotEmptyGen<int> && val.Equals(val1); }
     public static bool Compare(ImplementAllInterface<int> val, ImplementAllInterface<int> val1) { return val is IEmpty && val is INotEmpty && val is IEmptyGen<int> && val is INotEmptyGen<int> && val.Equals(val1); }
-    public static bool Compare(WithMultipleGCHandleStruct val, WithMultipleGCHandleStruct val1)
-    { return val.H1 == val1.H1 && val.H2 == val1.H2 && val.H3 == val1.H3 && val.H4 == val1.H4 && val.H5 == val1.H5; }
+    public static bool Compare(WithMultipleGCHandleStruct val, WithMultipleGCHandleStruct val1) { return val.H1 == val1.H1 && val.H2 == val1.H2 && val.H3 == val1.H3 && val.H4 == val1.H4 && val.H5 == val1.H5; }
     public static bool Compare(WithOnlyFXTypeStruct val, WithOnlyFXTypeStruct val1) { return val.GUID == val1.GUID && val.DECIMAL == val1.DECIMAL; }
     public static bool Compare(MixedAllStruct val, MixedAllStruct val1)
     {
         return val.INT == val1.INT &&
-        val.IntQ == val1.IntQ &&
-        val.IntQA[0] == val1.IntQA[0] &&
-        val.STRING == val1.STRING &&
-        val.INTE == val1.INTE &&
-        val.EMPTYCLASS.Equals(val1.EMPTYCLASS) &&
-        val.IEMPTY.Equals(val1.IEMPTY) &&
-        Compare(val.EMPTYSTRUCT, val1.EMPTYSTRUCT) &&
-        val.IEMPTYGEN.Equals(val1.IEMPTYGEN) &&
-        Compare(val.EMPTYSTRUCTGEN, val1.EMPTYSTRUCTGEN) &&
-        Compare(val.WITHONLYFXTYPESTRUCT, val1.WITHONLYFXTYPESTRUCT) &&
-       Compare(val.GCHANDLE, val1.GCHANDLE);
+            val.IntQ == val1.IntQ &&
+            val.IntQA[0] == val1.IntQA[0] &&
+            val.STRING == val1.STRING &&
+            val.INTE == val1.INTE &&
+            val.EMPTYCLASS.Equals(val1.EMPTYCLASS) &&
+            val.IEMPTY.Equals(val1.IEMPTY) &&
+            Compare(val.EMPTYSTRUCT, val1.EMPTYSTRUCT) &&
+            val.IEMPTYGEN.Equals(val1.IEMPTYGEN) &&
+            Compare(val.EMPTYSTRUCTGEN, val1.EMPTYSTRUCTGEN) &&
+            Compare(val.WITHONLYFXTYPESTRUCT, val1.WITHONLYFXTYPESTRUCT) &&
+            Compare(val.GCHANDLE, val1.GCHANDLE);
     }
 
     public static bool Compare(char? val, char val1) { return Compare(val.Value, val1); }
@@ -380,7 +381,6 @@ internal static class Helper
     public static bool Compare(float? val, float val1) { return Compare(val.Value, val1); }
     public static bool Compare(double? val, double val1) { return Compare(val.Value, val1); }
     public static bool Compare(decimal? val, decimal val1) { return Compare(val.Value, val1); }
-
     public static bool Compare(IntPtr? val, IntPtr val1) { return Compare(val.Value, val1); }
     public static bool Compare(UIntPtr? val, UIntPtr val1) { return Compare(val.Value, val1); }
     public static bool Compare(Guid? val, Guid val1) { return Compare(val.Value, val1); }

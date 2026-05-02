@@ -283,6 +283,25 @@ _GC_SOURCES = [
 _GC_TEXTUAL_HDRS = [
     "gc.cpp",
     "gcee.cpp",
+    "region_allocator.cpp",
+    "region_free_list.cpp",
+    "finalization.cpp",
+    "interface.cpp",
+    "allocation.cpp",
+    "mark_phase.cpp",
+    "plan_phase.cpp",
+    "relocate_compact.cpp",
+    "sweep.cpp",
+    "background.cpp",
+    "regions_segments.cpp",
+    "card_table.cpp",
+    "memory.cpp",
+    "diagnostics.cpp",
+    "dynamic_tuning.cpp",
+    "no_gc.cpp",
+    "dynamic_heap_count.cpp",
+    "init.cpp",
+    "collect.cpp",
 ]
 
 # clrgc — standalone GC with segments

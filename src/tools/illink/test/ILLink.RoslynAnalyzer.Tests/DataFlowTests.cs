@@ -143,6 +143,12 @@ namespace ILLink.RoslynAnalyzer.Tests
         }
 
         [Fact]
+        public Task DependencyInjectionPattern()
+        {
+            return RunTest();
+        }
+
+        [Fact]
         public Task DynamicDependencyDataflow()
         {
             return RunTest(nameof(DynamicDependencyDataflow));
@@ -246,7 +252,7 @@ namespace ILLink.RoslynAnalyzer.Tests
         }
 
         [Fact]
-        public Task MakeGenericDataflowIntrinsics()
+        public Task RequiresDynamicCodeAnalyzerIntrinsics()
         {
             return RunTest();
         }

@@ -66,6 +66,7 @@ netcoreapp_impl_assembly(
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.cs",
         "//src/libraries/Common:src/System/Text/ValueStringBuilder.AppendSpanFormattable.cs",
         "//src/libraries/Common:src/System/Obsoletions.cs",
+        "//src/libraries/Common:src/System/LocalAppContextSwitches.Common.cs",
         "//src/libraries/Common:src/System/Net/CredentialCacheKey.cs",
         # SocketsHttpHandler Common sources (non-browser, non-wasi)
         "//src/libraries/Common:src/System/Net/Security/SslClientAuthenticationOptionsExtensions.cs",

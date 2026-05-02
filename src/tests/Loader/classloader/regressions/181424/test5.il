@@ -14,7 +14,7 @@
 //
 // In Main, we have three tests.
 // The first two effective load types Foo and (what originally was:) Bar.
-// TypeDefs are used here, so the IL code will actually contain tokens to the 
+// TypeDefs are used here, so the IL code will actually contain tokens to the
 // respective types.  This works fine.
 // But in the third test, we try to use Foo through a TypeRef whose resolution scope
 // is 'this' assembly, thereby trying to load type Foo by name.  But this is ambiguous,
@@ -22,7 +22,7 @@
 // just took the first one it found, giving us no way to load the second one by name.
 // Thus, VSWhidbey 181424 was filed to disallow this scenario.
 // We expected a TypeLoadException now when trying to load two types that have the same
-// name in the same namespace. 
+// name in the same namespace.
 
 .class public Bar extends [mscorlib]System.Object{
     .field public int32 i
@@ -85,13 +85,13 @@
     stloc retVal
     ldstr "FAIL: (TypeRef to Foo) i != 3"
     call void [System.Console]System.Console::WriteLine(string)
-    
+
     NEXT3:
     ldloc retVal
     ldc.i4 100
     bne.un END
     ldstr "PASS"
-    call void [System.Console]System.Console::WriteLine(string)    
+    call void [System.Console]System.Console::WriteLine(string)
 
     END:
     ldloc retVal

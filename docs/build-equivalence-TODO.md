@@ -1,6 +1,7 @@
 # Build Equivalence: Remaining Differences
 
-Tracked by `compare-bazel.sh`. Run with `--skip-build` after a baseline build.
+Tracked by `compare-bazel.sh`. Run with `--skip-build` only after a baseline
+rebuild so the MSBuild binlogs contain the full managed compilation set.
 
 ## Summary (as of 2026-02-17)
 

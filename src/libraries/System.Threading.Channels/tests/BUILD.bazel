@@ -6,6 +6,7 @@ library_test(
     name = "System.Threading.Channels.Tests",
     srcs = glob(["*.cs"]) + [
         "//src/libraries/Common/tests:System/Diagnostics/DebuggerAttributes.cs",
+        "//src/libraries/Common/tests:System/Threading/Tasks/TaskTimeoutExtensions.cs",
     ],
     deps = [
         "//src/libraries/System.Threading.Channels:ref_System.Threading.Channels",

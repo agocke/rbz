@@ -29,9 +29,7 @@ load(
 
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 
-# Derive major.minor from PRODUCT_VERSION for TFM filenames
-# (e.g., "10.0.4" -> "10.0" -> ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs")
-_TFM_VERSION = ".".join(PRODUCT_VERSION.split(".")[:2])
+_NETCOREAPP_CURRENT_ASSEMBLY_VERSION = NETCOREAPP_CURRENT[len("net"):].split(".")[0] + "." + NETCOREAPP_CURRENT[len("net"):].split(".")[1] + ".0.0"
 
 LIVE_NETCOREAPP_DEPS = [
 #    "//src/libraries:live_System.Runtime",
@@ -55,11 +53,6 @@ COMMON_GENERATOR_ANALYZERS = [
     "//src/libraries/System.Runtime.InteropServices:ComInterfaceGenerator",
     "//src/libraries/System.Text.Json:JsonSourceGenerator",
     "//src/libraries/System.Text.RegularExpressions:RegexGenerator",
-]
-
-DOWNLEVEL_GENERATOR_ANALYZERS = [
-    "//src/libraries/System.Runtime.InteropServices:DownlevelLibraryImportGenerator",
-    "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
 ]
 
 # ── Core_Root library set ─────────────────────────────────────────────
@@ -159,288 +152,6 @@ LIVE_REFPACK_DEPS = [
     "//src/libraries/System.Runtime.InteropServices:ref_System.Runtime.InteropServices",
 ]
 
-_OPEN_SIGNED_REF_ASSEMBLIES = {
-    "Microsoft.Win32.SystemEvents": True,
-    "System.CodeDom": True,
-    "System.Configuration.ConfigurationManager": True,
-    "System.Data.Odbc": True,
-    "System.Data.OleDb": True,
-    "System.Diagnostics.DiagnosticSource": True,
-    "System.Diagnostics.EventLog": True,
-    "System.Diagnostics.PerformanceCounter": True,
-    "System.Formats.Asn1": True,
-    "System.Formats.Cbor": True,
-    "System.Formats.Nrbf": True,
-    "System.Formats.Tar": True,
-    "System.IO.Hashing": True,
-    "System.IO.Pipelines": True,
-    "System.IO.Ports": True,
-    "System.Memory.Data": True,
-    "System.Net.Http.Json": True,
-    "System.Net.HttpListener": True,
-    "System.Net.Mail": True,
-    "System.Net.ServerSentEvents": True,
-    "System.Net.WebClient": True,
-    "System.Net.WebProxy": True,
-    "System.Numerics.Tensors": True,
-    "System.Reflection.MetadataLoadContext": True,
-    "System.Resources.Extensions": True,
-    "System.Security.Cryptography.Cose": True,
-    "System.Security.Cryptography.Xml": True,
-    "System.Security.Permissions": True,
-    "System.ServiceModel.Syndication": True,
-    "System.Text.Encodings.Web": True,
-    "System.Threading.Channels": True,
-    "System.Threading.RateLimiting": True,
-    "System.Transactions.Local": True,
-    "System.Web.HttpUtility": True,
-    "System.Windows.Extensions": True,
-}
-
-_ECMA_SIGNED_REF_ASSEMBLIES = {
-    "System.ComponentModel.Composition": True,
-    "System.ComponentModel.Composition.Registration": True,
-    "System.DirectoryServices.AccountManagement": True,
-    "System.IO.Compression": True,
-    "System.IO.Compression.Brotli": True,
-    "System.IO.Compression.ZipFile": True,
-    "System.Reflection.Context": True,
-}
-
-_SOURCE_BUILD_REF_ANALYZER_ASSEMBLIES = {
-    "Microsoft.Extensions.Caching.Abstractions": True,
-    "Microsoft.Extensions.Caching.Memory": True,
-    "Microsoft.Extensions.Configuration": True,
-    "Microsoft.Extensions.Configuration.Abstractions": True,
-    "Microsoft.Extensions.Configuration.Binder": True,
-    "Microsoft.Extensions.Configuration.CommandLine": True,
-    "Microsoft.Extensions.Configuration.EnvironmentVariables": True,
-    "Microsoft.Extensions.Configuration.FileExtensions": True,
-    "Microsoft.Extensions.Configuration.Ini": True,
-    "Microsoft.Extensions.Configuration.Json": True,
-    "Microsoft.Extensions.Configuration.UserSecrets": True,
-    "Microsoft.Extensions.Configuration.Xml": True,
-    "Microsoft.Extensions.DependencyInjection": True,
-    "Microsoft.Extensions.DependencyInjection.Abstractions": True,
-    "Microsoft.Extensions.DependencyModel": True,
-    "Microsoft.Extensions.Diagnostics": True,
-    "Microsoft.Extensions.Diagnostics.Abstractions": True,
-    "Microsoft.Extensions.FileProviders.Abstractions": True,
-    "Microsoft.Extensions.FileProviders.Composite": True,
-    "Microsoft.Extensions.FileProviders.Physical": True,
-    "Microsoft.Extensions.FileSystemGlobbing": True,
-    "Microsoft.Extensions.Hosting": True,
-    "Microsoft.Extensions.Hosting.Abstractions": True,
-    "Microsoft.Extensions.Hosting.Systemd": True,
-    "Microsoft.Extensions.Hosting.WindowsServices": True,
-    "Microsoft.Extensions.Http": True,
-    "Microsoft.Extensions.Logging": True,
-    "Microsoft.Extensions.Logging.Abstractions": True,
-    "Microsoft.Extensions.Logging.Configuration": True,
-    "Microsoft.Extensions.Logging.Console": True,
-    "Microsoft.Extensions.Logging.Debug": True,
-    "Microsoft.Extensions.Logging.EventLog": True,
-    "Microsoft.Extensions.Logging.EventSource": True,
-    "Microsoft.Extensions.Logging.TraceSource": True,
-    "Microsoft.Extensions.Options": True,
-    "Microsoft.Extensions.Options.ConfigurationExtensions": True,
-    "Microsoft.Extensions.Options.DataAnnotations": True,
-    "Microsoft.Extensions.Primitives": True,
-    "Microsoft.Win32.Registry.AccessControl": True,
-    "Microsoft.Win32.SystemEvents": True,
-    "System.CodeDom": True,
-    "System.ComponentModel.Composition": True,
-    "System.ComponentModel.Composition.Registration": True,
-    "System.Configuration.ConfigurationManager": True,
-    "System.Data.Odbc": True,
-    "System.Data.OleDb": True,
-    "System.Diagnostics.EventLog": True,
-    "System.Diagnostics.PerformanceCounter": True,
-    "System.DirectoryServices": True,
-    "System.DirectoryServices.AccountManagement": True,
-    "System.DirectoryServices.Protocols": True,
-    "System.Formats.Cbor": True,
-    "System.Formats.Nrbf": True,
-    "System.IO.Hashing": True,
-    "System.IO.Packaging": True,
-    "System.IO.Ports": True,
-    "System.Management": True,
-    "System.Memory.Data": True,
-    "System.Net.Http.WinHttpHandler": True,
-    "System.Numerics.Tensors": True,
-    "System.Reflection.Context": True,
-    "System.Reflection.MetadataLoadContext": True,
-    "System.Resources.Extensions": True,
-    "System.Runtime.Caching": True,
-    "System.Runtime.Serialization.Schema": True,
-    "System.Security.Cryptography.Cose": True,
-    "System.Security.Cryptography.Pkcs": True,
-    "System.Security.Cryptography.ProtectedData": True,
-    "System.Security.Cryptography.Xml": True,
-    "System.Security.Permissions": True,
-    "System.ServiceModel.Syndication": True,
-    "System.ServiceProcess.ServiceController": True,
-    "System.Speech": True,
-    "System.Threading.RateLimiting": True,
-    "System.Windows.Extensions": True,
-}
-
-_MULTITARGET_REF_NOWARN_ASSEMBLIES = {
-    "Microsoft.Extensions.Caching.Abstractions": True,
-    "Microsoft.Extensions.Caching.Memory": True,
-    "Microsoft.Extensions.Configuration": True,
-    "Microsoft.Extensions.Configuration.Abstractions": True,
-    "Microsoft.Extensions.Configuration.Binder": True,
-    "Microsoft.Extensions.Configuration.CommandLine": True,
-    "Microsoft.Extensions.Configuration.EnvironmentVariables": True,
-    "Microsoft.Extensions.Configuration.FileExtensions": True,
-    "Microsoft.Extensions.Configuration.Ini": True,
-    "Microsoft.Extensions.Configuration.Json": True,
-    "Microsoft.Extensions.Configuration.UserSecrets": True,
-    "Microsoft.Extensions.Configuration.Xml": True,
-    "Microsoft.Extensions.DependencyInjection": True,
-    "Microsoft.Extensions.DependencyInjection.Abstractions": True,
-    "Microsoft.Extensions.DependencyModel": True,
-    "Microsoft.Extensions.Diagnostics": True,
-    "Microsoft.Extensions.Diagnostics.Abstractions": True,
-    "Microsoft.Extensions.FileProviders.Abstractions": True,
-    "Microsoft.Extensions.FileProviders.Composite": True,
-    "Microsoft.Extensions.FileProviders.Physical": True,
-    "Microsoft.Extensions.FileSystemGlobbing": True,
-    "Microsoft.Extensions.Hosting": True,
-    "Microsoft.Extensions.Hosting.Abstractions": True,
-    "Microsoft.Extensions.Hosting.Systemd": True,
-    "Microsoft.Extensions.Hosting.WindowsServices": True,
-    "Microsoft.Extensions.Http": True,
-    "Microsoft.Extensions.Logging": True,
-    "Microsoft.Extensions.Logging.Abstractions": True,
-    "Microsoft.Extensions.Logging.Configuration": True,
-    "Microsoft.Extensions.Logging.Console": True,
-    "Microsoft.Extensions.Logging.Debug": True,
-    "Microsoft.Extensions.Logging.EventLog": True,
-    "Microsoft.Extensions.Logging.EventSource": True,
-    "Microsoft.Extensions.Logging.TraceSource": True,
-    "Microsoft.Extensions.Options": True,
-    "Microsoft.Extensions.Options.ConfigurationExtensions": True,
-    "Microsoft.Extensions.Options.DataAnnotations": True,
-    "Microsoft.Extensions.Primitives": True,
-    "Microsoft.Win32.Registry.AccessControl": True,
-    "Microsoft.Win32.SystemEvents": True,
-    "System.CodeDom": True,
-    "System.Collections.Immutable": True,
-    "System.ComponentModel.Composition": True,
-    "System.ComponentModel.Composition.Registration": True,
-    "System.Configuration.ConfigurationManager": True,
-    "System.Data.Odbc": True,
-    "System.Data.OleDb": True,
-    "System.Diagnostics.DiagnosticSource": True,
-    "System.Diagnostics.EventLog": True,
-    "System.Diagnostics.PerformanceCounter": True,
-    "System.DirectoryServices": True,
-    "System.DirectoryServices.AccountManagement": True,
-    "System.DirectoryServices.Protocols": True,
-    "System.Formats.Asn1": True,
-    "System.Formats.Cbor": True,
-    "System.Formats.Nrbf": True,
-    "System.IO.Hashing": True,
-    "System.IO.Packaging": True,
-    "System.IO.Pipelines": True,
-    "System.IO.Ports": True,
-    "System.Linq.AsyncEnumerable": True,
-    "System.Management": True,
-    "System.Memory.Data": True,
-    "System.Net.Http.Json": True,
-    "System.Net.Http.WinHttpHandler": True,
-    "System.Net.ServerSentEvents": True,
-    "System.Numerics.Tensors": True,
-    "System.Reflection.Context": True,
-    "System.Reflection.Metadata": True,
-    "System.Reflection.MetadataLoadContext": True,
-    "System.Resources.Extensions": True,
-    "System.Runtime.Caching": True,
-    "System.Security.Cryptography.Cose": True,
-    "System.Security.Cryptography.Pkcs": True,
-    "System.Security.Cryptography.ProtectedData": True,
-    "System.Security.Cryptography.Xml": True,
-    "System.Security.Permissions": True,
-    "System.ServiceModel.Syndication": True,
-    "System.ServiceProcess.ServiceController": True,
-    "System.Speech": True,
-    "System.Text.Encoding.CodePages": True,
-    "System.Text.Encodings.Web": True,
-    "System.Text.Json": True,
-    "System.Threading.AccessControl": True,
-    "System.Threading.Channels": True,
-    "System.Threading.RateLimiting": True,
-    "System.Threading.Tasks.Dataflow": True,
-}
-
-_NULLABLE_REF_NOWARN_ASSEMBLIES = {
-    "System.CodeDom": True,
-    "System.ComponentModel.Composition.Registration": True,
-    "System.Configuration.ConfigurationManager": True,
-    "System.Diagnostics.EventLog": True,
-    "System.Diagnostics.PerformanceCounter": True,
-    "System.DirectoryServices.AccountManagement": True,
-    "System.DirectoryServices.Protocols": True,
-    "System.IO.Ports": True,
-    "System.Management": True,
-    "System.Runtime.Caching": True,
-    "System.Security.Permissions": True,
-    "System.ServiceModel.Syndication": True,
-    "System.Speech": True,
-}
-
-_OMIT_NULLABLE_ENABLE_REF_ASSEMBLIES = {
-    "System.CodeDom": True,
-    "System.ComponentModel.Composition.Registration": True,
-    "System.Configuration.ConfigurationManager": True,
-    "System.Diagnostics.EventLog": True,
-    "System.Diagnostics.PerformanceCounter": True,
-    "System.DirectoryServices.AccountManagement": True,
-    "System.DirectoryServices.Protocols": True,
-    "System.IO.Ports": True,
-    "System.Management": True,
-    "System.Runtime.Caching": True,
-    "System.Security.Permissions": True,
-    "System.ServiceModel.Syndication": True,
-    "System.Speech": True,
-}
-
-_UNSAFE_REF_ASSEMBLIES = {
-    "System.Diagnostics.PerformanceCounter": True,
-    "System.Memory": True,
-}
-
-_ADDITIONAL_REF_NOWARNS = {
-    "Microsoft.Extensions.Logging.EventSource": ["PKG0001"],
-    "System.CodeDom": ["nullable"],
-    "System.Collections.NonGeneric": ["CS0618"],
-    "System.ComponentModel.Composition.Registration": ["nullable"],
-    "System.Configuration.ConfigurationManager": ["nullable"],
-    "System.Diagnostics.EventLog": ["nullable"],
-    "System.Diagnostics.PerformanceCounter": ["nullable"],
-    "System.DirectoryServices.AccountManagement": ["nullable"],
-    "System.DirectoryServices.Protocols": ["nullable"],
-    "System.IO.Ports": ["nullable"],
-    "System.Management": ["nullable"],
-    "System.Net.Requests": ["CS0809"],
-    "System.Net.WebHeaderCollection": ["CS8765"],
-    "System.Numerics.Tensors": ["SA1001"],
-    "System.Runtime": ["CS8614"],
-    "System.Runtime.Caching": ["nullable"],
-    "System.Runtime.InteropServices": ["CS0618", "CS8765"],
-    "System.Runtime.Serialization.Formatters": ["SYSLIB0011", "SYSLIB0050", "SYSLIB0051"],
-    "System.ServiceModel.Syndication": ["nullable"],
-    "System.Speech": ["nullable"],
-}
-
-_SOURCE_BUILD_REF_ANALYZERS = COMMON_GENERATOR_ANALYZERS + [
-    "//src/libraries/System.Runtime.InteropServices.JavaScript:JSImportGenerator",
-    "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-    "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
-]
-
 def _default_strong_name_keyfile(base_name, keyfile):
     if keyfile != None:
         return keyfile
@@ -452,12 +163,6 @@ def _default_strong_name_keyfile(base_name, keyfile):
         return ASPNETCORE_SNK
     if base_name.startswith("Microsoft.Bcl."):
         return OPEN_SNK
-    if base_name in _OPEN_SIGNED_REF_ASSEMBLIES:
-        return OPEN_SNK
-    if base_name in _ECMA_SIGNED_REF_ASSEMBLIES:
-        return ECMA_SNK
-    if base_name == "System.Speech":
-        return SHAREDLIB1024_SNK
 
     return MSFT_SNK
 
@@ -474,23 +179,15 @@ def netcoreapp_ref_assembly(
     srcs,
     deps = [],
     nowarn = [],
-    analyzers = [],
     compiler_options = [],
     keyfile = None,
     cls_compliant = True,
-    assembly_version = "10.0.0.0",
+    assembly_version = _NETCOREAPP_CURRENT_ASSEMBLY_VERSION,
     **kwargs
 ):
-    # Resolve keyfile for publicsign determination
-    base_name = name[len("ref_"):]
-    _resolved_keyfile = _default_strong_name_keyfile(base_name, keyfile)
-    _publicsign = "/publicsign-" if _resolved_keyfile in (OPEN_SNK, ASPNETCORE_SNK) else "/publicsign+"
-
     compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
-        _publicsign,
-        # MSBuild sets RunAnalyzers=false for ref assemblies → /skipanalyzers+
-        "/skipanalyzers+",
+        "/publicsign+",
     ]
     nowarn = nowarn + [
         # Match Directory.Build.props IsReferenceAssemblyProject NoWarn
@@ -501,26 +198,7 @@ def netcoreapp_ref_assembly(
         "CS8625",
         "CS8617",
     ]
-    if base_name in _MULTITARGET_REF_NOWARN_ASSEMBLIES:
-        nowarn = nowarn + MULTITARGET_NOWARN
-    if base_name in _NULLABLE_REF_NOWARN_ASSEMBLIES:
-        nowarn = nowarn + ["nullable"]
-    if base_name in _ADDITIONAL_REF_NOWARNS:
-        nowarn = nowarn + _ADDITIONAL_REF_NOWARNS[base_name]
-    nowarn = _dedupe(nowarn)
-
-    analyzers = _dedupe(analyzers + [
-        "//src/tools/illink/src/ILLink.RoslynAnalyzer",
-    ])
-    if base_name in _SOURCE_BUILD_REF_ANALYZER_ASSEMBLIES:
-        analyzers = _dedupe(analyzers + _SOURCE_BUILD_REF_ANALYZERS)
-
-    ref_kwargs = dict(kwargs)
-    if "allow_unsafe_blocks" not in ref_kwargs and base_name in _UNSAFE_REF_ASSEMBLIES:
-        ref_kwargs["allow_unsafe_blocks"] = True
-    if "nullable" not in ref_kwargs and base_name not in _OMIT_NULLABLE_ENABLE_REF_ASSEMBLIES:
-        ref_kwargs["nullable"] = "enable"
-
+    base_name = name[len("ref_"):]
     csharp_library(
         name = name,
         out = base_name,
@@ -529,18 +207,18 @@ def netcoreapp_ref_assembly(
         cls_compliant = cls_compliant,
         assembly_version = assembly_version,
         visibility = [ "//visibility:public" ],
+        nullable = "annotations",
         keyfile = _default_strong_name_keyfile(base_name, keyfile),
         target_frameworks = [ NETCOREAPP_CURRENT ],
         disable_implicit_framework_refs = True,
         nowarn = nowarn,
-        analyzers = analyzers,
         compiler_options = compiler_options,
+        # Match MSBuild's LangVersion=preview from Directory.Build.props.
+        langversion = "preview",
         ref_assembly = True,
         debug_type = "none",
-        msbuild_analyzer_config = "style",
-        include_default_ruleset = False,
-        interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
-        **ref_kwargs
+        include_runtime_async = False,
+        **kwargs
     )
 
 def _gen_facades_impl(ctx):
@@ -668,9 +346,13 @@ def impl_assembly(
     jsimport_generator = True,
     include_editorconfig = True,
     interceptors_namespaces = None,
+    include_runtime_async = True,
+    event_source_generator = None,
     **kwargs
 ):
     base_name = name[len("impl_"):]
+    if assembly_version == None:
+        assembly_version = _NETCOREAPP_CURRENT_ASSEMBLY_VERSION
 
     # Assemblies whose MSBuild TFM includes an OS suffix receive OS-specific
     # implicit defines.  Match that in Bazel via select().
@@ -757,7 +439,7 @@ def impl_assembly(
     tfm_attrs_target = "tfmattrs_" + base_name
     gen_target_framework_attrs(
         name = tfm_attrs_target,
-        out = name + "/.NETCoreApp,Version=v" + _TFM_VERSION + ".AssemblyAttributes.cs",
+        out = name + "/.NETCoreApp.AssemblyAttributes.cs",
     )
     srcs = srcs + [":" + tfm_attrs_target]
 
@@ -813,32 +495,23 @@ def impl_assembly(
         # Key is basename — rules_dotnet looks up resource_logical_names by f.basename
         resource_logical_names["ILLink.Substitutions.xml"] = "ILLink.Substitutions.xml"
 
-    # Resolve the keyfile so we can derive the publicsign flag from it.
-    _resolved_keyfile = _default_strong_name_keyfile(base_name, keyfile)
-
-    # Open.snk and AspNetCore.snk are full key pairs → full signing (publicsign-).
-    # MSFT.snk, ECMA.snk, and others are public-only → public signing (publicsign+).
-    _publicsign = "/publicsign-" if _resolved_keyfile in (OPEN_SNK, ASPNETCORE_SNK) else "/publicsign+"
-
     # Match MSBuild compiler options
     compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
-        _publicsign,
+        "/publicsign+",
         # Match MSBuild's /features flags
         "/features:strict",
         "/features:nullablePublicOnly",
     ]
 
     # .NET SDK adds InterceptorsNamespaces for TFM >= 10.0 via
-    # FrameworkReferenceResolution.targets.  Allow callers to override:
-    #   None  → use the default namespace list
-    #   ""    → suppress the flag entirely (assembly doesn't need interceptors)
+    # FrameworkReferenceResolution.targets.  The ancestor SDK (rc.1) does not
+    # set this for regular library/test projects, so default to suppressing it.
+    # Allow callers to override:
+    #   None  → suppress the flag entirely (ancestor default)
+    #   ""    → suppress the flag entirely
     #   other → use the caller-supplied value
-    if interceptors_namespaces == None:
-        compiler_options = compiler_options + [
-            "/features:InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated",
-        ]
-    elif interceptors_namespaces:
+    if interceptors_namespaces != None and interceptors_namespaces != "":
         compiler_options = compiler_options + [
             "/features:InterceptorsNamespaces=" + interceptors_namespaces,
         ]
@@ -884,28 +557,57 @@ EOF""".format(version = PRODUCT_VERSION),
         ":" + _editorconfig_target,
     ]
 
-    # Merge caller-provided analyzers with the standard source build analyzers
-    # and ILLink Roslyn analyzer. Interop source generators are conditional on
-    # the assembly's dependency on System.Runtime.InteropServices / CoreLib
-    # (matching eng/generators.targets). JSImportGenerator is separate because
-    # MSBuild flows it through the targeting-pack analyzer set for OOB builds.
+    # Analyzer scoping mirrors MSBuild's two delivery mechanisms:
+    #
+    # 1. Libraries with EventSourceGenerator (event_source_generator=True):
+    #    eng/generators.targets adds EventSourceGenerator +
+    #    Microsoft.Interop.SourceGeneration for IsSourceProject +
+    #    DisableImplicitFrameworkReferences.  This covers both NCA inner
+    #    source libs AND packable "abstractions" libraries that still live
+    #    in the shared framework source tree.
+    #
+    # 2. Libraries without EventSourceGenerator (event_source_generator=False):
+    #    Extensions generators (Logging, Options) and Interop.SourceGeneration
+    #    flow via the local targeting pack (FrameworkReferenceResolution.targets).
+    #
+    # event_source_generator defaults to True (matching the majority of
+    # impl_assembly users).  OOB libraries that don't get EventSourceGenerator
+    # from MSBuild should set event_source_generator = False.
+    #
+    # ILLink.RoslynAnalyzer is always included — both delivery paths provide it.
     #
     # interop_source_generation defaults to library_import_generator when not
     # set explicitly (None).  Callers that need SourceGeneration without
     # LibraryImportGenerator (e.g. shim/facade assemblies) can pass
     # interop_source_generation = True, library_import_generator = False.
     _interop_source_generation = interop_source_generation if interop_source_generation != None else library_import_generator
+    _event_source_generator = event_source_generator if event_source_generator != None else True
     _analyzers = analyzers + [
         "//:source_build_analyzers",
         "//src/tools/illink/src/ILLink.RoslynAnalyzer",
     ]
+
+    if _event_source_generator:
+        # eng/generators.targets: EventSourceGenerator + Interop.SourceGeneration
+        # for IsSourceProject + DisableImplicitFrameworkReferences.
+        _analyzers = _analyzers + [
+            "//src/libraries/System.Private.CoreLib:EventSourceGenerator",
+            "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+        ]
+    else:
+        # Targeting-pack analyzers for OOB / non-EventSourceGenerator libs.
+        _analyzers = _analyzers + [
+            "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+            "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
+        ]
+        if _interop_source_generation:
+            _analyzers = _analyzers + [
+                "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
+            ]
+
     if library_import_generator:
         _analyzers = _analyzers + [
             "//src/libraries/System.Runtime.InteropServices:LibraryImportGenerator",
-        ]
-    if _interop_source_generation:
-        _analyzers = _analyzers + [
-            "//src/libraries/System.Runtime.InteropServices:Microsoft.Interop.SourceGeneration",
         ]
     if com_interface_generator:
         _analyzers = _analyzers + [
@@ -963,6 +665,7 @@ EOF""".format(version = PRODUCT_VERSION),
         additionalfiles = _additionalfiles,
         analyzer_configs = _analyzer_configs,
         analyzers = _analyzers,
+        include_runtime_async = include_runtime_async,
         **kwargs
     )
 
@@ -1011,17 +714,13 @@ def netcoreapp_impl_assembly(skip_locals_init = True, jsimport_generator = False
 def live_csharp_library(
     name,
     deps = [],
-    srcs = [],
     nullable = "enable",
     compiler_options = [],
     treat_warnings_as_errors = False,
-    cls_compliant = None,
-    is_trimmable = None,
-    is_aot_compatible = None,
-    generate_assembly_info = False,
     **kwargs
 ):
     deps = deps + LIVE_REFPACK_DEPS
+    target_frameworks = kwargs.pop("target_frameworks", [NETCOREAPP_CURRENT])
 
     # Match MSBuild compiler options for features (nullable/strict)
     compiler_options = compiler_options + [
@@ -1029,37 +728,14 @@ def live_csharp_library(
         "/features:nullablePublicOnly",
     ]
 
-    # Optionally generate AssemblyInfo.cs matching MSBuild's output
-    # (CLSCompliant, IsTrimmable, etc.) for production libraries.
-    # Test helpers should leave generate_assembly_info = False.
-    if generate_assembly_info:
-        out = kwargs.get("out", name)
-        assembly_info_target = "assemblyinfo_" + name
-        _cls = cls_compliant if cls_compliant != None else True
-        _trim = is_trimmable if is_trimmable != None else True
-        _aot = is_aot_compatible if is_aot_compatible != None else True
-        gen_assembly_info(
-            name = assembly_info_target,
-            out = name + "/" + out + ".AssemblyInfo.cs",
-            assembly_name = out,
-            informational_version = CI_INFORMATIONAL_VERSION,
-            cls_compliant = _cls,
-            is_trimmable = _trim,
-            is_aot_compatible = _aot,
-            ref_deps = deps,
-            include_neutral_resources_language = kwargs.get("resx_file") != None,
-        )
-        srcs = srcs + [":" + assembly_info_target]
-
     csharp_library(
         name = name,
-        srcs = srcs,
         deps = deps,
         nullable = nullable,
         langversion = "preview",
         compiler_options = compiler_options,
         disable_implicit_framework_refs = True,
-        target_frameworks = [ NETCOREAPP_CURRENT ],
+        target_frameworks = target_frameworks,
         treat_warnings_as_errors = treat_warnings_as_errors,
         **kwargs
     )

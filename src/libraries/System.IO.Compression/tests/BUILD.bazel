@@ -5,11 +5,11 @@ library_test(
     name = "System.IO.Compression.Tests",
     defines = select({"@platforms//os:linux": ["UNIX", "UNIX1_0"], "@platforms//os:macos": ["UNIX", "UNIX1_0"], "//conditions:default": []}),
     srcs = glob(["**/*.cs"]) + [
-        "//src/libraries/Common/tests:System/IO/PathFeatures.cs",
         "//src/libraries/Common/tests:System/IO/CallTrackingStream.cs",
         "//src/libraries/Common/tests:System/IO/Compression/CRC.cs",
         "//src/libraries/Common/tests:System/IO/Compression/CompressionStreamTestBase.cs",
         "//src/libraries/Common/tests:System/IO/Compression/CompressionStreamUnitTestBase.cs",
+        "//src/libraries/Common/tests:System/IO/Compression/EncoderDecoderTestBase.cs",
         "//src/libraries/Common/tests:System/IO/Compression/FileData.cs",
         "//src/libraries/Common/tests:System/IO/Compression/LocalMemoryStream.cs",
         "//src/libraries/Common/tests:System/IO/Compression/StreamHelpers.cs",

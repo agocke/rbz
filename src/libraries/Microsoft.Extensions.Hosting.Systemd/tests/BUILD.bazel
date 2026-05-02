@@ -29,6 +29,8 @@ library_test(
         "//src/libraries/Microsoft.Extensions.Options.ConfigurationExtensions:impl_Microsoft.Extensions.Options.ConfigurationExtensions",
         "//src/libraries/Microsoft.Extensions.Primitives:ref_Microsoft.Extensions.Primitives",
         "//src/libraries/System.Diagnostics.DiagnosticSource:ref_System.Diagnostics.DiagnosticSource",
+        "//src/libraries/Common/tests:TestUtilities",
+        "@paket.main//microsoft.dotnet.remoteexecutor",
         "@paket.main//microsoft.dotnet.xunitassert",
         "@paket.main//microsoft.dotnet.xunitextensions",
         "@paket.main//xunit.abstractions",

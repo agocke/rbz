@@ -23,6 +23,8 @@ netcoreapp_ref_assembly(
 
 netcoreapp_impl_assembly(
     name = "impl_System.Collections.Immutable",
+    include_runtime_async = False,
+    event_source_generator = True,
     com_interface_generator = True,
     nowarn = MULTITARGET_NOWARN + ["CP0003", "CS1591"],
     srcs = glob([

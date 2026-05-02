@@ -113,6 +113,8 @@ library_test(
     srcs = glob(
         ["**/*.cs"],
         exclude = [
+            # Present in source but not compiled by the MSBuild test project.
+            "JsonNamingPolicyTests.cs",
             # TrimmingTests are not applicable under Bazel
             "TrimmingTests/**",
         ],

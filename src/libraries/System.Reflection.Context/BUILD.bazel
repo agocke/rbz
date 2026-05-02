@@ -17,10 +17,12 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Reflection.Context",
+    include_runtime_async = False,
+    event_source_generator = False,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     com_interface_generator = True,
     keyfile = ECMA_SNK,
-    nowarn = MULTITARGET_NOWARN + ["CP0003", "NU5128", "CS1591"],
+    nowarn = MULTITARGET_NOWARN + ["CP0003", "NU5128"],
     srcs = glob(["src/**/*.cs"]),
     deps = [
         "//src/libraries:ref_System.Runtime",

@@ -4,11 +4,11 @@ bazel_dep(name = "rules_dotnet")
 git_override(
     module_name = "rules_dotnet",
     remote = "https://github.com/agocke/rules_dotnet.git",
-    commit = "e02dc11e69a60652b6ab6a1ca9cceeba0c615e29",
+    commit = "96ecc8c01bbf330bdaa30356a8c37714271cb710",
 )
 
 dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
-dotnet.toolchain(dotnet_version = "10.0.100")
+dotnet.toolchain(dotnet_version = "11.0.100-preview.3.26207.106")
 use_repo(dotnet, "dotnet_toolchains")
 
 register_toolchains("@dotnet_toolchains//:all")
@@ -20,7 +20,7 @@ use_repo(
     "paket.main",
     "nuget.microsoft.codeanalysis.analyzers.v5.0.0-2.26170.102",
     "nuget.microsoft.codeanalysis.bannedapianalyzers.v3.3.5-beta1.23270.2",
-    "nuget.microsoft.codeanalysis.csharp.codestyle.v4.14.0",
+    "nuget.microsoft.codeanalysis.csharp.codestyle.v5.0.0-2.26070.104",
     "nuget.microsoft.codeanalysis.netanalyzers.v10.0.106",
     "nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26170.102",
     "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26170.102",
@@ -40,8 +40,8 @@ illink_extension = use_extension("//paket:paket.illink_extension.bzl", "illink_e
 use_repo(
     illink_extension,
     "paket.illink",
-    "nuget.microsoft.codeanalysis.common.v4.14.0",
-    "nuget.microsoft.codeanalysis.csharp.v4.14.0",
+    "nuget.microsoft.codeanalysis.common.v5.0.0-2.26070.104",
+    "nuget.microsoft.codeanalysis.csharp.v5.0.0-2.26070.104",
 )
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")

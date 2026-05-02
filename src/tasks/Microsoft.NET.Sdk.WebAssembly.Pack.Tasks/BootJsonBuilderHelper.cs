@@ -224,7 +224,7 @@ namespace Microsoft.NET.Sdk.WebAssembly
                 var asset = new WasmAsset()
                 {
                     name = a.Key,
-                    integrity = a.Value,
+                    hash = a.Value,
                     cache = GetCacheControl(a.Key, resources)
                 };
 
@@ -286,7 +286,7 @@ namespace Microsoft.NET.Sdk.WebAssembly
                 {
                     virtualPath = resources.fingerprinting?[a.Key] ?? a.Key,
                     name = a.Key,
-                    integrity = a.Value,
+                    hash = a.Value,
                     cache = GetCacheControl(a.Key, resources)
                 };
 
@@ -325,15 +325,15 @@ namespace Microsoft.NET.Sdk.WebAssembly
                 var asset = new VfsAsset()
                 {
                     virtualPath = a.Key,
-                    name = assetName,
-                    integrity = a.Value.Values.First(),
+                    name = $"../{assetName}",
+                    hash = a.Value.Values.First(),
                     cache = GetCacheControl(assetName, resources)
                 };
 
                 if (bundlerFriendly)
                 {
                     string escaped = EscapeName(string.Concat(asset.name));
-                    imports.Add($"import * as {escaped} from \"./{asset.name}\";");
+                    imports.Add($"import {escaped} from \"./{asset.name}\";");
                     asset.resolvedUrl = EncodeJavascriptVariableInJson(escaped);
                 }
 

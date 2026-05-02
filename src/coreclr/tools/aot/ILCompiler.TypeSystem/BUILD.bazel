@@ -1,4 +1,4 @@
-load("//:defs.bzl", "csharp_library", "gen_assembly_info", "gen_target_framework_attrs", "resgen")
+load("//:defs.bzl", "NETCOREAPP_MINIMUM", "NETCOREAPP_TOOL_CURRENT", "csharp_library", "resgen")
 
 resgen(
     name = "TypeSystemResources",
@@ -8,30 +8,12 @@ resgen(
 
 exports_files(["BannedSymbols.txt"])
 
-gen_assembly_info(
-    name = "assemblyinfo_ILCompiler.TypeSystem",
-    out = "ILCompiler.TypeSystem.AssemblyInfo.cs",
-    assembly_name = "ILCompiler.TypeSystem",
-    cls_compliant = False,
-    is_aot_compatible = False,
-    include_serviceable = False,
-    include_description = False,
-    assembly_configuration = "Release",
-    include_dll_safe_search_path = 0,
-)
-
-gen_target_framework_attrs(
-    name = "tfmattrs_ILCompiler.TypeSystem",
-    out = ".NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
-)
-
 csharp_library(
     name = "ILCompiler.TypeSystem",
+    include_runtime_async = False,
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
-    nowarn = ["1591", "CA1859", "CA1866"],
+    nowarn = ["1591", "CA1859"],
     srcs = [
-        ":assemblyinfo_ILCompiler.TypeSystem",
-        ":tfmattrs_ILCompiler.TypeSystem",
         "//src/coreclr/tools/Common:TypeSystem/Common/ArrayMethod.Diagnostic.cs",
         "//src/coreclr/tools/Common:TypeSystem/Canon/ArrayType.Canon.cs",
         "//src/coreclr/tools/Common:TypeSystem/Canon/ByRefType.Canon.cs",
@@ -248,6 +230,8 @@ csharp_library(
         "//src/coreclr/tools/Common:TypeSystem/RuntimeDetermined/TypeDesc.RuntimeDetermined.cs",
         "//src/coreclr/tools/Common:TypeSystem/RuntimeDetermined/TypeSystemContext.RuntimeDetermined.cs",
         "//src/coreclr/tools/Common:System/FormattingHelpers.cs",
+        "//src/coreclr/tools/Common:TypeSystem/Common/VersionResilientHashCode.TypeSystem.cs",
+        "//src/libraries/Common:src/Internal/VersionResilientHashCode.cs",
         "//src/coreclr/tools/Common:TypeSystem/Sorting/ArrayType.Sorting.cs",
         "//src/coreclr/tools/Common:TypeSystem/Sorting/ByRefType.Sorting.cs",
         "//src/coreclr/tools/Common:TypeSystem/Sorting/FunctionPointerType.Sorting.cs",
@@ -270,7 +254,7 @@ csharp_library(
     deps = [
         "@paket.main//microsoft.diasymreader",
     ],
-    target_frameworks = ["net10.0"],
+    target_frameworks = [NETCOREAPP_MINIMUM, NETCOREAPP_TOOL_CURRENT],
     visibility = ["//visibility:public"],
     analyzers = [
         "//:source_build_analyzers",

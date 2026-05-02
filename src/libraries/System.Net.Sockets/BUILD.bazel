@@ -54,6 +54,8 @@ netcoreapp_impl_assembly(
         "//src/libraries/Common:src/System/Net/TcpValidationHelpers.cs",
         "//src/libraries/Common:src/System/Net/SocketAddressExtensions.cs",
         "//src/libraries/Common:src/System/Net/SocketProtocolSupportPal.cs",
+        "//src/libraries/Common:src/System/LocalAppContextSwitches.Common.cs",
+        "//src/libraries/Common:src/System/Net/LocalAppContextSwitches.Net.cs",
         "//src/libraries/Common:src/System/Net/Sockets/SocketExceptionFactory.cs",
         "//src/libraries/Common:src/System/Net/Sockets/ProtocolFamily.cs",
         "//src/libraries/Common:src/System/Net/Sockets/ProtocolType.cs",

@@ -12,18 +12,20 @@ internal sealed class Assembly : IData<Assembly>
     {
         Target.TypeInfo type = target.GetTypeInfo(DataType.Assembly);
 
-        Module = target.ReadPointer(address + (ulong)type.Fields[nameof(Module)].Offset);
-        IsCollectible = target.Read<byte>(address + (ulong)type.Fields[nameof(IsCollectible)].Offset);
-        Error = target.ReadPointer(address + (ulong)type.Fields[nameof(Error)].Offset);
-        NotifyFlags = target.Read<uint>(address + (ulong)type.Fields[nameof(NotifyFlags)].Offset);
-        Level = target.Read<uint>(address + (ulong)type.Fields[nameof(Level)].Offset);
+        Module = target.ReadPointerField(address, type, nameof(Module));
+        IsCollectible = target.ReadField<byte>(address, type, nameof(IsCollectible));
+        IsDynamic = target.ReadField<byte>(address, type, nameof(IsDynamic)) != 0;
+        Error = target.ReadPointerField(address, type, nameof(Error));
+        NotifyFlags = target.ReadField<uint>(address, type, nameof(NotifyFlags));
+        IsLoaded = target.ReadField<byte>(address, type, nameof(IsLoaded)) != 0;
     }
 
     public TargetPointer Module { get; init; }
     public byte IsCollectible { get; init; }
+    public bool IsDynamic { get; init; }
     public TargetPointer Error { get; init; }
     public uint NotifyFlags { get; init; }
-    public uint Level { get; init; }
+    public bool IsLoaded { get; init; }
 
     public bool IsError => Error != TargetPointer.Null;
 }

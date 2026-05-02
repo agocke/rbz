@@ -12,14 +12,14 @@ internal sealed class ILCodeVersionNode : IData<ILCodeVersionNode>
     {
         Target.TypeInfo type = target.GetTypeInfo(DataType.ILCodeVersionNode);
 
-        VersionId = target.ReadNUInt(address + (ulong)type.Fields[nameof(VersionId)].Offset);
-        Next = target.ReadPointer(address + (ulong)type.Fields[nameof(Next)].Offset);
-        RejitState = target.Read<uint>(address + (ulong)type.Fields[nameof(RejitState)].Offset);
+        VersionId = target.ReadNUIntField(address, type, nameof(VersionId));
+        Next = target.ReadPointerField(address, type, nameof(Next));
+        RejitState = target.ReadField<uint>(address, type, nameof(RejitState));
+        ILAddress = target.ReadPointerField(address, type, nameof(ILAddress));
     }
 
     public TargetNUInt VersionId { get; init; }
-
     public TargetPointer Next { get; init; }
-
     public uint RejitState { get; init; }
+    public TargetPointer ILAddress { get; init; }
 }

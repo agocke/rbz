@@ -25,6 +25,7 @@ netcoreapp_impl_assembly(
         "src/System/IO/MemoryMappedFiles/MemoryMappedViewStream.cs",
         "src/System/IO/MemoryMappedFiles/MemoryMappedFileRights.cs",
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
+        "//src/libraries/Common:src/System/NullableBool.cs",
     ] + select({
         "@platforms//os:linux": [
             "src/Microsoft/Win32/SafeMemoryMappedFileHandle.Unix.cs",
@@ -41,7 +42,6 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MSync.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Open.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.OpenFlags.cs",
-            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Stat.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.SysConf.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.FTruncate.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MAdvise.cs",
@@ -64,7 +64,6 @@ netcoreapp_impl_assembly(
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MSync.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Open.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.OpenFlags.cs",
-            "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.Stat.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.SysConf.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.FTruncate.cs",
             "//src/libraries/Common:src/Interop/Unix/System.Native/Interop.MAdvise.cs",

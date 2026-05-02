@@ -13,6 +13,7 @@ netcoreapp_ref_assembly(
         "//src/libraries:ref_System.Runtime",
     ],
     allow_unsafe_blocks = True,
+    nowarn = ["CS9368"],
 )
 
 netcoreapp_impl_assembly(

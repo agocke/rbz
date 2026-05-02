@@ -59,11 +59,6 @@ public class BootJsonData
     public int debugLevel { get; set; }
 
     /// <summary>
-    /// Gets a value that determines if the linker is enabled.
-    /// </summary>
-    public bool? linkerEnabled { get; set; }
-
-    /// <summary>
     /// Config files for the application
     /// </summary>
     /// <remarks>
@@ -122,6 +117,36 @@ public class BootJsonData
     /// Gets or sets pthread pool unused size.
     /// </summary>
     public int? pthreadPoolUnusedSize { get; set; }
+
+    /// <summary>
+    /// internal flags for test instrumentation
+    /// </summary>
+    [DataMember(EmitDefaultValue = false)]
+    public bool? exitOnUnhandledError { get; set; }
+
+    /// <summary>
+    /// internal flags for test instrumentation
+    /// </summary>
+    [DataMember(EmitDefaultValue = false)]
+    public bool? appendElementOnExit { get; set; }
+
+    /// <summary>
+    /// internal flags for test instrumentation
+    /// </summary>
+    [DataMember(EmitDefaultValue = false)]
+    public bool? logExitCode { get; set; }
+
+    /// <summary>
+    /// internal flags for test instrumentation
+    /// </summary>
+    [DataMember(EmitDefaultValue = false)]
+    public bool? asyncFlushOnExit { get; set; }
+
+    /// <summary>
+    /// internal flags for test instrumentation
+    /// </summary>
+    [DataMember(EmitDefaultValue = false)]
+    public bool? forwardConsole { get; set; }
 }
 
 /// <summary>
@@ -358,7 +383,7 @@ public class SymbolsAsset
 public class WasmAsset
 {
     public string name { get; set; }
-    public string integrity { get; set; }
+    public string hash { get; set; }
     public string resolvedUrl { get; set; }
     public string cache { get; set; }
 }
@@ -368,7 +393,7 @@ public class GeneralAsset
 {
     public string virtualPath { get; set; }
     public string name { get; set; }
-    public string integrity { get; set; }
+    public string hash { get; set; }
     public string resolvedUrl { get; set; }
     public string cache { get; set; }
 }
@@ -378,7 +403,7 @@ public class VfsAsset
 {
     public string virtualPath { get; set; }
     public string name { get; set; }
-    public string integrity { get; set; }
+    public string hash { get; set; }
     public string resolvedUrl { get; set; }
     public string cache { get; set; }
 }

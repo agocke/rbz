@@ -9,7 +9,6 @@ netcoreapp_ref_assembly(
     name = "ref_System.Windows.Extensions",
     srcs = [
         "ref/System.Windows.Extensions.cs",
-        "ref/System.Windows.Extensions.Forwards.cs",
     ],
     deps = [
         "//src/libraries:ref_System.Runtime",
@@ -17,7 +16,6 @@ netcoreapp_ref_assembly(
         "//src/libraries/System.ComponentModel.EventBasedAsync:ref_System.ComponentModel.EventBasedAsync",
         "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",
         "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
-        "//src/libraries/shims/stubs:ref_System.Drawing.Common",
     ],
 )
 
@@ -29,10 +27,7 @@ impl_assembly(
     include_editorconfig = False,
     pnse = True,
     pnse_message = "SR.PlatformNotSupported_System_Windows_Extensions",
-    pnse_ref_srcs = [
-        "ref/System.Windows.Extensions.cs",
-        "ref/System.Windows.Extensions.Forwards.cs",
-    ],
+    pnse_ref_srcs = ["ref/System.Windows.Extensions.cs"],
     nowarn = ["CP0003", "CS1591"],
     analyzers = [
         "//src/libraries/System.Text.Json:JsonSourceGenerator",
@@ -45,7 +40,6 @@ impl_assembly(
         "//src/libraries/System.ComponentModel.EventBasedAsync:ref_System.ComponentModel.EventBasedAsync",
         "//src/libraries/System.ComponentModel.TypeConverter:ref_System.ComponentModel.TypeConverter",
         "//src/libraries/System.Security.Cryptography:ref_System.Security.Cryptography",
-        "//src/libraries/shims/stubs:ref_System.Drawing.Common",
     ],
     resx_file = "src/Resources/Strings.resx",
     supported_os_platforms_short = ["windows"],

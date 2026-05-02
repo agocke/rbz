@@ -12,6 +12,9 @@ netcoreapp_ref_assembly(
         "ref/System.Security.Cryptography.Pkcs.cs",
         "ref/System.Security.Cryptography.Pkcs.netstandard21.cs",
     ],
+    nowarn = [
+        "SYSLIB5006",
+    ],
     deps = [
         "//src/libraries:ref_System.Runtime",
         "//src/libraries/System.Collections:ref_System.Collections",
@@ -22,10 +25,11 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_System.Security.Cryptography.Pkcs",
+    include_runtime_async = False,
+    event_source_generator = False,
     analyzers = COMMON_GENERATOR_ANALYZERS,
     srcs = [
         # Asn1Reader shared projitems
-        "//src/libraries/Common:src/System/Security/Cryptography/Asn1Reader/AsnValueReader.cs",
         # Common: DisableRuntimeMarshalling (NETCoreApp only)
         "//src/libraries/Common:src/DisableRuntimeMarshalling.cs",
         # Common: API types (platform independent)
@@ -57,6 +61,7 @@ impl_assembly(
         "//src/libraries/Common:src/System/Obsoletions.cs",
         "//src/libraries/Common:src/System/Memory/PointerMemoryManager.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/CryptoPool.cs",
+        "//src/libraries/Common:src/System/Security/Cryptography/AsnWriter/AsnWriterExtensions.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/Oids.cs",
         "//src/libraries/Common:src/System/Security/Cryptography/Oids.Shared.cs",
         # Common: Asn1 types

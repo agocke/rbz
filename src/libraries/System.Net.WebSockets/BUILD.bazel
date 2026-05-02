@@ -47,6 +47,7 @@ netcoreapp_impl_assembly(
         "//src/libraries/System.Collections:ref_System.Collections",
         "//src/libraries/System.Collections.Specialized:ref_System.Collections.Specialized",
         "//src/libraries/System.Diagnostics.Tracing:ref_System.Diagnostics.Tracing",
+        "//src/libraries/System.IO.Compression:impl_System.IO.Compression",
         "//src/libraries/System.Memory:ref_System.Memory",
         "//src/libraries/System.Net.Primitives:ref_System.Net.Primitives",
         "//src/libraries/System.Numerics.Vectors:ref_System.Numerics.Vectors",

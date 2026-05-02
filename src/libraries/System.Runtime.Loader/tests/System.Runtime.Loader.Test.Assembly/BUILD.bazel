@@ -4,6 +4,7 @@ exports_files(["TestClass.cs"])
 
 csharp_library(
     name = "System.Runtime.Loader.Test.Assembly",
+    include_runtime_async = False,
     srcs = ["TestClass.cs"],
     target_frameworks = [NETCOREAPP_CURRENT],
     keyfile = OPEN_SNK,
@@ -25,6 +26,5 @@ csharp_library(
     interceptors_namespaces = ";Microsoft.Extensions.Validation.Generated",
     include_default_ruleset = False,
     include_syslib_warnaserror = False,
-    skip_analyzers = True,
     visibility = ["//src/libraries/System.Runtime.Loader/tests:__subpackages__"],
 )

@@ -16,6 +16,7 @@ netcoreapp_ref_assembly(
         "//src/libraries/Microsoft.Extensions.Configuration.Abstractions:ref_Microsoft.Extensions.Configuration.Abstractions",
         "//src/libraries/Microsoft.Extensions.DependencyInjection:ref_Microsoft.Extensions.DependencyInjection",
         "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
+        "//src/libraries/Microsoft.Extensions.Diagnostics:ref_Microsoft.Extensions.Diagnostics",
         "//src/libraries/Microsoft.Extensions.Diagnostics.Abstractions:ref_Microsoft.Extensions.Diagnostics.Abstractions",
         "//src/libraries/Microsoft.Extensions.FileProviders.Abstractions:ref_Microsoft.Extensions.FileProviders.Abstractions",
         "//src/libraries/Microsoft.Extensions.FileProviders.Physical:ref_Microsoft.Extensions.FileProviders.Physical",
@@ -29,6 +30,8 @@ netcoreapp_ref_assembly(
 
 impl_assembly(
     name = "impl_Microsoft.Extensions.Hosting",
+    include_runtime_async = False,
+    event_source_generator = False,
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     srcs = glob(
         ["src/**/*.cs"],

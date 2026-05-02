@@ -9,6 +9,7 @@ impl_assembly(
     ],
     deps = [
         "//src/libraries:ref_System.Runtime",
+        "//src/libraries/Microsoft.Bcl.AsyncInterfaces:impl_Microsoft.Bcl.AsyncInterfaces",
     ],
     nowarn = MULTITARGET_NOWARN + ["CP0003"],
     exclude_sr = True,

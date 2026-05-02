@@ -3,9 +3,11 @@ load("@rules_dotnet//dotnet/private/rules/csharp:binary.bzl", _base_csharp_binar
 load("//eng/bazel:version.bzl", "PRODUCT_VERSION")
 
 # The TFM that we're building
-NETCOREAPP_CURRENT = "net10.0"
+NETCOREAPP_CURRENT = "net11.0"
 # The TFM used by our LKG SDK
-NETCOREAPP_TOOL_CURRENT = "net10.0"
+NETCOREAPP_TOOL_CURRENT = "net11.0"
+# The minimum netcoreapp TFM still used by selected tool/test-support projects
+NETCOREAPP_MINIMUM = "net10.0"
 
 # ─── Centralized versioned NuGet repo names ──────────────────────────────────
 # These are the Bazel repo names for version-pinned NuGet packages.
@@ -27,7 +29,7 @@ MIBC_LINUX_ARM64_REPO = "nuget.optimization.linux-arm64.mibc.runtime.v1.0.0-prer
 # Analyzer NuGet packages (from eng/Analyzers.targets)
 CODEANALYSIS_ANALYZERS_REPO = "nuget.microsoft.codeanalysis.analyzers.v5.0.0-2.26170.102"
 CODEANALYSIS_NETANALYZERS_REPO = "nuget.microsoft.codeanalysis.netanalyzers.v10.0.106"
-CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codestyle.v4.14.0"
+CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codestyle.v5.0.0-2.26070.104"
 DOTNET_CODEANALYSIS_REPO = "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26170.102"
 STYLECOP_ANALYZERS_UNSTABLE_REPO = "nuget.stylecop.analyzers.unstable.v1.2.0.556"
 XUNIT_ANALYZERS_REPO = "nuget.xunit.analyzers.v1.22.0"
@@ -46,7 +48,6 @@ ECMA_SNK = "//eng:snk/ECMA.snk"
 SHAREDLIB1024_SNK = "//eng:snk/35MSSharedLib1024.snk"
 SILVERLIGHT_SNK = "//eng:snk/SilverlightPlatformPublicKey.snk"
 DEFAULT_RULESET = "//eng:Default.ruleset"
-
 # MIBC PGO optimization data files from NuGet (matched to target architecture).
 # MSBuild equivalent: eng/restore/optimizationData.targets selects the right
 # optimization.<OS>-<ARCH>.mibc.runtime package, then crossgen-corelib.proj
@@ -68,6 +69,114 @@ MIBC_FILES = select({
 
 # Label for the Roslyn compiler server persistent worker binary.
 _SHARED_COMPILATION_WORKER = "@rules_dotnet//dotnet/private/tools/compiler_worker"
+
+def _append_unique(items, extras):
+    result = list(items)
+    for item in extras:
+        if item not in result:
+            result.append(item)
+    return result
+
+# Test-support helper assets built via raw csharp_library/csharp_binary do not
+# flow through library_test, but their MSBuild projects still receive the local
+# targeting-pack Extensions generators and ESGEN suppressions. Keep Bazel aligned
+# for the helper assemblies that compare-bazel matches against those projects.
+_TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS = [
+    "ApplicationNameSetFromArgument",
+    "BuildWebHostInvalidSignature",
+    "BuildWebHostPatternTestSite",
+    "CollectibleAssembly",
+    "CreateHostBuilderInvalidSignature",
+    "CreateHostBuilderPatternTestSite",
+    "CreateWebHostBuilderInvalidSignature",
+    "CreateWebHostBuilderPatternTestSite",
+    "DefaultApartmentStateMain",
+    "LoaderLinkTest.Dynamic",
+    "LoaderLinkTest.Shared",
+    "MockHostTypes",
+    "MTAMain",
+    "NoSpecialEntryPointPattern",
+    "NoSpecialEntryPointPatternBuildsThenThrows",
+    "NoSpecialEntryPointPatternExits",
+    "NoSpecialEntryPointPatternHangs",
+    "NoSpecialEntryPointPatternMainNoArgs",
+    "NoSpecialEntryPointPatternThrows",
+    "ReferencedClassLib",
+    "ReferencedClassLibNeutralIsSatellite",
+    "SerializableAssembly",
+    "STAMain",
+    "StreamConformanceTests",
+    "System.Diagnostics.FileVersionInfo.TestAssembly",
+    "System.Reflection.DispatchProxy.TestDependency",
+    "System.Reflection.TestExe",
+    "System.Runtime.Loader.Noop.Assembly",
+    "System.Runtime.Loader.Test.Assembly",
+    "System.Runtime.Loader.Test.Assembly2",
+    "System.Runtime.Loader.Test.ContextualReflectionDependency",
+    "TargetFrameworkNameTestApp",
+    "TestApp",
+    "TestAppOutsideOfTPA",
+    "TestUtilities.Unicode",
+    "TopLevelStatements",
+    "TopLevelStatementsTestsTimeout",
+    "XDocument.Common",
+    "XmlCoreTest",
+]
+
+_TEST_SUPPORT_EXTENSIONS_REF_TARGETS = [
+    "ApplicationNameSetFromArgument",
+    "BuildWebHostInvalidSignature",
+    "BuildWebHostPatternTestSite",
+    "CreateHostBuilderInvalidSignature",
+    "CreateHostBuilderPatternTestSite",
+    "CreateWebHostBuilderInvalidSignature",
+    "CreateWebHostBuilderPatternTestSite",
+    "DefaultApartmentStateMain",
+    "LoaderLinkTest.Dynamic",
+    "LoaderLinkTest.Shared",
+    "MTAMain",
+    "NoSpecialEntryPointPattern",
+    "NoSpecialEntryPointPatternBuildsThenThrows",
+    "NoSpecialEntryPointPatternExits",
+    "NoSpecialEntryPointPatternHangs",
+    "NoSpecialEntryPointPatternMainNoArgs",
+    "NoSpecialEntryPointPatternThrows",
+    "ReferencedClassLib",
+    "ReferencedClassLibNeutralIsSatellite",
+    "SerializableAssembly",
+    "STAMain",
+    "System.Diagnostics.FileVersionInfo.TestAssembly",
+    "System.Reflection.TestExe",
+    "System.Runtime.Loader.Noop.Assembly",
+    "System.Runtime.Loader.Test.Assembly",
+    "System.Runtime.Loader.Test.Assembly2",
+    "System.Runtime.Loader.Test.ContextualReflectionDependency",
+    "TargetFrameworkNameTestApp",
+    "TestApp",
+    "TestAppOutsideOfTPA",
+    "TestUtilities.Unicode",
+    "TopLevelStatements",
+    "TopLevelStatementsTestsTimeout",
+    "XDocument.Common",
+    "XmlCoreTest",
+]
+
+_TEST_SUPPORT_EXTENSIONS_ANALYZERS = [
+    "//src/libraries/Microsoft.Extensions.Logging.Abstractions:LoggingGenerators",
+    "//src/libraries/Microsoft.Extensions.Options:OptionsSourceGeneration",
+]
+
+_TEST_SUPPORT_EXTENSIONS_REFS = [
+    "//src/libraries/Microsoft.Extensions.Caching.Abstractions:ref_Microsoft.Extensions.Caching.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Configuration.Abstractions:ref_Microsoft.Extensions.Configuration.Abstractions",
+    "//src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions:ref_Microsoft.Extensions.DependencyInjection.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Diagnostics.Abstractions:ref_Microsoft.Extensions.Diagnostics.Abstractions",
+    "//src/libraries/Microsoft.Extensions.FileProviders.Abstractions:ref_Microsoft.Extensions.FileProviders.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Hosting.Abstractions:ref_Microsoft.Extensions.Hosting.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Logging.Abstractions:ref_Microsoft.Extensions.Logging.Abstractions",
+    "//src/libraries/Microsoft.Extensions.Options:ref_Microsoft.Extensions.Options",
+    "//src/libraries/Microsoft.Extensions.Primitives:ref_Microsoft.Extensions.Primitives",
+]
 
 # Version constants matching eng/Versions.props
 _MAJOR_VERSION = PRODUCT_VERSION.split(".")[0]
@@ -256,7 +365,7 @@ def _gen_assembly_info_impl(ctx):
         lines.append('[assembly: System.Reflection.AssemblyDefaultAliasAttribute("%s")]' % assembly_name)
 
     if ctx.attr.include_neutral_resources_language:
-        lines.append('[assembly: System.Resources.NeutralResourcesLanguageAttribute("en-US")]')
+        lines.append('[assembly: System.Resources.NeutralResourcesLanguage("en-US")]')
 
     if ctx.attr.cls_compliant:
         lines.append("[assembly: CLSCompliantAttribute(true)]")
@@ -292,13 +401,12 @@ def _gen_assembly_info_impl(ctx):
         lines.append('[assembly: System.Reflection.AssemblyConfigurationAttribute("%s")]' % ctx.attr.assembly_configuration)
 
     lines.append('[assembly: System.Reflection.AssemblyCopyrightAttribute("© Microsoft Corporation. All rights reserved.")]')
-    if ctx.attr.include_description:
-        desc = ctx.attr.assembly_description if ctx.attr.assembly_description else assembly_name
-        # MSBuild's WriteCodeFragment uses CSharpCodeGenerator.QuoteSnippetString which
-        # picks C-style (escaped, 80-char chunked) or verbatim (@"") based on length.
-        # Indent is 4 spaces (1 indent level in CodeDOM default).
-        desc_str = _quote_csharp_string(desc, "    ")
-        lines.append('[assembly: System.Reflection.AssemblyDescriptionAttribute(%s)]' % desc_str)
+    desc = ctx.attr.assembly_description if ctx.attr.assembly_description else assembly_name
+    # MSBuild's WriteCodeFragment uses CSharpCodeGenerator.QuoteSnippetString which
+    # picks C-style (escaped, 80-char chunked) or verbatim (@"") based on length.
+    # Indent is 4 spaces (1 indent level in CodeDOM default).
+    desc_str = _quote_csharp_string(desc, "    ")
+    lines.append('[assembly: System.Reflection.AssemblyDescriptionAttribute(%s)]' % desc_str)
     lines.append('[assembly: System.Reflection.AssemblyFileVersionAttribute("%s")]' % ctx.attr.file_version)
     lines.append('[assembly: System.Reflection.AssemblyInformationalVersionAttribute("%s")]' % ctx.attr.informational_version)
     lines.append('[assembly: System.Reflection.AssemblyProductAttribute("Microsoft® .NET")]')
@@ -309,10 +417,6 @@ def _gen_assembly_info_impl(ctx):
     # Long-form platform attributes (from TFM-based targeting) go after RepositoryUrl
     for platform in ctx.attr.supported_os_platforms:
         lines.append('[assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("%s")]' % platform)
-
-    # InternalsVisibleTo attributes — MSBuild puts these in the AssemblyInfo file
-    for ivt in ctx.attr.internals_visible_to:
-        lines.append('[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"%s")]' % ivt)
 
     lines.append("")
     lines.append("// Generated by the MSBuild WriteCodeFragment class.")
@@ -344,30 +448,19 @@ gen_assembly_info = rule(
         ),
         "include_neutral_resources_language": attr.bool(default = True),
         "assembly_description": attr.string(default = ""),
-        "include_description": attr.bool(default = True),
         "assembly_configuration": attr.string(default = ""),
         "not_supported": attr.bool(default = False),
         "supported_os_platforms": attr.string_list(default = []),
         "supported_os_platforms_short": attr.string_list(default = []),
         "unsupported_os_platforms": attr.string_list(default = []),
-        "internals_visible_to": attr.string_list(default = []),
     },
 )
 
 def _gen_target_framework_attrs_impl(ctx):
-    """Generate the .NETCoreApp,Version=vX.Y.AssemblyAttributes.cs file.
-
-    Also supports .NETStandard when framework_type is set to 'netstandard'.
-    """
-    if ctx.attr.framework_type == "netstandard":
-        moniker = ".NETStandard"
-        display = ".NET Standard"
-    else:
-        moniker = ".NETCoreApp"
-        display = ".NET"
-    content = '// <autogenerated />\nusing System;\nusing System.Reflection;\n[assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute("%s,Version=v%s.%s", FrameworkDisplayName = "%s %s.%s")]\n' % (
-        moniker, ctx.attr.major_version, ctx.attr.minor_version,
-        display, ctx.attr.major_version, ctx.attr.minor_version,
+    """Generate the .NETCoreApp,Version=vX.Y.AssemblyAttributes.cs file."""
+    content = '// <autogenerated />\nusing System;\nusing System.Reflection;\n[assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute(".NETCoreApp,Version=v%s.%s", FrameworkDisplayName = ".NET %s.%s")]\n' % (
+        ctx.attr.major_version, ctx.attr.minor_version,
+        ctx.attr.major_version, ctx.attr.minor_version,
     )
     ctx.actions.write(ctx.outputs.out, content)
 
@@ -377,11 +470,6 @@ gen_target_framework_attrs = rule(
         "out": attr.output(mandatory = True),
         "major_version": attr.string(default = _MAJOR_VERSION),
         "minor_version": attr.string(default = _MINOR_VERSION),
-        "framework_type": attr.string(
-            default = "netcoreapp",
-            doc = "Framework type: 'netcoreapp' (default) or 'netstandard'.",
-            values = ["netcoreapp", "netstandard"],
-        ),
     },
 )
 
@@ -445,16 +533,24 @@ def csharp_library(
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
     include_library_nowarn = True,
-    skip_analyzers = False,
+    include_runtime_async = True,
     interceptors_namespaces = None,
     editorconfig_name = None,
     extra_editorconfig_content = "",
+    langversion = "preview",
     **kwargs
 ):
     if out == None:
         out = name
     if editorconfig_name == None:
         editorconfig_name = out
+
+    deps = kwargs.pop("deps", [])
+    if name in _TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS:
+        nowarn = _append_unique(nowarn, ["ESGEN001", "ESGEN002"])
+        analyzers = _append_unique(analyzers, _TEST_SUPPORT_EXTENSIONS_ANALYZERS)
+    if name in _TEST_SUPPORT_EXTENSIONS_REF_TARGETS:
+        deps = _append_unique(deps, _TEST_SUPPORT_EXTENSIONS_REFS)
 
     if resx_file != None:
         _resource_name = resource_name if resource_name else "FxResources.%s.SR" % out
@@ -536,9 +632,6 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
 
         analyzer_configs = analyzer_configs + _msbuild_analyzer_configs
 
-        if resx_file != None and resx_file not in additionalfiles:
-            additionalfiles = additionalfiles + [resx_file]
-
     # rules_dotnet explicitly passes /nullable:disable for assemblies with
     # nullable="disable", but MSBuild omits /nullable entirely (disable is
     # the default).  The explicit flag triggers CS8632 on nullable
@@ -556,16 +649,6 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
     _pathmap_key = "%s/%s/%s" % (_pkg, name, NETCOREAPP_CURRENT)
     _pathmap_value = "/_/artifacts/obj/%s/Release/%s" % (out, NETCOREAPP_CURRENT)
 
-    # Derive signing flags from keyfile. MSBuild only emits /delaysign-
-    # and /publicsign when SignAssembly is true (i.e. a keyfile is present).
-    # Open.snk and AspNetCore.snk are full key pairs → /publicsign-.
-    # MSFT.snk, ECMA.snk, etc. are public-only → /publicsign+.
-    _keyfile = kwargs.get("keyfile")
-    _signing_flags = []
-    if _keyfile != None:
-        _publicsign = "/publicsign-" if _keyfile in (OPEN_SNK, ASPNETCORE_SNK) else "/publicsign+"
-        _signing_flags = ["/delaysign-", _publicsign]
-
     _compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
         "/platform:AnyCPU",
@@ -576,12 +659,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-        # MSBuild SDK defaults that csc always receives from the .NET SDK.
-        "/fullpaths",
-        "/errorreport:prompt",
-    ] + _signing_flags
-    if skip_analyzers:
-        _compiler_options = _compiler_options + ["/skipanalyzers+"]
+    ] + ([
+        # Enable runtime async for .NET 11+ CoreCLR targets.
+        # MSBuild: src/libraries/Directory.Build.targets + eng/testing/tests.targets
+        # Disable for net10.0 tool projects (e.g. ILCompiler/crossgen2).
+        "/features:runtime-async=on",
+    ] if include_runtime_async else [])
     if include_syslib_warnaserror:
         _compiler_options = _compiler_options + [
             # Arcade SDK promotes SYSLIB0011 to an error.  Test-support
@@ -608,11 +691,16 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         resource_logical_names = resource_logical_names,
         use_shared_compilation = use_shared_compilation,
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
+        langversion = langversion,
         nowarn = nowarn + _nullable_nowarn + [
             "CS1701",
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
             "NU5105",
+            # CS8002: Referenced assembly does not have a strong name.
+            # Roslyn's Microsoft.CSharp.Core.targets suppresses this for all
+            # .NETCoreApp targets because .NET Core ignores strong naming.
+            "CS8002",
         ] + ([
             # src/libraries/Directory.Build.props global NoWarn — not present
             # in NativeAOT tool projects under src/coreclr/tools/.
@@ -621,6 +709,9 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
             "CS1705",
             "IDE0060",
             "IDE0100",
+            # IDE0031 fires on older SDK (10.0.100-rc.1) but not on newer
+            # releases; suppress to maintain compatibility across SDK versions.
+            "IDE0031",
         ] if include_library_nowarn else []),
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,
@@ -645,6 +736,7 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         additionalfiles = additionalfiles,
         analyzer_configs = analyzer_configs,
         analyzers = analyzers,
+        deps = deps,
         # In CI mode, normalize PDB paths to match MSBuild's CI layout
         # (ContinuousIntegrationBuild=true → DeterministicSourcePaths → PathMap).
         pathmap = select({
@@ -671,14 +763,22 @@ def csharp_binary(
     include_default_ruleset = True,
     include_syslib_warnaserror = True,
     include_library_nowarn = True,
-    skip_analyzers = False,
+    include_runtime_async = True,
     interceptors_namespaces = None,
     editorconfig_name = None,
     extra_editorconfig_content = "",
+    langversion = "preview",
     **kwargs
 ):
     if editorconfig_name == None:
         editorconfig_name = name
+
+    deps = kwargs.pop("deps", [])
+    if name in _TEST_SUPPORT_EXTENSIONS_ANALYZER_TARGETS:
+        nowarn = _append_unique(nowarn, ["ESGEN001", "ESGEN002"])
+        analyzers = _append_unique(analyzers, _TEST_SUPPORT_EXTENSIONS_ANALYZERS)
+    if name in _TEST_SUPPORT_EXTENSIONS_REF_TARGETS:
+        deps = _append_unique(deps, _TEST_SUPPORT_EXTENSIONS_REFS)
 
     if msbuild_analyzer_config not in ["none", "style", "source"]:
         fail("msbuild_analyzer_config must be one of: none, style, source")
@@ -725,12 +825,6 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
     # annotations (e.g. string?) in shared source files.
     _nullable_nowarn = ["CS8632"] if kwargs.get("nullable") == "disable" else []
 
-    _keyfile = kwargs.get("keyfile")
-    _signing_flags = []
-    if _keyfile != None:
-        _publicsign = "/publicsign-" if _keyfile in (OPEN_SNK, ASPNETCORE_SNK) else "/publicsign+"
-        _signing_flags = ["/delaysign-", _publicsign]
-
     _compiler_options = compiler_options + [
         "/checksumalgorithm:SHA256",
         "/platform:AnyCPU",
@@ -741,12 +835,12 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         # compiler_options to emit /warn:9999, matching MSBuild's
         # WarningLevel=9999.
         "/warn:9999",
-        # MSBuild SDK defaults that csc always receives from the .NET SDK.
-        "/fullpaths",
-        "/errorreport:prompt",
-    ] + _signing_flags + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
-    if skip_analyzers:
-        _compiler_options = _compiler_options + ["/skipanalyzers+"]
+    ] + ([
+        # Enable runtime async for .NET 11+ CoreCLR targets.
+        # MSBuild: src/libraries/Directory.Build.targets + eng/testing/tests.targets
+        # Disable for net10.0 tool projects (e.g. ILCompiler/crossgen2).
+        "/features:runtime-async=on",
+    ] if include_runtime_async else []) + (["/warnaserror+:SYSLIB0011"] if include_syslib_warnaserror else [])
     if interceptors_namespaces != None:
         _compiler_options = _compiler_options + [
             "/features:InterceptorsNamespaces=" + interceptors_namespaces,
@@ -763,11 +857,16 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         srcs = srcs,
         use_shared_compilation = use_shared_compilation,
         shared_compilation_worker = _SHARED_COMPILATION_WORKER if use_shared_compilation else None,
+        langversion = langversion,
         nowarn = nowarn + _nullable_nowarn + [
             "CS1701",
             # Arcade SDK global NoWarn (Microsoft.DotNet.Arcade.Sdk targets)
             "CS1702",
             "NU5105",
+            # CS8002: Referenced assembly does not have a strong name.
+            # Roslyn's Microsoft.CSharp.Core.targets suppresses this for all
+            # .NETCoreApp targets because .NET Core ignores strong naming.
+            "CS8002",
         ] + ([
             # src/libraries/Directory.Build.props global NoWarn — not present
             # in NativeAOT tool projects under src/coreclr/tools/.
@@ -776,6 +875,9 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
             "CS1705",
             "IDE0060",
             "IDE0100",
+            # IDE0031 fires on older SDK (10.0.100-rc.1) but not on newer
+            # releases; suppress to maintain compatibility across SDK versions.
+            "IDE0031",
         ] if include_library_nowarn else []),
         # Match MSBuild's TreatWarningsAsErrors=true from Directory.Build.props.
         treat_warnings_as_errors = treat_warnings_as_errors,
@@ -798,5 +900,6 @@ EOF""".format(version = PRODUCT_VERSION, extra = extra_editorconfig_content, glo
         additionalfiles = additionalfiles,
         analyzer_configs = analyzer_configs,
         analyzers = analyzers,
+        deps = deps,
         **kwargs
     )
