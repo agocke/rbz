@@ -557,7 +557,7 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 
 | OS | CMake | Bazel | Notes |
 |----|-------|-------|-------|
-| Linux (glibc) | ✅ | 🔨 In progress | First target; linux-x64 compiler flags verified. linux-arm64 cross-compile via `--platforms=//platforms:linux_arm64`. |
+| Linux (glibc) | ✅ | 🔨 In progress | linux-x64 primary dev target. linux-arm64 cross-compile via `--platforms=//platforms:linux_arm64` (all native + managed source targets build; tests require host CC toolchain in container). |
 | Linux (musl/Alpine) | ✅ | ❌ Not started | |
 | macOS (Darwin) | ✅ | 🔄 In progress | Cross-compile for arm64 via `--platforms` and `--cpu=darwin_arm64` in `.bazelrc`. Tests skipped on Intel CI runners. |
 | Windows | ✅ | 🔨 Host only | corehost (dotnet.exe, hostfxr.dll, hostpolicy.dll, apphost.exe, nethost.dll) builds with MSVC; CI on `windows-latest` |
@@ -580,7 +580,7 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 |-------------|-------|-------|-------|
 | x64 (AMD64) | ✅ | 🔨 In progress | First target |
 | x86 (i386) | ✅ | ❌ Not started | |
-| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host; 95/95 native and 187/192 coreclr targets build. Remaining: lttng (missing arm64 dev pkg), interpexec.cpp (upstream bug), crossgen2-publish (host/target link mismatch). |
+| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host via container toolchain. All native libs (95/95), coreclr, nativeaot, and managed library source targets build. Test targets need host CC toolchain in container. crossgen2-publish needs host CC for NativeAOT link. |
 | ARM (32-bit) | ✅ | ❌ Not started | |
 | ARMv6 | ✅ | ❌ Not started | |
 | RISC-V 64 | ✅ | ❌ Not started | |
