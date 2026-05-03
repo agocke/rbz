@@ -67,3 +67,111 @@ jobs:
         with:
           path: ~/.cache/bazel-disk
           key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
+
+  # Cross-compile for linux-arm64 and run tests on Helix arm64 machines.
+  # The build runs in a cross-build container with an arm64 sysroot.
+  # Test DLLs are managed (arch-independent) so they're built on the x64 host.
+  # An arm64 testhost is assembled from Bazel's arm64 native outputs + managed libs.
+  linux-arm64-helix:
+    name: Linux ARM64 (Helix)
+    runs-on: [self-hosted, Linux, X64]
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      CROSS_IMAGE: mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64
+      CROSS_CONTAINER: arm64-cross-ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y clang-18 lld libkrb5-dev liblttng-ust-dev libssl-dev
+
+      - name: Restore Bazel cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.cache/bazel-disk
+          key: bazel-Linux-arm64-${{ github.sha }}
+          restore-keys: |
+            bazel-Linux-arm64-
+
+      - name: Start cross-build container
+        run: |
+          docker pull "$CROSS_IMAGE"
+          docker rm -f "$CROSS_CONTAINER" 2>/dev/null || true
+          docker run -d --name "$CROSS_CONTAINER" \
+            -v "$PWD:/repo" \
+            -v "$(which bazel):/usr/local/bin/bazel" \
+            -v "$HOME/.cache/bazel-disk:/disk-cache" \
+            "$CROSS_IMAGE" sleep infinity
+
+          # Create ICU symlink for Bazel's icu4c_repository rule
+          docker exec "$CROSS_CONTAINER" sh -c '
+            ln -sf /crossrootfs/arm64/usr/include/unicode /usr/include/unicode 2>/dev/null || true
+          '
+
+      - name: Build arm64 (native + managed source) in container
+        run: |
+          docker exec "$CROSS_CONTAINER" sh -c '
+            export HOME=/tmp/bazel-home
+            cd /repo
+            bazel --nohome_rc build --keep_going \
+              --config=clr_release --config=libs_release \
+              --platforms=//platforms:linux_arm64 \
+              --disk_cache=/disk-cache \
+              //src/coreclr/... //src/native/... //src/libraries/...
+          '
+
+      - name: Build test assemblies on host (managed, arch-independent)
+        run: |
+          bazel build --keep_going \
+            --config=clr_release --config=libs_release \
+            --disk_cache=~/.cache/bazel-disk \
+            //src/libraries/... //eng:xunit_console_runner
+
+      - name: Prepare Helix payloads
+        run: |
+          eng/bazel/prepare-helix-payloads.sh --config clr_release
+
+      - name: Install .NET SDK
+        run: |
+          # Download the .NET SDK version from global.json
+          SDK_VERSION=$(python3 -c "import json; print(json.load(open('global.json'))['tools']['dotnet'])" 2>/dev/null || true)
+          if [[ -z "$SDK_VERSION" ]]; then
+            SDK_VERSION=$(python3 -c "import json; print(json.load(open('global.json'))['sdk']['version'])" 2>/dev/null)
+          fi
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version "$SDK_VERSION" --install-dir "$PWD/.dotnet"
+          echo "$PWD/.dotnet" >> "$GITHUB_PATH"
+          .dotnet/dotnet --version
+
+      - name: Send to Helix
+        run: |
+          export PATH="$PWD/.dotnet:$PATH"
+          dotnet msbuild eng/bazel/sendtohelix.proj \
+            /p:Creator="${GITHUB_ACTOR:-bazel-ci}" \
+            /p:HelixBuild="${GITHUB_RUN_ID:-local}" \
+            /p:TesthostPayload="$PWD/artifacts/helix/testhost" \
+            /p:TestPayloadDir="$PWD/artifacts/helix/tests"
+        env:
+          # Helix SDK requires AzDO-style env vars for source tracking
+          BUILD_SOURCEBRANCH: refs/heads/${{ github.ref_name }}
+          BUILD_REPOSITORY_NAME: ${{ github.repository }}
+          SYSTEM_TEAMPROJECT: public
+          BUILD_REASON: ${{ github.event_name == 'pull_request' && 'PullRequest' || 'Manual' }}
+
+      - name: Cleanup container
+        if: always()
+        run: docker rm -f "$CROSS_CONTAINER" 2>/dev/null || true
+
+      - name: Save Bazel cache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.cache/bazel-disk
+          key: bazel-Linux-arm64-${{ github.sha }}

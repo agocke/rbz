@@ -557,7 +557,7 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 
 | OS | CMake | Bazel | Notes |
 |----|-------|-------|-------|
-| Linux (glibc) | ✅ | 🔨 In progress | linux-x64 primary dev target. linux-arm64 cross-compile via `--platforms=//platforms:linux_arm64` (all native + managed source targets build; tests require host CC toolchain in container). |
+| Linux (glibc) | ✅ | 🔨 In progress | linux-x64 primary dev target. linux-arm64 cross-compile via `--platforms=//platforms:linux_arm64` (all native + managed source targets build; tests run on Helix arm64 machines via CI). |
 | Linux (musl/Alpine) | ✅ | ❌ Not started | |
 | macOS (Darwin) | ✅ | 🔄 In progress | Cross-compile for arm64 via `--platforms` and `--cpu=darwin_arm64` in `.bazelrc`. Tests skipped on Intel CI runners. |
 | Windows | ✅ | 🔨 Host only | corehost (dotnet.exe, hostfxr.dll, hostpolicy.dll, apphost.exe, nethost.dll) builds with MSVC; CI on `windows-latest` |
@@ -580,7 +580,7 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 |-------------|-------|-------|-------|
 | x64 (AMD64) | ✅ | 🔨 In progress | First target |
 | x86 (i386) | ✅ | ❌ Not started | |
-| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host via container toolchain. All native libs (95/95), coreclr, nativeaot, and managed library source targets build. Test targets need host CC toolchain in container. crossgen2-publish needs host CC for NativeAOT link. |
+| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host via container toolchain. All native libs (95/95), coreclr, nativeaot, and managed library source targets build. Tests run on Helix arm64 machines via `eng/bazel/sendtohelix.proj`. crossgen2-publish needs host CC for NativeAOT link. |
 | ARM (32-bit) | ✅ | ❌ Not started | |
 | ARMv6 | ✅ | ❌ Not started | |
 | RISC-V 64 | ✅ | ❌ Not started | |
@@ -1146,6 +1146,69 @@ special support**. The `impl_netcoreapp` filegroup contains 165 total entries
   - **CoreCLR tests (all non-JIT)**: `bazel test //src/tests/GC/... //src/tests/Loader/... //src/tests/baseservices/... //src/tests/async/... //src/tests/Regressions/... //src/tests/CoreMangLib/... //src/tests/reflection/... --config=clr_checked`
   - **Include pri1 tests**: `bazel test //... --config=clr_checked --test_tag_filters=`
   - **Only pri1 tests**: `bazel test //... --config=clr_checked --test_tag_filters=pri1`
+
+---
+
+## CI Pipeline (`.github/workflows/bazel.yml`)
+
+The Bazel CI runs on GitHub Actions with self-hosted runners.
+
+### Standard legs
+
+| Leg | Runner | Config | Targets |
+|-----|--------|--------|---------|
+| Linux release | self-hosted Linux X64 | `clr_release` | `//...` (build + test) |
+| Linux checked | self-hosted Linux X64 | `clr_checked + libs_release` | `//...` (build + test) |
+| macOS release | self-hosted macOS X64 | `clr_release + libs_release` | `//...` (build + test) |
+| Windows host | windows-latest | `clr_release + libs_release` | `//src/native/corehost:all` (build only) |
+
+### Linux ARM64 (Helix) leg
+
+Cross-compiles for linux-arm64 in a container and runs tests on Helix arm64
+machines. The workflow:
+
+1. **Container build**: Runs `bazel build` inside the
+   `mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64`
+   container with `--platforms=//platforms:linux_arm64` to produce arm64 native
+   binaries.
+
+2. **Host test build**: Builds test DLLs on the x64 host — managed assemblies
+   are architecture-independent.
+
+3. **Payload assembly** (`eng/bazel/prepare-helix-payloads.sh`): Assembles an
+   arm64 testhost from Bazel outputs (dotnet, libcoreclr, native libs, managed
+   framework DLLs) plus per-test work item directories with test DLLs and
+   dependencies.
+
+4. **Helix submission** (`eng/bazel/sendtohelix.proj`): Sends work items to the
+   `(Ubuntu.2204.ArmArch.Open)AzureLinux.3.Arm64.Open` Helix queue (anonymous,
+   no access token needed). Each test runs `dotnet exec xunit.console.dll
+   TestName.dll` on an arm64 machine.
+
+#### Running locally
+
+```bash
+# 1. Build arm64 in container (from repo root)
+docker run --rm -v "$PWD:/repo" -w /repo \
+  mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64 \
+  bash -c 'export HOME=/tmp/bazel-home && bazel --nohome_rc build --keep_going \
+    --config=clr_release --config=libs_release \
+    --platforms=//platforms:linux_arm64 \
+    //src/coreclr/... //src/native/... //src/libraries/...'
+
+# 2. Build test assemblies on host
+bazel build --config=clr_release --config=libs_release \
+  //src/libraries/... //eng:xunit_console_runner
+
+# 3. Assemble payloads
+eng/bazel/prepare-helix-payloads.sh --test-filter "System.Runtime"
+
+# 4. Submit to Helix (requires BUILD_SOURCEBRANCH, BUILD_REPOSITORY_NAME,
+#    SYSTEM_TEAMPROJECT, BUILD_REASON env vars for Helix SDK)
+BUILD_SOURCEBRANCH=refs/heads/bazel BUILD_REPOSITORY_NAME=agocke/rbz \
+SYSTEM_TEAMPROJECT=public BUILD_REASON=Manual \
+dotnet msbuild eng/bazel/sendtohelix.proj /p:Creator=yourname /p:HelixBuild=local
+```
 
 ---
 
