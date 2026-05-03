@@ -10,6 +10,7 @@ exports_files([
     "run_binary.sh.tpl",
     "run_test.sh.tpl",
     "run_library_test.sh.tpl",
+    "helix_library_test.sh.tpl",
     "testing/xunit/xunit.runner.json",
 ])
 

@@ -13,10 +13,14 @@ filegroup(
     }) + select({
         "@platforms//os:linux": [
             "//src/coreclr/jit:libclrjit.so",
-            "//src/coreclr/System.Private.CoreLib:crossgen_System.Private.CoreLib",
             "//src/native/libs/System.Security.Cryptography.Native:System.Security.Cryptography.Native.OpenSsl",
         ],
         "@platforms//os:macos": [],
+    }) + select({
+        # crossgen_System.Private.CoreLib uses the x64 JIT and is incompatible
+        # with arm64 cross-compilation. Use the un-crossgen'd CoreLib for arm64.
+        "@platforms//cpu:aarch64": ["//src/coreclr/System.Private.CoreLib:impl_System.Private.CoreLib"],
+        "//conditions:default": ["//src/coreclr/System.Private.CoreLib:crossgen_System.Private.CoreLib"],
     }),
     visibility = ["//visibility:public"],
 )

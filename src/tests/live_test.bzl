@@ -372,20 +372,38 @@ def _xunit_library_test_impl(ctx):
     testhost = ctx.file._shared_testhost
 
     windows_constraint = ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]
+    aarch64_constraint = ctx.attr._aarch64_constraint[platform_common.ConstraintValueInfo]
+    is_helix = ctx.target_platform_has_constraint(aarch64_constraint) and not ctx.target_platform_has_constraint(windows_constraint)
+
     launcher = ctx.actions.declare_file("{}.{}".format(dll.basename, "bat" if ctx.target_platform_has_constraint(windows_constraint) else "sh"), sibling = dll)
-    ctx.actions.expand_template(
-        template = ctx.file._launcher_sh,
-        output = launcher,
-        substitutions = {
-            "TEMPLATED_testhost": to_rlocation_path(ctx, testhost),
-            "TEMPLATED_xunit_console": to_rlocation_path(ctx, xunit_console_dll),
-            "TEMPLATED_entry_dll": to_rlocation_path(ctx, dll),
-            "TEMPLATED_depsfile": to_rlocation_path(ctx, test_depsfile),
-            "TEMPLATED_runtimeconfig": to_rlocation_path(ctx, test_runtimeconfig),
-            "TEMPLATED_writable_test_dir": "true" if ctx.attr.writable_test_dir else "false",
-        },
-        is_executable = True,
-    )
+    if is_helix:
+        # Cross-compiled arm64 test: use helix launcher that writes a manifest
+        # instead of executing the test. Collected after `bazel test` to submit
+        # to Helix for remote arm64 execution.
+        ctx.actions.expand_template(
+            template = ctx.file._helix_launcher_sh,
+            output = launcher,
+            substitutions = {
+                "TEMPLATED_testhost": to_rlocation_path(ctx, testhost),
+                "TEMPLATED_entry_dll": to_rlocation_path(ctx, dll),
+                "TEMPLATED_test_name": ctx.label.name,
+            },
+            is_executable = True,
+        )
+    else:
+        ctx.actions.expand_template(
+            template = ctx.file._launcher_sh,
+            output = launcher,
+            substitutions = {
+                "TEMPLATED_testhost": to_rlocation_path(ctx, testhost),
+                "TEMPLATED_xunit_console": to_rlocation_path(ctx, xunit_console_dll),
+                "TEMPLATED_entry_dll": to_rlocation_path(ctx, dll),
+                "TEMPLATED_depsfile": to_rlocation_path(ctx, test_depsfile),
+                "TEMPLATED_runtimeconfig": to_rlocation_path(ctx, test_runtimeconfig),
+                "TEMPLATED_writable_test_dir": "true" if ctx.attr.writable_test_dir else "false",
+            },
+            is_executable = True,
+        )
     additional_runfiles.append(testhost)
     additional_runfiles.extend(ctx.files._bash_runfiles)
 
@@ -664,6 +682,11 @@ _xunit_library_test = rule(
                 default = "//eng:run_library_test.sh.tpl",
                 allow_single_file = True,
             ),
+            "_helix_launcher_sh": attr.label(
+                doc = "A template file for the Helix manifest launcher (cross-compiled arm64 tests)",
+                default = "//eng:helix_library_test.sh.tpl",
+                allow_single_file = True,
+            ),
             "_xunit_runner": attr.label(
                 doc = "The xunit console runner files",
                 default = "//eng:xunit_console_runner",
@@ -685,6 +708,15 @@ _xunit_library_test = rule(
                       "Built once and shared across all library tests to avoid " +
                       "redundant ~90MB file copies per test.",
                 default = "//src/tests:shared_testhost",
+                allow_single_file = True,
+            ),
+            "_aarch64_constraint": attr.label(default = "@platforms//cpu:aarch64"),
+            # Override COMMON_ATTRS's _core_root to remove the //:Core_Root
+            # dependency. Library tests use _shared_testhost, not Core_Root.
+            # Without this override, Core_Root's x64-specific deps make all
+            # library tests incompatible with arm64 cross-compilation.
+            "_core_root": attr.label(
+                default = None,
                 allow_single_file = True,
             ),
             "writable_test_dir": attr.bool(

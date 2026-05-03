@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Helix payload packaging launcher for cross-compiled tests.
+# Instead of running the test, this script writes a manifest of test file paths
+# to $TEST_UNDECLARED_OUTPUTS_DIR. After `bazel test`, a collection script reads
+# the manifests from bazel-testlogs/ to assemble Helix payloads.
+
+# --- begin runfiles.bash initialization v3 ---
+# Copy-pasted from the Bazel Bash runfiles library v3.
+set -uo pipefail; set +e; f=bazel_tools/tools/bash/runfiles/runfiles.bash
+source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
+  source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
+  source "$0.runfiles/$f" 2>/dev/null || \
+  source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+  source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+  { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
+# --- end runfiles.bash initialization v3 ---
+
+TESTHOST_RAW=$(rlocation TEMPLATED_testhost)
+ENTRY_DLL="$(rlocation TEMPLATED_entry_dll)"
+
+# Validate resolved paths
+if [[ -z "$ENTRY_DLL" || ! -f "$ENTRY_DLL" ]]; then
+    echo >&2 "ERROR: ENTRY_DLL not found: $ENTRY_DLL"
+    exit 1
+fi
+if [[ -z "$TESTHOST_RAW" || ! -d "$TESTHOST_RAW" ]]; then
+    echo >&2 "ERROR: TESTHOST not found: $TESTHOST_RAW"
+    exit 1
+fi
+
+# Canonicalize paths (resolve symlinks) so they survive after test sandbox cleanup
+TEST_DIR="$(cd "$(dirname "$ENTRY_DLL")" && pwd -P)"
+TESTHOST="$(cd "$TESTHOST_RAW" && pwd -P)"
+TEST_NAME="TEMPLATED_test_name"
+
+if [[ -z "${TEST_UNDECLARED_OUTPUTS_DIR:-}" ]]; then
+    echo >&2 "ERROR: TEST_UNDECLARED_OUTPUTS_DIR not set"
+    exit 1
+fi
+
+# Write manifest for collection by prepare-helix-payloads.sh
+mkdir -p "$TEST_UNDECLARED_OUTPUTS_DIR"
+cat > "$TEST_UNDECLARED_OUTPUTS_DIR/helix_manifest.txt" <<EOF
+TEST_NAME=$TEST_NAME
+TEST_DIR=$TEST_DIR
+TESTHOST=$TESTHOST
+EOF
+

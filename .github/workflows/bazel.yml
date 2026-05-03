@@ -91,7 +91,7 @@ jobs:
             done
           '
 
-      - name: Build arm64 (all targets) in container
+      - name: Build and test arm64 (in container)
         if: ${{ matrix.use_helix }}
         run: |
           CONFIG_FLAGS="--config=${{ matrix.config }}"
@@ -105,20 +105,21 @@ jobs:
               $CONFIG_FLAGS \
               --platforms=${{ matrix.platforms }} \
               --disk_cache=/disk-cache \
-              //src/... //eng:xunit_console_runner
+              //src/...
+            bazel --nohome_rc test --keep_going \
+              $CONFIG_FLAGS \
+              --platforms=${{ matrix.platforms }} \
+              --disk_cache=/disk-cache \
+              //src/libraries/...
           "
 
       - name: Prepare Helix payloads (in container)
         if: ${{ matrix.use_helix }}
         run: |
-          CONFIG_FLAGS="--config=${{ matrix.config }}"
-          if [ -n "${{ matrix.libs_config }}" ]; then
-            CONFIG_FLAGS="$CONFIG_FLAGS --config=${{ matrix.libs_config }}"
-          fi
           docker exec arm64-cross-ci sh -c "
             export HOME=/tmp/bazel-home
             cd /repo
-            eng/bazel/prepare-helix-payloads.sh --bazel-config '$CONFIG_FLAGS'
+            eng/bazel/prepare-helix-payloads.sh
           "
           # Fix ownership — container runs as root, host runner needs write access
           sudo chown -R "$(id -u):$(id -g)" artifacts/helix
