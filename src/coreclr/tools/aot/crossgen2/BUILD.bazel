@@ -117,5 +117,12 @@ publish_binary(
     eventpipe = True,
     debug_symbols = True,
     extra_ilc_args = _CROSSGEN2_PUBLISH_EXTRA_ILC_ARGS,
+    # NativeAOT publish of crossgen2 is only done for native builds, not
+    # cross-compilation.  MSBuild cross-builds produce a host-arch
+    # single-file publish instead (crossgen2_inbuild.csproj).
+    target_compatible_with = select({
+        "@platforms//cpu:arm64": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
 )

@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ bazel, bazel-main, bazel-mac ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
@@ -79,7 +83,15 @@ jobs:
             ln -sf /crossrootfs/arm64/usr/include/unicode /usr/include/unicode 2>/dev/null || true
           '
 
-      - name: Build arm64 (native + managed) in container
+          # The container has LLVM tools but no GNU binutils — create symlinks
+          # so Bazel's auto-detected host CC toolchain can find ar/strip/etc.
+          docker exec arm64-cross-ci sh -c '
+            for tool in ar nm strip ranlib objdump; do
+              ln -sf /usr/local/bin/llvm-$tool /usr/local/bin/$tool 2>/dev/null || true
+            done
+          '
+
+      - name: Build arm64 (all targets) in container
         if: ${{ matrix.use_helix }}
         run: |
           CONFIG_FLAGS="--config=${{ matrix.config }}"
@@ -93,20 +105,23 @@ jobs:
               $CONFIG_FLAGS \
               --platforms=${{ matrix.platforms }} \
               --disk_cache=/disk-cache \
-              //src/coreclr/... //src/native/... //src/libraries/...
+              //src/... //eng:xunit_console_runner
           "
 
-      - name: Build test assemblies on host
+      - name: Prepare Helix payloads (in container)
         if: ${{ matrix.use_helix }}
         run: |
-          bazel build --keep_going \
-            --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} \
-            --disk_cache=~/.cache/bazel-disk \
-            //src/libraries/... //eng:xunit_console_runner
-
-      - name: Prepare Helix payloads
-        if: ${{ matrix.use_helix }}
-        run: eng/bazel/prepare-helix-payloads.sh
+          CONFIG_FLAGS="--config=${{ matrix.config }}"
+          if [ -n "${{ matrix.libs_config }}" ]; then
+            CONFIG_FLAGS="$CONFIG_FLAGS --config=${{ matrix.libs_config }}"
+          fi
+          docker exec arm64-cross-ci sh -c "
+            export HOME=/tmp/bazel-home
+            cd /repo
+            eng/bazel/prepare-helix-payloads.sh --bazel-config '$CONFIG_FLAGS'
+          "
+          # Fix ownership — container runs as root, host runner needs write access
+          sudo chown -R "$(id -u):$(id -g)" artifacts/helix
 
       - name: Install .NET SDK
         if: ${{ matrix.use_helix }}

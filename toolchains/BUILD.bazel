@@ -45,3 +45,22 @@ toolchain(
     toolchain = ":linux_arm64_cc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
+
+# Test-execution toolchain for cross-compilation: Bazel's default test
+# toolchain requires an execution platform matching the target, which blocks
+# `bazel build` of test targets during cross-compilation.  This toolchain
+# tells Bazel that arm64 test execution is handled externally (via Helix),
+# so it's safe to build arm64 test targets on an x64 host.
+toolchain(
+    name = "linux_arm64_helix_test_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+    ],
+    toolchain = "@bazel_tools//tools/test:empty_toolchain",
+    toolchain_type = "@bazel_tools//tools/test:default_test_toolchain_type",
+)
