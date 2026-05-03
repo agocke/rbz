@@ -19,6 +19,13 @@ jobs:
             name: Linux checked
             config: clr_checked
             libs_config: libs_release
+          - os: [self-hosted, Linux, X64]
+            name: Linux ARM64 (Helix)
+            config: clr_release
+            libs_config: libs_release
+            platforms: //platforms:linux_arm64
+            use_helix: true
+            cross_image: mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64
           - os: [self-hosted, macOS, X64]
             name: macOS release
             config: clr_release
@@ -50,98 +57,56 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: ~/.cache/bazel-disk
-          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
+          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ matrix.platforms && 'arm64-' || '' }}${{ github.sha }}
           restore-keys: |
-            bazel-${{ runner.os }}-${{ matrix.config }}-
+            bazel-${{ runner.os }}-${{ matrix.config }}-${{ matrix.platforms && 'arm64-' || '' }}
 
-      - name: Build
-        run: bazel build ${{ matrix.targets || '//...' }} --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk
-
-      - name: Test
-        if: ${{ !matrix.targets && !matrix.skip_tests }}
-        run: bazel test //... --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk --test_output=errors
-
-      - name: Save Bazel cache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: ~/.cache/bazel-disk
-          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
-
-  # Cross-compile for linux-arm64 and run tests on Helix arm64 machines.
-  # The build runs in a cross-build container with an arm64 sysroot.
-  # Test DLLs are managed (arch-independent) so they're built on the x64 host.
-  # An arm64 testhost is assembled from Bazel's arm64 native outputs + managed libs.
-  linux-arm64-helix:
-    name: Linux ARM64 (Helix)
-    runs-on: [self-hosted, Linux, X64]
-
-    defaults:
-      run:
-        shell: bash
-
-    env:
-      CROSS_IMAGE: mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64
-      CROSS_CONTAINER: arm64-cross-ci
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Install host dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq -y clang-18 lld libkrb5-dev liblttng-ust-dev libssl-dev
-
-      - name: Restore Bazel cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.cache/bazel-disk
-          key: bazel-Linux-arm64-${{ github.sha }}
-          restore-keys: |
-            bazel-Linux-arm64-
+      # ---------- Cross-build steps (use_helix: true) ----------
 
       - name: Start cross-build container
+        if: ${{ matrix.use_helix }}
         run: |
-          docker pull "$CROSS_IMAGE"
-          docker rm -f "$CROSS_CONTAINER" 2>/dev/null || true
-          docker run -d --name "$CROSS_CONTAINER" \
+          docker pull "${{ matrix.cross_image }}"
+          docker rm -f arm64-cross-ci 2>/dev/null || true
+          docker run -d --name arm64-cross-ci \
             -v "$PWD:/repo" \
             -v "$(which bazel):/usr/local/bin/bazel" \
             -v "$HOME/.cache/bazel-disk:/disk-cache" \
-            "$CROSS_IMAGE" sleep infinity
+            "${{ matrix.cross_image }}" sleep infinity
 
           # Create ICU symlink for Bazel's icu4c_repository rule
-          docker exec "$CROSS_CONTAINER" sh -c '
+          docker exec arm64-cross-ci sh -c '
             ln -sf /crossrootfs/arm64/usr/include/unicode /usr/include/unicode 2>/dev/null || true
           '
 
-      - name: Build arm64 (native + managed source) in container
+      - name: Build arm64 (native + managed) in container
+        if: ${{ matrix.use_helix }}
         run: |
-          docker exec "$CROSS_CONTAINER" sh -c '
+          docker exec arm64-cross-ci sh -c '
             export HOME=/tmp/bazel-home
             cd /repo
             bazel --nohome_rc build --keep_going \
-              --config=clr_release --config=libs_release \
-              --platforms=//platforms:linux_arm64 \
+              --config=${{ matrix.config }} ${{ matrix.libs_config && format(''--config={0}'', matrix.libs_config) || '''' }} \
+              --platforms=${{ matrix.platforms }} \
               --disk_cache=/disk-cache \
               //src/coreclr/... //src/native/... //src/libraries/...
           '
 
-      - name: Build test assemblies on host (managed, arch-independent)
+      - name: Build test assemblies on host
+        if: ${{ matrix.use_helix }}
         run: |
           bazel build --keep_going \
-            --config=clr_release --config=libs_release \
+            --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} \
             --disk_cache=~/.cache/bazel-disk \
             //src/libraries/... //eng:xunit_console_runner
 
       - name: Prepare Helix payloads
-        run: |
-          eng/bazel/prepare-helix-payloads.sh --config clr_release
+        if: ${{ matrix.use_helix }}
+        run: eng/bazel/prepare-helix-payloads.sh
 
       - name: Install .NET SDK
+        if: ${{ matrix.use_helix }}
         run: |
-          # Download the .NET SDK version from global.json
           SDK_VERSION=$(python3 -c "import json; print(json.load(open('global.json'))['tools']['dotnet'])" 2>/dev/null || true)
           if [[ -z "$SDK_VERSION" ]]; then
             SDK_VERSION=$(python3 -c "import json; print(json.load(open('global.json'))['sdk']['version'])" 2>/dev/null)
@@ -151,6 +116,7 @@ jobs:
           .dotnet/dotnet --version
 
       - name: Send to Helix
+        if: ${{ matrix.use_helix }}
         run: |
           export PATH="$PWD/.dotnet:$PATH"
           dotnet msbuild eng/bazel/sendtohelix.proj \
@@ -159,19 +125,28 @@ jobs:
             /p:TesthostPayload="$PWD/artifacts/helix/testhost" \
             /p:TestPayloadDir="$PWD/artifacts/helix/tests"
         env:
-          # Helix SDK requires AzDO-style env vars for source tracking
           BUILD_SOURCEBRANCH: refs/heads/${{ github.ref_name }}
           BUILD_REPOSITORY_NAME: ${{ github.repository }}
           SYSTEM_TEAMPROJECT: public
           BUILD_REASON: ${{ github.event_name == 'pull_request' && 'PullRequest' || 'Manual' }}
 
       - name: Cleanup container
-        if: always()
-        run: docker rm -f "$CROSS_CONTAINER" 2>/dev/null || true
+        if: ${{ always() && matrix.use_helix }}
+        run: docker rm -f arm64-cross-ci 2>/dev/null || true
+
+      # ---------- Standard build + test steps (no Helix) ----------
+
+      - name: Build
+        if: ${{ !matrix.use_helix }}
+        run: bazel build ${{ matrix.targets || '//...' }} --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk
+
+      - name: Test
+        if: ${{ !matrix.targets && !matrix.skip_tests && !matrix.use_helix }}
+        run: bazel test //... --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk --test_output=errors
 
       - name: Save Bazel cache
         if: always()
         uses: actions/cache/save@v5
         with:
           path: ~/.cache/bazel-disk
-          key: bazel-Linux-arm64-${{ github.sha }}
+          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ matrix.platforms && 'arm64-' || '' }}${{ github.sha }}
