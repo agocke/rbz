@@ -110,6 +110,7 @@ jobs:
               $CONFIG_FLAGS \
               --platforms=${{ matrix.platforms }} \
               --disk_cache=/disk-cache \
+              --nozip_undeclared_test_outputs \
               //src/libraries/...
           "
 
