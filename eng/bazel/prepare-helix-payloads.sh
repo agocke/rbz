@@ -47,56 +47,67 @@ fi
 
 echo "==> SDK version: $SDK_VERSION"
 
-# ---------- Find manifests from bazel-testlogs ----------
-TESTLOGS_DIR="$REPO_ROOT/bazel-testlogs"
-if [[ ! -d "$TESTLOGS_DIR" ]]; then
-    echo "ERROR: bazel-testlogs/ not found. Run 'bazel test' first." >&2
+# ---------- Find manifests from bazel test outputs ----------
+# The bazel-testlogs convenience symlink only points to the default config's
+# testlogs (e.g. k8-opt/testlogs). When using --platforms for cross-compilation,
+# tests are under a transitioned config (e.g. k8-opt-ST-<hash>/testlogs).
+# Search all config directories under bazel-out/ for test outputs.
+BAZEL_OUT="$REPO_ROOT/bazel-out"
+if [[ ! -d "$BAZEL_OUT" ]]; then
+    echo "ERROR: bazel-out/ not found. Run 'bazel build/test' first." >&2
     exit 1
 fi
 
-# Debug: show what bazel-testlogs resolves to and sample contents
-echo "   bazel-testlogs -> $(readlink -f "$TESTLOGS_DIR" 2>/dev/null || echo "$TESTLOGS_DIR")"
-echo "   Top-level contents:"
-ls "$TESTLOGS_DIR" 2>/dev/null | head -5 || true
-if [[ -d "$TESTLOGS_DIR/src/libraries" ]]; then
-    echo "   Sample test dir:"
-    find "$TESTLOGS_DIR/src/libraries" -maxdepth 4 -type d | head -5 || true
-    echo "   Sample test files:"
-    find "$TESTLOGS_DIR/src/libraries" -maxdepth 5 -type f | head -10 || true
-fi
+# Find all testlogs directories across all configs
+testlog_dirs=()
+for d in "$BAZEL_OUT"/*/testlogs; do
+    [[ -d "$d" ]] && testlog_dirs+=("$d")
+done
 
-# Look for manifests in test.outputs/ directories (undeclared test outputs).
-# Bazel places these at: bazel-testlogs/<pkg>/<target>/test.outputs/helix_manifest.txt
+echo "   Found ${#testlog_dirs[@]} testlogs dir(s):"
+for d in "${testlog_dirs[@]}"; do
+    echo "     $(basename "$(dirname "$d")")/testlogs"
+done
+
+# Search for helix manifests in test.outputs/ across all testlogs dirs
 manifests=()
-while IFS= read -r -d '' manifest; do
-    manifests+=("$manifest")
-done < <(find "$TESTLOGS_DIR/src/libraries" -path "*/test.outputs/helix_manifest.txt" -print0 2>/dev/null)
-
-# Fallback: check if manifests are anywhere under testlogs
-if [[ ${#manifests[@]} -eq 0 ]]; then
+for tld in "${testlog_dirs[@]}"; do
     while IFS= read -r -d '' manifest; do
         manifests+=("$manifest")
-    done < <(find "$TESTLOGS_DIR" -name "helix_manifest.txt" -print0 2>/dev/null)
+    done < <(find "$tld" -path "*/test.outputs/helix_manifest.txt" -print0 2>/dev/null)
+done
+
+# Fallback: search by name anywhere in testlogs
+if [[ ${#manifests[@]} -eq 0 ]]; then
+    for tld in "${testlog_dirs[@]}"; do
+        while IFS= read -r -d '' manifest; do
+            manifests+=("$manifest")
+        done < <(find "$tld" -name "helix_manifest.txt" -print0 2>/dev/null)
+    done
 fi
 
-# Fallback: extract from outputs.zip files if manifests not found loose
+# Fallback: extract from outputs.zip files
 if [[ ${#manifests[@]} -eq 0 ]]; then
     echo "   No loose manifests found, checking for outputs.zip..."
-    EXTRACT_DIR="$(mktemp -d)"
-    while IFS= read -r -d '' zipfile; do
-        target_dir="$(dirname "$zipfile")"
-        if unzip -q -o "$zipfile" "helix_manifest.txt" -d "$target_dir" 2>/dev/null; then
-            manifests+=("$target_dir/helix_manifest.txt")
-        fi
-    done < <(find "$TESTLOGS_DIR" -name "outputs.zip" -print0 2>/dev/null)
+    for tld in "${testlog_dirs[@]}"; do
+        while IFS= read -r -d '' zipfile; do
+            target_dir="$(dirname "$zipfile")"
+            if unzip -q -o "$zipfile" "helix_manifest.txt" -d "$target_dir" 2>/dev/null; then
+                manifests+=("$target_dir/helix_manifest.txt")
+            fi
+        done < <(find "$tld" -name "outputs.zip" -print0 2>/dev/null)
+    done
     echo "   Found ${#manifests[@]} manifests in zip files"
 fi
 
 if [[ ${#manifests[@]} -eq 0 ]]; then
-    echo "ERROR: No helix manifests found in bazel-testlogs/." >&2
-    echo "   Searched: $TESTLOGS_DIR" >&2
-    echo "   All files in testlogs (first 20):" >&2
-    find "$TESTLOGS_DIR" -type f 2>/dev/null | head -20 >&2 || true
+    echo "ERROR: No helix manifests found in any testlogs directory." >&2
+    echo "   Searched:" >&2
+    for d in "${testlog_dirs[@]}"; do echo "     $d" >&2; done
+    echo "   Sample files (first 20):" >&2
+    for tld in "${testlog_dirs[@]}"; do
+        find "$tld" -type f 2>/dev/null | head -20 >&2 || true
+    done
     exit 1
 fi
 

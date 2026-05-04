@@ -28,9 +28,19 @@ if [[ -z "$TESTHOST_RAW" || ! -d "$TESTHOST_RAW" ]]; then
     exit 1
 fi
 
-# Canonicalize paths (resolve symlinks) so they survive after test sandbox cleanup
-TEST_DIR="$(cd "$(dirname "$ENTRY_DLL")" && pwd -P)"
-TESTHOST="$(cd "$TESTHOST_RAW" && pwd -P)"
+# Convert sandbox paths to persistent execroot paths.
+# During sandboxed test execution, paths look like:
+#   .../sandbox/processwrapper-sandbox/NNN/execroot/_main/bazel-out/...
+# The persistent equivalent is:
+#   .../execroot/_main/bazel-out/...
+# Strip the sandbox prefix to get paths that survive after test cleanup.
+make_persistent() {
+    local p="$1"
+    echo "$p" | sed 's|/sandbox/[^/]*/[0-9]*/execroot/|/execroot/|'
+}
+
+TEST_DIR="$(make_persistent "$(cd "$(dirname "$ENTRY_DLL")" && pwd)")"
+TESTHOST="$(make_persistent "$(cd "$TESTHOST_RAW" && pwd)")"
 TEST_NAME="TEMPLATED_test_name"
 
 if [[ -z "${TEST_UNDECLARED_OUTPUTS_DIR:-}" ]]; then

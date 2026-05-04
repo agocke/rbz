@@ -67,63 +67,14 @@ jobs:
 
       # ---------- Cross-build steps (use_helix: true) ----------
 
-      - name: Start cross-build container
+      - name: Cross-build and prepare Helix payloads
         if: ${{ matrix.use_helix }}
         run: |
-          docker pull "${{ matrix.cross_image }}"
-          docker rm -f arm64-cross-ci 2>/dev/null || true
-          docker run -d --name arm64-cross-ci \
-            -v "$PWD:/repo" \
-            -v "$(which bazel):/usr/local/bin/bazel" \
-            -v "$HOME/.cache/bazel-disk:/disk-cache" \
-            "${{ matrix.cross_image }}" sleep infinity
-
-          # Create ICU symlink for Bazel's icu4c_repository rule
-          docker exec arm64-cross-ci sh -c '
-            ln -sf /crossrootfs/arm64/usr/include/unicode /usr/include/unicode 2>/dev/null || true
-          '
-
-          # The container has LLVM tools but no GNU binutils — create symlinks
-          # so Bazel's auto-detected host CC toolchain can find ar/strip/etc.
-          docker exec arm64-cross-ci sh -c '
-            for tool in ar nm strip ranlib objdump; do
-              ln -sf /usr/local/bin/llvm-$tool /usr/local/bin/$tool 2>/dev/null || true
-            done
-          '
-
-      - name: Build and test arm64 (in container)
-        if: ${{ matrix.use_helix }}
-        run: |
-          CONFIG_FLAGS="--config=${{ matrix.config }}"
-          if [ -n "${{ matrix.libs_config }}" ]; then
-            CONFIG_FLAGS="$CONFIG_FLAGS --config=${{ matrix.libs_config }}"
-          fi
-          docker exec arm64-cross-ci sh -c "
-            export HOME=/tmp/bazel-home
-            cd /repo
-            bazel --nohome_rc build --keep_going \
-              $CONFIG_FLAGS \
-              --platforms=${{ matrix.platforms }} \
-              --disk_cache=/disk-cache \
-              //src/...
-            bazel --nohome_rc test --keep_going \
-              $CONFIG_FLAGS \
-              --platforms=${{ matrix.platforms }} \
-              --disk_cache=/disk-cache \
-              --nozip_undeclared_test_outputs \
-              //src/libraries/...
-          "
-
-      - name: Prepare Helix payloads (in container)
-        if: ${{ matrix.use_helix }}
-        run: |
-          docker exec arm64-cross-ci sh -c "
-            export HOME=/tmp/bazel-home
-            cd /repo
-            eng/bazel/prepare-helix-payloads.sh
-          "
-          # Fix ownership — container runs as root, host runner needs write access
-          sudo chown -R "$(id -u):$(id -g)" artifacts/helix
+          eng/bazel/cross-build.sh \
+            --image "${{ matrix.cross_image }}" \
+            --disk-cache "$HOME/.cache/bazel-disk" \
+            --bazel-config "--config=${{ matrix.config }} --config=${{ matrix.libs_config }}" \
+            --platforms "${{ matrix.platforms }}"
 
       - name: Install .NET SDK
         if: ${{ matrix.use_helix }}
