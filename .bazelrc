@@ -264,3 +264,12 @@ build:ci --//:ci=true
 # To run ONLY pri1 tests: bazel test --test_tag_filters=pri1 //...
 # =====================================================================
 test --test_tag_filters=-pri1
+
+# =====================================================================
+# --config=cross_container: Cross-build inside dotnet cross-build container
+# Uses the LLVM host toolchain (llvm-ar, llvm-nm, etc.) and sets the ICU
+# include path from the cross-rootfs.  Avoids needing /usr/local/bin/ar
+# symlinks or /usr/include/unicode symlinks that require root.
+# =====================================================================
+build:cross_container --extra_toolchains=//toolchains:linux_x64_llvm_toolchain
+build:cross_container --repo_env=DOTNET_ICU_INCLUDE=/crossrootfs/arm64/usr/include/unicode

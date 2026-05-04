@@ -20,9 +20,14 @@ def _icu4c_repository_impl(rctx):
         # Symlink the include directory
         rctx.symlink(icu_path + "/include", "include")
     else:
-        # Linux: ICU headers are in /usr/include (system-wide)
-        # Create include/unicode symlink pointing to /usr/include/unicode
-        rctx.symlink("/usr/include/unicode", "include/unicode")
+        # Linux: check DOTNET_ICU_INCLUDE env var first, then fall back to
+        # /usr/include/unicode (standard system-wide location).
+        custom_path = rctx.os.environ.get("DOTNET_ICU_INCLUDE", "")
+        if custom_path:
+            icu_unicode_dir = custom_path
+        else:
+            icu_unicode_dir = "/usr/include/unicode"
+        rctx.symlink(icu_unicode_dir, "include/unicode")
 
     # Write the BUILD file
     rctx.file("BUILD.bazel", """
@@ -39,5 +44,8 @@ cc_library(
 icu4c_repository = repository_rule(
     implementation = _icu4c_repository_impl,
     local = True,
-    doc = "Locates ICU4C headers on macOS (Homebrew) or Linux (system).",
+    environ = ["DOTNET_ICU_INCLUDE"],
+    doc = "Locates ICU4C headers on macOS (Homebrew) or Linux (system). " +
+          "Set DOTNET_ICU_INCLUDE to override the Linux include path " +
+          "(e.g. /crossrootfs/arm64/usr/include/unicode).",
 )

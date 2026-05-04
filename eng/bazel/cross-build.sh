@@ -82,19 +82,19 @@ docker run "${DOCKER_ARGS[@]}" "$CROSS_IMAGE" sleep infinity
 
 # Create ICU symlink for Bazel's icu4c_repository rule.
 # The container has ICU headers at /crossrootfs/arm64/usr/include/unicode
-# but the repo rule looks at /usr/include/unicode.
+# but the repo rule looks at /usr/include/unicode.  The --config=cross_container
+# bazelrc config sets DOTNET_ICU_INCLUDE to point at the right path, but the
+# host x64 build still needs ICU at the default location for any host-targeting
+# native code.  If /usr/include/unicode already exists we skip this.
 docker exec "$CONTAINER_NAME" sh -c '
-    mkdir -p /usr/include
-    ln -sf /crossrootfs/arm64/usr/include/unicode /usr/include/unicode
+    if [ ! -d /usr/include/unicode ]; then
+        mkdir -p /usr/include
+        ln -sf /crossrootfs/arm64/usr/include/unicode /usr/include/unicode
+    fi
 '
 
-# The container has LLVM tools but no GNU binutils — create symlinks
-# so Bazel's auto-detected host CC toolchain can find ar/strip/etc.
-docker exec "$CONTAINER_NAME" sh -c '
-    for tool in ar nm strip ranlib objdump; do
-        ln -sf /usr/local/bin/llvm-$tool /usr/local/bin/$tool 2>/dev/null || true
-    done
-'
+# Use --config=cross_container for LLVM host toolchain + ICU path config.
+# This avoids needing root symlinks for ar/nm/strip and /usr/include/unicode.
 
 # If no bazel binary was mounted, install bazelisk
 if [[ -z "$BAZEL_BIN" ]]; then
@@ -117,6 +117,7 @@ docker exec "$CONTAINER_NAME" sh -c "
     export HOME=/tmp/bazel-home
     cd /repo
     bazel --nohome_rc build --keep_going \
+        --config=cross_container \
         $BAZEL_CONFIG \
         --platforms=$PLATFORMS \
         $CACHE_FLAG \
@@ -132,9 +133,11 @@ docker exec "$CONTAINER_NAME" sh -c "
     rm -rf $MANIFEST_DIR
     mkdir -p $MANIFEST_DIR
     bazel --nohome_rc test --keep_going \
+        --config=cross_container \
         $BAZEL_CONFIG \
         --platforms=$PLATFORMS \
         $CACHE_FLAG \
+        --nocache_test_results \
         --test_env=HELIX_MANIFEST_DIR=$MANIFEST_DIR \
         //src/libraries/...
 "
