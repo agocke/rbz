@@ -17,7 +17,7 @@
 #   --bazel-config FLAGS   Bazel --config flags (default: --config=clr_release --config=libs_release)
 #   --platforms LABEL       Bazel --platforms target
 #   --container NAME       Container name (default: arm64-cross-ci)
-#   --skip-helix           Stop after payload preparation (don't submit to Helix)
+#   --send-to-helix        Submit work items to Helix after packaging
 #   --creator NAME         Helix Creator field (default: $USER)
 #   --helix-build ID       Helix Build ID (default: local-<timestamp>)
 #
@@ -38,7 +38,7 @@ DISK_CACHE=""
 BAZEL_CONFIG="--config=clr_release --config=libs_release"
 PLATFORMS="//platforms:linux_arm64"
 CONTAINER_NAME="arm64-cross-ci"
-SKIP_HELIX=""
+SKIP_HELIX="1"
 HELIX_CREATOR="${USER:-local}"
 HELIX_BUILD="local-$(date +%s)"
 
@@ -49,7 +49,7 @@ while [[ $# -gt 0 ]]; do
         --bazel-config) BAZEL_CONFIG="$2"; shift 2 ;;
         --platforms) PLATFORMS="$2"; shift 2 ;;
         --container) CONTAINER_NAME="$2"; shift 2 ;;
-        --skip-helix) SKIP_HELIX=1; shift ;;
+        --send-to-helix) SKIP_HELIX=""; shift ;;
         --creator) HELIX_CREATOR="$2"; shift 2 ;;
         --helix-build) HELIX_BUILD="$2"; shift 2 ;;
         *) echo "Unknown option: $1" >&2; exit 1 ;;

@@ -111,6 +111,7 @@ jobs:
             --disk-cache "$HOME/.cache/bazel-disk" \
             --bazel-config "--config=${{ matrix.config }} --config=${{ matrix.libs_config }}" \
             --platforms "${{ matrix.platforms }}" \
+            --send-to-helix \
             --creator "${GITHUB_ACTOR:-bazel-ci}" \
             --helix-build "${GITHUB_RUN_ID:-local}"
         env:
