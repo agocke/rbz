@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# Helix payload packaging launcher for cross-compiled tests.
-# Instead of running the test, this script writes a manifest of test file paths
-# to $TEST_UNDECLARED_OUTPUTS_DIR. After `bazel test`, a collection script reads
-# the manifests from bazel-testlogs/ to assemble Helix payloads.
+# Self-contained Helix test launcher for cross-compiled arm64 tests.
+#
+# Instead of running the test locally, this script:
+#   1. Reads Helix container info from $HELIX_CONTAINER_INFO
+#   2. Zips test files from Bazel's assembled output directory
+#   3. Uploads the test payload to the shared blob container
+#   4. Creates a single-work-item Helix job
+#   5. Polls for completion and reports pass/fail
+#
+# Bazel test caching works naturally: if test inputs haven't changed,
+# the cached result is reused without dispatching to Helix.
 
 # --- begin runfiles.bash initialization v3 ---
-# Copy-pasted from the Bazel Bash runfiles library v3.
 set -uo pipefail; set +e; f=bazel_tools/tools/bash/runfiles/runfiles.bash
 source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
   source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
@@ -15,49 +21,213 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
   { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
 # --- end runfiles.bash initialization v3 ---
 
-TESTHOST_RAW=$(rlocation TEMPLATED_testhost)
-ENTRY_DLL="$(rlocation TEMPLATED_entry_dll)"
-
-# Validate resolved paths
-if [[ -z "$ENTRY_DLL" || ! -f "$ENTRY_DLL" ]]; then
-    echo >&2 "ERROR: ENTRY_DLL not found: $ENTRY_DLL"
-    exit 1
-fi
-if [[ -z "$TESTHOST_RAW" || ! -d "$TESTHOST_RAW" ]]; then
-    echo >&2 "ERROR: TESTHOST not found: $TESTHOST_RAW"
-    exit 1
-fi
-
-# Convert sandbox paths to persistent execroot paths.
-# During sandboxed test execution, paths look like:
-#   .../sandbox/processwrapper-sandbox/NNN/execroot/_main/bazel-out/...
-# The persistent equivalent is:
-#   .../execroot/_main/bazel-out/...
-# Strip the sandbox prefix to get paths that survive after test cleanup.
-make_persistent() {
-    local p="$1"
-    echo "$p" | sed 's|/sandbox/[^/]*/[0-9]*/execroot/|/execroot/|'
-}
-
-TEST_DIR="$(make_persistent "$(cd "$(dirname "$ENTRY_DLL")" && pwd)")"
-TESTHOST="$(make_persistent "$(cd "$TESTHOST_RAW" && pwd)")"
+HELIX_BASE="https://helix.dot.net"
+API_VER="api-version=2019-06-17"
 TEST_NAME="TEMPLATED_test_name"
 
-# Write manifest to HELIX_MANIFEST_DIR if set (deterministic location),
-# otherwise fall back to TEST_UNDECLARED_OUTPUTS_DIR (bazel-testlogs).
-if [[ -n "${HELIX_MANIFEST_DIR:-}" ]]; then
-    MANIFEST_DIR="$HELIX_MANIFEST_DIR"
-elif [[ -n "${TEST_UNDECLARED_OUTPUTS_DIR:-}" ]]; then
-    MANIFEST_DIR="$TEST_UNDECLARED_OUTPUTS_DIR"
-else
-    echo >&2 "ERROR: Neither HELIX_MANIFEST_DIR nor TEST_UNDECLARED_OUTPUTS_DIR set"
+# Resolve paths via runfiles
+ENTRY_DLL="$(rlocation TEMPLATED_entry_dll)"
+XUNIT_CONSOLE="$(rlocation TEMPLATED_xunit_console)"
+DEPSFILE="$(rlocation TEMPLATED_depsfile)"
+RUNTIMECONFIG="$(rlocation TEMPLATED_runtimeconfig)"
+
+# Validate
+if [[ -z "${HELIX_CONTAINER_INFO:-}" ]]; then
+    echo >&2 "ERROR: HELIX_CONTAINER_INFO env var not set."
+    echo >&2 "Run eng/bazel/helix-create-container.sh first and pass via --test_env."
+    exit 1
+fi
+if [[ ! -f "$HELIX_CONTAINER_INFO" ]]; then
+    echo >&2 "ERROR: HELIX_CONTAINER_INFO file not found: $HELIX_CONTAINER_INFO"
+    exit 1
+fi
+for var_name in ENTRY_DLL XUNIT_CONSOLE DEPSFILE RUNTIMECONFIG; do
+    val="${!var_name}"
+    if [[ -z "$val" || ! -f "$val" ]]; then
+        echo >&2 "ERROR: $var_name not found: $val"
+        exit 1
+    fi
+done
+
+# Read container info
+WRITE_TOKEN=$(python3 -c "import json; print(json.load(open('$HELIX_CONTAINER_INFO'))['write_token'])")
+READ_TOKEN=$(python3 -c "import json; print(json.load(open('$HELIX_CONTAINER_INFO'))['read_token'])")
+BLOB_BASE=$(python3 -c "import json; print(json.load(open('$HELIX_CONTAINER_INFO'))['blob_base'])")
+TESTHOST_URI=$(python3 -c "import json; print(json.load(open('$HELIX_CONTAINER_INFO'))['testhost_uri'])")
+QUEUE_ID=$(python3 -c "import json; print(json.load(open('$HELIX_CONTAINER_INFO'))['queue_id'])")
+DOCKER_TAG=$(python3 -c "import json; print(json.load(open('$HELIX_CONTAINER_INFO'))['docker_tag'])")
+HELIX_SOURCE=$(python3 -c "import json; print(json.load(open('$HELIX_CONTAINER_INFO'))['source'])")
+HELIX_CREATOR=$(python3 -c "import json; print(json.load(open('$HELIX_CONTAINER_INFO'))['creator'])")
+
+# ---------- Step 1: Build test payload zip ----------
+TEST_DIR="$(cd "$(dirname "$ENTRY_DLL")" && pwd -P)"
+WORK_DIR="${TEST_TMPDIR:-/tmp}/helix-${TEST_NAME}"
+rm -rf "$WORK_DIR"
+mkdir -p "$WORK_DIR"
+
+# Generate run.sh for Helix to execute
+# $HELIX_CORRELATION_PAYLOAD contains the testhost (dotnet, shared framework, xunit runner)
+cat > "$WORK_DIR/run.sh" << 'RUN_INNER_EOF'
+#!/usr/bin/env bash
+set -eu
+export DOTNET_ROOT="$HELIX_CORRELATION_PAYLOAD"
+RUN_INNER_EOF
+cat >> "$WORK_DIR/run.sh" << RUN_INNER_EOF
+exec "\$HELIX_CORRELATION_PAYLOAD/dotnet" exec \\
+  --runtimeconfig $(basename "$RUNTIMECONFIG") \\
+  --depsfile $(basename "$DEPSFILE") \\
+  xunit.console.dll \\
+  ${TEST_NAME}.dll \\
+  -nologo \\
+  -notrait "category=failing" \\
+  -notrait "category=OuterLoop"
+RUN_INNER_EOF
+chmod +x "$WORK_DIR/run.sh"
+
+# Zip test files: test DLL, runtimeconfig, depsfile, data files, and run.sh.
+# Skip framework assemblies (in testhost), launcher scripts, and Bazel metadata.
+python3 << PYEOF
+import zipfile, os, sys, shutil
+
+zip_path = "$WORK_DIR/payload.zip"
+test_dir = "$TEST_DIR"
+run_sh = "$WORK_DIR/run.sh"
+
+# Skip Bazel metadata and launcher scripts
+skip_extensions = {'.sh', '.bat', '.repo_mapping', '.runfiles_manifest', '.params'}
+# Skip directories that are Bazel artifacts, not test data
+skip_dirs = {'ref', 'runfiles'}
+
+with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+    # Add run.sh
+    zf.write(run_sh, 'run.sh')
+
+    # Add test files from the Bazel output directory
+    for entry in os.listdir(test_dir):
+        filepath = os.path.join(test_dir, entry)
+
+        if os.path.isdir(filepath):
+            # Skip Bazel internal directories and runfiles
+            base = os.path.basename(entry)
+            if base in skip_dirs or base.endswith('.runfiles'):
+                continue
+            # Include test data subdirectories
+            for root, dirs, files in os.walk(filepath):
+                for f in files:
+                    full = os.path.join(root, f)
+                    arcname = os.path.relpath(full, test_dir)
+                    zf.write(full, arcname)
+            continue
+
+        ext = os.path.splitext(entry)[1]
+        if ext in skip_extensions:
+            continue
+
+        # Resolve symlinks
+        real_path = os.path.realpath(filepath)
+        if os.path.isfile(real_path):
+            zf.write(real_path, entry)
+
+size_mb = os.path.getsize(zip_path) / 1048576
+print(f"   Payload: {size_mb:.1f} MB")
+PYEOF
+
+# ---------- Step 2: Upload test payload ----------
+PAYLOAD_BLOB="${TEST_NAME}-$(python3 -c "import uuid; print(uuid.uuid4())").zip"
+curl -sf -X PUT \
+    "${BLOB_BASE}/${PAYLOAD_BLOB}${WRITE_TOKEN}" \
+    -H "x-ms-blob-type: BlockBlob" \
+    -H "Content-Type: application/zip" \
+    --data-binary "@${WORK_DIR}/payload.zip"
+PAYLOAD_URI="${BLOB_BASE}/${PAYLOAD_BLOB}${READ_TOKEN}"
+
+# ---------- Step 3: Build and upload job-list JSON ----------
+JOB_LIST_BLOB="${TEST_NAME}-joblist-$(python3 -c "import uuid; print(uuid.uuid4())").json"
+python3 -c "
+import json, sys
+job_list = [{
+    'WorkItemId': '$TEST_NAME',
+    'Command': 'chmod +x run.sh && ./run.sh',
+    'TimeoutInSeconds': 900,
+    'PayloadUri': '$PAYLOAD_URI',
+    'CorrelationPayloadUrisWithDestinations': {
+        '$TESTHOST_URI': ''
+    }
+}]
+with open('$WORK_DIR/job-list.json', 'w') as f:
+    json.dump(job_list, f)
+"
+curl -sf -X PUT \
+    "${BLOB_BASE}/${JOB_LIST_BLOB}${WRITE_TOKEN}" \
+    -H "x-ms-blob-type: BlockBlob" \
+    -H "Content-Type: application/json" \
+    --data-binary "@${WORK_DIR}/job-list.json"
+LIST_URI="${BLOB_BASE}/${JOB_LIST_BLOB}${READ_TOKEN}"
+
+# ---------- Step 4: Create Helix job ----------
+IDEMPOTENCY_KEY=$(python3 -c "import uuid; print(uuid.uuid4())")
+JOB_RESULT=$(curl -sf -X POST \
+    "${HELIX_BASE}/api/jobs?${API_VER}" \
+    -H "Content-Type: application/json; charset=utf-8" \
+    -H "Idempotency-Key: ${IDEMPOTENCY_KEY}" \
+    -d "$(python3 -c "
+import json
+job = {
+    'Type': 'test/bazel/arm64/',
+    'QueueId': '$QUEUE_ID',
+    'ListUri': '$LIST_URI',
+    'Creator': '$HELIX_CREATOR',
+    'Source': '$HELIX_SOURCE',
+    'DockerTag': '$DOCKER_TAG',
+    'Properties': {
+        'TestName': '$TEST_NAME'
+    }
+}
+print(json.dumps(job))
+")")
+
+JOB_NAME=$(echo "$JOB_RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['Name'])")
+echo "   Helix job: $JOB_NAME (${TEST_NAME})"
+echo "   Details: ${HELIX_BASE}/api/jobs/${JOB_NAME}/details?${API_VER}"
+
+# ---------- Step 5: Poll for completion ----------
+POLL_INTERVAL=10
+MAX_WAIT=900
+WAITED=0
+
+while true; do
+    PF=$(curl -sf "${HELIX_BASE}/api/jobs/${JOB_NAME}/pf?${API_VER}" 2>/dev/null || echo '{}')
+    WORKING=$(echo "$PF" | python3 -c "import json,sys; print(json.load(sys.stdin).get('Working', -1))" 2>/dev/null || echo "-1")
+    TOTAL=$(echo "$PF" | python3 -c "import json,sys; print(json.load(sys.stdin).get('Total', 0))" 2>/dev/null || echo "0")
+
+    if [[ "$WORKING" == "0" && "$TOTAL" != "0" ]]; then
+        break
+    fi
+
+    if [[ $WAITED -ge $MAX_WAIT ]]; then
+        echo >&2 "ERROR: Helix job $JOB_NAME timed out after ${MAX_WAIT}s"
+        exit 1
+    fi
+
+    sleep $POLL_INTERVAL
+    WAITED=$((WAITED + POLL_INTERVAL))
+done
+
+# ---------- Step 6: Check results ----------
+FAILED=$(echo "$PF" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('Failed', [])))")
+PASSED=$(echo "$PF" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('Passed', [])))")
+
+# Clean up temp files
+rm -rf "$WORK_DIR"
+
+if [[ "$FAILED" != "0" ]]; then
+    echo >&2 "FAILED: ${TEST_NAME} (Helix job: $JOB_NAME)"
+    # Stream console output for failed work item
+    echo >&2 "--- Helix console output ---"
+    curl -sfL "${HELIX_BASE}/api/jobs/${JOB_NAME}/workitems/${TEST_NAME}/console?${API_VER}" >&2 || true
+    echo >&2 "--- End console output ---"
     exit 1
 fi
 
-mkdir -p "$MANIFEST_DIR"
-cat > "$MANIFEST_DIR/${TEST_NAME}.manifest" <<EOF
-TEST_NAME=$TEST_NAME
-TEST_DIR=$TEST_DIR
-TESTHOST=$TESTHOST
-EOF
-
+echo "PASSED: ${TEST_NAME} (Helix job: $JOB_NAME)"
+exit 0

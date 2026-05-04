@@ -113,7 +113,7 @@ jobs:
           DOCKER_ARGS+=(-v "$HOME/.cache/bazel-disk:/disk-cache")
           docker run "${DOCKER_ARGS[@]}" "${{ matrix.cross_image }}" sleep infinity
 
-      - name: Cross-build and submit to Helix
+      - name: Cross-build and test on Helix
         run: |
           eng/bazel/cross-build.sh \
             --disk-cache "$HOME/.cache/bazel-disk" \
@@ -121,12 +121,7 @@ jobs:
             --platforms "${{ matrix.platforms }}" \
             --send-to-helix \
             --creator "${GITHUB_ACTOR:-bazel-ci}" \
-            --helix-build "${GITHUB_RUN_ID:-local}"
-        env:
-          BUILD_SOURCEBRANCH: refs/heads/${{ github.ref_name }}
-          BUILD_REPOSITORY_NAME: ${{ github.repository }}
-          SYSTEM_TEAMPROJECT: public
-          BUILD_REASON: ${{ github.event_name == 'pull_request' && 'PullRequest' || 'Manual' }}
+            --source "pr/${{ github.repository }}/refs/heads/${{ github.ref_name }}"
 
       - name: Cleanup container
         if: always()

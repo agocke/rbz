@@ -377,15 +377,18 @@ def _xunit_library_test_impl(ctx):
 
     launcher = ctx.actions.declare_file("{}.{}".format(dll.basename, "bat" if ctx.target_platform_has_constraint(windows_constraint) else "sh"), sibling = dll)
     if is_helix:
-        # Cross-compiled arm64 test: use helix launcher that writes a manifest
-        # instead of executing the test. Collected after `bazel test` to submit
-        # to Helix for remote arm64 execution.
+        # Cross-compiled arm64 test: use helix launcher that dispatches to Helix
+        # for remote arm64 execution. Each test handles its own Helix job
+        # creation, polling, and result reporting.
         ctx.actions.expand_template(
             template = ctx.file._helix_launcher_sh,
             output = launcher,
             substitutions = {
                 "TEMPLATED_testhost": to_rlocation_path(ctx, testhost),
+                "TEMPLATED_xunit_console": to_rlocation_path(ctx, xunit_console_dll),
                 "TEMPLATED_entry_dll": to_rlocation_path(ctx, dll),
+                "TEMPLATED_depsfile": to_rlocation_path(ctx, test_depsfile),
+                "TEMPLATED_runtimeconfig": to_rlocation_path(ctx, test_runtimeconfig),
                 "TEMPLATED_test_name": ctx.label.name,
             },
             is_executable = True,

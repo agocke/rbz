@@ -580,7 +580,7 @@ CMake currently supports all of these OS × architecture combinations. Bazel sup
 |-------------|-------|-------|-------|
 | x64 (AMD64) | ✅ | 🔨 In progress | First target |
 | x86 (i386) | ✅ | ❌ Not started | |
-| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host via container toolchain. All native libs (95/95), coreclr, nativeaot, and managed library source targets build. Tests run on Helix arm64 machines via `eng/bazel/sendtohelix.proj`. crossgen2-publish needs host CC for NativeAOT link. |
+| ARM64 (AArch64) | ✅ | 🔨 In progress | Cross-compile from x64 host via container toolchain. All native libs (95/95), coreclr, nativeaot, and managed library source targets build. Tests dispatch to Helix arm64 machines per-test via self-contained Helix launcher (`eng/helix_library_test.sh.tpl`), with Bazel test caching. crossgen2-publish needs host CC for NativeAOT link. |
 | ARM (32-bit) | ✅ | ❌ Not started | |
 | ARMv6 | ✅ | ❌ Not started | |
 | RISC-V 64 | ✅ | ❌ Not started | |
@@ -1165,49 +1165,41 @@ The Bazel CI runs on GitHub Actions with self-hosted runners.
 ### Linux ARM64 (Helix) leg
 
 Cross-compiles for linux-arm64 in a container and runs tests on Helix arm64
-machines. The workflow:
+machines. Each test dispatches its own Helix job, polls for results, and reports
+pass/fail — Bazel test caching works naturally so only changed tests re-run.
 
 1. **Container build**: Runs `bazel build` inside the
    `mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64`
    container with `--platforms=//platforms:linux_arm64` to produce arm64 native
    binaries.
 
-2. **Host test build**: Builds test DLLs on the x64 host — managed assemblies
-   are architecture-independent.
+2. **Testhost upload** (`eng/bazel/helix-create-container.sh`): Creates a Helix
+   blob storage container, zips and uploads the shared testhost (dotnet +
+   shared framework), and writes `container.json` with SAS tokens. This runs
+   once before `bazel test`.
 
-3. **Payload assembly** (`eng/bazel/prepare-helix-payloads.sh`): Assembles an
-   arm64 testhost from Bazel outputs (dotnet, libcoreclr, native libs, managed
-   framework DLLs) plus per-test work item directories with test DLLs and
-   dependencies.
-
-4. **Helix submission** (`eng/bazel/sendtohelix.proj`): Sends work items to the
-   `(Ubuntu.2204.ArmArch.Open)AzureLinux.3.Arm64.Open` Helix queue (anonymous,
-   no access token needed). Each test runs `dotnet exec xunit.console.dll
-   TestName.dll` on an arm64 machine.
+3. **Per-test Helix dispatch** (`eng/helix_library_test.sh.tpl`): Each arm64
+   test target uses the Helix launcher template instead of running locally.
+   The launcher reads `container.json`, zips the test's output directory,
+   uploads the payload, creates a single-work-item Helix job on the
+   `AzureLinux.3.Arm64.Open` queue (anonymous, no access token needed),
+   polls for completion, and reports pass/fail.
 
 #### Running locally
 
 ```bash
-# 1. Build arm64 in container (from repo root)
-docker run --rm -v "$PWD:/repo" -w /repo \
+# 1. Start the cross-build container
+docker run -d --name arm64-cross-ci \
+  -v "$PWD:/repo" \
+  -v "$(which bazel):/usr/local/bin/bazel" \
   mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64 \
-  bash -c 'export HOME=/tmp/bazel-home && bazel --nohome_rc build --keep_going \
-    --config=clr_release --config=libs_release \
-    --platforms=//platforms:linux_arm64 \
-    //src/coreclr/... //src/native/... //src/libraries/...'
+  sleep infinity
 
-# 2. Build test assemblies on host
-bazel build --config=clr_release --config=libs_release \
-  //src/libraries/... //eng:xunit_console_runner
+# 2. Build + test via Helix (uses eng/bazel/cross-build.sh)
+eng/bazel/cross-build.sh --send-to-helix
 
-# 3. Assemble payloads
-eng/bazel/prepare-helix-payloads.sh --test-filter "System.Runtime"
-
-# 4. Submit to Helix (requires BUILD_SOURCEBRANCH, BUILD_REPOSITORY_NAME,
-#    SYSTEM_TEAMPROJECT, BUILD_REASON env vars for Helix SDK)
-BUILD_SOURCEBRANCH=refs/heads/bazel BUILD_REPOSITORY_NAME=agocke/rbz \
-SYSTEM_TEAMPROJECT=public BUILD_REASON=Manual \
-dotnet msbuild eng/bazel/sendtohelix.proj /p:Creator=yourname /p:HelixBuild=local
+# 3. Cleanup
+docker rm -f arm64-cross-ci
 ```
 
 ---
