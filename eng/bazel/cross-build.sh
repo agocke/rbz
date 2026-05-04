@@ -1,14 +1,25 @@
 #!/usr/bin/env bash
-# Cross-build and prepare Helix payloads for linux-arm64.
+# Cross-build, package, and (optionally) submit arm64 tests to Helix.
 #
 # This script:
 #   1. Starts a cross-build container with the arm64 toolchain
 #   2. Builds all targets for arm64 inside the container
 #   3. Runs library tests (which produce helix manifests instead of executing)
 #   4. Collects manifests and packages Helix payloads
+#   5. Submits work items to Helix (unless --skip-helix)
 #
 # Usage:
-#   eng/bazel/cross-build.sh [--image IMAGE] [--disk-cache DIR] [--bazel-config FLAGS]
+#   eng/bazel/cross-build.sh [OPTIONS]
+#
+# Options:
+#   --image IMAGE          Cross-build container image
+#   --disk-cache DIR       Bazel disk cache directory
+#   --bazel-config FLAGS   Bazel --config flags (default: --config=clr_release --config=libs_release)
+#   --platforms LABEL       Bazel --platforms target
+#   --container NAME       Container name (default: arm64-cross-ci)
+#   --skip-helix           Stop after payload preparation (don't submit to Helix)
+#   --creator NAME         Helix Creator field (default: $USER)
+#   --helix-build ID       Helix Build ID (default: local-<timestamp>)
 #
 # Output:
 #   artifacts/helix/testhost/   — shared testhost (Helix correlation payload)
@@ -27,6 +38,9 @@ DISK_CACHE=""
 BAZEL_CONFIG="--config=clr_release --config=libs_release"
 PLATFORMS="//platforms:linux_arm64"
 CONTAINER_NAME="arm64-cross-ci"
+SKIP_HELIX=""
+HELIX_CREATOR="${USER:-local}"
+HELIX_BUILD="local-$(date +%s)"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -35,6 +49,9 @@ while [[ $# -gt 0 ]]; do
         --bazel-config) BAZEL_CONFIG="$2"; shift 2 ;;
         --platforms) PLATFORMS="$2"; shift 2 ;;
         --container) CONTAINER_NAME="$2"; shift 2 ;;
+        --skip-helix) SKIP_HELIX=1; shift ;;
+        --creator) HELIX_CREATOR="$2"; shift 2 ;;
+        --helix-build) HELIX_BUILD="$2"; shift 2 ;;
         *) echo "Unknown option: $1" >&2; exit 1 ;;
     esac
 done
@@ -137,4 +154,32 @@ if [[ -d "$REPO_ROOT/artifacts/helix" ]]; then
     fi
 fi
 
-echo "==> Cross-build complete. Helix payloads at: artifacts/helix/"
+# ---------- Step 5: Submit to Helix ----------
+if [[ -n "$SKIP_HELIX" ]]; then
+    echo "==> Cross-build complete (Helix submission skipped). Payloads at: artifacts/helix/"
+    exit 0
+fi
+
+echo "==> Submitting tests to Helix..."
+
+# Ensure .NET SDK is available
+DOTNET_CMD="dotnet"
+if ! command -v "$DOTNET_CMD" &>/dev/null || ! "$DOTNET_CMD" msbuild --version &>/dev/null 2>&1; then
+    echo "   Installing .NET SDK..."
+    SDK_VERSION=$(python3 -c "import json; print(json.load(open('$REPO_ROOT/global.json'))['tools']['dotnet'])" 2>/dev/null || true)
+    if [[ -z "$SDK_VERSION" ]]; then
+        SDK_VERSION=$(python3 -c "import json; print(json.load(open('$REPO_ROOT/global.json'))['sdk']['version'])" 2>/dev/null)
+    fi
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version "$SDK_VERSION" --install-dir "$REPO_ROOT/.dotnet"
+    DOTNET_CMD="$REPO_ROOT/.dotnet/dotnet"
+fi
+
+echo "   SDK version: $("$DOTNET_CMD" --version)"
+
+"$DOTNET_CMD" msbuild "$REPO_ROOT/eng/bazel/sendtohelix.proj" \
+    /p:Creator="$HELIX_CREATOR" \
+    /p:HelixBuild="$HELIX_BUILD" \
+    /p:TesthostPayload="$REPO_ROOT/artifacts/helix/testhost" \
+    /p:TestPayloadDir="$REPO_ROOT/artifacts/helix/tests"
+
+echo "==> Done. Tests submitted to Helix (Build: $HELIX_BUILD)."

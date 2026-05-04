@@ -104,32 +104,15 @@ jobs:
           restore-keys: |
             bazel-Linux-arm64-${{ matrix.config }}-
 
-      - name: Cross-build and prepare Helix payloads
+      - name: Cross-build and submit to Helix
         run: |
           eng/bazel/cross-build.sh \
             --image "${{ matrix.cross_image }}" \
             --disk-cache "$HOME/.cache/bazel-disk" \
             --bazel-config "--config=${{ matrix.config }} --config=${{ matrix.libs_config }}" \
-            --platforms "${{ matrix.platforms }}"
-
-      - name: Install .NET SDK
-        run: |
-          SDK_VERSION=$(python3 -c "import json; print(json.load(open('global.json'))['tools']['dotnet'])" 2>/dev/null || true)
-          if [[ -z "$SDK_VERSION" ]]; then
-            SDK_VERSION=$(python3 -c "import json; print(json.load(open('global.json'))['sdk']['version'])" 2>/dev/null)
-          fi
-          curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version "$SDK_VERSION" --install-dir "$PWD/.dotnet"
-          echo "$PWD/.dotnet" >> "$GITHUB_PATH"
-          .dotnet/dotnet --version
-
-      - name: Send to Helix
-        run: |
-          export PATH="$PWD/.dotnet:$PATH"
-          dotnet msbuild eng/bazel/sendtohelix.proj \
-            /p:Creator="${GITHUB_ACTOR:-bazel-ci}" \
-            /p:HelixBuild="${GITHUB_RUN_ID:-local}" \
-            /p:TesthostPayload="$PWD/artifacts/helix/testhost" \
-            /p:TestPayloadDir="$PWD/artifacts/helix/tests"
+            --platforms "${{ matrix.platforms }}" \
+            --creator "${GITHUB_ACTOR:-bazel-ci}" \
+            --helix-build "${GITHUB_RUN_ID:-local}"
         env:
           BUILD_SOURCEBRANCH: refs/heads/${{ github.ref_name }}
           BUILD_REPOSITORY_NAME: ${{ github.repository }}
