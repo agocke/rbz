@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ---------- Native build + test (runs tests locally) ----------
   build:
     strategy:
       fail-fast: false
@@ -23,13 +24,6 @@ jobs:
             name: Linux checked
             config: clr_checked
             libs_config: libs_release
-          - os: [self-hosted, Linux, X64]
-            name: Linux ARM64 (Helix)
-            config: clr_release
-            libs_config: libs_release
-            platforms: //platforms:linux_arm64
-            use_helix: true
-            cross_image: mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64
           - os: [self-hosted, macOS, X64]
             name: macOS release
             config: clr_release
@@ -61,14 +55,56 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: ~/.cache/bazel-disk
-          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ matrix.platforms && 'arm64-' || '' }}${{ github.sha }}
+          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
           restore-keys: |
-            bazel-${{ runner.os }}-${{ matrix.config }}-${{ matrix.platforms && 'arm64-' || '' }}
+            bazel-${{ runner.os }}-${{ matrix.config }}-
 
-      # ---------- Cross-build steps (use_helix: true) ----------
+      - name: Build
+        run: bazel build ${{ matrix.targets || '//...' }} --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk
+
+      - name: Test
+        if: ${{ !matrix.targets && !matrix.skip_tests }}
+        run: bazel test //... --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk --test_output=errors
+
+      - name: Save Bazel cache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.cache/bazel-disk
+          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
+
+  # ---------- Cross-build + Helix (builds in container, tests on Helix) ----------
+  cross-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux ARM64 (Helix)
+            config: clr_release
+            libs_config: libs_release
+            platforms: //platforms:linux_arm64
+            cross_image: mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64
+
+    name: ${{ matrix.name }}
+    runs-on: [self-hosted, Linux, X64]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Restore Bazel cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.cache/bazel-disk
+          key: bazel-Linux-arm64-${{ matrix.config }}-${{ github.sha }}
+          restore-keys: |
+            bazel-Linux-arm64-${{ matrix.config }}-
 
       - name: Cross-build and prepare Helix payloads
-        if: ${{ matrix.use_helix }}
         run: |
           eng/bazel/cross-build.sh \
             --image "${{ matrix.cross_image }}" \
@@ -77,7 +113,6 @@ jobs:
             --platforms "${{ matrix.platforms }}"
 
       - name: Install .NET SDK
-        if: ${{ matrix.use_helix }}
         run: |
           SDK_VERSION=$(python3 -c "import json; print(json.load(open('global.json'))['tools']['dotnet'])" 2>/dev/null || true)
           if [[ -z "$SDK_VERSION" ]]; then
@@ -88,7 +123,6 @@ jobs:
           .dotnet/dotnet --version
 
       - name: Send to Helix
-        if: ${{ matrix.use_helix }}
         run: |
           export PATH="$PWD/.dotnet:$PATH"
           dotnet msbuild eng/bazel/sendtohelix.proj \
@@ -103,22 +137,12 @@ jobs:
           BUILD_REASON: ${{ github.event_name == 'pull_request' && 'PullRequest' || 'Manual' }}
 
       - name: Cleanup container
-        if: ${{ always() && matrix.use_helix }}
+        if: always()
         run: docker rm -f arm64-cross-ci 2>/dev/null || true
-
-      # ---------- Standard build + test steps (no Helix) ----------
-
-      - name: Build
-        if: ${{ !matrix.use_helix }}
-        run: bazel build ${{ matrix.targets || '//...' }} --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk
-
-      - name: Test
-        if: ${{ !matrix.targets && !matrix.skip_tests && !matrix.use_helix }}
-        run: bazel test //... --config=${{ matrix.config }} ${{ matrix.libs_config && format('--config={0}', matrix.libs_config) || '' }} --disk_cache=~/.cache/bazel-disk --test_output=errors
 
       - name: Save Bazel cache
         if: always()
         uses: actions/cache/save@v5
         with:
           path: ~/.cache/bazel-disk
-          key: bazel-${{ runner.os }}-${{ matrix.config }}-${{ matrix.platforms && 'arm64-' || '' }}${{ github.sha }}
+          key: bazel-Linux-arm64-${{ matrix.config }}-${{ github.sha }}
