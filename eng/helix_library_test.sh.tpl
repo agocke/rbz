@@ -148,7 +148,7 @@ import json, sys
 job_list = [{
     'WorkItemId': '$TEST_NAME',
     'Command': 'chmod +x run.sh && ./run.sh',
-    'TimeoutInSeconds': 900,
+    'TimeoutInSeconds': 1800,
     'PayloadUri': '$PAYLOAD_URI',
     'CorrelationPayloadUrisWithDestinations': {
         '$TESTHOST_URI': ''
@@ -187,13 +187,23 @@ print(json.dumps(job))
 ")")
 
 JOB_NAME=$(echo "$JOB_RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['Name'])")
+HELIX_CONSOLE_URL="${HELIX_BASE}/api/jobs/${JOB_NAME}/workitems/${TEST_NAME}/console?${API_VER}"
 echo "   Helix job: $JOB_NAME (${TEST_NAME})"
 echo "   Details: ${HELIX_BASE}/api/jobs/${JOB_NAME}/details?${API_VER}"
 
+# On any exit (including SIGTERM from Bazel timeout), dump the Helix console log
+dump_helix_output() {
+    echo >&2 ""
+    echo >&2 "=== Helix console: ${TEST_NAME} (job: $JOB_NAME) ==="
+    curl -sfL "$HELIX_CONSOLE_URL" >&2 || echo >&2 "(console log not yet available)"
+    echo >&2 "=== End Helix console ==="
+}
+trap dump_helix_output EXIT
+
 # ---------- Step 5: Poll for completion ----------
+# No script-side timeout — Bazel's --test_timeout is the single source of truth.
+# If Bazel kills us (SIGTERM), the EXIT trap dumps whatever Helix output is available.
 POLL_INTERVAL=10
-MAX_WAIT=900
-WAITED=0
 
 while true; do
     PF=$(curl -sf "${HELIX_BASE}/api/jobs/${JOB_NAME}/pf?${API_VER}" 2>/dev/null || echo '{}')
@@ -204,13 +214,7 @@ while true; do
         break
     fi
 
-    if [[ $WAITED -ge $MAX_WAIT ]]; then
-        echo >&2 "ERROR: Helix job $JOB_NAME timed out after ${MAX_WAIT}s"
-        exit 1
-    fi
-
     sleep $POLL_INTERVAL
-    WAITED=$((WAITED + POLL_INTERVAL))
 done
 
 # ---------- Step 6: Check results ----------
@@ -222,12 +226,10 @@ rm -rf "$WORK_DIR"
 
 if [[ "$FAILED" != "0" ]]; then
     echo >&2 "FAILED: ${TEST_NAME} (Helix job: $JOB_NAME)"
-    # Stream console output for failed work item
-    echo >&2 "--- Helix console output ---"
-    curl -sfL "${HELIX_BASE}/api/jobs/${JOB_NAME}/workitems/${TEST_NAME}/console?${API_VER}" >&2 || true
-    echo >&2 "--- End console output ---"
     exit 1
 fi
 
+# Suppress the EXIT trap output on success
+trap - EXIT
 echo "PASSED: ${TEST_NAME} (Helix job: $JOB_NAME)"
 exit 0

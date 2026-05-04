@@ -136,7 +136,7 @@ docker exec "$CONTAINER_NAME" sh -c "
         --platforms=$PLATFORMS \
         $CACHE_FLAG \
         $HELIX_ENV_FLAGS \
-        --test_timeout=900 \
+        --test_timeout=2400 \
         --local_test_jobs=64 \
         --jobs=64 \
         //src/libraries/...
