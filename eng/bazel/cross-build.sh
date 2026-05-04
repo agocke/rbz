@@ -107,15 +107,18 @@ docker exec "$CONTAINER_NAME" sh -c "
 "
 
 # ---------- Step 3: Run tests (produces helix manifests) ----------
+MANIFEST_DIR="/repo/artifacts/helix/manifests"
 echo "==> Running library tests (helix manifest mode)..."
 docker exec "$CONTAINER_NAME" sh -c "
     export HOME=/tmp/bazel-home
     cd /repo
+    rm -rf $MANIFEST_DIR
+    mkdir -p $MANIFEST_DIR
     bazel --nohome_rc test --keep_going \
         $BAZEL_CONFIG \
         --platforms=$PLATFORMS \
         $CACHE_FLAG \
-        --nozip_undeclared_test_outputs \
+        --test_env=HELIX_MANIFEST_DIR=$MANIFEST_DIR \
         //src/libraries/...
 "
 
@@ -124,7 +127,7 @@ echo "==> Collecting helix manifests and packaging payloads..."
 docker exec "$CONTAINER_NAME" sh -c "
     export HOME=/tmp/bazel-home
     cd /repo
-    eng/bazel/prepare-helix-payloads.sh
+    eng/bazel/prepare-helix-payloads.sh --manifest-dir $MANIFEST_DIR
 "
 
 # Fix ownership — container runs as root

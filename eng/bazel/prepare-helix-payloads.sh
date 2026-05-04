@@ -1,20 +1,16 @@
 #!/usr/bin/env bash
-# Prepares Helix payloads by collecting manifests from bazel-testlogs/ after
-# running `bazel test` with helix launcher templates for cross-compiled tests.
+# Prepares Helix payloads from helix manifests produced by `bazel test`.
 #
-# Prerequisites:
-#   bazel test //src/libraries/... --platforms=//platforms:linux_arm64 ...
-#
-# The helix launcher (eng/helix_library_test.sh.tpl) writes a manifest to
-# $TEST_UNDECLARED_OUTPUTS_DIR for each test. After `bazel test`, these are
-# collected into bazel-testlogs/<target>/test.outputs/helix_manifest.txt.
+# The helix launcher (eng/helix_library_test.sh.tpl) writes a .manifest file
+# for each test to HELIX_MANIFEST_DIR (passed via --test_env).
 #
 # This script:
-#   1. Copies the shared testhost as the Helix correlation payload
-#   2. For each manifest, packages the test's output directory as a work item
+#   1. Reads manifests from the specified directory
+#   2. Copies the shared testhost as the Helix correlation payload
+#   3. For each manifest, packages the test's output directory as a work item
 #
 # Usage:
-#   eng/bazel/prepare-helix-payloads.sh
+#   eng/bazel/prepare-helix-payloads.sh --manifest-dir DIR
 #
 # Output:
 #   artifacts/helix/testhost/     — arm64 testhost directory (correlation payload)
@@ -28,9 +24,17 @@ cd "$REPO_ROOT"
 HELIX_DIR="$REPO_ROOT/artifacts/helix"
 TESTHOST_DIR="$HELIX_DIR/testhost"
 TESTS_DIR="$HELIX_DIR/tests"
+MANIFEST_DIR=""
 
-# Clean previous payloads
-rm -rf "$HELIX_DIR"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --manifest-dir) MANIFEST_DIR="$2"; shift 2 ;;
+        *) echo "Unknown option: $1" >&2; exit 1 ;;
+    esac
+done
+
+# Clean previous payloads (but not manifests — they may be inside HELIX_DIR)
+rm -rf "$TESTHOST_DIR" "$TESTS_DIR"
 mkdir -p "$TESTHOST_DIR" "$TESTS_DIR"
 
 # Get the .NET SDK version
@@ -47,67 +51,21 @@ fi
 
 echo "==> SDK version: $SDK_VERSION"
 
-# ---------- Find manifests from bazel test outputs ----------
-# The bazel-testlogs convenience symlink only points to the default config's
-# testlogs (e.g. k8-opt/testlogs). When using --platforms for cross-compilation,
-# tests are under a transitioned config (e.g. k8-opt-ST-<hash>/testlogs).
-# Search all config directories under bazel-out/ for test outputs.
-BAZEL_OUT="$REPO_ROOT/bazel-out"
-if [[ ! -d "$BAZEL_OUT" ]]; then
-    echo "ERROR: bazel-out/ not found. Run 'bazel build/test' first." >&2
+# ---------- Find manifests ----------
+if [[ -n "$MANIFEST_DIR" && -d "$MANIFEST_DIR" ]]; then
+    # Deterministic location: manifests written directly by helix launcher
+    manifests=()
+    while IFS= read -r -d '' manifest; do
+        manifests+=("$manifest")
+    done < <(find "$MANIFEST_DIR" -name "*.manifest" -print0 2>/dev/null)
+else
+    echo "ERROR: --manifest-dir is required. Usage: prepare-helix-payloads.sh --manifest-dir DIR" >&2
     exit 1
 fi
 
-# Find all testlogs directories across all configs
-testlog_dirs=()
-for d in "$BAZEL_OUT"/*/testlogs; do
-    [[ -d "$d" ]] && testlog_dirs+=("$d")
-done
-
-echo "   Found ${#testlog_dirs[@]} testlogs dir(s):"
-for d in "${testlog_dirs[@]}"; do
-    echo "     $(basename "$(dirname "$d")")/testlogs"
-done
-
-# Search for helix manifests in test.outputs/ across all testlogs dirs
-manifests=()
-for tld in "${testlog_dirs[@]}"; do
-    while IFS= read -r -d '' manifest; do
-        manifests+=("$manifest")
-    done < <(find "$tld" -path "*/test.outputs/helix_manifest.txt" -print0 2>/dev/null)
-done
-
-# Fallback: search by name anywhere in testlogs
 if [[ ${#manifests[@]} -eq 0 ]]; then
-    for tld in "${testlog_dirs[@]}"; do
-        while IFS= read -r -d '' manifest; do
-            manifests+=("$manifest")
-        done < <(find "$tld" -name "helix_manifest.txt" -print0 2>/dev/null)
-    done
-fi
-
-# Fallback: extract from outputs.zip files
-if [[ ${#manifests[@]} -eq 0 ]]; then
-    echo "   No loose manifests found, checking for outputs.zip..."
-    for tld in "${testlog_dirs[@]}"; do
-        while IFS= read -r -d '' zipfile; do
-            target_dir="$(dirname "$zipfile")"
-            if unzip -q -o "$zipfile" "helix_manifest.txt" -d "$target_dir" 2>/dev/null; then
-                manifests+=("$target_dir/helix_manifest.txt")
-            fi
-        done < <(find "$tld" -name "outputs.zip" -print0 2>/dev/null)
-    done
-    echo "   Found ${#manifests[@]} manifests in zip files"
-fi
-
-if [[ ${#manifests[@]} -eq 0 ]]; then
-    echo "ERROR: No helix manifests found in any testlogs directory." >&2
-    echo "   Searched:" >&2
-    for d in "${testlog_dirs[@]}"; do echo "     $d" >&2; done
-    echo "   Sample files (first 20):" >&2
-    for tld in "${testlog_dirs[@]}"; do
-        find "$tld" -type f 2>/dev/null | head -20 >&2 || true
-    done
+    echo "ERROR: No manifests found in $MANIFEST_DIR" >&2
+    ls "$MANIFEST_DIR" 2>&1 | head -10 >&2
     exit 1
 fi
 

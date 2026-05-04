@@ -43,14 +43,19 @@ TEST_DIR="$(make_persistent "$(cd "$(dirname "$ENTRY_DLL")" && pwd)")"
 TESTHOST="$(make_persistent "$(cd "$TESTHOST_RAW" && pwd)")"
 TEST_NAME="TEMPLATED_test_name"
 
-if [[ -z "${TEST_UNDECLARED_OUTPUTS_DIR:-}" ]]; then
-    echo >&2 "ERROR: TEST_UNDECLARED_OUTPUTS_DIR not set"
+# Write manifest to HELIX_MANIFEST_DIR if set (deterministic location),
+# otherwise fall back to TEST_UNDECLARED_OUTPUTS_DIR (bazel-testlogs).
+if [[ -n "${HELIX_MANIFEST_DIR:-}" ]]; then
+    MANIFEST_DIR="$HELIX_MANIFEST_DIR"
+elif [[ -n "${TEST_UNDECLARED_OUTPUTS_DIR:-}" ]]; then
+    MANIFEST_DIR="$TEST_UNDECLARED_OUTPUTS_DIR"
+else
+    echo >&2 "ERROR: Neither HELIX_MANIFEST_DIR nor TEST_UNDECLARED_OUTPUTS_DIR set"
     exit 1
 fi
 
-# Write manifest for collection by prepare-helix-payloads.sh
-mkdir -p "$TEST_UNDECLARED_OUTPUTS_DIR"
-cat > "$TEST_UNDECLARED_OUTPUTS_DIR/helix_manifest.txt" <<EOF
+mkdir -p "$MANIFEST_DIR"
+cat > "$MANIFEST_DIR/${TEST_NAME}.manifest" <<EOF
 TEST_NAME=$TEST_NAME
 TEST_DIR=$TEST_DIR
 TESTHOST=$TESTHOST
