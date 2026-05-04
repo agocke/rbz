@@ -84,6 +84,10 @@ fi
 # Copy the shared testhost directory as the Helix correlation payload
 cp -rL "$TESTHOST/." "$TESTHOST_DIR/"
 
+# Ensure dotnet host is executable — Helix correlation payload may be
+# mounted read-only, so we must set permissions at packaging time.
+chmod +x "$TESTHOST_DIR/dotnet" 2>/dev/null || true
+
 # Copy xunit console runner into testhost — Helix run.sh references it from
 # $HELIX_CORRELATION_PAYLOAD. The runner DLLs are in each test's output dir
 # (symlinked by the test rule); grab them from the first test's TEST_DIR.
@@ -186,7 +190,6 @@ EOF
 #!/usr/bin/env bash
 set -eu
 
-chmod +x "$HELIX_CORRELATION_PAYLOAD/dotnet"
 export DOTNET_ROOT="$HELIX_CORRELATION_PAYLOAD"
 
 RUNEOF
