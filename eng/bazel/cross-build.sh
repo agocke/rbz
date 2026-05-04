@@ -137,6 +137,7 @@ docker exec "$CONTAINER_NAME" sh -c "
         $CACHE_FLAG \
         $HELIX_ENV_FLAGS \
         --test_timeout=900 \
+        --local_test_jobs=64 \
         //src/libraries/...
 " || {
     EXIT_CODE=$?
