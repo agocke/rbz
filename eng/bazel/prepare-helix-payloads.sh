@@ -54,6 +54,17 @@ if [[ ! -d "$TESTLOGS_DIR" ]]; then
     exit 1
 fi
 
+# Debug: show what bazel-testlogs resolves to and sample contents
+echo "   bazel-testlogs -> $(readlink -f "$TESTLOGS_DIR" 2>/dev/null || echo "$TESTLOGS_DIR")"
+echo "   Top-level contents:"
+ls "$TESTLOGS_DIR" 2>/dev/null | head -5 || true
+if [[ -d "$TESTLOGS_DIR/src/libraries" ]]; then
+    echo "   Sample test dir:"
+    find "$TESTLOGS_DIR/src/libraries" -maxdepth 4 -type d | head -5 || true
+    echo "   Sample test files:"
+    find "$TESTLOGS_DIR/src/libraries" -maxdepth 5 -type f | head -10 || true
+fi
+
 # Look for manifests in test.outputs/ directories (undeclared test outputs).
 # Bazel places these at: bazel-testlogs/<pkg>/<target>/test.outputs/helix_manifest.txt
 manifests=()
@@ -61,15 +72,31 @@ while IFS= read -r -d '' manifest; do
     manifests+=("$manifest")
 done < <(find "$TESTLOGS_DIR/src/libraries" -path "*/test.outputs/helix_manifest.txt" -print0 2>/dev/null)
 
-# Fallback: check if manifests are directly under test dirs (varies by Bazel version)
+# Fallback: check if manifests are anywhere under testlogs
 if [[ ${#manifests[@]} -eq 0 ]]; then
     while IFS= read -r -d '' manifest; do
         manifests+=("$manifest")
-    done < <(find "$TESTLOGS_DIR/src/libraries" -name "helix_manifest.txt" -print0 2>/dev/null)
+    done < <(find "$TESTLOGS_DIR" -name "helix_manifest.txt" -print0 2>/dev/null)
+fi
+
+# Fallback: extract from outputs.zip files if manifests not found loose
+if [[ ${#manifests[@]} -eq 0 ]]; then
+    echo "   No loose manifests found, checking for outputs.zip..."
+    EXTRACT_DIR="$(mktemp -d)"
+    while IFS= read -r -d '' zipfile; do
+        target_dir="$(dirname "$zipfile")"
+        if unzip -q -o "$zipfile" "helix_manifest.txt" -d "$target_dir" 2>/dev/null; then
+            manifests+=("$target_dir/helix_manifest.txt")
+        fi
+    done < <(find "$TESTLOGS_DIR" -name "outputs.zip" -print0 2>/dev/null)
+    echo "   Found ${#manifests[@]} manifests in zip files"
 fi
 
 if [[ ${#manifests[@]} -eq 0 ]]; then
-    echo "ERROR: No helix manifests found in bazel-testlogs/. Did bazel test run?" >&2
+    echo "ERROR: No helix manifests found in bazel-testlogs/." >&2
+    echo "   Searched: $TESTLOGS_DIR" >&2
+    echo "   All files in testlogs (first 20):" >&2
+    find "$TESTLOGS_DIR" -type f 2>/dev/null | head -20 >&2 || true
     exit 1
 fi
 
