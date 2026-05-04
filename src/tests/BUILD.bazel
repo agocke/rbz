@@ -21,6 +21,14 @@ filegroup(
         # with arm64 cross-compilation. Use the un-crossgen'd CoreLib for arm64.
         "@platforms//cpu:aarch64": ["//src/coreclr/System.Private.CoreLib:impl_System.Private.CoreLib"],
         "//conditions:default": ["//src/coreclr/System.Private.CoreLib:crossgen_System.Private.CoreLib"],
+    }) + select({
+        # For cross-compilation, include the Bazel-built dotnet host and hostfxr
+        # so the testhost uses arm64 binaries instead of the x64 SDK ones.
+        "@platforms//cpu:aarch64": [
+            "//src/native/corehost:dotnet",
+            "//src/native/corehost:hostfxr",
+        ],
+        "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
 )

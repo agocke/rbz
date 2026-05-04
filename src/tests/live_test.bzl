@@ -583,10 +583,17 @@ cp -aL "$SDK_ROOT/shared/Microsoft.NETCore.App/$VERSION/"* "$FW_DIR/"
 # Copy Bazel-built runtime files (managed + native) over SDK.
 # The crossgen'd CoreLib is named System.Private.CoreLib.r2r.dll but the
 # runtime expects System.Private.CoreLib.dll, so rename it during copy.
+# For cross-compilation, the list may include dotnet (host binary) and
+# libhostfxr.so which need to go to specific locations rather than FW_DIR.
 for f in "$@"; do
     base=$(basename "$f")
     if [ "$base" = "System.Private.CoreLib.r2r.dll" ]; then
         cp -afL "$f" "$FW_DIR/System.Private.CoreLib.dll"
+    elif [ "$base" = "dotnet" ]; then
+        cp -afL "$f" "$OUT/dotnet"
+        chmod +x "$OUT/dotnet"
+    elif [ "$base" = "libhostfxr.so" ]; then
+        cp -afL "$f" "$OUT/host/fxr/$VERSION/"
     else
         cp -afL "$f" "$FW_DIR/"
     fi
