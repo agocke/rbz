@@ -104,10 +104,18 @@ jobs:
           restore-keys: |
             bazel-Linux-arm64-${{ matrix.config }}-
 
+      - name: Start cross-build container
+        run: |
+          BAZEL_BIN="$(which bazelisk 2>/dev/null || which bazel 2>/dev/null || true)"
+          DOCKER_ARGS=(-d --name arm64-cross-ci -v "$PWD:/repo")
+          [[ -n "$BAZEL_BIN" ]] && DOCKER_ARGS+=(-v "$BAZEL_BIN:/usr/local/bin/bazel")
+          mkdir -p "$HOME/.cache/bazel-disk"
+          DOCKER_ARGS+=(-v "$HOME/.cache/bazel-disk:/disk-cache")
+          docker run "${DOCKER_ARGS[@]}" "${{ matrix.cross_image }}" sleep infinity
+
       - name: Cross-build and submit to Helix
         run: |
           eng/bazel/cross-build.sh \
-            --image "${{ matrix.cross_image }}" \
             --disk-cache "$HOME/.cache/bazel-disk" \
             --bazel-config "--config=${{ matrix.config }} --config=${{ matrix.libs_config }}" \
             --platforms "${{ matrix.platforms }}" \

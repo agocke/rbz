@@ -1,22 +1,30 @@
 #!/usr/bin/env bash
 # Cross-build, package, and (optionally) submit arm64 tests to Helix.
 #
-# This script:
-#   1. Starts a cross-build container with the arm64 toolchain
-#   2. Builds all targets for arm64 inside the container
-#   3. Runs library tests (which produce helix manifests instead of executing)
-#   4. Collects manifests and packages Helix payloads
-#   5. Submits work items to Helix (unless --skip-helix)
+# This script runs inside an already-running cross-build container.
+# The caller is responsible for pulling the image and starting the
+# container with the repo mounted at /repo.
+#
+# Steps:
+#   1. Builds all targets for arm64 inside the container
+#   2. Runs library tests (which produce helix manifests instead of executing)
+#   3. Collects manifests and packages Helix payloads
+#   4. Submits work items to Helix (if --send-to-helix)
 #
 # Usage:
+#   # Start the container yourself:
+#   docker run -d --name arm64-cross-ci -v "$PWD:/repo" \
+#     mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64 \
+#     sleep infinity
+#
+#   # Then run the script:
 #   eng/bazel/cross-build.sh [OPTIONS]
 #
 # Options:
-#   --image IMAGE          Cross-build container image
-#   --disk-cache DIR       Bazel disk cache directory
+#   --container NAME       Container name (default: arm64-cross-ci)
+#   --disk-cache DIR       Host-side Bazel disk cache (mounted into container as /disk-cache)
 #   --bazel-config FLAGS   Bazel --config flags (default: --config=clr_release --config=libs_release)
 #   --platforms LABEL       Bazel --platforms target
-#   --container NAME       Container name (default: arm64-cross-ci)
 #   --send-to-helix        Submit work items to Helix after packaging
 #   --creator NAME         Helix Creator field (default: $USER)
 #   --helix-build ID       Helix Build ID (default: local-<timestamp>)
@@ -33,7 +41,6 @@ REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 # ---------- Parse arguments ----------
-CROSS_IMAGE="mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64"
 DISK_CACHE=""
 BAZEL_CONFIG="--config=clr_release --config=libs_release"
 PLATFORMS="//platforms:linux_arm64"
@@ -44,7 +51,6 @@ HELIX_BUILD="local-$(date +%s)"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --image) CROSS_IMAGE="$2"; shift 2 ;;
         --disk-cache) DISK_CACHE="$2"; shift 2 ;;
         --bazel-config) BAZEL_CONFIG="$2"; shift 2 ;;
         --platforms) PLATFORMS="$2"; shift 2 ;;
@@ -56,56 +62,18 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# ---------- Step 1: Start container ----------
-echo "==> Starting cross-build container ($CROSS_IMAGE)..."
-
-docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
-
-DOCKER_ARGS=(
-    -d --name "$CONTAINER_NAME"
-    -v "$REPO_ROOT:/repo"
-)
-
-# Mount bazelisk/bazel binary into the container
-BAZEL_BIN="$(which bazelisk 2>/dev/null || which bazel 2>/dev/null || true)"
-if [[ -n "$BAZEL_BIN" ]]; then
-    DOCKER_ARGS+=(-v "$BAZEL_BIN:/usr/local/bin/bazel")
+# ---------- Verify container is running ----------
+if ! docker inspect "$CONTAINER_NAME" &>/dev/null; then
+    echo "ERROR: Container '$CONTAINER_NAME' is not running." >&2
+    echo "Start it first, e.g.:" >&2
+    echo "  docker run -d --name $CONTAINER_NAME -v \"\$PWD:/repo\" \\" >&2
+    echo "    mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-arm64 \\" >&2
+    echo "    sleep infinity" >&2
+    exit 1
 fi
 
-# Mount disk cache if provided
-if [[ -n "$DISK_CACHE" ]]; then
-    mkdir -p "$DISK_CACHE"
-    DOCKER_ARGS+=(-v "$DISK_CACHE:/disk-cache")
-fi
-
-docker run "${DOCKER_ARGS[@]}" "$CROSS_IMAGE" sleep infinity
-
-# Create ICU symlink for Bazel's icu4c_repository rule.
-# The container has ICU headers at /crossrootfs/arm64/usr/include/unicode
-# but the repo rule looks at /usr/include/unicode.  The --config=cross_container
-# bazelrc config sets DOTNET_ICU_INCLUDE to point at the right path, but the
-# host x64 build still needs ICU at the default location for any host-targeting
-# native code.  If /usr/include/unicode already exists we skip this.
-docker exec "$CONTAINER_NAME" sh -c '
-    if [ ! -d /usr/include/unicode ]; then
-        mkdir -p /usr/include
-        ln -sf /crossrootfs/arm64/usr/include/unicode /usr/include/unicode
-    fi
-'
-
-# Use --config=cross_container for LLVM host toolchain + ICU path config.
-# This avoids needing root symlinks for ar/nm/strip and /usr/include/unicode.
-
-# If no bazel binary was mounted, install bazelisk
-if [[ -z "$BAZEL_BIN" ]]; then
-    echo "   Installing bazelisk in container..."
-    docker exec "$CONTAINER_NAME" sh -c '
-        curl -fsSL https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-linux-amd64 \
-            -o /usr/local/bin/bazel && chmod +x /usr/local/bin/bazel
-    '
-fi
-
-# Build the disk cache flag
+# Mount disk cache if provided (remount into running container isn't possible,
+# so we expect the caller to have mounted it when starting the container).
 CACHE_FLAG=""
 if [[ -n "$DISK_CACHE" ]]; then
     CACHE_FLAG="--disk_cache=/disk-cache"
