@@ -180,19 +180,18 @@ EOF
     fi
 
     # Write Helix run script
+    # Use dotnet directly from the correlation payload so it can find
+    # host/fxr/<version>/libhostfxr.so relative to itself.
     cat > "$work_dir/run.sh" <<'RUNEOF'
 #!/usr/bin/env bash
 set -eu
 
-DOTNET_DIR="$(mktemp -d)"
-cp "$HELIX_CORRELATION_PAYLOAD/dotnet" "$DOTNET_DIR/dotnet"
-chmod +x "$DOTNET_DIR/dotnet"
-
+chmod +x "$HELIX_CORRELATION_PAYLOAD/dotnet"
 export DOTNET_ROOT="$HELIX_CORRELATION_PAYLOAD"
 
 RUNEOF
     cat >> "$work_dir/run.sh" <<RUNEOF
-exec "\$DOTNET_DIR/dotnet" exec \\
+exec "\$HELIX_CORRELATION_PAYLOAD/dotnet" exec \\
   --runtimeconfig $TEST_NAME.runtimeconfig.json \\
   --depsfile $TEST_NAME.deps.json \\
   \$HELIX_CORRELATION_PAYLOAD/xunit.console.dll \\
