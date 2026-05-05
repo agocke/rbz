@@ -87,14 +87,29 @@ print(f'   Zipped {os.path.getsize(sys.argv[1]) / 1048576:.1f} MB')
 
 TESTHOST_BLOB="testhost-$(python3 -c "import uuid; print(uuid.uuid4())").zip"
 echo "==> Uploading testhost to blob storage..."
-curl -sf -X PUT \
-    "${BLOB_BASE}/${TESTHOST_BLOB}${WRITE_TOKEN}" \
-    -H "x-ms-blob-type: BlockBlob" \
-    -H "Content-Type: application/zip" \
-    --data-binary "@${TESTHOST_ZIP}"
+UPLOAD_URL="${BLOB_BASE}/${TESTHOST_BLOB}${WRITE_TOKEN}"
+for attempt in 1 2 3; do
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
+        "$UPLOAD_URL" \
+        -H "x-ms-blob-type: BlockBlob" \
+        -H "x-ms-version: 2020-10-02" \
+        -H "Content-Type: application/zip" \
+        --data-binary "@${TESTHOST_ZIP}" \
+        --connect-timeout 30 \
+        --max-time 300)
+    if [[ "$HTTP_CODE" -ge 200 && "$HTTP_CODE" -lt 300 ]]; then
+        break
+    fi
+    echo "   Upload attempt $attempt failed with HTTP $HTTP_CODE"
+    if [[ $attempt -eq 3 ]]; then
+        echo "ERROR: Failed to upload testhost after 3 attempts (HTTP $HTTP_CODE)" >&2
+        exit 1
+    fi
+    sleep $((attempt * 5))
+done
 
 TESTHOST_URI="${BLOB_BASE}/${TESTHOST_BLOB}${READ_TOKEN}"
-echo "   Uploaded: $TESTHOST_BLOB"
+echo "   Uploaded: $TESTHOST_BLOB (HTTP $HTTP_CODE)"
 
 # Clean up temp zip
 rm -f "$TESTHOST_ZIP"

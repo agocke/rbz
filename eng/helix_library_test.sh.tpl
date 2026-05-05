@@ -71,11 +71,6 @@ cat > "$WORK_DIR/run.sh" << 'RUN_INNER_EOF'
 #!/usr/bin/env bash
 set -eu
 export DOTNET_ROOT="$HELIX_CORRELATION_PAYLOAD"
-# Prevent thread pool starvation deadlocks on arm64:
-# Tests running in parallel with concurrent async SSL handshakes (client + server
-# in same process) can exhaust the small initial thread pool (= CPU count),
-# causing permanent deadlock. Force a higher minimum to prevent this.
-export DOTNET_ThreadPool_ForceMinWorkerThreads=64
 RUN_INNER_EOF
 cat >> "$WORK_DIR/run.sh" << RUN_INNER_EOF
 exec "\$HELIX_CORRELATION_PAYLOAD/dotnet" exec \\
@@ -139,11 +134,27 @@ PYEOF
 
 # ---------- Step 2: Upload test payload ----------
 PAYLOAD_BLOB="${TEST_NAME}-$(python3 -c "import uuid; print(uuid.uuid4())").zip"
-curl -sf -X PUT \
-    "${BLOB_BASE}/${PAYLOAD_BLOB}${WRITE_TOKEN}" \
-    -H "x-ms-blob-type: BlockBlob" \
-    -H "Content-Type: application/zip" \
-    --data-binary "@${WORK_DIR}/payload.zip"
+upload_blob() {
+    local url="$1" file="$2" ctype="$3"
+    for attempt in 1 2 3; do
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
+            "$url" \
+            -H "x-ms-blob-type: BlockBlob" \
+            -H "x-ms-version: 2020-10-02" \
+            -H "Content-Type: $ctype" \
+            --data-binary "@$file" \
+            --connect-timeout 30 \
+            --max-time 300)
+        if [[ "$HTTP_CODE" -ge 200 && "$HTTP_CODE" -lt 300 ]]; then return 0; fi
+        echo "   Upload attempt $attempt failed (HTTP $HTTP_CODE)" >&2
+        if [[ $attempt -eq 3 ]]; then
+            echo "ERROR: Upload failed after 3 attempts (HTTP $HTTP_CODE)" >&2
+            return 1
+        fi
+        sleep $((attempt * 5))
+    done
+}
+upload_blob "${BLOB_BASE}/${PAYLOAD_BLOB}${WRITE_TOKEN}" "${WORK_DIR}/payload.zip" "application/zip"
 PAYLOAD_URI="${BLOB_BASE}/${PAYLOAD_BLOB}${READ_TOKEN}"
 
 # ---------- Step 3: Build and upload job-list JSON ----------
@@ -162,11 +173,7 @@ job_list = [{
 with open('$WORK_DIR/job-list.json', 'w') as f:
     json.dump(job_list, f)
 "
-curl -sf -X PUT \
-    "${BLOB_BASE}/${JOB_LIST_BLOB}${WRITE_TOKEN}" \
-    -H "x-ms-blob-type: BlockBlob" \
-    -H "Content-Type: application/json" \
-    --data-binary "@${WORK_DIR}/job-list.json"
+upload_blob "${BLOB_BASE}/${JOB_LIST_BLOB}${WRITE_TOKEN}" "${WORK_DIR}/job-list.json" "application/json"
 LIST_URI="${BLOB_BASE}/${JOB_LIST_BLOB}${READ_TOKEN}"
 
 # ---------- Step 4: Create Helix job ----------
