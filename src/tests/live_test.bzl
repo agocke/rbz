@@ -372,8 +372,7 @@ def _xunit_library_test_impl(ctx):
     testhost = ctx.file._shared_testhost
 
     windows_constraint = ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]
-    aarch64_constraint = ctx.attr._aarch64_constraint[platform_common.ConstraintValueInfo]
-    is_helix = ctx.target_platform_has_constraint(aarch64_constraint) and not ctx.target_platform_has_constraint(windows_constraint)
+    is_helix = ctx.attr._use_helix[BuildSettingInfo].value == "true"
 
     launcher = ctx.actions.declare_file("{}.{}".format(dll.basename, "bat" if ctx.target_platform_has_constraint(windows_constraint) else "sh"), sibling = dll)
     if is_helix:
@@ -583,6 +582,11 @@ cp -aL "$SDK_ROOT/host/fxr/$VERSION/"* "$OUT/host/fxr/$VERSION/"
 # SDK shared framework as base (lowest priority)
 cp -aL "$SDK_ROOT/shared/Microsoft.NETCore.App/$VERSION/"* "$FW_DIR/"
 
+# Remove SDK native libraries (.so/.dylib) before overlaying Bazel-built ones.
+# The SDK is always the host architecture (x64), which is wrong for cross-compilation
+# (arm64). Even for same-arch builds, prefer Bazel-built native libs for consistency.
+rm -f "$FW_DIR/"*.so "$FW_DIR/"*.dylib 2>/dev/null || true
+
 # Copy Bazel-built runtime files (managed + native) over SDK.
 # The crossgen'd CoreLib is named System.Private.CoreLib.r2r.dll but the
 # runtime expects System.Private.CoreLib.dll, so rename it during copy.
@@ -720,7 +724,7 @@ _xunit_library_test = rule(
                 default = "//src/tests:shared_testhost",
                 allow_single_file = True,
             ),
-            "_aarch64_constraint": attr.label(default = "@platforms//cpu:aarch64"),
+            "_use_helix": attr.label(default = "//:use_helix"),
             # Override COMMON_ATTRS's _core_root to remove the //:Core_Root
             # dependency. Library tests use _shared_testhost, not Core_Root.
             # Without this override, Core_Root's x64-specific deps make all

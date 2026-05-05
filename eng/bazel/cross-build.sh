@@ -122,7 +122,7 @@ if [[ -n "$SEND_TO_HELIX" ]]; then
             --source '$HELIX_SOURCE'
     "
 
-    HELIX_ENV_FLAGS="--test_env=HELIX_CONTAINER_INFO=$CONTAINER_INFO"
+    HELIX_ENV_FLAGS="--test_env=HELIX_CONTAINER_INFO=$CONTAINER_INFO --//:use_helix=true"
 fi
 
 # ---------- Step 3: Run tests ----------

@@ -170,6 +170,21 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+# Helix mode: when "true", library tests dispatch to Helix for remote execution
+# instead of running locally. Used for cross-compiled arm64 tests where the
+# build machine can't execute the target binaries.
+string_flag(
+    name = "use_helix",
+    build_setting_default = "false",
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "helix_test",
+    flag_values = {"//:use_helix": "true"},
+    visibility = ["//visibility:public"],
+)
+
 # ── Platform config_settings ─────────────────────────────────────────
 # Compound OS × CPU settings for platform-specific code paths.
 config_setting(
