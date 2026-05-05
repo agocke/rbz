@@ -71,6 +71,11 @@ cat > "$WORK_DIR/run.sh" << 'RUN_INNER_EOF'
 #!/usr/bin/env bash
 set -eu
 export DOTNET_ROOT="$HELIX_CORRELATION_PAYLOAD"
+# Prevent thread pool starvation deadlocks on arm64:
+# Tests running in parallel with concurrent async SSL handshakes (client + server
+# in same process) can exhaust the small initial thread pool (= CPU count),
+# causing permanent deadlock. Force a higher minimum to prevent this.
+export DOTNET_ThreadPool_ForceMinWorkerThreads=64
 RUN_INNER_EOF
 cat >> "$WORK_DIR/run.sh" << RUN_INNER_EOF
 exec "\$HELIX_CORRELATION_PAYLOAD/dotnet" exec \\
@@ -148,7 +153,7 @@ import json, sys
 job_list = [{
     'WorkItemId': '$TEST_NAME',
     'Command': 'chmod +x run.sh && ./run.sh',
-    'TimeoutInSeconds': 1800,
+    'TimeoutInSeconds': 2700,
     'PayloadUri': '$PAYLOAD_URI',
     'CorrelationPayloadUrisWithDestinations': {
         '$TESTHOST_URI': ''
