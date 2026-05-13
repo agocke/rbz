@@ -30,7 +30,6 @@ jobs:
 
     env:
       BXL_TOOL_VERSION: '0.2.0-ci.5.b2e4b6e'
-      BXL_CACHE_DIR: ${{ runner.temp }}/bxl-cache
 
     steps:
       - name: Checkout runtime
@@ -56,6 +55,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          export BXL_CACHE_DIR="$RUNNER_TEMP/bxl-cache"
           chmod +x ./bxl.sh
           ./bxl.sh
 
