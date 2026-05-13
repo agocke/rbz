@@ -38,7 +38,7 @@ jobs:
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '11.0.100-preview.3.26207.106'
+          dotnet-version: '11.0.100-preview.5.26227.104'
 
       - name: Install BuildXL bootstrap tool
         shell: bash
