@@ -55,6 +55,13 @@ export const mcjRecorderTimeoutBeforeStop = CoreClr.coreclr_test({
 });
 
 @@public
+export const basicTestWithMcj = CoreClr.coreclr_test({
+    name: "BasicTestWithMcj",
+    srcs: ["BasicTestWithMcj.cs"],
+    optimize: true
+});
+
+@@public
 export const tieredVtableMethodTests = CoreClr.coreclr_test({
     name: "TieredVtableMethodTests",
     srcs: ["TieredVtableMethodTests.cs"]
