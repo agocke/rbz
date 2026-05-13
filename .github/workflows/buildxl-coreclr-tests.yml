@@ -51,6 +51,12 @@ jobs:
 
           echo "$RUNNER_TEMP/bxl-tools" >> "$GITHUB_PATH"
 
+      - name: Build clr+libs prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./build.sh clr+libs -c Release
+
       - name: Run BuildXL CoreCLR tests
         shell: bash
         run: |
