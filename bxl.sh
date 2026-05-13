@@ -24,12 +24,16 @@ if [[ -z "${BUILDXL_BIN:-}" ]]; then
             *) echo "ERROR: unsupported host OS: $(uname -s)" >&2; exit 1 ;;
         esac
 
-        while IFS= read -r candidate; do
-            if [[ -x "$candidate/bxl" && -d "$candidate/Sdk/Sdk.Transformers" ]]; then
-                BUILDXL_BIN="$candidate"
-                break
-            fi
-        done < <(find "$HOME/.dotnet/tools/.store" -type d -path "*/agtest.bxl.tool/*/tools/net*/$arch_dir" 2>/dev/null | sort -r)
+        for store_root in "$bxl_dir/.store" "$HOME/.dotnet/tools/.store"; do
+            [[ -d "$store_root" ]] || continue
+
+            while IFS= read -r candidate; do
+                if [[ -x "$candidate/bxl" && -d "$candidate/Sdk/Sdk.Transformers" ]]; then
+                    BUILDXL_BIN="$candidate"
+                    break 2
+                fi
+            done < <(find "$store_root" -type d -path "*/agtest.bxl.tool*/tools/net*/$arch_dir" 2>/dev/null | sort -r)
+        done
     fi
 fi
 
