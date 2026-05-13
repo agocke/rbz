@@ -23,6 +23,7 @@ if [[ -z "${BUILDXL_BIN:-}" ]]; then
             MINGW*|MSYS*|CYGWIN*) arch_dir="win-x64" ;;
             *) echo "ERROR: unsupported host OS: $(uname -s)" >&2; exit 1 ;;
         esac
+        rid_package="agtest.bxl.tool.$arch_dir"
 
         for store_root in "$bxl_dir/.store" "$HOME/.dotnet/tools/.store"; do
             [[ -d "$store_root" ]] || continue
@@ -32,7 +33,7 @@ if [[ -z "${BUILDXL_BIN:-}" ]]; then
                     BUILDXL_BIN="$candidate"
                     break 2
                 fi
-            done < <(find "$store_root" -type d -path "*/agtest.bxl.tool*/tools/net*/$arch_dir" 2>/dev/null | sort -r)
+            done < <(find "$store_root" -type d -path "*/agtest.bxl.tool/*/$rid_package/*/tools/net*/$arch_dir" 2>/dev/null | sort -r)
         done
     fi
 fi
