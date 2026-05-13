@@ -51,6 +51,12 @@ jobs:
 
           echo "$RUNNER_TEMP/bxl-tools" >> "$GITHUB_PATH"
 
+      - name: Install native build dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo ./eng/common/native/install-dependencies.sh
+
       - name: Build clr+libs prerequisites
         shell: bash
         run: |
