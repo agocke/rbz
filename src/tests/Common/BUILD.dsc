@@ -6,6 +6,10 @@ import * as Defs from "Defs";
 
 const dotNetRoot = Environment.getPathValue("DOTNET_ROOT");
 const dotNetSdkVersion = Environment.getStringValue("DOTNET_SDK_VERSION");
+const roslynDeps = [
+    f`${dotNetRoot}/sdk/${dotNetSdkVersion}/Roslyn/bincore/Microsoft.CodeAnalysis.dll`,
+    f`${dotNetRoot}/sdk/${dotNetSdkVersion}/Roslyn/bincore/Microsoft.CodeAnalysis.CSharp.dll`,
+];
 
 const csharpToolchain = CSharp.csharpToolchain({
     name: "dotnet-sdk",
@@ -45,4 +49,45 @@ export const testLibrary = CSharp.csharp_library({
         "CS3002",
         "CS3003",
     ],
+});
+
+@@public
+export const xunitWrapperLibrary = CSharp.csharp_library({
+    name: "XUnitWrapperLibrary",
+    toolchain: csharpToolchain,
+    srcs: [
+        "XUnitWrapperLibrary/Help.cs",
+        "XUnitWrapperLibrary/TestFilter.cs",
+        "XUnitWrapperLibrary/TestOutputRecorder.cs",
+        "XUnitWrapperLibrary/TestSummary.cs",
+    ],
+    refs: [
+        ...Defs.CORE_ROOT_REFPACK_DEPS,
+        "//artifacts/bin/System.Xml.ReaderWriter/ref/Release/net11.0:System.Xml.ReaderWriter.dll",
+    ],
+    allowUnsafe: true,
+});
+
+@@public
+export const xunitWrapperGenerator = CSharp.csharp_library({
+    name: "XUnitWrapperGenerator",
+    toolchain: csharpToolchain,
+    srcs: [
+        "XUnitWrapperGenerator/CodeBuilder.cs",
+        "XUnitWrapperGenerator/Descriptors.cs",
+        "XUnitWrapperGenerator/ImmutableDictionaryValueComparer.cs",
+        "XUnitWrapperGenerator/ITestInfo.cs",
+        "XUnitWrapperGenerator/OptionsHelper.cs",
+        "XUnitWrapperGenerator/RoslynUtils.cs",
+        "XUnitWrapperGenerator/RuntimeConfiguration.cs",
+        "XUnitWrapperGenerator/RuntimeTestModes.cs",
+        "XUnitWrapperGenerator/SymbolExtensions.cs",
+        "XUnitWrapperGenerator/TargetFrameworkMonikers.cs",
+        "XUnitWrapperGenerator/TestPlatforms.cs",
+        "XUnitWrapperGenerator/TestRuntimes.cs",
+        "XUnitWrapperGenerator/XUnitWrapperGenerator.cs",
+        "XUnitWrapperLibrary/TestFilter.cs",
+    ],
+    refs: Defs.CORE_ROOT_REFPACK_DEPS,
+    fileRefs: roslynDeps,
 });
