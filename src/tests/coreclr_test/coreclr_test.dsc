@@ -15,16 +15,8 @@ import {Cmd} from "Sdk.Transformers";
 import * as Defs from "Defs";
 import * as Common from "Tests.Common";
 
-const dotNetRoot = Environment.getPathValue("DOTNET_ROOT");
-const dotNetSdkVersion = Environment.getStringValue("DOTNET_SDK_VERSION");
 const supportToolchain: Rules.Toolchain = { kind: "Toolchain", name: "coreclr-test-support" };
 const bashExe = f`/bin/bash`;
-
-const csharpToolchain = CSharp.csharpToolchain({
-    name: "dotnet-sdk",
-    hostExe: f`${dotNetRoot}/dotnet`,
-    compiler: f`${dotNetRoot}/sdk/${dotNetSdkVersion}/Roslyn/bincore/csc.dll`,
-});
 
 // ============================================================================
 //  coreclr_test arguments and result
@@ -184,7 +176,7 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
     const deps = [Common.testLibrary, ...(referenceXunitWrapperGenerator ? [Common.xunitWrapperLibrary] : []), ...(args.deps || [])];
     const csInfo = CSharp.csharp_binary({
         name: args.name,
-        toolchain: csharpToolchain,
+        toolchain: Common.csharpToolchain,
         srcs: args.srcs,
         refs: Defs.CORECLR_TEST_COMMON_DEPS,
         fileRefs: Defs.CORECLR_TEST_COMMON_REFS,

@@ -45,31 +45,6 @@ fi
 
 export BUILDXL_BIN
 
-if [[ -z "${DOTNET_SDK_VERSION:-}" ]]; then
-    DOTNET_SDK_VERSION="$(dotnet --version)"
-fi
-
-if [[ -z "${DOTNET_ROOT:-}" || ! -f "${DOTNET_ROOT}/sdk/${DOTNET_SDK_VERSION}/Roslyn/bincore/csc.dll" ]]; then
-    dotnet_path="$(realpath "$(command -v dotnet)")"
-    dotnet_root_candidates=()
-
-    if [[ -d "$PWD/.dotnet" ]]; then
-        dotnet_root_candidates+=("$PWD/.dotnet")
-    fi
-
-    dotnet_root_candidates+=("$(dirname "$dotnet_path")")
-
-    for candidate in "${dotnet_root_candidates[@]}"; do
-        if [[ -f "$candidate/sdk/$DOTNET_SDK_VERSION/Roslyn/bincore/csc.dll" ]]; then
-            DOTNET_ROOT="$candidate"
-            break
-        fi
-    done
-fi
-
-export DOTNET_ROOT
-export DOTNET_SDK_VERSION
-
 exec "$BXL" \
     /c:config.dsc \
     /server- \

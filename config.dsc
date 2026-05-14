@@ -49,7 +49,7 @@ config({
             kind: "Download",
             downloads: [{
                 moduleName: "DotNetSdk",
-                url: "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.201/dotnet-sdk-10.0.201-linux-x64.tar.gz",
+                url: "https://ci.dot.net/public/Sdk/11.0.100-preview.5.26227.104/dotnet-sdk-11.0.100-preview.5.26227.104-linux-x64.tar.gz",
                 archiveType: "tgz",
             }],
         },

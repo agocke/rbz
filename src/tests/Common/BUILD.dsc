@@ -4,17 +4,22 @@
 import * as CSharp from "Sdk.Rules.CSharp";
 import * as Defs from "Defs";
 
-const dotNetRoot = Environment.getPathValue("DOTNET_ROOT");
-const dotNetSdkVersion = Environment.getStringValue("DOTNET_SDK_VERSION");
+const dotNetRoot = f`${Context.getMount("SourceRoot").path}/.dotnet`;
+const dotNetSdkVersion = "11.0.100-preview.5.26227.104";
+function sdkFile(path: string): File {
+    return f`${dotNetRoot}/sdk/${dotNetSdkVersion}/${path}`;
+}
+
 const roslynDeps = [
-    f`${dotNetRoot}/sdk/${dotNetSdkVersion}/Roslyn/bincore/Microsoft.CodeAnalysis.dll`,
-    f`${dotNetRoot}/sdk/${dotNetSdkVersion}/Roslyn/bincore/Microsoft.CodeAnalysis.CSharp.dll`,
+    sdkFile("Microsoft.CodeAnalysis.dll"),
+    sdkFile("Microsoft.CodeAnalysis.CSharp.dll"),
 ];
 
-const csharpToolchain = CSharp.csharpToolchain({
+@@public
+export const csharpToolchain = CSharp.csharpToolchain({
     name: "dotnet-sdk",
     hostExe: f`${dotNetRoot}/dotnet`,
-    compiler: f`${dotNetRoot}/sdk/${dotNetSdkVersion}/Roslyn/bincore/csc.dll`,
+    compiler: sdkFile("Roslyn/bincore/csc.dll"),
 });
 
 @@public
