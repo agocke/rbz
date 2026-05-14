@@ -12,6 +12,7 @@
 import * as Rules from "Sdk.Rules";
 import * as CSharp from "Sdk.Rules.CSharp";
 import * as Defs from "Defs";
+import * as Common from "Tests.Common";
 
 const dotNetRoot = Environment.getPathValue("DOTNET_ROOT");
 const dotNetSdkVersion = Environment.getStringValue("DOTNET_SDK_VERSION");
@@ -66,6 +67,7 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
         srcs: args.srcs,
         refs: [...Defs.CORECLR_TEST_COMMON_DEPS, ...(args.deps || [])],
         fileRefs: Defs.CORECLR_TEST_COMMON_REFS,
+        deps: [Common.testLibrary],
         optimize: args.optimize !== undefined ? args.optimize : true,
         allowUnsafe: args.allowUnsafe !== undefined ? args.allowUnsafe : true,
         defines: args.defines,

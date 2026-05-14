@@ -63,17 +63,6 @@ jobs:
           set -euo pipefail
           ./build.sh clr+libs -c Release
 
-      - name: Build CoreCLR test library
-        shell: bash
-        run: |
-          set -euo pipefail
-          ./eng/common/msbuild.sh src/tests/Common/CoreCLRTestLibrary/CoreCLRTestLibrary.csproj \
-            /t:Build \
-            /p:TargetArchitecture=x64 \
-            /p:Configuration=Release \
-            /p:TargetOS=linux \
-            /p:RuntimeFlavor=CoreCLR
-
       - name: Run BuildXL CoreCLR tests
         shell: bash
         run: |

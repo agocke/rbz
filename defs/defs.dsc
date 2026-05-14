@@ -74,15 +74,6 @@ export const XUNIT_DEPS: File[] = [
     importFrom("xunit.abstractions").Contents.all.getFile(r`lib/netstandard1.0/xunit.abstractions.dll`)
 ];
 
-// ============================================================================
-//  TEST_LIBRARY
-// ============================================================================
-
-@@public
-export const TEST_LIBRARY: Rules.Label =
-    "//artifacts/tests/coreclr/linux.x64.Release/Common/CoreCLRTestLibrary/CoreCLRTestLibrary:TestLibrary.dll";
-
-// ============================================================================
 //  XUNIT_WRAPPER_GENERATOR — source generator that creates test Main()
 // ============================================================================
 
@@ -97,7 +88,6 @@ export const XUNIT_WRAPPER_GENERATOR: File =
 @@public
 export const CORECLR_TEST_COMMON_DEPS: Rules.Label[] = [
     ...CORE_ROOT_REFPACK_DEPS,
-    TEST_LIBRARY
 ];
 
 // ============================================================================

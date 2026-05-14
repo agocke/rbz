@@ -35,6 +35,9 @@ config({
                 // Repo-specific definitions
                 f`defs/module.config.dsc`,
 
+                // Common test support libraries
+                f`src/tests/Common/module.config.dsc`,
+
                 // Repo-specific test macro (like src/tests/live_test.bzl)
                 f`src/tests/coreclr_test/module.config.dsc`,
 
