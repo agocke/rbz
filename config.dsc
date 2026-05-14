@@ -3,6 +3,10 @@
 // External rule SDKs are fetched via GitRepository/Download so the workspace
 // can build against the latest pinned BuildXL rule snapshots without relying
 // on sibling checkouts.
+//
+// For local development with modified rules, temporarily replace the
+// GitRepository block with a DScript block pointing at local checkouts and
+// add corresponding mounts. See README or checkpoints for details.
 config({
     resolvers: [
         {
@@ -47,32 +51,34 @@ config({
         },
         {
             kind: "Download",
-            downloads: [{
-                moduleName: "DotNetSdk",
-                url: "https://ci.dot.net/public/Sdk/11.0.100-preview.5.26227.104/dotnet-sdk-11.0.100-preview.5.26227.104-linux-x64.tar.gz",
-                archiveType: "tgz",
-            }],
+            downloads: [
+                {
+                    moduleName: "DotNetSdk",
+                    url: "https://ci.dot.net/public/Sdk/11.0.100-preview.5.26227.104/dotnet-sdk-11.0.100-preview.5.26227.104-linux-x64.tar.gz",
+                    archiveType: "tgz",
+                },
+                {
+                    moduleName: "Microsoft.DotNet.XUnitAssert",
+                    url: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/flat2/microsoft.dotnet.xunitassert/3.2.2-beta.26211.102/microsoft.dotnet.xunitassert.3.2.2-beta.26211.102.nupkg",
+                    archiveType: "zip",
+                },
+                {
+                    moduleName: "xunit.extensibility.core",
+                    url: "https://api.nuget.org/v3-flatcontainer/xunit.extensibility.core/2.9.3/xunit.extensibility.core.2.9.3.nupkg",
+                    archiveType: "zip",
+                },
+                {
+                    moduleName: "Microsoft.DotNet.XUnitExtensions",
+                    url: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/flat2/microsoft.dotnet.xunitextensions/11.0.0-beta.26211.102/microsoft.dotnet.xunitextensions.11.0.0-beta.26211.102.nupkg",
+                    archiveType: "zip",
+                },
+                {
+                    moduleName: "xunit.abstractions",
+                    url: "https://api.nuget.org/v3-flatcontainer/xunit.abstractions/2.0.3/xunit.abstractions.2.0.3.nupkg",
+                    archiveType: "zip",
+                },
+            ],
         },
-        {
-            kind: "Nuget",
-            repositories: {
-                "nuget.org": "https://api.nuget.org/v3/index.json",
-                "dotnet-public": "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json",
-                "dotnet-tools": "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json",
-                "dotnet-eng": "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json",
-                "dotnet11": "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json"
-            },
-            packages: [
-                { id: "Microsoft.DotNet.XUnitAssert", version: "3.2.2-beta.26211.102", tfm: ".NETCoreApp,Version=v10.0",
-                  dependentPackageIdsToSkip: ["*"], dependentPackageIdsToIgnore: ["*"] },
-                { id: "xunit.extensibility.core", version: "2.9.3", tfm: ".NETStandard,Version=v1.1",
-                  dependentPackageIdsToSkip: ["*"], dependentPackageIdsToIgnore: ["*"] },
-                { id: "Microsoft.DotNet.XUnitExtensions", version: "11.0.0-beta.26211.102", tfm: ".NETCoreApp,Version=v10.0",
-                  dependentPackageIdsToSkip: ["*"], dependentPackageIdsToIgnore: ["*"] },
-                { id: "xunit.abstractions", version: "2.0.3", tfm: ".NETStandard,Version=v1.0",
-                  dependentPackageIdsToSkip: ["*"], dependentPackageIdsToIgnore: ["*"] }
-            ]
-        }
     ],
 
     mounts: [

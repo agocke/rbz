@@ -4,23 +4,13 @@
 import * as CSharp from "Sdk.Rules.CSharp";
 import * as Defs from "Defs";
 
-const dotnetSdk = importFrom("DotNetSdk").extracted;
-const sdkVersion = "11.0.100-preview.5.26227.104";
-
-function sdkFile(path: string): File {
-    return dotnetSdk.assertExistence(r`sdk/${sdkVersion}/${path}`);
-}
-
-const roslynDeps = [
-    sdkFile("Microsoft.CodeAnalysis.dll"),
-    sdkFile("Microsoft.CodeAnalysis.CSharp.dll"),
-];
+const dotnetSdkVersion = "11.0.100-preview.5.26227.104";
 
 @@public
 export const csharpToolchain = CSharp.csharpToolchainFromContents({
     name: "dotnet-sdk",
-    contents: dotnetSdk,
-    compilerPath: `sdk/${sdkVersion}/Roslyn/bincore/csc.dll`,
+    contents: importFrom("DotNetSdk").extracted,
+    compilerPath: `sdk/${dotnetSdkVersion}/Roslyn/bincore/csc.dll`,
 });
 
 @@public
@@ -43,8 +33,8 @@ export const testLibrary = CSharp.csharp_library({
     refs: [
         ...Defs.CORE_ROOT_REFPACK_DEPS,
         "//artifacts/bin/System.Text.Json/ref/Release/net11.0:System.Text.Json.dll",
+        ...Defs.XUNIT_DEPS,
     ],
-    fileRefs: Defs.XUNIT_DEPS,
     allowUnsafe: true,
     nowarn: [
         "CS0419",
@@ -55,6 +45,7 @@ export const testLibrary = CSharp.csharp_library({
         "CS3002",
         "CS3003",
     ],
+    externalPackages: Defs.EXTERNAL_PACKAGES,
 });
 
 @@public
@@ -72,6 +63,7 @@ export const xunitWrapperLibrary = CSharp.csharp_library({
         "//artifacts/bin/System.Xml.ReaderWriter/ref/Release/net11.0:System.Xml.ReaderWriter.dll",
     ],
     allowUnsafe: true,
+    externalPackages: Defs.EXTERNAL_PACKAGES,
 });
 
 @@public
@@ -94,6 +86,10 @@ export const xunitWrapperGenerator = CSharp.csharp_library({
         "XUnitWrapperGenerator/XUnitWrapperGenerator.cs",
         "XUnitWrapperLibrary/TestFilter.cs",
     ],
-    refs: Defs.CORE_ROOT_REFPACK_DEPS,
-    fileRefs: roslynDeps,
+    refs: [
+        ...Defs.CORE_ROOT_REFPACK_DEPS,
+        `@DotNetSdk//sdk/${dotnetSdkVersion}:Microsoft.CodeAnalysis.dll`,
+        `@DotNetSdk//sdk/${dotnetSdkVersion}:Microsoft.CodeAnalysis.CSharp.dll`,
+    ],
+    externalPackages: Defs.EXTERNAL_PACKAGES,
 });

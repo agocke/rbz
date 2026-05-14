@@ -179,13 +179,13 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
         toolchain: Common.csharpToolchain,
         srcs: args.srcs,
         refs: Defs.CORECLR_TEST_COMMON_DEPS,
-        fileRefs: Defs.CORECLR_TEST_COMMON_REFS,
         deps: deps,
         optimize: args.optimize !== undefined ? args.optimize : true,
         allowUnsafe: args.allowUnsafe !== undefined ? args.allowUnsafe : true,
         defines: args.defines,
         nowarn: allNowarn,
         analyzers: referenceXunitWrapperGenerator ? [Common.xunitWrapperGenerator.binary] : undefined,
+        externalPackages: Defs.EXTERNAL_PACKAGES,
     });
 
     const buildStamp = emitBuildStamp({
