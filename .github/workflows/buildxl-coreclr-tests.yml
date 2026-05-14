@@ -11,6 +11,7 @@ on:
       - 'bxl.sh'
       - 'config.dsc'
       - 'defs/**'
+      - 'src/tests/Common/**'
       - 'src/tests/coreclr_test/**'
       - 'src/tests/baseservices/TieredCompilation/**'
   push:
@@ -20,12 +21,14 @@ on:
       - 'bxl.sh'
       - 'config.dsc'
       - 'defs/**'
+      - 'src/tests/Common/**'
       - 'src/tests/coreclr_test/**'
       - 'src/tests/baseservices/TieredCompilation/**'
   workflow_dispatch:
 
 jobs:
   buildxl-coreclr-tests:
+    if: github.repository == 'agocke/rbz'
     runs-on: ubuntu-latest
 
     env:
@@ -63,7 +66,26 @@ jobs:
           set -euo pipefail
           ./build.sh clr+libs -c Release
 
-      - name: Run BuildXL CoreCLR tests
+      - name: Show BuildXL test set
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          summary_file="$(mktemp)"
+          {
+            echo "## BuildXL TieredCompilation test set"
+            echo
+            echo "These are the test assemblies this workflow currently compiles:"
+            echo
+            awk -F'"' '
+              /name:/ { name=$2 }
+              /srcs:/ { printf "- `%s` from `%s`\n", name, $2 }
+            ' src/tests/baseservices/TieredCompilation/BUILD.dsc
+          } | tee "$summary_file"
+
+          cat "$summary_file" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run BuildXL CoreCLR build
         shell: bash
         run: |
           set -euo pipefail
@@ -71,7 +93,97 @@ jobs:
           chmod +x ./bxl.sh
           ./bxl.sh
 
-      - name: Upload BuildXL logs
+      - name: Build TieredCompilation test runners
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          projects=(
+            baseservices/TieredCompilation/BasicTest_DefaultMode.csproj
+            baseservices/TieredCompilation/BasicTest_QuickJitForLoopsOff.csproj
+            baseservices/TieredCompilation/BasicTest_QuickJitForLoopsOn.csproj
+            baseservices/TieredCompilation/BasicTest_QuickJitOff.csproj
+            baseservices/TieredCompilation/BasicTest_QuickJitOn.csproj
+            baseservices/TieredCompilation/BasicTestWithMcj.csproj
+            baseservices/TieredCompilation/McjRecorderTimeoutBeforeStop.csproj
+            baseservices/TieredCompilation/TieredVtableMethodTests.csproj
+          )
+
+          summary_file="$(mktemp)"
+          {
+            echo "## TieredCompilation runtime test set"
+            echo
+            echo "This job builds the full current BuildXL TieredCompilation slice."
+            echo "The execution steps below cover the directly runnable subset; \`BasicTestWithMcj\` remains build-only here."
+            echo
+          } > "$summary_file"
+
+          for project in "${projects[@]}"; do
+            echo "- \`${project##*/}\`" >> "$summary_file"
+            echo "::group::Building ${project##*/}"
+            src/tests/build.sh -test:"$project" x64 Release
+            echo "::endgroup::"
+          done
+
+          cat "$summary_file" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run BasicTest_DefaultMode
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_root="$GITHUB_WORKSPACE/artifacts/tests/coreclr/linux.x64.Release"
+          bash "$test_root/baseservices/TieredCompilation/BasicTest_DefaultMode/BasicTest_DefaultMode.sh" \
+            -coreroot "$test_root/Tests/Core_Root"
+
+      - name: Run BasicTest_QuickJitForLoopsOff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_root="$GITHUB_WORKSPACE/artifacts/tests/coreclr/linux.x64.Release"
+          bash "$test_root/baseservices/TieredCompilation/BasicTest_QuickJitForLoopsOff/BasicTest_QuickJitForLoopsOff.sh" \
+            -coreroot "$test_root/Tests/Core_Root"
+
+      - name: Run BasicTest_QuickJitForLoopsOn
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_root="$GITHUB_WORKSPACE/artifacts/tests/coreclr/linux.x64.Release"
+          bash "$test_root/baseservices/TieredCompilation/BasicTest_QuickJitForLoopsOn/BasicTest_QuickJitForLoopsOn.sh" \
+            -coreroot "$test_root/Tests/Core_Root"
+
+      - name: Run BasicTest_QuickJitOff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_root="$GITHUB_WORKSPACE/artifacts/tests/coreclr/linux.x64.Release"
+          bash "$test_root/baseservices/TieredCompilation/BasicTest_QuickJitOff/BasicTest_QuickJitOff.sh" \
+            -coreroot "$test_root/Tests/Core_Root"
+
+      - name: Run BasicTest_QuickJitOn
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_root="$GITHUB_WORKSPACE/artifacts/tests/coreclr/linux.x64.Release"
+          bash "$test_root/baseservices/TieredCompilation/BasicTest_QuickJitOn/BasicTest_QuickJitOn.sh" \
+            -coreroot "$test_root/Tests/Core_Root"
+
+      - name: Run McjRecorderTimeoutBeforeStop
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_root="$GITHUB_WORKSPACE/artifacts/tests/coreclr/linux.x64.Release"
+          bash "$test_root/baseservices/TieredCompilation/McjRecorderTimeoutBeforeStop/McjRecorderTimeoutBeforeStop.sh" \
+            -coreroot "$test_root/Tests/Core_Root"
+
+      - name: Run TieredVtableMethodTests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_root="$GITHUB_WORKSPACE/artifacts/tests/coreclr/linux.x64.Release"
+          bash "$test_root/baseservices/TieredCompilation/TieredVtableMethodTests/TieredVtableMethodTests.sh" \
+            -coreroot "$test_root/Tests/Core_Root"
+
+      - name: Upload workflow logs
         if: failure()
         uses: actions/upload-artifact@v7
         with:
@@ -79,4 +191,7 @@ jobs:
           path: |
             ${{ github.workspace }}/Out/Logs/**
             ${{ github.workspace }}/Out/Objects/**/*_run/*.log
+            ${{ github.workspace }}/artifacts/log/**
+            ${{ github.workspace }}/artifacts/tests/coreclr/**/*.log
+            ${{ github.workspace }}/artifacts/tests/coreclr/**/*.xml
           if-no-files-found: ignore
