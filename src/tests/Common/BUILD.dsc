@@ -4,10 +4,11 @@
 import * as CSharp from "Sdk.Rules.CSharp";
 import * as Defs from "Defs";
 
-const dotNetRoot = f`${Context.getMount("SourceRoot").path}/.dotnet`;
-const dotNetSdkVersion = "11.0.100-preview.5.26227.104";
+const dotnetSdk = importFrom("DotNetSdk").extracted;
+const sdkVersion = "11.0.100-preview.5.26227.104";
+
 function sdkFile(path: string): File {
-    return f`${dotNetRoot}/sdk/${dotNetSdkVersion}/${path}`;
+    return dotnetSdk.assertExistence(r`sdk/${sdkVersion}/${path}`);
 }
 
 const roslynDeps = [
@@ -16,10 +17,10 @@ const roslynDeps = [
 ];
 
 @@public
-export const csharpToolchain = CSharp.csharpToolchain({
+export const csharpToolchain = CSharp.csharpToolchainFromContents({
     name: "dotnet-sdk",
-    hostExe: f`${dotNetRoot}/dotnet`,
-    compiler: sdkFile("Roslyn/bincore/csc.dll"),
+    contents: dotnetSdk,
+    compilerPath: `sdk/${sdkVersion}/Roslyn/bincore/csc.dll`,
 });
 
 @@public

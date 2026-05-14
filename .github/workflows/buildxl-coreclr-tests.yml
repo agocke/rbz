@@ -32,11 +32,16 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      BXL_TOOL_VERSION: '0.2.0-ci.5.b2e4b6e'
+      BXL_TOOL_VERSION: '0.2.0-ci.6.496a287'
 
     steps:
       - name: Checkout runtime
         uses: actions/checkout@v6
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '11.0.100-preview.5.26227.104'
 
       - name: Install BuildXL bootstrap tool
         shell: bash
