@@ -9,12 +9,6 @@ using TestLibrary;
 
 public static class BasicTest
 {
-    public static int Main()
-    {
-        System.Console.WriteLine("INTENTIONAL_FAIL_MARKER: explicit Main reached");
-        return 42;
-    }
-
     [ActiveIssue("No crossgen folder under Core_Root", typeof(Utilities), nameof(Utilities.IsNativeAot))]
     [ActiveIssue("missing assembly", TestPlatforms.Windows, runtimes: TestRuntimes.Mono)]
     [ActiveIssue("No crossgen folder under Core_Root", TestPlatforms.Android)]
@@ -25,6 +19,7 @@ public static class BasicTest
         PromoteToTier1(Foo, () => FooWithLoop(2));
         Foo();
         FooWithLoop(2);
+        Assert.Fail("Intentional test failure to verify CI");
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
