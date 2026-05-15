@@ -3,7 +3,6 @@
 
 import * as CSharp from "Sdk.Rules.CSharp";
 import * as Defs from "Defs";
-import {Cmd} from "Sdk.Transformers";
 
 const dotnetSdk = importFrom("DotNetSdk").extracted;
 const sdkVersion = "11.0.100-preview.5.26227.104";
@@ -12,20 +11,11 @@ function sdkFile(path: string): File {
     return dotnetSdk.assertExistence(r`sdk/${sdkVersion}/${path}`);
 }
 
-// The Download resolver drops file-level symlinks from the SDK tarball.
-// Roslyn/bincore/csc.dll expects Microsoft.CodeAnalysis.dll next to it (via
-// symlink), but the real file is at the SDK root.  Tell the dotnet host to
-// also probe the SDK root directory so csc can find its dependencies.
-const sdkRootPath = sdkFile("Microsoft.CodeAnalysis.dll").parent;
-
 @@public
 export const csharpToolchain = CSharp.csharpToolchainFromContents({
     name: "dotnet-sdk",
     contents: dotnetSdk,
     compilerPath: `sdk/${sdkVersion}/Roslyn/bincore/csc.dll`,
-    hostArguments: [
-        Cmd.option("--additionalprobingpath ", sdkRootPath),
-    ],
 });
 
 @@public
