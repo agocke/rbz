@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      BXL_TOOL_VERSION: '0.2.0-ci.7.b93871e'
+      BXL_TOOL_VERSION: '0.2.0-ci.8.5f00873'
       RUNTIME_PACKAGE_VERSION: '11.0.0-preview.5.26264.105'
 
     steps:
