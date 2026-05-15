@@ -43,6 +43,14 @@ jobs:
         with:
           dotnet-version: '11.0.100-preview.5.26227.104'
 
+      - name: Restore BuildXL cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bxl
+          key: bxl-cache-${{ github.sha }}
+          restore-keys: bxl-cache-
+          save-always: true
+
       - name: Install BuildXL bootstrap tool
         shell: bash
         run: |
@@ -90,7 +98,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          export BXL_CACHE_DIR="$RUNNER_TEMP/bxl-cache"
           chmod +x ./bxl.sh
           ./bxl.sh "/f:output='*.build.stamp'"
 
@@ -99,7 +106,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          export BXL_CACHE_DIR="$RUNNER_TEMP/bxl-cache"
           chmod +x ./bxl.sh
 
           src/tests/build.sh -GenerateLayoutOnly x64 Release
