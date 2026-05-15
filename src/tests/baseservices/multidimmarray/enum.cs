@@ -15,7 +15,8 @@ public class Test
         {
             TestLibrary.TestFramework.EndTestCase();
             TestLibrary.TestFramework.LogInformation("PASS");
-            return 100;
+            // Intentional failure to verify CI catches test failures.
+            return 0;
         }
         else
         {

@@ -44,7 +44,9 @@ config({
                 f`src/tests/coreclr_test/module.config.dsc`,
 
                 // Test modules
-                f`src/tests/baseservices/TieredCompilation/module.config.dsc`
+                f`src/tests/baseservices/TieredCompilation/module.config.dsc`,
+                f`src/tests/baseservices/multidimmarray/module.config.dsc`,
+                f`src/tests/baseservices/compilerservices/FixedAddressValueType/module.config.dsc`
             ]
         },
         {
