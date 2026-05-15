@@ -148,6 +148,42 @@ jobs:
           chmod +x ./bxl.sh
           ./bxl.sh "/f:output='*.test.stamp'"
 
+      - name: Test result summary
+        if: always() && hashFiles('Out/Logs/BuildXL.Dev.log') != ''
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          log="Out/Logs/BuildXL.Dev.log"
+
+          # Enumerate every test pip that BXL knew about (from "run coreclr test: <name>" descriptions).
+          mapfile -t all_tests < <(
+            grep -oE 'run coreclr test: [A-Za-z_0-9]+' "$log" \
+              | awk '{print $NF}' | sort -u
+          )
+
+          # Failed test pips appear as "error DX0064: [... || run coreclr test: <name>, ...] - failed with exit code N".
+          mapfile -t failed_tests < <(
+            grep -E 'error DX0064:.*run coreclr test: [A-Za-z_0-9]+.*failed with exit code' "$log" \
+              | grep -oE 'run coreclr test: [A-Za-z_0-9]+' \
+              | awk '{print $NF}' | sort -u
+          )
+
+          total=${#all_tests[@]}
+          failed=${#failed_tests[@]}
+          passed=$((total - failed))
+
+          {
+            echo "## BuildXL test results"
+            echo
+            echo "**${passed} passed, ${failed} failed (of ${total} total)**"
+            if (( failed > 0 )); then
+              echo
+              echo "### Failed tests"
+              for t in "${failed_tests[@]}"; do echo "- \`$t\`"; done
+            fi
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Upload workflow logs
         if: failure()
         uses: actions/upload-artifact@v7
