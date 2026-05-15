@@ -4,17 +4,12 @@
 import * as CSharp from "Sdk.Rules.CSharp";
 import * as Defs from "Defs";
 
-const dotnetSdk = importFrom("DotNetSdk").extracted;
 const sdkVersion = "11.0.100-preview.5.26227.104";
-
-function sdkFile(path: string): File {
-    return dotnetSdk.assertExistence(r`sdk/${sdkVersion}/${path}`);
-}
 
 @@public
 export const csharpToolchain = CSharp.csharpToolchainFromContents({
     name: "dotnet-sdk",
-    contents: dotnetSdk,
+    contents: importFrom("DotNetSdk").extracted,
     compilerPath: `sdk/${sdkVersion}/Roslyn/bincore/csc.dll`,
 });
 
@@ -91,10 +86,10 @@ export const xunitWrapperGenerator = CSharp.csharp_library({
         "XUnitWrapperGenerator/XUnitWrapperGenerator.cs",
         "XUnitWrapperLibrary/TestFilter.cs",
     ],
-    refs: Defs.CORE_ROOT_REFPACK_DEPS,
-    externalPackages: Defs.EXTERNAL_PACKAGES,
-    fileRefs: [
-        sdkFile("Microsoft.CodeAnalysis.dll"),
-        sdkFile("Microsoft.CodeAnalysis.CSharp.dll"),
+    refs: [
+        ...Defs.CORE_ROOT_REFPACK_DEPS,
+        `@DotNetSdk//sdk/${sdkVersion}:Microsoft.CodeAnalysis.dll`,
+        `@DotNetSdk//sdk/${sdkVersion}:Microsoft.CodeAnalysis.CSharp.dll`,
     ],
+    externalPackages: Defs.EXTERNAL_PACKAGES,
 });
