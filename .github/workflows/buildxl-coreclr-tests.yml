@@ -48,8 +48,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/bxl
-          key: bxl-cache-${{ github.sha }}
-          restore-keys: bxl-cache-
+          key: bxl-cache-v2-${{ github.sha }}
+          restore-keys: bxl-cache-v2-
           save-always: true
 
       - name: Install BuildXL bootstrap tool
