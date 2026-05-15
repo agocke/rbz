@@ -1,9 +1,0 @@
-is_global = true
-
-# Options consumed by XUnitWrapperGenerator (see
-# src/tests/Common/XUnitWrapperGenerator/OptionsHelper.cs and
-# XUnitWrapperGenerator.props). These let the generator emit correct
-# platform/runtime conditionals for [ActiveIssue]/[SkipOnPlatform]/etc.
-build_property.TargetOS = linux
-build_property.TargetArchitecture = x64
-build_property.RuntimeFlavor = CoreCLR

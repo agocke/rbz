@@ -11,12 +11,32 @@
 
 import * as Rules from "Sdk.Rules";
 import * as CSharp from "Sdk.Rules.CSharp";
-import {Cmd} from "Sdk.Transformers";
+import {Cmd, Transformer} from "Sdk.Transformers";
 import * as Defs from "Defs";
 import * as Common from "Tests.Common";
 
 const supportToolchain: Rules.Toolchain = { kind: "Toolchain", name: "coreclr-test-support" };
 const bashExe = f`/bin/bash`;
+
+// ============================================================================
+//  XUnitWrapperGenerator analyzer config
+//
+//  Generated rather than checked in so the build_property.* values can be
+//  derived from the build configuration. The generator reads these via
+//  csc /analyzerconfig: to emit correct platform/runtime conditionals
+//  for [ActiveIssue]/[SkipOnPlatform]/etc.
+// ============================================================================
+
+const generatorGlobalConfig: File = Transformer.writeAllLines({
+    outputPath: p`${Context.getMount("ObjectRoot").path}/coreclr_test/coreclr.globalconfig`,
+    lines: [
+        "is_global = true",
+        "",
+        "build_property.TargetOS = linux",
+        "build_property.TargetArchitecture = x64",
+        "build_property.RuntimeFlavor = CoreCLR",
+    ],
+});
 
 // ============================================================================
 //  coreclr_test arguments and result
@@ -173,7 +193,7 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
     const allNowarn = [...testNowarn, ...(args.nowarn || [])];
     const referenceXunitWrapperGenerator = args.referenceXunitWrapperGenerator !== false;
     const analyzerConfigs = referenceXunitWrapperGenerator
-        ? [f`${Context.getMount("SourceRoot").path}/src/tests/coreclr_test/coreclr.globalconfig`]
+        ? [generatorGlobalConfig]
         : undefined;
 
     const deps = [Common.testLibrary, ...(referenceXunitWrapperGenerator ? [Common.xunitWrapperLibrary] : []), ...(args.deps || [])];
