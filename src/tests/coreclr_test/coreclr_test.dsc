@@ -172,6 +172,9 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
     ];
     const allNowarn = [...testNowarn, ...(args.nowarn || [])];
     const referenceXunitWrapperGenerator = args.referenceXunitWrapperGenerator !== false;
+    const analyzerConfigs = referenceXunitWrapperGenerator
+        ? [f`${Context.getMount("SourceRoot").path}/src/tests/coreclr_test/coreclr.globalconfig`]
+        : undefined;
 
     const deps = [Common.testLibrary, ...(referenceXunitWrapperGenerator ? [Common.xunitWrapperLibrary] : []), ...(args.deps || [])];
     const csInfo = CSharp.csharp_binary({
@@ -186,6 +189,7 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
         defines: args.defines,
         nowarn: allNowarn,
         analyzers: referenceXunitWrapperGenerator ? [Common.xunitWrapperGenerator.binary] : undefined,
+        analyzerConfigs: analyzerConfigs,
     });
 
     const buildStamp = emitBuildStamp({
