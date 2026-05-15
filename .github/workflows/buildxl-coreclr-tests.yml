@@ -143,46 +143,53 @@ jobs:
       - name: Test
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
 
           chmod +x ./bxl.sh
           ./bxl.sh "/f:output='*.test.stamp'"
-
-      - name: Test result summary
-        if: always() && hashFiles('Out/Logs/BuildXL.Dev.log') != ''
-        shell: bash
-        run: |
-          set -uo pipefail
+          bxl_exit=$?
 
           log="Out/Logs/BuildXL.Dev.log"
+          if [[ -f "$log" ]]; then
+            mapfile -t all_tests < <(
+              grep -oE 'run coreclr test: [A-Za-z_0-9]+' "$log" \
+                | awk '{print $NF}' | sort -u
+            )
+            mapfile -t failed_tests < <(
+              grep -E 'error DX0064:.*run coreclr test: [A-Za-z_0-9]+.*failed with exit code' "$log" \
+                | grep -oE 'run coreclr test: [A-Za-z_0-9]+' \
+                | awk '{print $NF}' | sort -u
+            )
 
-          # Enumerate every test pip that BXL knew about (from "run coreclr test: <name>" descriptions).
-          mapfile -t all_tests < <(
-            grep -oE 'run coreclr test: [A-Za-z_0-9]+' "$log" \
-              | awk '{print $NF}' | sort -u
-          )
+            total=${#all_tests[@]}
+            failed=${#failed_tests[@]}
+            passed=$((total - failed))
 
-          # Failed test pips appear as "error DX0064: [... || run coreclr test: <name>, ...] - failed with exit code N".
-          mapfile -t failed_tests < <(
-            grep -E 'error DX0064:.*run coreclr test: [A-Za-z_0-9]+.*failed with exit code' "$log" \
-              | grep -oE 'run coreclr test: [A-Za-z_0-9]+' \
-              | awk '{print $NF}' | sort -u
-          )
-
-          total=${#all_tests[@]}
-          failed=${#failed_tests[@]}
-          passed=$((total - failed))
-
-          {
-            echo "## BuildXL test results"
             echo
-            echo "**${passed} passed, ${failed} failed (of ${total} total)**"
+            echo "============================================================"
+            echo " BuildXL test results: ${passed} passed, ${failed} failed (of ${total} total)"
+            echo "============================================================"
             if (( failed > 0 )); then
-              echo
-              echo "### Failed tests"
-              for t in "${failed_tests[@]}"; do echo "- \`$t\`"; done
+              echo "Failed tests:"
+              for t in "${failed_tests[@]}"; do echo "  - $t"; done
             fi
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+            echo
+
+            if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+              {
+                echo "## BuildXL test results"
+                echo
+                echo "**${passed} passed, ${failed} failed (of ${total} total)**"
+                if (( failed > 0 )); then
+                  echo
+                  echo "### Failed tests"
+                  for t in "${failed_tests[@]}"; do echo "- \`$t\`"; done
+                fi
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+          exit "$bxl_exit"
 
       - name: Upload workflow logs
         if: failure()
