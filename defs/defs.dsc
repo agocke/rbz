@@ -18,18 +18,19 @@ import * as Rules from "Sdk.Rules";
 @@public
 export const EXTERNAL_PACKAGES: Map<string, StaticDirectory> = Map.empty<string, StaticDirectory>()
     .add("DotNetSdk", importFrom("DotNetSdk").extracted)
+    .add("Microsoft.NETCore.App.Ref", importFrom("Microsoft.NETCore.App.Ref").Contents.all)
     .add("Microsoft.DotNet.XUnitAssert", importFrom("Microsoft.DotNet.XUnitAssert").Contents.all)
     .add("xunit.extensibility.core", importFrom("xunit.extensibility.core").Contents.all)
     .add("Microsoft.DotNet.XUnitExtensions", importFrom("Microsoft.DotNet.XUnitExtensions").Contents.all)
     .add("xunit.abstractions", importFrom("xunit.abstractions").Contents.all);
 
 // ============================================================================
-//  CORE_ROOT_REFPACK_DEPS — framework refs available in this repo
-//  Convention: artifacts/bin/<Name>/ref/Release/net11.0/<Name>.dll
+//  CORE_ROOT_REFPACK_DEPS — framework refs from Microsoft.NETCore.App.Ref
+//  Convention: @Microsoft.NETCore.App.Ref//ref/net11.0:<Name>.dll
 // ============================================================================
 
 function refLabel(name: string): Rules.Label {
-    return `//artifacts/bin/${name}/ref/Release/net11.0:${name}.dll`;
+    return `@Microsoft.NETCore.App.Ref//ref/net11.0:${name}.dll`;
 }
 
 @@public
@@ -100,14 +101,6 @@ export const XUNIT_RUNTIME_DEPS: File[] = [
     EXTERNAL_PACKAGES.get("xunit.abstractions").assertExistence(r`lib/netstandard1.0/xunit.abstractions.dll`),
 ];
 
-//  XUNIT_RUNTIME_DEPS — runtime files staged beside executable tests
-// ============================================================================
-
-@@public
-export const XUNIT_RUNTIME_DEPS: File[] = [
-    ...XUNIT_DEPS
-];
-
 //  CORE_ROOT paths used by BuildXL-backed CoreCLR test execution
 // ============================================================================
 
@@ -126,6 +119,5 @@ export const CORE_ROOT_CORERUN: File =
 @@public
 export const CORECLR_TEST_COMMON_DEPS: Rules.Label[] = [
     ...CORE_ROOT_REFPACK_DEPS,
-    ...XUNIT_DEPS,
-    TEST_LIBRARY
+    ...XUNIT_DEPS
 ];

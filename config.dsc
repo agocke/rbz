@@ -10,6 +10,7 @@ config({
             modules: [
                 f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Prelude/package.config.dsc`,
                 f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Transformers/package.config.dsc`,
+                f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Deployment/module.config.dsc`,
                 f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Managed.Shared/module.config.dsc`,
             ]
         },
@@ -26,7 +27,7 @@ config({
                     moduleName: "bxl_rules_dotnet_repo",
                     owner: "agocke",
                     repository: "bxl_rules_dotnet",
-                    commit: "52b26eaba24e173b5877c24ecc63c059f6bb77a5",
+                    commit: "08e3659a24ecaa67802438af4458ff3773e0959f",
                 },
             ],
         },
@@ -64,6 +65,8 @@ config({
                 "dotnet11": "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json"
             },
             packages: [
+                { id: "Microsoft.NETCore.App.Ref", version: "11.0.0-preview.5.26264.105", tfm: ".NETCoreApp,Version=v11.0",
+                  dependentPackageIdsToSkip: ["*"], dependentPackageIdsToIgnore: ["*"] },
                 { id: "Microsoft.DotNet.XUnitAssert", version: "3.2.2-beta.26211.102", tfm: ".NETCoreApp,Version=v10.0",
                   dependentPackageIdsToSkip: ["*"], dependentPackageIdsToIgnore: ["*"] },
                 { id: "xunit.extensibility.core", version: "2.9.3", tfm: ".NETStandard,Version=v1.1",

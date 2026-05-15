@@ -33,6 +33,7 @@ jobs:
 
     env:
       BXL_TOOL_VERSION: '0.2.0-ci.7.b93871e'
+      RUNTIME_PACKAGE_VERSION: '11.0.0-preview.5.26264.105'
 
     steps:
       - name: Checkout runtime
@@ -62,17 +63,50 @@ jobs:
 
           echo "$RUNNER_TEMP/bxl-tools" >> "$GITHUB_PATH"
 
-      - name: Install native build dependencies
+      - name: Build corerun test host
         shell: bash
         run: |
           set -euo pipefail
-          sudo ./eng/common/native/install-dependencies.sh
+          ./build.sh clr.hosts -c Release
 
-      - name: Build clr+libs prerequisites
+      - name: Assemble Core_Root from NuGet runtime package
         shell: bash
         run: |
           set -euo pipefail
-          ./build.sh clr+libs -c Release
+
+          CORE_ROOT="artifacts/tests/coreclr/linux.x64.Release/Tests/Core_Root"
+          mkdir -p "$CORE_ROOT"
+
+          # Download the runtime NuGet package
+          pkg_url="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/flat2"
+          pkg_url+="/microsoft.netcore.app.runtime.linux-x64"
+          pkg_url+="/${RUNTIME_PACKAGE_VERSION}/microsoft.netcore.app.runtime.linux-x64.${RUNTIME_PACKAGE_VERSION}.nupkg"
+
+          pkg_dir="$(mktemp -d)"
+          curl -sSL "$pkg_url" -o "$pkg_dir/runtime.nupkg"
+
+          # Extract managed and native files into Core_Root
+          python3 -c "
+          import zipfile, shutil, os, sys
+          core_root = sys.argv[1]
+          with zipfile.ZipFile(sys.argv[2]) as z:
+              for info in z.infolist():
+                  if info.filename.startswith('runtimes/linux-x64/lib/net11.0/') and info.filename.endswith('.dll'):
+                      with z.open(info) as src, open(os.path.join(core_root, os.path.basename(info.filename)), 'wb') as dst:
+                          shutil.copyfileobj(src, dst)
+                  elif info.filename.startswith('runtimes/linux-x64/native/'):
+                      name = os.path.basename(info.filename)
+                      if name:
+                          target = os.path.join(core_root, name)
+                          with z.open(info) as src, open(target, 'wb') as dst:
+                              shutil.copyfileobj(src, dst)
+                          os.chmod(target, 0o755)
+          " "$CORE_ROOT" "$pkg_dir/runtime.nupkg"
+
+          # Copy corerun from build output
+          cp artifacts/bin/coreclr/linux.x64.Release/corerun "$CORE_ROOT/"
+
+          echo "Core_Root assembled: $(ls "$CORE_ROOT"/*.dll | wc -l) managed + $(ls "$CORE_ROOT"/*.so | wc -l) native files"
 
       - name: Show BuildXL test set
         shell: bash
@@ -107,8 +141,6 @@ jobs:
           set -euo pipefail
 
           chmod +x ./bxl.sh
-
-          src/tests/build.sh -GenerateLayoutOnly x64 Release
           ./bxl.sh "/f:output='*.test.stamp'"
 
       - name: Upload workflow logs
