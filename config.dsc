@@ -43,10 +43,10 @@ config({
                 // Repo-specific test macro (like src/tests/live_test.bzl)
                 f`src/tests/coreclr_test/module.config.dsc`,
 
-                // Test modules
-                f`src/tests/baseservices/TieredCompilation/module.config.dsc`,
-                f`src/tests/baseservices/multidimmarray/module.config.dsc`,
-                f`src/tests/baseservices/compilerservices/FixedAddressValueType/module.config.dsc`
+                // Repo test root: owns all BUILD.dsc files under src/tests/
+                // (recursively, stopping at nested module boundaries like
+                // src/tests/Common/ and src/tests/coreclr_test/).
+                f`src/tests/module.config.dsc`
             ]
         },
         {
