@@ -179,7 +179,7 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
         toolchain: Common.csharpToolchain,
         srcs: args.srcs,
         refs: Defs.CORECLR_TEST_COMMON_DEPS,
-        fileRefs: Defs.CORECLR_TEST_COMMON_REFS,
+        externalPackages: Defs.EXTERNAL_PACKAGES,
         deps: deps,
         optimize: args.optimize !== undefined ? args.optimize : true,
         allowUnsafe: args.allowUnsafe !== undefined ? args.allowUnsafe : true,

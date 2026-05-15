@@ -10,6 +10,7 @@ config({
             modules: [
                 f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Prelude/package.config.dsc`,
                 f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Transformers/package.config.dsc`,
+                f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Managed.Shared/module.config.dsc`,
             ]
         },
         {
@@ -19,13 +20,13 @@ config({
                     moduleName: "bxl_rules_repo",
                     owner: "agocke",
                     repository: "bxl_rules",
-                    commit: "684f3255dcbd4ca08acede8eda932347bb6f9578",
+                    commit: "3a494442b296c7459a4efdcfdccda5d66b6fe41a",
                 },
                 {
                     moduleName: "bxl_rules_dotnet_repo",
                     owner: "agocke",
                     repository: "bxl_rules_dotnet",
-                    commit: "c1434b76c42f427f3431cba270096a600b263844",
+                    commit: "52b26eaba24e173b5877c24ecc63c059f6bb77a5",
                 },
             ],
         },
