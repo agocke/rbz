@@ -19,6 +19,7 @@ public static class BasicTest
         PromoteToTier1(Foo, () => FooWithLoop(2));
         Foo();
         FooWithLoop(2);
+        Assert.Fail("Intentional test failure to verify CI");
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
