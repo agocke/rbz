@@ -384,3 +384,4 @@ Out/
 
 # Bazel convenience symlinks
 /bazel-*
+MODULE.bazel.lock
