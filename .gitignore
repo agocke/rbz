@@ -381,3 +381,6 @@ test:.cs
 *.testResults.xml
 *.testStats.csv
 Out/
+
+# Bazel convenience symlinks
+/bazel-*
