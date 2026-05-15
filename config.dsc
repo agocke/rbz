@@ -14,6 +14,7 @@ config({
             modules: [
                 f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Prelude/package.config.dsc`,
                 f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Transformers/package.config.dsc`,
+                f`${Environment.getPathValue("BUILDXL_BIN")}/Sdk/Sdk.Managed.Shared/module.config.dsc`,
             ]
         },
         {
@@ -57,26 +58,20 @@ config({
                     url: "https://ci.dot.net/public/Sdk/11.0.100-preview.5.26227.104/dotnet-sdk-11.0.100-preview.5.26227.104-linux-x64.tar.gz",
                     archiveType: "tgz",
                 },
-                {
-                    moduleName: "Microsoft.DotNet.XUnitAssert",
-                    url: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/flat2/microsoft.dotnet.xunitassert/3.2.2-beta.26211.102/microsoft.dotnet.xunitassert.3.2.2-beta.26211.102.nupkg",
-                    archiveType: "zip",
-                },
-                {
-                    moduleName: "xunit.extensibility.core",
-                    url: "https://api.nuget.org/v3-flatcontainer/xunit.extensibility.core/2.9.3/xunit.extensibility.core.2.9.3.nupkg",
-                    archiveType: "zip",
-                },
-                {
-                    moduleName: "Microsoft.DotNet.XUnitExtensions",
-                    url: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/flat2/microsoft.dotnet.xunitextensions/11.0.0-beta.26211.102/microsoft.dotnet.xunitextensions.11.0.0-beta.26211.102.nupkg",
-                    archiveType: "zip",
-                },
-                {
-                    moduleName: "xunit.abstractions",
-                    url: "https://api.nuget.org/v3-flatcontainer/xunit.abstractions/2.0.3/xunit.abstractions.2.0.3.nupkg",
-                    archiveType: "zip",
-                },
+            ],
+        },
+        {
+            kind: "Nuget",
+            repositories: {
+                "nuget.org": "https://api.nuget.org/v3/index.json",
+                "dotnet-eng": "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json",
+            },
+            packages: [
+                { id: "Microsoft.DotNet.XUnitAssert", version: "3.2.2-beta.26211.102", alias: "Microsoft.DotNet.XUnitAssert" },
+                { id: "xunit.extensibility.core", version: "2.9.3", dependentPackageIdsToIgnore: ["NETStandard.Library"] },
+                { id: "Microsoft.DotNet.XUnitExtensions", version: "11.0.0-beta.26211.102", alias: "Microsoft.DotNet.XUnitExtensions", dependentPackageIdsToIgnore: ["NETStandard.Library", "System.Runtime.InteropServices.RuntimeInformation"] },
+                { id: "xunit.abstractions", version: "2.0.3", dependentPackageIdsToIgnore: ["NETStandard.Library"] },
+                { id: "xunit.extensibility.execution", version: "2.9.3", dependentPackageIdsToIgnore: ["NETStandard.Library"] },
             ],
         },
     ],

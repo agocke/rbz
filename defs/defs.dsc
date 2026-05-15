@@ -18,10 +18,10 @@ import * as Rules from "Sdk.Rules";
 @@public
 export const EXTERNAL_PACKAGES: Map<string, StaticDirectory> = Map.empty<string, StaticDirectory>()
     .add("DotNetSdk", importFrom("DotNetSdk").extracted)
-    .add("Microsoft.DotNet.XUnitAssert", importFrom("Microsoft.DotNet.XUnitAssert").extracted)
-    .add("xunit.extensibility.core", importFrom("xunit.extensibility.core").extracted)
-    .add("Microsoft.DotNet.XUnitExtensions", importFrom("Microsoft.DotNet.XUnitExtensions").extracted)
-    .add("xunit.abstractions", importFrom("xunit.abstractions").extracted);
+    .add("Microsoft.DotNet.XUnitAssert", importFrom("Microsoft.DotNet.XUnitAssert").Contents.all)
+    .add("xunit.extensibility.core", importFrom("xunit.extensibility.core").Contents.all)
+    .add("Microsoft.DotNet.XUnitExtensions", importFrom("Microsoft.DotNet.XUnitExtensions").Contents.all)
+    .add("xunit.abstractions", importFrom("xunit.abstractions").Contents.all);
 
 // ============================================================================
 //  CORE_ROOT_REFPACK_DEPS — framework refs available in this repo
