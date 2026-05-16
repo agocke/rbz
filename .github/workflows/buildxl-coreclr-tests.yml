@@ -119,19 +119,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          summary_file="$(mktemp)"
-          {
-            echo "## BuildXL TieredCompilation test set"
-            echo
-            echo "These are the test assemblies this workflow currently compiles:"
-            echo
-            awk -F'"' '
-              /name:/ { name=$2 }
-              /srcs:/ { printf "- `%s` from `%s`\n", name, $2 }
-            ' src/tests/baseservices/TieredCompilation/BUILD.dsc
-          } | tee "$summary_file"
+          total=$(grep -rh 'CoreClr\.coreclr_test(' src/tests --include='BUILD.dsc' | wc -l)
+          disabled=$(grep -rh 'run:\s*false' src/tests --include='BUILD.dsc' | wc -l)
+          enabled=$((total - disabled))
+          files=$(find src/tests -name BUILD.dsc | wc -l)
 
-          cat "$summary_file" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## BuildXL CoreCLR test set"
+            echo
+            echo "- **${total}** \`coreclr_test\` targets in **${files}** \`BUILD.dsc\` files"
+            echo "- **${enabled}** enabled (run as tests)"
+            echo "- **${disabled}** marked \`run: false\` (compile-only)"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Build
         shell: bash
