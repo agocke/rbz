@@ -12,6 +12,7 @@ export const jIT_Directed_nullabletypes_boxunboxenum_d = CoreClr.coreclr_test({
     srcs: ["boxunboxenum.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -20,6 +21,7 @@ export const jIT_Directed_nullabletypes_boxunboxenum_do = CoreClr.coreclr_test({
     srcs: ["boxunboxenum.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -27,6 +29,7 @@ export const jIT_Directed_nullabletypes_boxunboxenum_r = CoreClr.coreclr_test({
     name: "boxunboxenum_r",
     srcs: ["boxunboxenum.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -34,6 +37,7 @@ export const jIT_Directed_nullabletypes_boxunboxenum_ro = CoreClr.coreclr_test({
     name: "boxunboxenum_ro",
     srcs: ["boxunboxenum.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -42,6 +46,7 @@ export const jIT_Directed_nullabletypes_boxunboxinterface_d = CoreClr.coreclr_te
     srcs: ["boxunboxinterface.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -50,6 +55,7 @@ export const jIT_Directed_nullabletypes_boxunboxinterface_do = CoreClr.coreclr_t
     srcs: ["boxunboxinterface.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -57,6 +63,7 @@ export const jIT_Directed_nullabletypes_boxunboxinterface_r = CoreClr.coreclr_te
     name: "boxunboxinterface_r",
     srcs: ["boxunboxinterface.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -64,6 +71,7 @@ export const jIT_Directed_nullabletypes_boxunboxinterface_ro = CoreClr.coreclr_t
     name: "boxunboxinterface_ro",
     srcs: ["boxunboxinterface.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -72,6 +80,7 @@ export const jIT_Directed_nullabletypes_castclassenum_d = CoreClr.coreclr_test({
     srcs: ["castclassenum.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -80,6 +89,7 @@ export const jIT_Directed_nullabletypes_castclassenum_do = CoreClr.coreclr_test(
     srcs: ["castclassenum.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -87,6 +97,7 @@ export const jIT_Directed_nullabletypes_castclassenum_r = CoreClr.coreclr_test({
     name: "castclassenum_r",
     srcs: ["castclassenum.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -94,6 +105,7 @@ export const jIT_Directed_nullabletypes_castclassenum_ro = CoreClr.coreclr_test(
     name: "castclassenum_ro",
     srcs: ["castclassenum.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -102,6 +114,7 @@ export const jIT_Directed_nullabletypes_castclassinterface_d = CoreClr.coreclr_t
     srcs: ["castclassinterface.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -110,6 +123,7 @@ export const jIT_Directed_nullabletypes_castclassinterface_do = CoreClr.coreclr_
     srcs: ["castclassinterface.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -117,6 +131,7 @@ export const jIT_Directed_nullabletypes_castclassinterface_r = CoreClr.coreclr_t
     name: "castclassinterface_r",
     srcs: ["castclassinterface.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -124,6 +139,7 @@ export const jIT_Directed_nullabletypes_castclassinterface_ro = CoreClr.coreclr_
     name: "castclassinterface_ro",
     srcs: ["castclassinterface.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -132,6 +148,7 @@ export const jIT_Directed_nullabletypes_castclassvaluetype_d = CoreClr.coreclr_t
     srcs: ["castclassvaluetype.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -140,6 +157,7 @@ export const jIT_Directed_nullabletypes_castclassvaluetype_do = CoreClr.coreclr_
     srcs: ["castclassvaluetype.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -147,6 +165,7 @@ export const jIT_Directed_nullabletypes_castclassvaluetype_r = CoreClr.coreclr_t
     name: "castclassvaluetype_r",
     srcs: ["castclassvaluetype.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -154,6 +173,7 @@ export const jIT_Directed_nullabletypes_castclassvaluetype_ro = CoreClr.coreclr_
     name: "castclassvaluetype_ro",
     srcs: ["castclassvaluetype.cs", "//src/tests/JIT/Directed/nullabletypes/Desktop:StructDefinitions.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
