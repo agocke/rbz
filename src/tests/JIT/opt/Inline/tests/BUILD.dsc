@@ -273,8 +273,8 @@ export const jIT_opt_Inline_tests_inline_handler = CoreClr.coreclr_test({
     name: "Inline_handler",
     srcs: ["Inline_handler.cs"],
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public

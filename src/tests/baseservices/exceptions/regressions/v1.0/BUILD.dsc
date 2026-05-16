@@ -11,6 +11,6 @@ export const baseservices_exceptions_regressions_v1_0__19896 = CoreClr.coreclr_t
     name: "19896",
     srcs: ["19896.cs"],
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });

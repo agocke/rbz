@@ -43,6 +43,14 @@ export const jIT_Intrinsics_mathFloorDouble_r = CoreClr.coreclr_test({
 });
 
 @@public
+export const jIT_Intrinsics_binaryPrimitivesReverseEndianness_r = CoreClr.coreclr_test({
+    name: "BinaryPrimitivesReverseEndianness_r",
+    srcs: ["BinaryPrimitivesReverseEndianness.cs"],
+    allowUnsafe: true,
+    tags: ["manual"],
+});
+
+@@public
 export const jIT_Intrinsics_mathRoundSingle_ro = CoreClr.coreclr_test({
     name: "MathRoundSingle_ro",
     srcs: ["MathRoundSingle.cs"],
@@ -107,6 +115,15 @@ export const jIT_Intrinsics_typeEqualitySealed_ro = CoreClr.coreclr_test({
 export const jIT_Intrinsics_bitOperationsIntrinsics_r = CoreClr.coreclr_test({
     name: "BitOperationsIntrinsics_r",
     srcs: ["BitOperationsPopCount.cs"],
+});
+
+@@public
+export const jIT_Intrinsics_binaryPrimitivesReverseEndianness_ro = CoreClr.coreclr_test({
+    name: "BinaryPrimitivesReverseEndianness_ro",
+    srcs: ["BinaryPrimitivesReverseEndianness.cs"],
+    allowUnsafe: true,
+    optimize: true,
+    tags: ["manual"],
 });
 
 @@public

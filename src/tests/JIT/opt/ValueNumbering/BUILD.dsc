@@ -42,8 +42,8 @@ export const jIT_opt_ValueNumbering_exceptionSetsPropagation_Hwi = CoreClr.corec
     srcs: ["ExceptionSetsPropagation_Hwi.cs"],
     optimize: true,
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
@@ -52,8 +52,8 @@ export const jIT_opt_ValueNumbering_exceptionSets = CoreClr.coreclr_test({
     srcs: ["ExceptionSets.cs"],
     optimize: true,
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public

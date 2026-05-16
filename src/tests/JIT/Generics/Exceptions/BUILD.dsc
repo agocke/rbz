@@ -12,8 +12,8 @@ export const jIT_Generics_Exceptions_specific_struct_instance02 = CoreClr.corecl
     srcs: ["specific_struct_instance02.cs"],
     debugType: "pdbonly",
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
@@ -22,8 +22,8 @@ export const jIT_Generics_Exceptions_specific_struct_static02 = CoreClr.coreclr_
     srcs: ["specific_struct_static02.cs"],
     debugType: "pdbonly",
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
@@ -32,8 +32,8 @@ export const jIT_Generics_Exceptions_specific_class_instance01 = CoreClr.coreclr
     srcs: ["specific_class_instance01.cs"],
     debugType: "pdbonly",
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
@@ -58,8 +58,8 @@ export const jIT_Generics_Exceptions_specific_struct_static01 = CoreClr.coreclr_
     srcs: ["specific_struct_static01.cs"],
     debugType: "pdbonly",
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
@@ -76,8 +76,8 @@ export const jIT_Generics_Exceptions_specific_class_instance02 = CoreClr.coreclr
     srcs: ["specific_class_instance02.cs"],
     debugType: "pdbonly",
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
@@ -86,8 +86,8 @@ export const jIT_Generics_Exceptions_specific_struct_instance01 = CoreClr.corecl
     srcs: ["specific_struct_instance01.cs"],
     debugType: "pdbonly",
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
@@ -96,8 +96,8 @@ export const jIT_Generics_Exceptions_specific_class_static01 = CoreClr.coreclr_t
     srcs: ["specific_class_static01.cs"],
     debugType: "pdbonly",
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
@@ -106,8 +106,8 @@ export const jIT_Generics_Exceptions_specific_class_static02 = CoreClr.coreclr_t
     srcs: ["specific_class_static02.cs"],
     debugType: "pdbonly",
     pri: 1,
-    size: "medium",
     run: false,
+    size: "medium",
 });
 
 @@public
