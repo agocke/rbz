@@ -152,9 +152,26 @@ jobs:
           failed=${#failed_tests[@]}
           total=$((passed + failed))
 
+          # Whole-build cache stats from BuildXL.stats. Per-pip cached-vs-executed
+          # for test pips specifically would require parsing the XLG; the build-wide
+          # numbers convey the cache effectiveness clearly enough.
+          stats="Out/Logs/BuildXL.stats"
+          total_pips=$(awk -F= '$1=="TotalProcessPips"{print $2}' "$stats" 2>/dev/null)
+          cache_hits=$(awk -F= '$1=="ProcessPipCacheHits"{print $2}' "$stats" 2>/dev/null)
+          cache_misses=$(awk -F= '$1=="ProcessPipCacheMisses"{print $2}' "$stats" 2>/dev/null)
+          : "${total_pips:=?}"; : "${cache_hits:=?}"; : "${cache_misses:=?}"
+
+          if [[ "$cache_hits" =~ ^[0-9]+$ && "$total_pips" =~ ^[0-9]+$ && "$total_pips" -gt 0 ]]; then
+            hit_pct=$(awk -v h="$cache_hits" -v t="$total_pips" 'BEGIN{printf "%.1f", (h*100)/t}')
+            cache_line="${cache_hits} cache hits / ${cache_misses} executed of ${total_pips} process pips (${hit_pct}% hit)"
+          else
+            cache_line="cache stats unavailable"
+          fi
+
           echo
           echo "============================================================"
           echo " BuildXL test results: ${passed} passed, ${failed} failed (of ${total} total)"
+          echo " Build cache:          ${cache_line}"
           echo "============================================================"
           if (( failed > 0 )); then
             echo "Failed tests:"
@@ -167,6 +184,8 @@ jobs:
               echo "## BuildXL test results"
               echo
               echo "**${passed} passed, ${failed} failed (of ${total} total)**"
+              echo
+              echo "Build cache: ${cache_line}"
               if (( failed > 0 )); then
                 echo
                 echo "### Failed tests"
