@@ -343,6 +343,13 @@ export const jIT_opt_Inline_tests_mathfunc = CoreClr.coreclr_test({
 });
 
 @@public
+export const jIT_opt_Inline_tests_calli = CoreClr.il_coreclr_test({
+    name: "calli",
+    srcs: ["calli.il"],
+    debugType: "pdbonly",
+});
+
+@@public
 export const jIT_opt_Inline_tests_arrayOfStructs = CoreClr.coreclr_test({
     name: "ArrayOfStructs",
     srcs: ["ArrayOfStructs.cs"],

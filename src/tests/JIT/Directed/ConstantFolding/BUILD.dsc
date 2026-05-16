@@ -26,6 +26,14 @@ export const jIT_Directed_ConstantFolding_value_numbering_unordered_comparisons_
 });
 
 @@public
+export const jIT_Directed_ConstantFolding_handlesInAddrModes = CoreClr.il_coreclr_test({
+    name: "HandlesInAddrModes",
+    srcs: ["HandlesInAddrModes.il"],
+    debugType: "pdbonly",
+    optimize: true,
+});
+
+@@public
 export const jIT_Directed_ConstantFolding_folding_extends_int32_on_64_bit_hosts = CoreClr.coreclr_test({
     name: "folding_extends_int32_on_64_bit_hosts",
     srcs: ["folding_extends_int32_on_64_bit_hosts.cs"],

@@ -17,6 +17,14 @@ export const jIT_Generics_Exceptions_specific_struct_instance02 = CoreClr.corecl
 });
 
 @@public
+export const jIT_Generics_Exceptions_genericCatchInterfaceProgram = CoreClr.il_coreclr_test({
+    name: "GenericCatchInterfaceProgram",
+    srcs: ["GenericCatchInterfaceProgram.il"],
+    optimize: true,
+    run: false,
+});
+
+@@public
 export const jIT_Generics_Exceptions_specific_struct_static02 = CoreClr.coreclr_test({
     name: "specific_struct_static02",
     srcs: ["specific_struct_static02.cs"],

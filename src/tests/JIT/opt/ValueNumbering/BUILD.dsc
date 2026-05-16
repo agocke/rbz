@@ -66,6 +66,16 @@ export const jIT_opt_ValueNumbering_exposedLocalsNumbering = CoreClr.coreclr_tes
 });
 
 @@public
+export const jIT_opt_ValueNumbering_exceptionSetsPropagation_LclHeap = CoreClr.il_coreclr_test({
+    name: "ExceptionSetsPropagation_LclHeap",
+    srcs: ["ExceptionSetsPropagation_LclHeap.il"],
+    optimize: true,
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
 export const jIT_opt_ValueNumbering_constStringConstIndexOptimizations = CoreClr.coreclr_test({
     name: "ConstStringConstIndexOptimizations",
     srcs: ["ConstStringConstIndexOptimizations.cs"],

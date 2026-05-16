@@ -554,6 +554,95 @@ export const baseservices_exceptions_generics_try_catch09 = CoreClr.coreclr_test
 });
 
 @@public
+export const baseservices_exceptions_generics_try_fault_struct01 = CoreClr.il_coreclr_test({
+    name: "try-fault-struct01",
+    srcs: ["try-fault-struct01.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
+export const baseservices_exceptions_generics_try_fault_struct02 = CoreClr.il_coreclr_test({
+    name: "try-fault-struct02",
+    srcs: ["try-fault-struct02.il"],
+    pri: 1,
+    size: "medium",
+});
+
+@@public
+export const baseservices_exceptions_generics_try_fault_struct03 = CoreClr.il_coreclr_test({
+    name: "try-fault-struct03",
+    srcs: ["try-fault-struct03.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
+export const baseservices_exceptions_generics_try_fault01 = CoreClr.il_coreclr_test({
+    name: "try-fault01",
+    srcs: ["try-fault01.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
+export const baseservices_exceptions_generics_try_fault02 = CoreClr.il_coreclr_test({
+    name: "try-fault02",
+    srcs: ["try-fault02.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
+export const baseservices_exceptions_generics_try_fault03 = CoreClr.il_coreclr_test({
+    name: "try-fault03",
+    srcs: ["try-fault03.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
+export const baseservices_exceptions_generics_try_filter_finally01 = CoreClr.il_coreclr_test({
+    name: "try-filter-finally01",
+    srcs: ["try-filter-finally01.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
+export const baseservices_exceptions_generics_try_filter_finally02 = CoreClr.il_coreclr_test({
+    name: "try-filter-finally02",
+    srcs: ["try-filter-finally02.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
+export const baseservices_exceptions_generics_try_filter_struct02 = CoreClr.il_coreclr_test({
+    name: "try-filter-struct02",
+    srcs: ["try-filter-struct02.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
+export const baseservices_exceptions_generics_try_filter02 = CoreClr.il_coreclr_test({
+    name: "try-filter02",
+    srcs: ["try-filter02.il"],
+    pri: 1,
+    size: "medium",
+    run: false,
+});
+
+@@public
 export const baseservices_exceptions_generics_try_finally_struct01 = CoreClr.coreclr_test({
     name: "try-finally-struct01",
     srcs: ["try-finally-struct01.cs"],

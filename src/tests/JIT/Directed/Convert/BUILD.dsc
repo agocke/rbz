@@ -7,12 +7,45 @@
 import * as CoreClr from "CoreClrTest";
 
 @@public
+export const jIT_Directed_Convert_ldind_conv = CoreClr.il_coreclr_test({
+    name: "ldind_conv",
+    srcs: ["ldind_conv.il"],
+    optimize: true,
+    run: false,
+});
+
+@@public
 export const jIT_Directed_Convert_fPZero = CoreClr.coreclr_test({
     name: "FPZero",
     srcs: ["FPZero.cs"],
     allowUnsafe: true,
     debugType: "pdbonly",
     optimize: true,
+    pri: 1,
+    size: "medium",
+});
+
+@@public
+export const jIT_Directed_Convert_minopts_convu1 = CoreClr.il_coreclr_test({
+    name: "minopts_convu1",
+    srcs: ["minopts_convu1.il"],
+    debugType: "pdbonly",
+    pri: 1,
+    size: "medium",
+});
+
+@@public
+export const jIT_Directed_Convert_signed_overflow_conversions_are_not_treated_as_unsigned = CoreClr.il_coreclr_test({
+    name: "signed_overflow_conversions_are_not_treated_as_unsigned",
+    srcs: ["signed_overflow_conversions_are_not_treated_as_unsigned.il"],
+    debugType: "pdbonly",
+});
+
+@@public
+export const jIT_Directed_Convert_implicitConv = CoreClr.il_coreclr_test({
+    name: "implicitConv",
+    srcs: ["implicitConv.il"],
+    debugType: "pdbonly",
     pri: 1,
     size: "medium",
 });
