@@ -44,12 +44,13 @@ jobs:
         with:
           dotnet-version: '11.0.100-preview.5.26227.104'
 
-      # NOTE: BXL caching via actions/cache is currently disabled because
-      # restoring ~/.cache/bxl through actions/cache loses symlink semantics
-      # (e.g. Out/frontend/Download/DotNetSdk/c/host/fxr disappears), causing
-      # csc invocations to fail with exit code 131. Re-enable once BXL CAS
-      # can round-trip symlinks through tar-based caching, or once we can
-      # exclude the Download outputs from the cached state.
+      - name: Restore BuildXL cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bxl
+          key: bxl-cache-${{ github.sha }}
+          restore-keys: bxl-cache-
+          save-always: true
 
       - name: Install BuildXL bootstrap tool
         shell: bash
