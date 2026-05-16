@@ -15,8 +15,8 @@ import {Cmd, Transformer} from "Sdk.Transformers";
 import * as Defs from "Defs";
 import * as Common from "Tests.Common";
 
-const supportToolchain: Rules.Toolchain = { kind: "Toolchain", name: "coreclr-test-support" };
-const bashExe = f`/bin/bash`;
+export const supportToolchain: Rules.Toolchain = { kind: "Toolchain", name: "coreclr-test-support" };
+export const bashExe = f`/bin/bash`;
 
 // ============================================================================
 //  XUnitWrapperGenerator analyzer config
@@ -86,7 +86,7 @@ export interface CoreClrTestResult extends Rules.Provider {
 
 interface BuildStampAttrs {
     name: string;
-    binary: CSharp.CSharpInfo;
+    binary: File;
 }
 
 interface BuildStampResult extends Rules.Provider {
@@ -96,7 +96,7 @@ interface BuildStampResult extends Rules.Provider {
 
 interface RunCoreClrTestAttrs {
     name: string;
-    binary: CSharp.CSharpInfo;
+    binary: File;
     runtimeFiles: File[];
     environmentVariables: {name: string, value: string}[];
 }
@@ -112,12 +112,12 @@ function stageFile(actions: Rules.Actions, file: File): Rules.Artifact {
         actions.declareOutput(file.path.name.toString()));
 }
 
-const emitBuildStamp = Rules.rule<BuildStampAttrs, BuildStampAttrs, Rules.Toolchain, BuildStampResult>({
+export const emitBuildStamp = Rules.rule<BuildStampAttrs, BuildStampAttrs, Rules.Toolchain, BuildStampResult>({
     doc: "Mark a CoreCLR test assembly as built.",
     toolchain: supportToolchain,
     resolve: (attrs, _resolver) => attrs,
     impl: (ctx) => {
-        const stamp = ctx.actions.declareOutput(`${ctx.args.binary.binary.nameWithoutExtension}.build.stamp`);
+        const stamp = ctx.actions.declareOutput(`${ctx.args.binary.nameWithoutExtension}.build.stamp`);
         const script = ctx.actions.writeFile(
             ctx.actions.declareOutput(`${ctx.args.name}.build.sh`),
             [
@@ -133,8 +133,8 @@ const emitBuildStamp = Rules.rule<BuildStampAttrs, BuildStampAttrs, Rules.Toolch
                 Cmd.argument(Rules.cmdOutput(stamp)),
             ],
             outputs: [stamp],
-            dependencies: [Rules.sourceArtifact(ctx.args.binary.binary)],
-            description: `mark coreclr test build: ${ctx.args.binary.binary.nameWithoutExtension}`,
+            dependencies: [Rules.sourceArtifact(ctx.args.binary)],
+            description: `mark coreclr test build: ${ctx.args.binary.nameWithoutExtension}`,
         });
 
         const stampFile = Rules.getFile(produced[0]);
@@ -146,15 +146,15 @@ const emitBuildStamp = Rules.rule<BuildStampAttrs, BuildStampAttrs, Rules.Toolch
     },
 });
 
-const runCoreClrTest = Rules.rule<RunCoreClrTestAttrs, RunCoreClrTestAttrs, Rules.Toolchain, RunCoreClrTestResult>({
+export const runCoreClrTest = Rules.rule<RunCoreClrTestAttrs, RunCoreClrTestAttrs, Rules.Toolchain, RunCoreClrTestResult>({
     doc: "Run a CoreCLR standalone test via corerun and capture a BuildXL-visible stamp.",
     toolchain: supportToolchain,
     resolve: (attrs, _resolver) => attrs,
     impl: (ctx) => {
-        const stagedBinary = stageFile(ctx.actions, ctx.args.binary.binary);
+        const stagedBinary = stageFile(ctx.actions, ctx.args.binary);
         const stagedRuntimeFiles = ctx.args.runtimeFiles.map(file => stageFile(ctx.actions, file));
 
-        const stamp = ctx.actions.declareOutput(`${ctx.args.binary.binary.nameWithoutExtension}.test.stamp`);
+        const stamp = ctx.actions.declareOutput(`${ctx.args.binary.nameWithoutExtension}.test.stamp`);
         const script = ctx.actions.writeFile(
             ctx.actions.declareOutput(`${ctx.args.name}.run.sh`),
             [
@@ -190,7 +190,7 @@ const runCoreClrTest = Rules.rule<RunCoreClrTestAttrs, RunCoreClrTestAttrs, Rule
             ],
             environmentVariables: ctx.args.environmentVariables,
             workingDirectory: Defs.CORE_ROOT_DIR,
-            description: `run coreclr test: ${ctx.args.binary.binary.nameWithoutExtension}`,
+            description: `run coreclr test: ${ctx.args.binary.nameWithoutExtension}`,
         });
 
         const stampFile = Rules.getFile(produced[0]);
@@ -236,7 +236,7 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
 
     const buildStamp = emitBuildStamp({
         name: `${args.name}_build`,
-        binary: csInfo,
+        binary: csInfo.binary,
     }).stamp;
 
     const runtimeFiles = [
@@ -251,7 +251,7 @@ export function coreclr_test(args: CoreClrTestArguments): CoreClrTestResult {
         ? undefined
         : runCoreClrTest({
             name: `${args.name}_test`,
-            binary: csInfo,
+            binary: csInfo.binary,
             runtimeFiles: runtimeFiles,
             environmentVariables: args.env || [],
         }).stamp;

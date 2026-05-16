@@ -44,18 +44,43 @@ _HOST_PLATFORM_LABELS = {
     "@platforms//os:linux",
 }
 
-_SUPPORTED_RULES = {"coreclr_test"}
+_SUPPORTED_RULES = {"coreclr_test", "il_coreclr_test"}
+
+# Per-rule macro name to emit on the BXL side.
+_BXL_MACRO = {
+    "coreclr_test": "CoreClr.coreclr_test",
+    "il_coreclr_test": "CoreClr.il_coreclr_test",
+}
+
+# Per-rule whitelist of bazel attrs that we know how to forward.
+_KNOWN_ATTRS_BY_RULE = {
+    "coreclr_test": {
+        "name", "srcs", "optimize", "allow_unsafe_blocks", "defines",
+        "nowarn", "env", "pri", "size", "debug_type", "tags",
+        "target_compatible_with", "compiler_options", "test_deps",
+        "async", "flaky", "nullable", "visibility", "deps",
+    },
+    "il_coreclr_test": {
+        "name", "srcs", "debug_type", "optimize", "env", "pri", "size",
+        "tags", "target_compatible_with", "flaky", "visibility", "deps",
+    },
+}
 
 
 class SkipTarget(Exception):
     """Raised when a target cannot be ported and should be skipped."""
 
 
-def _classify_dep(dep: str) -> str:
+def _classify_dep(dep: str, rule: str) -> str:
     """Return 'drop', 'keep', or 'unsupported' for a bazel dep label."""
     if dep.startswith(_IMPLICIT_DEP_PREFIXES):
         return "drop"
     if _LIBRARY_REF_RE.match(dep):
+        return "drop"
+    # IL tests use deps as runtime DLLs symlinked next to the test binary.
+    # //src/tests/Common:TestLibrary is already in Core_Root, so it resolves
+    # at runtime via corerun's TPA — drop it for IL tests instead of failing.
+    if rule == "il_coreclr_test" and dep == "//src/tests/Common:TestLibrary":
         return "drop"
     if dep.startswith(":"):
         return "unsupported"
@@ -265,7 +290,7 @@ def _unique_identifier(name: str, pkg_rel: str) -> str:
 
 
 _EXISTING_DISABLED_RE = re.compile(
-    r"export\s+const\s+\w+\s*=\s*CoreClr\.coreclr_test\(\s*\{"
+    r"export\s+const\s+\w+\s*=\s*CoreClr\.(?:coreclr_test|il_coreclr_test)\(\s*\{"
     r"(?P<body>(?:[^{}]|\{[^{}]*\})*)"
     r"\}\s*\)",
     re.MULTILINE,
@@ -308,7 +333,7 @@ def convert_file(src_build: Path, target_dir: Path, *, pkg_rel: str = "", worksp
         if rule == "load":
             continue
         if rule not in _SUPPORTED_RULES:
-            if rule in ("il_coreclr_test", "coreclr_merged_test",
+            if rule in ("coreclr_merged_test",
                        "live_csharp_library", "csharp_library"):
                 notes.append(f"skipped {rule}")
                 skipped += 1
@@ -331,7 +356,7 @@ def convert_file(src_build: Path, target_dir: Path, *, pkg_rel: str = "", worksp
             if "deps" in attrs_ast:
                 deps_val = _eval_literal(attrs_ast["deps"], pkg_dir=target_dir)
                 for dep in deps_val:
-                    c = _classify_dep(dep)
+                    c = _classify_dep(dep, rule)
                     if c == "drop":
                         continue
                     if c == "unsupported":
@@ -340,12 +365,13 @@ def convert_file(src_build: Path, target_dir: Path, *, pkg_rel: str = "", worksp
                 if kept_deps:
                     raise SkipTarget(f"non-implicit deps remain: {kept_deps}")
 
+            known_attrs = _KNOWN_ATTRS_BY_RULE[rule]
             out_attrs: dict = {}
             for k, v_node in attrs_ast.items():
                 if k == "deps":
                     continue
-                if k not in _KNOWN_BAZEL_ATTRS:
-                    raise SkipTarget(f"unknown attr {k!r}")
+                if k not in known_attrs:
+                    raise SkipTarget(f"unknown attr {k!r} for rule {rule}")
                 val = _eval_literal(v_node, pkg_dir=target_dir)
                 if k == "env":
                     val = _emit_env(val)
@@ -392,8 +418,9 @@ def convert_file(src_build: Path, target_dir: Path, *, pkg_rel: str = "", worksp
                 out_attrs["run"] = False
             for k in sorted(out_attrs.keys()):
                 attr_lines.append(f"    {k}: {_emit_value(out_attrs[k])},")
+            macro = _BXL_MACRO[rule]
             out_lines.append(
-                f"@@public\nexport const {export_id} = CoreClr.coreclr_test({{\n"
+                f"@@public\nexport const {export_id} = {macro}({{\n"
                 + "\n".join(attr_lines)
                 + "\n});\n"
             )
