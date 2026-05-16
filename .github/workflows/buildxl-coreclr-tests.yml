@@ -114,24 +114,6 @@ jobs:
 
           echo "Core_Root assembled: $(ls "$CORE_ROOT"/*.dll | wc -l) managed + $(ls "$CORE_ROOT"/*.so | wc -l) native files"
 
-      - name: Show BuildXL test set
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          total=$(grep -rh 'CoreClr\.coreclr_test(' src/tests --include='BUILD.dsc' | wc -l)
-          disabled=$(grep -rh 'run:\s*false' src/tests --include='BUILD.dsc' | wc -l)
-          enabled=$((total - disabled))
-          files=$(find src/tests -name BUILD.dsc | wc -l)
-
-          {
-            echo "## BuildXL CoreCLR test set"
-            echo
-            echo "- **${total}** \`coreclr_test\` targets in **${files}** \`BUILD.dsc\` files"
-            echo "- **${enabled}** enabled (run as tests)"
-            echo "- **${disabled}** marked \`run: false\` (compile-only)"
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-
       - name: Build
         shell: bash
         run: |
@@ -149,44 +131,54 @@ jobs:
           ./bxl.sh "/f:output='*.test.stamp'"
           bxl_exit=$?
 
+          # Source of truth: every enabled coreclr_test target produces a
+          # *.test.stamp output on success. Cached pips re-emit the stamp,
+          # so this count is correct on warm-cache runs too.
+          mapfile -t passed_stamps < <(find Out/Objects -name '*.test.stamp' | sort)
+          mapfile -t passed_tests < <(
+            printf '%s\n' "${passed_stamps[@]}" \
+              | awk -F/ '{ n=$NF; sub(/\.test\.stamp$/,"",n); print n }' \
+              | sort -u
+          )
+
           log="Out/Logs/BuildXL.Dev.log"
-          if [[ -f "$log" ]]; then
-            mapfile -t all_tests < <(
-              grep -oE 'run coreclr test: [A-Za-z_0-9]+' "$log" \
-                | awk '{print $NF}' | sort -u
-            )
-            mapfile -t failed_tests < <(
-              grep -E 'error DX0064:.*run coreclr test: [A-Za-z_0-9]+.*failed with exit code' "$log" \
-                | grep -oE 'run coreclr test: [A-Za-z_0-9]+' \
-                | awk '{print $NF}' | sort -u
-            )
+          mapfile -t failed_tests < <(
+            [[ -f "$log" ]] && grep -E 'error DX0064:.*run coreclr test: [A-Za-z_0-9]+.*failed with exit code' "$log" \
+              | grep -oE 'run coreclr test: [A-Za-z_0-9]+' \
+              | awk '{print $NF}' | sort -u
+          )
 
-            total=${#all_tests[@]}
-            failed=${#failed_tests[@]}
-            passed=$((total - failed))
+          passed=${#passed_tests[@]}
+          failed=${#failed_tests[@]}
+          total=$((passed + failed))
 
-            echo
-            echo "============================================================"
-            echo " BuildXL test results: ${passed} passed, ${failed} failed (of ${total} total)"
-            echo "============================================================"
-            if (( failed > 0 )); then
-              echo "Failed tests:"
-              for t in "${failed_tests[@]}"; do echo "  - $t"; done
-            fi
-            echo
+          echo
+          echo "============================================================"
+          echo " BuildXL test results: ${passed} passed, ${failed} failed (of ${total} total)"
+          echo "============================================================"
+          if (( failed > 0 )); then
+            echo "Failed tests:"
+            for t in "${failed_tests[@]}"; do echo "  - $t"; done
+          fi
+          echo
 
-            if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
-              {
-                echo "## BuildXL test results"
+          if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+            {
+              echo "## BuildXL test results"
+              echo
+              echo "**${passed} passed, ${failed} failed (of ${total} total)**"
+              if (( failed > 0 )); then
                 echo
-                echo "**${passed} passed, ${failed} failed (of ${total} total)**"
-                if (( failed > 0 )); then
-                  echo
-                  echo "### Failed tests"
-                  for t in "${failed_tests[@]}"; do echo "- \`$t\`"; done
-                fi
-              } >> "$GITHUB_STEP_SUMMARY"
-            fi
+                echo "### Failed tests"
+                for t in "${failed_tests[@]}"; do echo "- \`$t\`"; done
+              fi
+              echo
+              echo "<details><summary>All ${passed} passed tests</summary>"
+              echo
+              for t in "${passed_tests[@]}"; do echo "- \`$t\`"; done
+              echo
+              echo "</details>"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
           exit "$bxl_exit"
