@@ -146,6 +146,7 @@ export const loader_classloader_generics_Layout_General_base02d_seq_ser = CoreCl
     srcs: ["Base02d_seq_ser.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public

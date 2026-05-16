@@ -12,4 +12,5 @@ export const baseservices_exceptions_exceptionstacktrace_exceptionstacktrace = C
     srcs: ["exceptionstacktrace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

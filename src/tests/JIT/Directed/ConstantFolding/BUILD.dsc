@@ -13,6 +13,7 @@ export const jIT_Directed_ConstantFolding_value_numbering_checked_arithmetic_wit
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public

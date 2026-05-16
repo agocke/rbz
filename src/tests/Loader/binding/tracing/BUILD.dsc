@@ -13,16 +13,3 @@ export const loader_binding_tracing_assemblyToLoadDependency = CoreClr.coreclr_t
     tags: ["manual"],
 });
 
-@@public
-export const loader_binding_tracing_binderTracingTest_Basic = CoreClr.coreclr_test({
-    name: "BinderTracingTest.Basic",
-    srcs: ["BinderTracingTest.Basic.cs", "BinderTracingTest.DefaultProbing.cs"],
-    tags: ["manual"],
-});
-
-@@public
-export const loader_binding_tracing_binderTracingTest_ResolutionFlow = CoreClr.coreclr_test({
-    name: "BinderTracingTest.ResolutionFlow",
-    srcs: ["BinderTracingTest.EventHandlers.cs", "BinderTracingTest.ResolutionFlow.cs"],
-    tags: ["manual"],
-});

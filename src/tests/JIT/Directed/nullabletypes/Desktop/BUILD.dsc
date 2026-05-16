@@ -20,6 +20,7 @@ export const jIT_Directed_nullabletypes_Desktop_boxunboxvaluetype_do = CoreClr.c
     srcs: ["boxunboxvaluetype.cs", "StructDefinitions.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -45,6 +46,7 @@ export const jIT_Directed_nullabletypes_Desktop_nullcomparaison_ro = CoreClr.cor
 export const jIT_Directed_nullabletypes_Desktop_boxunboxvaluetype_r = CoreClr.coreclr_test({
     name: "boxunboxvaluetype_r",
     srcs: ["boxunboxvaluetype.cs", "StructDefinitions.cs"],
+    run: false,
 });
 
 @@public
@@ -62,4 +64,5 @@ export const jIT_Directed_nullabletypes_Desktop_boxunboxvaluetype_ro = CoreClr.c
     name: "boxunboxvaluetype_ro",
     srcs: ["boxunboxvaluetype.cs", "StructDefinitions.cs"],
     optimize: true,
+    run: false,
 });

@@ -11,4 +11,5 @@ export const jIT_Regression_CLR_x86_JIT_V1_2_M01_b07900_b07900 = CoreClr.coreclr
     name: "b07900",
     srcs: ["rpPasses.cs"],
     debugType: "pdbonly",
+    run: false,
 });

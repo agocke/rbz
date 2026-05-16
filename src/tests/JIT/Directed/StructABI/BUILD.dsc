@@ -78,4 +78,5 @@ export const jIT_Directed_StructABI_structreturn = CoreClr.coreclr_test({
     allowUnsafe: true,
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });

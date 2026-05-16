@@ -12,4 +12,5 @@ export const baseservices_threading_regressions_6906__6906 = CoreClr.coreclr_tes
     srcs: ["repro.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

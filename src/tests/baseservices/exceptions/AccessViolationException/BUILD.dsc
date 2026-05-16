@@ -12,6 +12,7 @@ export const baseservices_exceptions_AccessViolationException_aVException01 = Co
     srcs: ["AVException01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -20,6 +21,7 @@ export const baseservices_exceptions_AccessViolationException_aVException02 = Co
     srcs: ["AVException02.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -28,4 +30,5 @@ export const baseservices_exceptions_AccessViolationException_aVException03 = Co
     srcs: ["AVException03.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

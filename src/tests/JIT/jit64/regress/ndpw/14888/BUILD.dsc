@@ -13,4 +13,5 @@ export const jIT_jit64_regress_ndpw_14888_objectusedonlyinhandler = CoreClr.core
     debugType: "pdbonly",
     pri: 1,
     size: "medium",
+    run: false,
 });

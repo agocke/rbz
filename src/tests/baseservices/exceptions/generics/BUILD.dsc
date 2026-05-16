@@ -12,6 +12,7 @@ export const baseservices_exceptions_generics_genericExceptions = CoreClr.corecl
     srcs: ["GenericExceptions.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -20,6 +21,7 @@ export const baseservices_exceptions_generics_genericExceptions01 = CoreClr.core
     srcs: ["genericexceptions01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -28,6 +30,7 @@ export const baseservices_exceptions_generics_genericExceptions02 = CoreClr.core
     srcs: ["genericexceptions02.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -36,6 +39,7 @@ export const baseservices_exceptions_generics_genericExceptions03 = CoreClr.core
     srcs: ["genericexceptions03.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -44,6 +48,7 @@ export const baseservices_exceptions_generics_genericExceptions04 = CoreClr.core
     srcs: ["genericexceptions04.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -52,6 +57,7 @@ export const baseservices_exceptions_generics_genericExceptions05 = CoreClr.core
     srcs: ["genericexceptions05.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -60,6 +66,7 @@ export const baseservices_exceptions_generics_genericExceptions06 = CoreClr.core
     srcs: ["genericexceptions06.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -68,6 +75,7 @@ export const baseservices_exceptions_generics_genericExceptions07 = CoreClr.core
     srcs: ["genericexceptions07.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -76,6 +84,7 @@ export const baseservices_exceptions_generics_genericExceptions08 = CoreClr.core
     srcs: ["genericexceptions08.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -84,6 +93,7 @@ export const baseservices_exceptions_generics_typeParameter001 = CoreClr.coreclr
     srcs: ["typeparameter001.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -92,6 +102,7 @@ export const baseservices_exceptions_generics_typeParameter002 = CoreClr.coreclr
     srcs: ["typeparameter002.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -100,6 +111,7 @@ export const baseservices_exceptions_generics_typeParameter003 = CoreClr.coreclr
     srcs: ["typeparameter003.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -108,6 +120,7 @@ export const baseservices_exceptions_generics_typeParameter004 = CoreClr.coreclr
     srcs: ["typeparameter004.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -116,6 +129,7 @@ export const baseservices_exceptions_generics_typeParameter005 = CoreClr.coreclr
     srcs: ["typeparameter005.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -124,6 +138,7 @@ export const baseservices_exceptions_generics_typeParameter006 = CoreClr.coreclr
     srcs: ["typeparameter006.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -132,6 +147,7 @@ export const baseservices_exceptions_generics_typeParameter007 = CoreClr.coreclr
     srcs: ["typeparameter007.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -140,6 +156,7 @@ export const baseservices_exceptions_generics_typeParameter008 = CoreClr.coreclr
     srcs: ["typeparameter008.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -148,6 +165,7 @@ export const baseservices_exceptions_generics_typeParameter009 = CoreClr.coreclr
     srcs: ["typeparameter009.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -156,6 +174,7 @@ export const baseservices_exceptions_generics_typeParameter010 = CoreClr.coreclr
     srcs: ["typeparameter010.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -164,6 +183,7 @@ export const baseservices_exceptions_generics_typeParameter011 = CoreClr.coreclr
     srcs: ["typeparameter011.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -172,6 +192,7 @@ export const baseservices_exceptions_generics_typeParameter012 = CoreClr.coreclr
     srcs: ["typeparameter012.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -180,6 +201,7 @@ export const baseservices_exceptions_generics_typeParameter013 = CoreClr.coreclr
     srcs: ["typeparameter013.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -188,6 +210,7 @@ export const baseservices_exceptions_generics_typeParameter014 = CoreClr.coreclr
     srcs: ["typeparameter014.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -196,6 +219,7 @@ export const baseservices_exceptions_generics_typeParameter015 = CoreClr.coreclr
     srcs: ["typeparameter015.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -204,6 +228,7 @@ export const baseservices_exceptions_generics_typeParameter016 = CoreClr.coreclr
     srcs: ["typeparameter016.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -212,6 +237,7 @@ export const baseservices_exceptions_generics_typeParameter017 = CoreClr.coreclr
     srcs: ["typeparameter017.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -220,6 +246,7 @@ export const baseservices_exceptions_generics_typeParameter018 = CoreClr.coreclr
     srcs: ["typeparameter018.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -228,6 +255,7 @@ export const baseservices_exceptions_generics_nested_try_catch01 = CoreClr.corec
     srcs: ["nested-try-catch01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -236,6 +264,7 @@ export const baseservices_exceptions_generics_nested_try_catch02 = CoreClr.corec
     srcs: ["nested-try-catch02.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -244,6 +273,7 @@ export const baseservices_exceptions_generics_nested_try_catch03 = CoreClr.corec
     srcs: ["nested-try-catch03.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -252,6 +282,7 @@ export const baseservices_exceptions_generics_nested_try_catch04 = CoreClr.corec
     srcs: ["nested-try-catch04.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -260,6 +291,7 @@ export const baseservices_exceptions_generics_nested_try_catch05 = CoreClr.corec
     srcs: ["nested-try-catch05.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -268,6 +300,7 @@ export const baseservices_exceptions_generics_nested_try_catch06 = CoreClr.corec
     srcs: ["nested-try-catch06.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -276,6 +309,7 @@ export const baseservices_exceptions_generics_nested_try_catch07 = CoreClr.corec
     srcs: ["nested-try-catch07.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -284,6 +318,7 @@ export const baseservices_exceptions_generics_nested_try_catch08 = CoreClr.corec
     srcs: ["nested-try-catch08.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -292,6 +327,7 @@ export const baseservices_exceptions_generics_nested_try_catch09 = CoreClr.corec
     srcs: ["nested-try-catch09.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -300,6 +336,7 @@ export const baseservices_exceptions_generics_nested_try_catch10 = CoreClr.corec
     srcs: ["nested-try-catch10.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -308,6 +345,7 @@ export const baseservices_exceptions_generics_try_catch_finally_struct01 = CoreC
     srcs: ["try-catch-finally-struct01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -316,6 +354,7 @@ export const baseservices_exceptions_generics_try_catch_finally_struct02 = CoreC
     srcs: ["try-catch-finally-struct02.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -332,6 +371,7 @@ export const baseservices_exceptions_generics_try_catch_finally01 = CoreClr.core
     srcs: ["try-catch-finally01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -340,6 +380,7 @@ export const baseservices_exceptions_generics_try_catch_finally02 = CoreClr.core
     srcs: ["try-catch-finally02.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -356,6 +397,7 @@ export const baseservices_exceptions_generics_try_catch_struct01 = CoreClr.corec
     srcs: ["try-catch-struct01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -364,6 +406,7 @@ export const baseservices_exceptions_generics_try_catch_struct02 = CoreClr.corec
     srcs: ["try-catch-struct02.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -372,6 +415,7 @@ export const baseservices_exceptions_generics_try_catch_struct03 = CoreClr.corec
     srcs: ["try-catch-struct03.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -380,6 +424,7 @@ export const baseservices_exceptions_generics_try_catch_struct04 = CoreClr.corec
     srcs: ["try-catch-struct04.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -388,6 +433,7 @@ export const baseservices_exceptions_generics_try_catch_struct05 = CoreClr.corec
     srcs: ["try-catch-struct05.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -396,6 +442,7 @@ export const baseservices_exceptions_generics_try_catch_struct06 = CoreClr.corec
     srcs: ["try-catch-struct06.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -404,6 +451,7 @@ export const baseservices_exceptions_generics_try_catch_struct07 = CoreClr.corec
     srcs: ["try-catch-struct07.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -412,6 +460,7 @@ export const baseservices_exceptions_generics_try_catch_struct08 = CoreClr.corec
     srcs: ["try-catch-struct08.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -420,6 +469,7 @@ export const baseservices_exceptions_generics_try_catch_struct09 = CoreClr.corec
     srcs: ["try-catch-struct09.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -428,6 +478,7 @@ export const baseservices_exceptions_generics_try_catch01 = CoreClr.coreclr_test
     srcs: ["try-catch01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -436,6 +487,7 @@ export const baseservices_exceptions_generics_try_catch02 = CoreClr.coreclr_test
     srcs: ["try-catch02.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -444,6 +496,7 @@ export const baseservices_exceptions_generics_try_catch03 = CoreClr.coreclr_test
     srcs: ["try-catch03.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -452,6 +505,7 @@ export const baseservices_exceptions_generics_try_catch04 = CoreClr.coreclr_test
     srcs: ["try-catch04.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -460,6 +514,7 @@ export const baseservices_exceptions_generics_try_catch05 = CoreClr.coreclr_test
     srcs: ["try-catch05.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -468,6 +523,7 @@ export const baseservices_exceptions_generics_try_catch06 = CoreClr.coreclr_test
     srcs: ["try-catch06.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -476,6 +532,7 @@ export const baseservices_exceptions_generics_try_catch07 = CoreClr.coreclr_test
     srcs: ["try-catch07.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -484,6 +541,7 @@ export const baseservices_exceptions_generics_try_catch08 = CoreClr.coreclr_test
     srcs: ["try-catch08.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -492,6 +550,7 @@ export const baseservices_exceptions_generics_try_catch09 = CoreClr.coreclr_test
     srcs: ["try-catch09.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -500,6 +559,7 @@ export const baseservices_exceptions_generics_try_finally_struct01 = CoreClr.cor
     srcs: ["try-finally-struct01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -516,6 +576,7 @@ export const baseservices_exceptions_generics_try_finally_struct03 = CoreClr.cor
     srcs: ["try-finally-struct03.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -524,6 +585,7 @@ export const baseservices_exceptions_generics_try_finally01 = CoreClr.coreclr_te
     srcs: ["try-finally01.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -540,4 +602,5 @@ export const baseservices_exceptions_generics_try_finally03 = CoreClr.coreclr_te
     srcs: ["try-finally03.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

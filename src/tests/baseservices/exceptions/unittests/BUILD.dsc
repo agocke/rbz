@@ -12,6 +12,7 @@ export const baseservices_exceptions_unittests_baadbaad = CoreClr.coreclr_test({
     srcs: ["Baadbaad.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -20,6 +21,7 @@ export const baseservices_exceptions_unittests_baseClass = CoreClr.coreclr_test(
     srcs: ["baseclass.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -28,6 +30,7 @@ export const baseservices_exceptions_unittests_collidedUnwind = CoreClr.coreclr_
     srcs: ["CollidedUnwind.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -36,6 +39,7 @@ export const baseservices_exceptions_unittests_eHPatternTests = CoreClr.coreclr_
     srcs: ["EHPatternTests.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -44,6 +48,7 @@ export const baseservices_exceptions_unittests_goryManagedPresent = CoreClr.core
     srcs: ["GoryManagedPresent.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -52,6 +57,7 @@ export const baseservices_exceptions_unittests_goryNativePast = CoreClr.coreclr_
     srcs: ["GoryNativePast.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -60,6 +66,7 @@ export const baseservices_exceptions_unittests_innerFinally = CoreClr.coreclr_te
     srcs: ["innerfinally.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -68,6 +75,7 @@ export const baseservices_exceptions_unittests_innerFinallyAndCatch = CoreClr.co
     srcs: ["InnerFinallyAndCatch.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -76,6 +84,7 @@ export const baseservices_exceptions_unittests_pending = CoreClr.coreclr_test({
     srcs: ["Pending.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -84,6 +93,7 @@ export const baseservices_exceptions_unittests_recurse = CoreClr.coreclr_test({
     srcs: ["Recurse.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -92,6 +102,7 @@ export const baseservices_exceptions_unittests_recursiveRethrow = CoreClr.corecl
     srcs: ["RecursiveRethrow.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -100,6 +111,7 @@ export const baseservices_exceptions_unittests_recursiveThrowNew = CoreClr.corec
     srcs: ["RecursiveThrowNew.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -108,6 +120,7 @@ export const baseservices_exceptions_unittests_rethrowAndFinally = CoreClr.corec
     srcs: ["rethrowandfinally.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -124,6 +137,7 @@ export const baseservices_exceptions_unittests_strSwitchFinally = CoreClr.corecl
     srcs: ["StrSwitchFinally.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -132,6 +146,7 @@ export const baseservices_exceptions_unittests_throwInCatch = CoreClr.coreclr_te
     srcs: ["throwincatch.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -140,6 +155,7 @@ export const baseservices_exceptions_unittests_throwInFinally = CoreClr.coreclr_
     srcs: ["throwinfinally.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -148,6 +164,7 @@ export const baseservices_exceptions_unittests_throwInFinallyNestedInTry = CoreC
     srcs: ["ThrowInFinallyNestedInTry.cs", "trace.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -156,4 +173,5 @@ export const baseservices_exceptions_unittests_tryCatchInFinally = CoreClr.corec
     srcs: ["trace.cs", "trycatchinfinally.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

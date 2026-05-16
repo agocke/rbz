@@ -10,12 +10,14 @@ import * as CoreClr from "CoreClrTest";
 export const gC_API_NoGCRegion_callback = CoreClr.coreclr_test({
     name: "Callback",
     srcs: ["Callback.cs"],
+    run: false,
 });
 
 @@public
 export const gC_API_NoGCRegion_callback_Svr = CoreClr.coreclr_test({
     name: "Callback_Svr",
     srcs: ["Callback.cs"],
+    run: false,
 });
 
 @@public

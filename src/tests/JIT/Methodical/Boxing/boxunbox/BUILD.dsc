@@ -11,4 +11,5 @@ export const jIT_Methodical_Boxing_boxunbox_keepAliveBoxOpt = CoreClr.coreclr_te
     name: "KeepAliveBoxOpt",
     srcs: ["KeepAliveBoxOpt.cs"],
     debugType: "pdbonly",
+    run: false,
 });

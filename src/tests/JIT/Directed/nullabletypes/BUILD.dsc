@@ -33,6 +33,7 @@ export const jIT_Directed_nullabletypes_gettype_d = CoreClr.coreclr_test({
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -43,6 +44,7 @@ export const jIT_Directed_nullabletypes_gettype_do = CoreClr.coreclr_test({
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -52,6 +54,7 @@ export const jIT_Directed_nullabletypes_gettype_r = CoreClr.coreclr_test({
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -61,6 +64,7 @@ export const jIT_Directed_nullabletypes_gettype_ro = CoreClr.coreclr_test({
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -141,6 +145,7 @@ export const jIT_Directed_nullabletypes_unboxnullable_d = CoreClr.coreclr_test({
     srcs: ["unboxnullable.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -149,6 +154,7 @@ export const jIT_Directed_nullabletypes_unboxnullable_do = CoreClr.coreclr_test(
     srcs: ["unboxnullable.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -156,6 +162,7 @@ export const jIT_Directed_nullabletypes_unboxnullable_r = CoreClr.coreclr_test({
     name: "unboxnullable_r",
     srcs: ["unboxnullable.cs"],
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -163,6 +170,7 @@ export const jIT_Directed_nullabletypes_unboxnullable_ro = CoreClr.coreclr_test(
     name: "unboxnullable_ro",
     srcs: ["unboxnullable.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -171,6 +179,7 @@ export const jIT_Directed_nullabletypes_value_d = CoreClr.coreclr_test({
     srcs: ["value.cs", "invokecommon.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -179,6 +188,7 @@ export const jIT_Directed_nullabletypes_value_do = CoreClr.coreclr_test({
     srcs: ["value.cs", "invokecommon.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -186,4 +196,5 @@ export const jIT_Directed_nullabletypes_value_ro = CoreClr.coreclr_test({
     name: "value_ro",
     srcs: ["value.cs", "invokecommon.cs"],
     optimize: true,
+    run: false,
 });

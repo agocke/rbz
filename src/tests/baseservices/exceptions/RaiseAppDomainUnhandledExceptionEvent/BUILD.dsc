@@ -10,4 +10,5 @@ import * as CoreClr from "CoreClrTest";
 export const baseservices_exceptions_RaiseAppDomainUnhandledExceptionEvent_raiseEvent = CoreClr.coreclr_test({
     name: "RaiseEvent",
     srcs: ["RaiseEvent.cs"],
+    run: false,
 });

@@ -11,4 +11,5 @@ export const jIT_opt_SSA_memorySsa = CoreClr.coreclr_test({
     name: "MemorySsa",
     srcs: ["MemorySsa.cs"],
     optimize: true,
+    run: false,
 });

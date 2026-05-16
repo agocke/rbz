@@ -7,20 +7,6 @@
 import * as CoreClr from "CoreClrTest";
 
 @@public
-export const readytorun_crossgen2_crossgen2smoke = CoreClr.coreclr_test({
-    name: "crossgen2smoke",
-    srcs: ["Program.cs", "helperdll.cs"],
-    tags: ["manual"],
-});
-
-@@public
-export const readytorun_crossgen2_crossgen2smoke_donotalwaysusecrossgen2 = CoreClr.coreclr_test({
-    name: "crossgen2smoke_donotalwaysusecrossgen2",
-    srcs: ["Program.cs", "helperdll.cs"],
-    tags: ["manual"],
-});
-
-@@public
 export const readytorun_crossgen2_helperdll = CoreClr.coreclr_test({
     name: "helperdll",
     srcs: ["helperdll.cs"],

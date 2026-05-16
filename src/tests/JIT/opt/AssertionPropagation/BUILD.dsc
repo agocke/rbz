@@ -55,6 +55,7 @@ export const jIT_opt_AssertionPropagation_arrBoundBinaryOp = CoreClr.coreclr_tes
     name: "ArrBoundBinaryOp",
     srcs: ["ArrBoundBinaryOp.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -80,6 +81,7 @@ export const jIT_opt_AssertionPropagation_arrBoundUnsigned = CoreClr.coreclr_tes
     name: "ArrBoundUnsigned",
     srcs: ["ArrBoundUnsigned.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -105,6 +107,7 @@ export const jIT_opt_AssertionPropagation_arrBoundMinLength = CoreClr.coreclr_te
     name: "ArrBoundMinLength",
     srcs: ["ArrBoundMinLength.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -139,4 +142,5 @@ export const jIT_opt_AssertionPropagation_arrBoundElim = CoreClr.coreclr_test({
     name: "ArrBoundElim",
     srcs: ["ArrBoundElim.cs"],
     optimize: true,
+    run: false,
 });

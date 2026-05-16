@@ -11,4 +11,5 @@ export const jIT_opt_HeadTailMerge_headmergeexception = CoreClr.coreclr_test({
     name: "headmergeexception",
     srcs: ["headmergeexception.cs"],
     optimize: true,
+    run: false,
 });

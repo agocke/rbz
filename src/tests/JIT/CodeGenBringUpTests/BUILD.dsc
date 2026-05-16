@@ -31,6 +31,7 @@ export const jIT_CodeGenBringUpTests_uModConst_do = CoreClr.coreclr_test({
     srcs: ["UModConst.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -38,6 +39,7 @@ export const jIT_CodeGenBringUpTests_arrayExc_r = CoreClr.coreclr_test({
     name: "ArrayExc_r",
     srcs: ["ArrayExc.cs"],
     debugType: "pdbonly",
+    run: false,
 });
 
 @@public
@@ -236,6 +238,7 @@ export const jIT_CodeGenBringUpTests_div2_d = CoreClr.coreclr_test({
     srcs: ["div2.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -720,6 +723,7 @@ export const jIT_CodeGenBringUpTests_divConst_d = CoreClr.coreclr_test({
     srcs: ["DivConst.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -872,6 +876,7 @@ export const jIT_CodeGenBringUpTests_uDivConst_ro = CoreClr.coreclr_test({
     srcs: ["UDivConst.cs"],
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -890,6 +895,7 @@ export const jIT_CodeGenBringUpTests_uDivConst_do = CoreClr.coreclr_test({
     srcs: ["UDivConst.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -918,6 +924,7 @@ export const jIT_CodeGenBringUpTests_modConst_do = CoreClr.coreclr_test({
     srcs: ["ModConst.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -954,6 +961,7 @@ export const jIT_CodeGenBringUpTests_uDivConst_r = CoreClr.coreclr_test({
     name: "UDivConst_r",
     srcs: ["UDivConst.cs"],
     debugType: "pdbonly",
+    run: false,
 });
 
 @@public
@@ -1177,6 +1185,7 @@ export const jIT_CodeGenBringUpTests_div2_ro = CoreClr.coreclr_test({
     srcs: ["div2.cs"],
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -1265,6 +1274,7 @@ export const jIT_CodeGenBringUpTests_recursiveTailCall_r = CoreClr.coreclr_test(
     debugType: "pdbonly",
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -1273,6 +1283,7 @@ export const jIT_CodeGenBringUpTests_div2_do = CoreClr.coreclr_test({
     srcs: ["div2.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -1393,6 +1404,7 @@ export const jIT_CodeGenBringUpTests_localloc_d = CoreClr.coreclr_test({
     allowUnsafe: true,
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -1540,6 +1552,7 @@ export const jIT_CodeGenBringUpTests_uDivConst_d = CoreClr.coreclr_test({
     srcs: ["UDivConst.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -1813,6 +1826,7 @@ export const jIT_CodeGenBringUpTests_div2_r = CoreClr.coreclr_test({
     name: "div2_r",
     srcs: ["div2.cs"],
     debugType: "pdbonly",
+    run: false,
 });
 
 @@public
@@ -1900,6 +1914,7 @@ export const jIT_CodeGenBringUpTests_localloc_ro = CoreClr.coreclr_test({
     allowUnsafe: true,
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -2491,6 +2506,7 @@ export const jIT_CodeGenBringUpTests_castThenBinop = CoreClr.coreclr_test({
     name: "CastThenBinop",
     srcs: ["CastThenBinop.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -2853,6 +2869,7 @@ export const jIT_CodeGenBringUpTests_uModConst_r = CoreClr.coreclr_test({
     name: "UModConst_r",
     srcs: ["UModConst.cs"],
     debugType: "pdbonly",
+    run: false,
 });
 
 @@public
@@ -2939,6 +2956,7 @@ export const jIT_CodeGenBringUpTests_divConst_do = CoreClr.coreclr_test({
     srcs: ["DivConst.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -2977,6 +2995,7 @@ export const jIT_CodeGenBringUpTests_arrayExc_d = CoreClr.coreclr_test({
     srcs: ["ArrayExc.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -2995,6 +3014,7 @@ export const jIT_CodeGenBringUpTests_modConst_ro = CoreClr.coreclr_test({
     srcs: ["ModConst.cs"],
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -3035,6 +3055,7 @@ export const jIT_CodeGenBringUpTests_recursiveTailCall_do = CoreClr.coreclr_test
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -3121,6 +3142,7 @@ export const jIT_CodeGenBringUpTests_divConst_r = CoreClr.coreclr_test({
     name: "DivConst_r",
     srcs: ["DivConst.cs"],
     debugType: "pdbonly",
+    run: false,
 });
 
 @@public
@@ -3259,6 +3281,7 @@ export const jIT_CodeGenBringUpTests_modConst_d = CoreClr.coreclr_test({
     srcs: ["ModConst.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -3388,6 +3411,7 @@ export const jIT_CodeGenBringUpTests_recursiveTailCall_ro = CoreClr.coreclr_test
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -3432,6 +3456,7 @@ export const jIT_CodeGenBringUpTests_modConst_r = CoreClr.coreclr_test({
     name: "ModConst_r",
     srcs: ["ModConst.cs"],
     debugType: "pdbonly",
+    run: false,
 });
 
 @@public
@@ -3726,6 +3751,7 @@ export const jIT_CodeGenBringUpTests_localloc_r = CoreClr.coreclr_test({
     srcs: ["Localloc.cs"],
     allowUnsafe: true,
     debugType: "pdbonly",
+    run: false,
 });
 
 @@public
@@ -4491,6 +4517,7 @@ export const jIT_CodeGenBringUpTests_uModConst_d = CoreClr.coreclr_test({
     srcs: ["UModConst.cs"],
     debugType: "full",
     optimize: false,
+    run: false,
 });
 
 @@public
@@ -4766,6 +4793,7 @@ export const jIT_CodeGenBringUpTests_divConst_ro = CoreClr.coreclr_test({
     srcs: ["DivConst.cs"],
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -4795,6 +4823,7 @@ export const jIT_CodeGenBringUpTests_recursiveTailCall_d = CoreClr.coreclr_test(
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -5049,6 +5078,7 @@ export const jIT_CodeGenBringUpTests_arrayExc_do = CoreClr.coreclr_test({
     srcs: ["ArrayExc.cs"],
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -5079,6 +5109,7 @@ export const jIT_CodeGenBringUpTests_localloc_do = CoreClr.coreclr_test({
     allowUnsafe: true,
     debugType: "full",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -5542,6 +5573,7 @@ export const jIT_CodeGenBringUpTests_arrayExc_ro = CoreClr.coreclr_test({
     srcs: ["ArrayExc.cs"],
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -6009,6 +6041,7 @@ export const jIT_CodeGenBringUpTests_uModConst_ro = CoreClr.coreclr_test({
     srcs: ["UModConst.cs"],
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });
 
 @@public

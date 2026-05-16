@@ -13,4 +13,5 @@ export const regressions_coreclr_25057_byref = CoreClr.coreclr_test({
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });

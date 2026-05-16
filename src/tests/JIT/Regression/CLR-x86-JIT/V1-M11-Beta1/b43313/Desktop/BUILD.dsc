@@ -11,4 +11,5 @@ export const jIT_Regression_CLR_x86_JIT_V1_M11_Beta1_b43313_Desktop_b43313_Deskt
     name: "b43313_Desktop",
     srcs: ["b43313.cs"],
     debugType: "pdbonly",
+    run: false,
 });

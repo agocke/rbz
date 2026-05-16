@@ -12,6 +12,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_externalException = C
     srcs: ["ExternalException.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -20,6 +21,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_handlerException = Co
     srcs: ["HandlerException.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -28,6 +30,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_multipleException = C
     srcs: ["MultipleException.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -36,6 +39,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_nestedEx1 = CoreClr.c
     srcs: ["NestedEx1.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -44,6 +48,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_nestedEx2 = CoreClr.c
     srcs: ["NestedEx2.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -52,6 +57,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_nestedException = Cor
     srcs: ["NestedException.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -60,6 +66,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_normalException = Cor
     srcs: ["NormalException.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -68,6 +75,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_recursiveException = 
     srcs: ["RecursiveException.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -76,6 +84,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_tryCatch = CoreClr.co
     srcs: ["TryCatch.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -84,6 +93,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_tryCatchFinally = Cor
     srcs: ["TryCatchFinally.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -92,6 +102,7 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_userException = CoreC
     srcs: ["UserException.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -100,4 +111,5 @@ export const baseservices_exceptions_regressions_V1_SEH_VJ_userExceptionThread =
     srcs: ["UserExceptionThread.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

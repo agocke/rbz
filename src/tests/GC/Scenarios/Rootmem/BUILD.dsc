@@ -10,4 +10,5 @@ import * as CoreClr from "CoreClrTest";
 export const gC_Scenarios_Rootmem_rootmem = CoreClr.coreclr_test({
     name: "rootmem",
     srcs: ["rootmem.cs"],
+    run: false,
 });

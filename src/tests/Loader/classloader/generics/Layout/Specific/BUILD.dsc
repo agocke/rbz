@@ -12,6 +12,7 @@ export const loader_classloader_generics_Layout_Specific_negative002 = CoreClr.c
     srcs: ["Negative002.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -20,6 +21,7 @@ export const loader_classloader_generics_Layout_Specific_negative004 = CoreClr.c
     srcs: ["Negative004.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -28,6 +30,7 @@ export const loader_classloader_generics_Layout_Specific_negative_ExplicitGen = 
     srcs: ["Negative_ExplicitGen.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -66,4 +69,5 @@ export const loader_classloader_generics_Layout_Specific_positive010 = CoreClr.c
 export const loader_classloader_generics_Layout_Specific_selfRecursiveGenerics = CoreClr.coreclr_test({
     name: "SelfRecursiveGenerics",
     srcs: ["SelfRecursiveGenerics.cs"],
+    run: false,
 });

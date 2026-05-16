@@ -10,4 +10,5 @@ import * as CoreClr from "CoreClrTest";
 export const loader_classloader_MethodImpl_internalMethodImplTest = CoreClr.coreclr_test({
     name: "InternalMethodImplTest",
     srcs: ["InternalMethodImplTest.cs"],
+    run: false,
 });

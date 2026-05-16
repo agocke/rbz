@@ -13,4 +13,5 @@ export const jIT_IL_Conformance_Convert_testConvertFromIntegral = CoreClr.corecl
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });

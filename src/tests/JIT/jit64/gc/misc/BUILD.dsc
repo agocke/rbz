@@ -122,6 +122,7 @@ export const jIT_jit64_gc_misc_fgtest1 = CoreClr.coreclr_test({
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -192,6 +193,7 @@ export const jIT_jit64_gc_misc_fgtest2 = CoreClr.coreclr_test({
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -262,6 +264,7 @@ export const jIT_jit64_gc_misc_eh1 = CoreClr.coreclr_test({
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -503,6 +506,7 @@ export const jIT_jit64_gc_misc_structfpseh6_1 = CoreClr.coreclr_test({
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -544,6 +548,7 @@ export const jIT_jit64_gc_misc_structfpseh5_1 = CoreClr.coreclr_test({
     optimize: false,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public

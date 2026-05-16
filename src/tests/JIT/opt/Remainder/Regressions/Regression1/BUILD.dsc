@@ -11,4 +11,5 @@ export const jIT_opt_Remainder_Regressions_Regression1_regression1 = CoreClr.cor
     name: "Regression1",
     srcs: ["Regression1.cs"],
     optimize: true,
+    run: false,
 });

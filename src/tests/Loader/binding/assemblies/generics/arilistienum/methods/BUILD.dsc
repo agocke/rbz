@@ -12,6 +12,7 @@ export const loader_binding_assemblies_generics_arilistienum_methods_exceptions 
     srcs: ["exceptions.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public

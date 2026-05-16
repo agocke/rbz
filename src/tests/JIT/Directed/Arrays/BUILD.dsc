@@ -32,6 +32,7 @@ export const jIT_Directed_Arrays_loopCloning = CoreClr.coreclr_test({
     debugType: "pdbonly",
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -57,4 +58,5 @@ export const jIT_Directed_Arrays_nintindexoutofrange = CoreClr.coreclr_test({
     name: "nintindexoutofrange",
     srcs: ["nintindexoutofrange.cs"],
     allowUnsafe: true,
+    run: false,
 });

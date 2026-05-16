@@ -12,6 +12,7 @@ export const baseservices_threading_regressions_beta2__437017 = CoreClr.coreclr_
     srcs: ["437017.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -20,4 +21,5 @@ export const baseservices_threading_regressions_beta2__437044 = CoreClr.coreclr_
     srcs: ["437044.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

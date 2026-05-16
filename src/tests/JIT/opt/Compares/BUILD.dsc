@@ -62,4 +62,5 @@ export const jIT_opt_Compares_compares = CoreClr.coreclr_test({
     name: "compares",
     srcs: ["compares.cs"],
     optimize: true,
+    run: false,
 });

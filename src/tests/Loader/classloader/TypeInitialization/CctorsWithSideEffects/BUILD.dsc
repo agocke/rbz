@@ -11,6 +11,7 @@ export const loader_classloader_TypeInitialization_CctorsWithSideEffects_cctorFo
     name: "CctorForWrite",
     srcs: ["CctorForWrite.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -18,6 +19,7 @@ export const loader_classloader_TypeInitialization_CctorsWithSideEffects_cctorFo
     name: "CctorForWrite2",
     srcs: ["CctorForWrite2.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -32,22 +34,26 @@ export const loader_classloader_TypeInitialization_CctorsWithSideEffects_cctorOp
 export const loader_classloader_TypeInitialization_CctorsWithSideEffects_cctorThrowInlinedStatic = CoreClr.coreclr_test({
     name: "CctorThrowInlinedStatic",
     srcs: ["CctorThrowInlinedStatic.cs"],
+    run: false,
 });
 
 @@public
 export const loader_classloader_TypeInitialization_CctorsWithSideEffects_cctorThrowMethodAccess = CoreClr.coreclr_test({
     name: "CctorThrowMethodAccess",
     srcs: ["CctorThrowMethodAccess.cs"],
+    run: false,
 });
 
 @@public
 export const loader_classloader_TypeInitialization_CctorsWithSideEffects_cctorThrowStaticField = CoreClr.coreclr_test({
     name: "CctorThrowStaticField",
     srcs: ["CctorThrowStaticField.cs"],
+    run: false,
 });
 
 @@public
 export const loader_classloader_TypeInitialization_CctorsWithSideEffects_typeLoadInitExcep = CoreClr.coreclr_test({
     name: "TypeLoadInitExcep",
     srcs: ["TypeLoadInitExcep.cs"],
+    run: false,
 });

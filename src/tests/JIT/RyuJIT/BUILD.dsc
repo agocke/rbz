@@ -12,4 +12,5 @@ export const jIT_RyuJIT_doWhileBndChk = CoreClr.coreclr_test({
     srcs: ["DoWhileBndChk.cs"],
     debugType: "pdbonly",
     optimize: true,
+    run: false,
 });

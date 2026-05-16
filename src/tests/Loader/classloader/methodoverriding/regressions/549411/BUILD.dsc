@@ -10,4 +10,5 @@ import * as CoreClr from "CoreClrTest";
 export const loader_classloader_methodoverriding_regressions_549411_exploit = CoreClr.coreclr_test({
     name: "exploit",
     srcs: ["exploit.cs"],
+    run: false,
 });

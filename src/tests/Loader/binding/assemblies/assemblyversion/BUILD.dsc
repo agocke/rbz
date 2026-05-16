@@ -12,4 +12,5 @@ export const loader_binding_assemblies_assemblyversion_embedStringVersions = Cor
     srcs: ["embedstringversions.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

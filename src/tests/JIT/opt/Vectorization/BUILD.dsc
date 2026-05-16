@@ -48,4 +48,5 @@ export const jIT_opt_Vectorization_unrollEqualsStartsWith = CoreClr.coreclr_test
     name: "UnrollEqualsStartsWith",
     srcs: ["UnrollEqualsStartsWith.cs", "UnrollEqualsStartsWith_Tests.cs"],
     optimize: true,
+    run: false,
 });

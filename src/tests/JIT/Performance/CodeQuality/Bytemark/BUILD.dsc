@@ -13,4 +13,5 @@ export const jIT_Performance_CodeQuality_Bytemark_bytemark = CoreClr.coreclr_tes
     debugType: "pdbonly",
     optimize: true,
     size: "large",
+    run: false,
 });

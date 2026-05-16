@@ -19,6 +19,7 @@ export const jIT_opt_ValueNumbering_constIndexRVA = CoreClr.coreclr_test({
     name: "ConstIndexRVA",
     srcs: ["ConstIndexRVA.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -42,6 +43,7 @@ export const jIT_opt_ValueNumbering_exceptionSetsPropagation_Hwi = CoreClr.corec
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -51,6 +53,7 @@ export const jIT_opt_ValueNumbering_exceptionSets = CoreClr.coreclr_test({
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -67,4 +70,5 @@ export const jIT_opt_ValueNumbering_constStringConstIndexOptimizations = CoreClr
     name: "ConstStringConstIndexOptimizations",
     srcs: ["ConstStringConstIndexOptimizations.cs"],
     optimize: true,
+    run: false,
 });

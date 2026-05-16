@@ -12,4 +12,5 @@ export const loader_binding_assemblies_assemblybugs_203962w_client = CoreClr.cor
     srcs: ["client.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

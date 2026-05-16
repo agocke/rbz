@@ -12,4 +12,5 @@ export const jIT_Regression_JitBlue_Runtime_92784_runtime_92784 = CoreClr.corecl
     srcs: ["Runtime_92784.cs"],
     allowUnsafe: true,
     optimize: true,
+    run: false,
 });

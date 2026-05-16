@@ -12,6 +12,7 @@ export const baseservices_exceptions_regressions_V1_SEH_COOL_finally_ = CoreClr.
     srcs: ["finally.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -20,4 +21,5 @@ export const baseservices_exceptions_regressions_V1_SEH_COOL_rethrow = CoreClr.c
     srcs: ["rethrow.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

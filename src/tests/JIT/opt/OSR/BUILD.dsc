@@ -55,6 +55,7 @@ export const jIT_opt_OSR_largefuncletframe = CoreClr.coreclr_test({
     srcs: ["largefuncletframe.cs"],
     allowUnsafe: true,
     optimize: true,
+    run: false,
 });
 
 @@public

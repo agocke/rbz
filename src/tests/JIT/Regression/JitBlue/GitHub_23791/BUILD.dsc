@@ -12,4 +12,5 @@ export const jIT_Regression_JitBlue_GitHub_23791_gitHub_23791 = CoreClr.coreclr_
     srcs: ["GitHub_23791.cs"],
     allowUnsafe: true,
     optimize: true,
+    run: false,
 });

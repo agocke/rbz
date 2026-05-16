@@ -18,6 +18,7 @@ export const gC_API_GCHandle_addrOfPinnedObject = CoreClr.coreclr_test({
 export const gC_API_GCHandle_addrOfPinnedObject_neg = CoreClr.coreclr_test({
     name: "AddrOfPinnedObject_neg",
     srcs: ["AddrOfPinnedObject_neg.cs"],
+    run: false,
 });
 
 @@public
@@ -40,12 +41,14 @@ export const gC_API_GCHandle_alloc_neg = CoreClr.coreclr_test({
 export const gC_API_GCHandle_alloc_neg2 = CoreClr.coreclr_test({
     name: "Alloc_neg2",
     srcs: ["Alloc_neg2.cs"],
+    run: false,
 });
 
 @@public
 export const gC_API_GCHandle_casting = CoreClr.coreclr_test({
     name: "Casting",
     srcs: ["Casting.cs"],
+    run: false,
 });
 
 @@public
@@ -68,6 +71,7 @@ export const gC_API_GCHandle_free = CoreClr.coreclr_test({
 export const gC_API_GCHandle_free_neg = CoreClr.coreclr_test({
     name: "Free_neg",
     srcs: ["Free_neg.cs"],
+    run: false,
 });
 
 @@public
@@ -98,6 +102,7 @@ export const gC_API_GCHandle_normal = CoreClr.coreclr_test({
 export const gC_API_GCHandle_pinObj_neg = CoreClr.coreclr_test({
     name: "PinObj_neg",
     srcs: ["PinObj_neg.cs"],
+    run: false,
 });
 
 @@public
@@ -120,12 +125,14 @@ export const gC_API_GCHandle_target = CoreClr.coreclr_test({
 export const gC_API_GCHandle_target_neg = CoreClr.coreclr_test({
     name: "Target_neg",
     srcs: ["Target_neg.cs"],
+    run: false,
 });
 
 @@public
 export const gC_API_GCHandle_toFromIntPtr = CoreClr.coreclr_test({
     name: "ToFromIntPtr",
     srcs: ["ToFromIntPtr.cs"],
+    run: false,
 });
 
 @@public

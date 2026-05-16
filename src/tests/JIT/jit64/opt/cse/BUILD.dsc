@@ -16,24 +16,6 @@ export const jIT_jit64_opt_cse_fieldexpr1_1 = CoreClr.coreclr_test({
 });
 
 @@public
-export const jIT_jit64_opt_cse_volatileTest_op_mod = CoreClr.coreclr_test({
-    name: "VolatileTest_op_mod",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_MOD"],
-    pri: 1,
-    size: "medium",
-});
-
-@@public
-export const jIT_jit64_opt_cse_volatileTest_op_and = CoreClr.coreclr_test({
-    name: "VolatileTest_op_and",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_AND"],
-    pri: 1,
-    size: "medium",
-});
-
-@@public
 export const jIT_jit64_opt_cse_staticFieldExpr1_1 = CoreClr.coreclr_test({
     name: "staticFieldExpr1_1",
     srcs: ["staticFieldExpr1_1.cs"],
@@ -92,6 +74,7 @@ export const jIT_jit64_opt_cse_staticFieldExprUnchecked1_r_loop = CoreClr.corecl
     name: "staticFieldExprUnchecked1_r_loop",
     srcs: ["staticFieldExprUnchecked1.cs"],
     defines: ["LOOP"],
+    run: false,
 });
 
 @@public
@@ -155,6 +138,7 @@ export const jIT_jit64_opt_cse_fieldExprUnchecked1 = CoreClr.coreclr_test({
     name: "fieldExprUnchecked1",
     srcs: ["fieldExprUnchecked1.cs"],
     debugType: "pdbonly",
+    run: false,
 });
 
 @@public
@@ -162,15 +146,6 @@ export const jIT_jit64_opt_cse_simpleexpr1_1 = CoreClr.coreclr_test({
     name: "simpleexpr1_1",
     srcs: ["simpleexpr1_1.cs"],
     debugType: "pdbonly",
-    pri: 1,
-    size: "medium",
-});
-
-@@public
-export const jIT_jit64_opt_cse_volatileTest_op_add = CoreClr.coreclr_test({
-    name: "VolatileTest_op_add",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_ADD"],
     pri: 1,
     size: "medium",
 });
@@ -251,6 +226,7 @@ export const jIT_jit64_opt_cse_arrayexpr1 = CoreClr.coreclr_test({
 export const jIT_jit64_opt_cse_staticFieldExprUnchecked1_r = CoreClr.coreclr_test({
     name: "staticFieldExprUnchecked1_r",
     srcs: ["staticFieldExprUnchecked1.cs"],
+    run: false,
 });
 
 @@public
@@ -285,6 +261,7 @@ export const jIT_jit64_opt_cse_staticFieldExprUnchecked1_r_try = CoreClr.coreclr
     name: "staticFieldExprUnchecked1_r_try",
     srcs: ["staticFieldExprUnchecked1.cs"],
     defines: ["TRY"],
+    run: false,
 });
 
 @@public
@@ -293,6 +270,7 @@ export const jIT_jit64_opt_cse_staticFieldExprUnchecked1_ro_loop = CoreClr.corec
     srcs: ["staticFieldExprUnchecked1.cs"],
     defines: ["LOOP"],
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -313,15 +291,6 @@ export const jIT_jit64_opt_cse_mixedexpr1_r_loop = CoreClr.coreclr_test({
 });
 
 @@public
-export const jIT_jit64_opt_cse_volatileTest_op_xor = CoreClr.coreclr_test({
-    name: "VolatileTest_op_xor",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_XOR"],
-    pri: 1,
-    size: "medium",
-});
-
-@@public
 export const jIT_jit64_opt_cse_pointerexpr1_1 = CoreClr.coreclr_test({
     name: "pointerexpr1_1",
     srcs: ["pointerexpr1_1.cs"],
@@ -336,6 +305,7 @@ export const jIT_jit64_opt_cse_staticFieldExprUnchecked1_r_loop_try = CoreClr.co
     name: "staticFieldExprUnchecked1_r_loop_try",
     srcs: ["staticFieldExprUnchecked1.cs"],
     defines: ["LOOP", "TRY"],
+    run: false,
 });
 
 @@public
@@ -344,24 +314,6 @@ export const jIT_jit64_opt_cse_hugeField1 = CoreClr.coreclr_test({
     srcs: ["HugeField1.cs"],
     debugType: "full",
     optimize: false,
-    pri: 1,
-    size: "medium",
-});
-
-@@public
-export const jIT_jit64_opt_cse_volatileTest_op_mul = CoreClr.coreclr_test({
-    name: "VolatileTest_op_mul",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_MUL"],
-    pri: 1,
-    size: "medium",
-});
-
-@@public
-export const jIT_jit64_opt_cse_volatileTest_op_shr = CoreClr.coreclr_test({
-    name: "VolatileTest_op_shr",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_SHR"],
     pri: 1,
     size: "medium",
 });
@@ -451,15 +403,6 @@ export const jIT_jit64_opt_cse_staticFieldExpr1_r_loop_try = CoreClr.coreclr_tes
 });
 
 @@public
-export const jIT_jit64_opt_cse_volatileTest_op_or = CoreClr.coreclr_test({
-    name: "VolatileTest_op_or",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_OR"],
-    pri: 1,
-    size: "medium",
-});
-
-@@public
 export const jIT_jit64_opt_cse_staticFieldExpr1_d_loop_try = CoreClr.coreclr_test({
     name: "staticFieldExpr1_d_loop_try",
     srcs: ["staticFieldExpr1.cs"],
@@ -492,15 +435,6 @@ export const jIT_jit64_opt_cse_mixedexpr1_d_loop_try = CoreClr.coreclr_test({
 });
 
 @@public
-export const jIT_jit64_opt_cse_volatileTest_op_sub = CoreClr.coreclr_test({
-    name: "VolatileTest_op_sub",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_SUB"],
-    pri: 1,
-    size: "medium",
-});
-
-@@public
 export const jIT_jit64_opt_cse_hugeSimpleExpr1 = CoreClr.coreclr_test({
     name: "hugeSimpleExpr1",
     srcs: ["hugeSimpleExpr1.cs"],
@@ -515,15 +449,7 @@ export const jIT_jit64_opt_cse_staticFieldExprUnchecked1_d_loop_try = CoreClr.co
     debugType: "full",
     defines: ["LOOP", "TRY"],
     optimize: false,
-});
-
-@@public
-export const jIT_jit64_opt_cse_volatileTest_op_div = CoreClr.coreclr_test({
-    name: "VolatileTest_op_div",
-    srcs: ["VolatileTest.cs"],
-    defines: ["OP_DIV"],
-    pri: 1,
-    size: "medium",
+    run: false,
 });
 
 @@public

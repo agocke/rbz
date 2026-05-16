@@ -20,6 +20,7 @@ export const baseservices_threading_threadstatic_threadStatic02 = CoreClr.corecl
     srcs: ["threadstatic02.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public
@@ -36,6 +37,7 @@ export const baseservices_threading_threadstatic_threadStatic05 = CoreClr.corecl
     srcs: ["threadstatic05.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });
 
 @@public

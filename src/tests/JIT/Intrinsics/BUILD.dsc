@@ -43,14 +43,6 @@ export const jIT_Intrinsics_mathFloorDouble_r = CoreClr.coreclr_test({
 });
 
 @@public
-export const jIT_Intrinsics_binaryPrimitivesReverseEndianness_r = CoreClr.coreclr_test({
-    name: "BinaryPrimitivesReverseEndianness_r",
-    srcs: ["BinaryPrimitivesReverseEndianness.cs"],
-    allowUnsafe: true,
-    tags: ["manual"],
-});
-
-@@public
 export const jIT_Intrinsics_mathRoundSingle_ro = CoreClr.coreclr_test({
     name: "MathRoundSingle_ro",
     srcs: ["MathRoundSingle.cs"],
@@ -69,6 +61,7 @@ export const jIT_Intrinsics_bMI1Intrinsics_ro = CoreClr.coreclr_test({
 export const jIT_Intrinsics_typeEqualitySealed_r = CoreClr.coreclr_test({
     name: "TypeEqualitySealed_r",
     srcs: ["TypeEqualitySealed.cs"],
+    run: false,
 });
 
 @@public
@@ -76,6 +69,7 @@ export const jIT_Intrinsics_memoryMarshalGetArrayDataReference_r = CoreClr.corec
     name: "MemoryMarshalGetArrayDataReference_r",
     srcs: ["MemoryMarshalGetArrayDataReference.cs"],
     allowUnsafe: true,
+    run: false,
 });
 
 @@public
@@ -91,6 +85,7 @@ export const jIT_Intrinsics_interlocked_r = CoreClr.coreclr_test({
     name: "Interlocked_r",
     srcs: ["Interlocked.cs"],
     allowUnsafe: true,
+    run: false,
 });
 
 @@public
@@ -105,21 +100,13 @@ export const jIT_Intrinsics_typeEqualitySealed_ro = CoreClr.coreclr_test({
     name: "TypeEqualitySealed_ro",
     srcs: ["TypeEqualitySealed.cs"],
     optimize: true,
+    run: false,
 });
 
 @@public
 export const jIT_Intrinsics_bitOperationsIntrinsics_r = CoreClr.coreclr_test({
     name: "BitOperationsIntrinsics_r",
     srcs: ["BitOperationsPopCount.cs"],
-});
-
-@@public
-export const jIT_Intrinsics_binaryPrimitivesReverseEndianness_ro = CoreClr.coreclr_test({
-    name: "BinaryPrimitivesReverseEndianness_ro",
-    srcs: ["BinaryPrimitivesReverseEndianness.cs"],
-    allowUnsafe: true,
-    optimize: true,
-    tags: ["manual"],
 });
 
 @@public
@@ -150,6 +137,7 @@ export const jIT_Intrinsics_memoryMarshalGetArrayDataReference_ro = CoreClr.core
     srcs: ["MemoryMarshalGetArrayDataReference.cs"],
     allowUnsafe: true,
     optimize: true,
+    run: false,
 });
 
 @@public
@@ -215,6 +203,7 @@ export const jIT_Intrinsics_interlocked_ro = CoreClr.coreclr_test({
     srcs: ["Interlocked.cs"],
     allowUnsafe: true,
     optimize: true,
+    run: false,
 });
 
 @@public

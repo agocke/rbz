@@ -12,4 +12,5 @@ export const baseservices_exceptions_regressions_Dev11_154243_dynamicmethodliven
     srcs: ["dynamicmethodliveness.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

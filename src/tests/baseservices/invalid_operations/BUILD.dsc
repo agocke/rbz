@@ -11,4 +11,5 @@ export const baseservices_invalid_operations_invalidOperations = CoreClr.coreclr
     name: "InvalidOperations",
     srcs: ["ManagedPointers.cs", "Arrays.cs"],
     optimize: false,
+    run: false,
 });

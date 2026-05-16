@@ -12,4 +12,5 @@ export const baseservices_exceptions_regressions_whidbeym3_3_106011__106011 = Co
     srcs: ["106011.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

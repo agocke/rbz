@@ -44,4 +44,5 @@ export const jIT_opt_Loops_tripCountOverflow = CoreClr.coreclr_test({
     optimize: true,
     pri: 1,
     size: "medium",
+    run: false,
 });

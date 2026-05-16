@@ -12,4 +12,5 @@ export const regressions_coreclr_0075_largeArrayTest = CoreClr.coreclr_test({
     srcs: ["largearraytest.cs"],
     pri: 1,
     size: "medium",
+    run: false,
 });

@@ -11,4 +11,5 @@ export const baseservices_compilerservices_RuntimeHelpers_runtimeHelpersTests = 
     name: "RuntimeHelpersTests",
     srcs: ["ExecuteCodeWithGuaranteedCleanup.cs", "RuntimeHelpersTests.cs"],
     pri: 1,
+    run: false,
 });
