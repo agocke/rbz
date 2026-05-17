@@ -27,7 +27,7 @@ interface IlCompileAttrs {
 
 interface IlCompileResolved {
     name: string;
-    srcs: Rules.SourceArtifact[];
+    srcs: Rules.Artifact[];
     debugType?: string;
     optimize?: boolean;
 }
@@ -64,7 +64,7 @@ const ilCompile = Rules.rule<IlCompileAttrs, IlCompileResolved, Rules.Toolchain,
         }
 
         const produced = ctx.actions.run({
-            tool: Defs.CORE_ROOT_ILASM,
+            tool: Rules.sourceArtifact(Defs.CORE_ROOT_ILASM),
             arguments: cmdArgs,
             outputs: [dll],
             description: `ilasm ${ctx.args.name}`,

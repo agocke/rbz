@@ -16,7 +16,7 @@ import * as Defs from "Defs";
 import * as Common from "Tests.Common";
 
 export const supportToolchain: Rules.Toolchain = { kind: "Toolchain", name: "coreclr-test-support" };
-export const bashExe = f`/bin/bash`;
+export const bashExe = Rules.sourceArtifact(f`/bin/bash`);
 
 // ============================================================================
 //  XUnitWrapperGenerator analyzer config
