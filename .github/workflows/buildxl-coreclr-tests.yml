@@ -121,7 +121,7 @@ jobs:
           set -euo pipefail
 
           chmod +x ./bxl.sh
-          ./bxl.sh "/f:output='*.build.stamp'"
+          ./bxl.sh build
 
       - name: Test
         shell: bash
@@ -129,10 +129,10 @@ jobs:
           set -uo pipefail
 
           chmod +x ./bxl.sh
-          ./bxl.sh "/f:output='*.test.stamp'"
+          ./bxl.sh test
           bxl_exit=$?
 
-          # Source of truth: every enabled coreclr_test target produces a
+          # Source of truth: every enabled test target produces a
           # *.test.stamp output on success. Cached pips re-emit the stamp,
           # so this count is correct on warm-cache runs too.
           mapfile -t passed_stamps < <(find Out/Objects -name '*.test.stamp' | sort)

@@ -5,9 +5,8 @@
  * il_coreclr_test — repo-specific build macro for CoreCLR IL tests.
  *
  * Assembles one or more .il source files into a test assembly using the
- * pre-built native ilasm from Core_Root, then wires the same
- * BuildXL-backed execution pip used by `coreclr_test` to run the
- * resulting binary via corerun.
+ * pre-built native ilasm from Core_Root, then wires test execution through
+ * an internal `kind: "test"` rule that runs the binary via corerun.
  */
 
 import * as Rules from "Sdk.Rules";
@@ -37,9 +36,11 @@ interface IlCompileResult extends Rules.Provider {
     defaultInfo: Rules.DefaultInfo;
 }
 
+const ilCompileToolchain: Rules.Toolchain = { kind: "Toolchain", name: "il-compile" };
+
 const ilCompile = Rules.rule<IlCompileAttrs, IlCompileResolved, Rules.Toolchain, IlCompileResult>({
     doc: "Assemble .il source files into a .dll using ilasm.",
-    toolchain: supportToolchain,
+    toolchain: ilCompileToolchain,
     resolve: (attrs, resolver) => <IlCompileResolved>{
         name: attrs.name,
         srcs: resolver.resolveAll(attrs.srcs),
@@ -80,6 +81,59 @@ const ilCompile = Rules.rule<IlCompileAttrs, IlCompileResolved, Rules.Toolchain,
 });
 
 // ============================================================================
+//  Internal test runner rule (kind: "test" → auto-tagged bxl-kind:test)
+// ============================================================================
+
+interface IlTestRunnerAttrs {
+    name: string;
+    binary: File;
+    env?: {name: string, value: string}[];
+    flaky?: boolean;
+    tags?: string[];
+}
+
+interface IlTestRunnerResult extends Rules.Provider {
+    testInfo: Rules.TestInfo;
+    defaultInfo: Rules.DefaultInfo;
+}
+
+const ilTestRunnerToolchain: Rules.Toolchain = { kind: "Toolchain", name: "il-test-runner" };
+
+const ilTestRunner = Rules.rule<IlTestRunnerAttrs, IlTestRunnerAttrs, Rules.Toolchain, IlTestRunnerResult>({
+    doc: "Run an IL test DLL via corerun.",
+    kind: "test",
+    toolchain: ilTestRunnerToolchain,
+    resolve: (attrs, _resolver) => attrs,
+    impl: (ctx) => {
+        const corerunPath = Defs.CORE_ROOT_CORERUN.path.toDiagnosticString();
+        const dllName = ctx.args.binary.name.toString();
+
+        const runner = ctx.runActions.writeFile(
+            ctx.runActions.declareOutput(`${ctx.args.name}.runner.sh`),
+            [
+                "#!/usr/bin/env bash",
+                `exec "${corerunPath}" "$(dirname "$0")/${dllName}" "$@"`,
+            ]);
+
+        const ti = Rules.scheduleTestRunner(ctx.args.name, Rules.testRunInfo({
+            executable: runner,
+            successExitCodes: [100],
+            env: ctx.args.env,
+            deps: [Rules.sourceArtifact(ctx.args.binary)],
+            size: "small",
+            flaky: ctx.args.flaky,
+            tags: ctx.args.tags,
+        }), ctx.runActions);
+
+        return {
+            kind: "IlTestRunnerResult",
+            testInfo: ti,
+            defaultInfo: Rules.defaultInfo({ files: [] }),
+        };
+    },
+});
+
+// ============================================================================
 //  il_coreclr_test public API
 // ============================================================================
 
@@ -106,8 +160,7 @@ export interface IlCoreClrTestArguments {
 @@public
 export interface IlCoreClrTestResult extends Rules.Provider {
     binary: File;
-    buildStamp: File;
-    testStamp?: File;
+    testInfo?: Rules.TestInfo;
     defaultInfo: Rules.DefaultInfo;
 }
 
@@ -120,30 +173,23 @@ export function il_coreclr_test(args: IlCoreClrTestArguments): IlCoreClrTestResu
         optimize: args.optimize,
     });
 
-    const buildStamp = emitBuildStamp({
-        name: `${args.name}_build`,
-        binary: ilResult.binary,
-    }).stamp;
-
     // Tests carrying the bazel "manual" tag are compiled but not run by default.
     const taggedManual = (args.tags || []).filter(t => t === "manual").length > 0;
     const shouldRun = args.run !== false && !taggedManual;
-    const testStamp = !shouldRun
+    const testResult = !shouldRun
         ? undefined
-        : runCoreClrTest({
+        : ilTestRunner({
             name: `${args.name}_test`,
             binary: ilResult.binary,
-            runtimeFiles: [],
-            environmentVariables: args.env || [],
-        }).stamp;
+            env: args.env,
+            flaky: args.flaky,
+            tags: args.tags,
+        });
 
     return {
         kind: "IlCoreClrTestResult",
         binary: ilResult.binary,
-        buildStamp: buildStamp,
-        testStamp: testStamp,
-        defaultInfo: Rules.defaultInfo({
-            files: testStamp !== undefined ? [buildStamp, testStamp] : [buildStamp],
-        }),
+        testInfo: testResult !== undefined ? testResult.testInfo : undefined,
+        defaultInfo: ilResult.defaultInfo,
     };
 }
