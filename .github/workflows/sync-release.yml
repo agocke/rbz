@@ -31,7 +31,7 @@ jobs:
       pr_number: ${{ steps.run-sync.outputs.pr_number }}
     steps:
       - name: Checkout bazel branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: bazel
           fetch-depth: 0
@@ -88,7 +88,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout sync branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.sync.outputs.sync_branch }}
           fetch-depth: 0
@@ -148,7 +148,7 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Checkout bazel branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: bazel
           fetch-depth: 0
