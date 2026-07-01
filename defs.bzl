@@ -14,9 +14,9 @@ NETCOREAPP_TOOL_CURRENT = "net10.0"
 #
 # The repo names follow the pattern: nuget.<lowercased-package-name>.v<version>
 
-ARCADE_SDK_REPO = "nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26170.102"
-GENFACADES_REPO = "nuget.microsoft.dotnet.genfacades.v10.0.0-beta.26170.102"
-XUNIT_CONSOLE_RUNNER_REPO = "nuget.microsoft.dotnet.xunitconsolerunner.v2.9.3-beta.26170.102"
+ARCADE_SDK_REPO = "nuget.microsoft.dotnet.arcade.sdk.v10.0.0-beta.26173.116"
+GENFACADES_REPO = "nuget.microsoft.dotnet.genfacades.v10.0.0-beta.26173.116"
+XUNIT_CONSOLE_RUNNER_REPO = "nuget.microsoft.dotnet.xunitconsolerunner.v2.9.3-beta.26173.116"
 UNICODE_DATA_REPO = "nuget.system.private.runtime.unicodedata.v10.0.0-beta.25418.1"
 ILLINK_TASKS_NET8_REPO = "nuget.microsoft.net.illink.tasks.v8.0.22"
 ILLINK_TASKS_NET9_REPO = "nuget.microsoft.net.illink.tasks.v9.0.11"
@@ -25,10 +25,10 @@ MIBC_LINUX_X64_REPO = "nuget.optimization.linux-x64.mibc.runtime.v1.0.0-prerelea
 MIBC_LINUX_ARM64_REPO = "nuget.optimization.linux-arm64.mibc.runtime.v1.0.0-prerelease.26080.1"
 
 # Analyzer NuGet packages (from eng/Analyzers.targets)
-CODEANALYSIS_ANALYZERS_REPO = "nuget.microsoft.codeanalysis.analyzers.v5.0.0-2.26170.102"
+CODEANALYSIS_ANALYZERS_REPO = "nuget.microsoft.codeanalysis.analyzers.v5.0.0-2.26173.116"
 CODEANALYSIS_NETANALYZERS_REPO = "nuget.microsoft.codeanalysis.netanalyzers.v10.0.106"
 CODEANALYSIS_CSHARP_CODESTYLE_REPO = "nuget.microsoft.codeanalysis.csharp.codestyle.v4.14.0"
-DOTNET_CODEANALYSIS_REPO = "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26170.102"
+DOTNET_CODEANALYSIS_REPO = "nuget.microsoft.dotnet.codeanalysis.v10.0.0-beta.26173.116"
 STYLECOP_ANALYZERS_UNSTABLE_REPO = "nuget.stylecop.analyzers.unstable.v1.2.0.556"
 XUNIT_ANALYZERS_REPO = "nuget.xunit.analyzers.v1.22.0"
 STATICCS_REPO = "nuget.staticcs.v0.2.0"
